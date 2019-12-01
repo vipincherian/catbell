@@ -1,13 +1,13 @@
 object frmAbout: TfrmAbout
   Left = 499
-  Height = 95
+  Height = 94
   Top = 325
-  Width = 357
+  Width = 344
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'About'
-  ClientHeight = 95
-  ClientWidth = 357
+  ClientHeight = 94
+  ClientWidth = 344
   Icon.Data = {
     7E04000000000100010010100000010020006804000016000000280000001000
     0000200000000100200000000000000400006400000064000000000000000000
@@ -48,7 +48,7 @@ object frmAbout: TfrmAbout
     0000
   }
   OnDestroy = FormDestroy
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '2.0.6.0'
   object Image1: TImage
     Left = 8
     Height = 48
@@ -166,8 +166,9 @@ object frmAbout: TfrmAbout
     Left = 72
     Height = 24
     Top = 48
-    Width = 282
-    Caption = 'Mozilla Public License, v. 2.0 (http://mozilla.org/MPL/2.0/)'
+    Width = 242
+    Caption = '(GNU General Public License, version 2)'
+    OnClick = StaticText3Click
     TabOrder = 3
   end
 end

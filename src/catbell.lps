@@ -26,7 +26,7 @@
       <Unit2>
         <Filename Value="controller.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="217"/>
         <CursorPos X="54" Y="33"/>
         <UsageCount Value="107"/>
@@ -35,9 +35,8 @@
       <Unit3>
         <Filename Value="mainformwidget.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="497"/>
+        <TopLine Value="451"/>
         <CursorPos Y="451"/>
         <UsageCount Value="107"/>
         <Loaded Value="True"/>
@@ -80,7 +79,7 @@
         <ComponentName Value="fraTimer"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="92"/>
         <CursorPos Y="33"/>
         <UsageCount Value="107"/>
@@ -110,7 +109,7 @@
         <ComponentName Value="frmTimerAlert"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="40"/>
         <CursorPos X="94" Y="61"/>
         <UsageCount Value="38"/>
@@ -123,7 +122,13 @@
         <ComponentName Value="frmAbout"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="50"/>
+        <CursorPos X="3" Y="67"/>
         <UsageCount Value="26"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit12>
       <Unit13>
         <Filename Value="alarmframe.pas"/>
@@ -260,11 +265,10 @@
       <Unit33>
         <Filename Value="../../lib/lpk/bgrabitmap-master/bgrabitmap/bgragtkbitmap.pas"/>
         <UnitName Value="BGRAGtkBitmap"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="57"/>
         <CursorPos X="3" Y="68"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit33>
       <Unit34>
         <Filename Value="../../lib/lpk/bgrabitmap-master/bgrabitmap/bgraopengl3d.pas"/>
@@ -283,7 +287,7 @@
         <UsageCount Value="10"/>
       </Unit35>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="mainformwidget.pas"/>
         <Caret Line="62" Column="23" TopLine="43"/>
@@ -376,33 +380,24 @@
         <Caret Line="488" Column="57" TopLine="488"/>
       </Position23>
       <Position24>
-        <Filename Value="controller.pas"/>
-        <Caret Line="203" Column="38" TopLine="230"/>
-      </Position24>
-      <Position25>
         <Filename Value="timerframe.pas"/>
         <Caret Line="33" TopLine="33"/>
-      </Position25>
-      <Position26>
-        <Filename Value="../../lib/lpk/bgrabitmap-master/bgrabitmap/bgragtkbitmap.pas"/>
-        <Caret Line="69" Column="69" TopLine="56"/>
-      </Position26>
-      <Position27>
-        <Filename Value="../../lib/lpk/bgrabitmap-master/bgrabitmap/bgragtkbitmap.pas"/>
-        <Caret Line="68" Column="3" TopLine="57"/>
-      </Position27>
-      <Position28>
+      </Position24>
+      <Position25>
         <Filename Value="settings.pas"/>
         <Caret Line="200" Column="71" TopLine="189"/>
-      </Position28>
-      <Position29>
+      </Position25>
+      <Position26>
         <Filename Value="clockswidget.pas"/>
         <Caret Line="488" Column="57" TopLine="488"/>
-      </Position29>
-      <Position30>
+      </Position26>
+      <Position27>
         <Filename Value="clocks.pas"/>
         <Caret Line="169" Column="35" TopLine="169"/>
-      </Position30>
+      </Position27>
+      <Position28>
+        <Filename Value="aboutform.pas"/>
+      </Position28>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
