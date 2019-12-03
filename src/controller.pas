@@ -194,6 +194,7 @@ var
 begin
   //Conf.SetValue(TIMER_TITLE, );
   Conf := TJSONConfig.Create(nil);
+  Conf.Formatted:=true;
   FClocks.SaveClocks(Conf);
   Conf.Filename := FDbFileName;
   //Conf.Flush;

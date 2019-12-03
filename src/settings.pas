@@ -170,6 +170,7 @@ begin
   FFileName := FileName;
   FConf := TJSONConfig.Create(Nil);
   FConf.Filename:=FFileName;
+  FConf.Formatted:=true;
 end;
 
 destructor TUserFileConfig.Destroy;
