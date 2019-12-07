@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, clockswidget, settings, optionsform, aboutform, BGRABitmap,
-  BGRABitmapTypes, FPimage, timeralertform, dateutils;
+  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf;
 
 const
   TICON_RED_INDEX: integer = 1;
@@ -118,6 +118,9 @@ type
     FTrayStoppedBitmap, FAppStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
     FClockWidget: TClocksWidget;
+    FClocks: TClocks;
+    FDbFileName: string;
+    FDbDefault: boolean;
     function GetClocks: TClocksWidget;
     procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
     procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
@@ -127,6 +130,9 @@ type
     procedure SetMoveUpEnabled(AValue: boolean);
     procedure FormShow(Sender: TObject);
     procedure UpdateAlertFormSettings;
+    procedure ExportToFile(Sender: TObject);
+    procedure PostTimerCreation(AValue: TTimerClock);
+    procedure SetListButtonsStatus;
   public
     { public declarations }
     OnNewTimer: TNotifyEvent;
@@ -135,12 +141,13 @@ type
     OnClockMoveUp: TNotifyEvent;
     OnClockMoveDown: TNotifyEvent;
     OnEXport: TNotifyEvent;
-    property Clocks: TClocksWidget read FClockWidget;
+    //property Clocks: TClocksWidget read FClockWidget;
     procedure NewTimerAdded(Sender: TObject);
     procedure NewAlarmAdded(Sender: TObject);
     procedure ClockDeleted(Sender: TObject);
     procedure ClockMovedUp(Sender: TObject);
     procedure ClockMovedDown(Sender: TObject);
+     procedure ClockSelected(Sender: TObject);
     procedure TimerFinished(Id: integer);
     procedure ProgressUpdate(Progress: single);
     //procedure OptionsEdit(Sender: TObject);
@@ -149,9 +156,13 @@ type
     function GetExportFileName: string;
     //property Form: TMainForm read FForm write SetForm;
     //property Clocks: TClocksWidget read GetClocks;
-    property DeleteEnabled: boolean write SetDeleteEnabled;
-    property MoveUpEnabled: boolean write SetMoveUpEnabled;
-    property MoveDownEnabled: boolean write SetMoveDownEnabled;
+    //property DeleteEnabled: boolean write SetDeleteEnabled;
+    //property MoveUpEnabled: boolean write SetMoveUpEnabled;
+    //property MoveDownEnabled: boolean write SetMoveDownEnabled;
+    procedure ProcessCommandline;
+    procedure SavetoFile;
+    procedure LoadfromFile;
+    //property Clocks: TClocks read FClocks;
   end;
 
 var
@@ -175,9 +186,14 @@ begin
   OnEXport := nil;
   FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
 
+  FClocks := TClocks.Create;
+  FDbDefault := True;
+
   //DoubleBuffered:=True;
   FClockWidget := TClocksWidget.Create;
   FClockWidget.ScrollBox := sbxClocks;
+
+  FClocks.Widget := FClockWidget;
   ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
   tiMain.Visible := True;
 
@@ -197,7 +213,7 @@ begin
 
   //Self.AlphaBlend:=True;
   //Self.AlphaBlendValue:=50;
-
+  {TODO: Add these to the form}
   aiNewTimer.OnExecute := @NewTimerAdded;
   aiNewAlarm.OnExecute := @NewAlarmAdded;
   //aiOptions.OnExecute := @OptionsEdit;
@@ -281,6 +297,7 @@ begin
     bmp.Free;
   end;
 
+
 end;
 
 procedure TMainForm.aiNewTimerExecute(Sender: TObject);
@@ -348,9 +365,10 @@ begin
   FAppStoppedBitmap.Free;
 
   //inherited Destroy;
-
+  SavetoFile;
+  FClocks.Destroy;
   FClockWidget.Free;
-end;
+  end;
 
 procedure TMainForm.sbxClocksClick(Sender: TObject);
 begin
@@ -374,7 +392,7 @@ end;
 
 function TMainForm.GetClocks: TClocksWidget;
 begin
-  Result := Clocks;
+  Result := FClockWidget;
 end;
 
 procedure TMainForm.DrawBaseIconBackground(Bmp: TBGRABitmap);
@@ -472,10 +490,44 @@ begin
   end;
 end;
 
-procedure TMainForm.NewTimerAdded(Sender: TObject);
+procedure TMainForm.ExportToFile(Sender: TObject);
+var
+  FileName: string;
+  Conf: TJSONConfig;
 begin
-  if OnNewTimer <> nil then
-    OnNewTimer(Sender);
+  SavetoFile;
+  FileName := '';
+  FileName := GetExportFileName;
+  if FileName <> '' then
+  begin
+    Conf := TJSONConfig.Create(nil);
+    FClocks.SaveClocks(Conf);
+    Conf.Filename := FileName;
+    Conf.Free;
+  end;
+end;
+
+procedure TMainForm.PostTimerCreation(AValue: TTimerClock);
+begin
+  AValue.AddSubscription(Self);
+  AValue.Widget.OnSelect := @ClockSelected;
+end;
+
+procedure TMainForm.SetListButtonsStatus;
+begin
+  SetDeleteEnabled(FClocks.AnySelected);
+  SetMoveDownEnabled(FClocks.Widget.CanSelectedMovDown);
+  setMoveUpEnabled(FClocks.Widget.CanSelectedMoveUp);
+end;
+
+procedure TMainForm.NewTimerAdded(Sender: TObject);
+var
+  Added: TTimerClock;
+begin
+  {*if OnNewTimer <> nil then
+    OnNewTimer(Sender);*}
+  Added := FClocks.AddTimer;
+  PostTimerCreation(Added);
 end;
 
 {TODO: This method NewAlarmAdded is not needed}
@@ -494,7 +546,7 @@ end;
 procedure TMainForm.ClockDeleted(Sender: TObject);
 begin
   //ShowMessage('Haha');
-  if OnClockDelete <> nil then
+  {*if OnClockDelete <> nil then
   begin
     OnClockDelete(Self);
   end
@@ -503,12 +555,13 @@ begin
 {$I %FILE%}
       +' ' +
 {$I %LINE%}
-      +': OnClockDelete was found to be Nil');
+      +': OnClockDelete was found to be Nil');*}
+  SetListButtonsStatus;
 end;
 
 procedure TMainForm.ClockMovedUp(Sender: TObject);
 begin
-  if OnClockMoveUp <> nil then
+  {*if OnClockMoveUp <> nil then
   begin
     OnClockMoveUp(Self);
   end
@@ -517,12 +570,14 @@ begin
 {$I %FILE%}
       +' ' +
 {$I %LINE%}
-      +': OnClockMoveUp was found to be Nil');
+      +': OnClockMoveUp was found to be Nil');*}
+  FClocks.Widget.MoveSelectedClocksUp;
+  SetListButtonsStatus;
 end;
 
 procedure TMainForm.ClockMovedDown(Sender: TObject);
 begin
-  if OnClockMoveDown <> nil then
+  {*if OnClockMoveDown <> nil then
   begin
     OnClockMoveDown(Self);
   end
@@ -531,7 +586,14 @@ begin
 {$I %FILE%}
       +' ' +
 {$I %LINE%}
-      +': OnClockMoveDown was found to be Nil');
+      +': OnClockMoveDown was found to be Nil');*}
+  FClocks.Widget.MoveSelectedClocksDown;
+  SetListButtonsStatus;
+end;
+
+procedure TMainForm.ClockSelected(Sender: TObject);
+begin
+  SetListButtonsStatus;
 end;
 
 procedure TMainForm.TimerFinished(Id: integer);
@@ -544,7 +606,7 @@ var
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
 
-  Widget := Clocks.GetClock(Id);
+  Widget := FClockWidget.GetClock(Id);
   Duration := Widget.Duration;
 
   Hours := HourOf(Duration);
@@ -657,6 +719,100 @@ begin
     Result := sdgExport.FileName
   else
     Result := '';
+end;
+
+procedure TMainForm.ProcessCommandline;
+var
+  DefaultDbFile: string;
+  PassedDbFile: string;
+  //Conf: TJSONConfig;
+begin
+  DefaultDbFile := GetAppConfigDir(False) + 'defdb.ccq';
+  FDbFileName := DefaultDbFile;
+  FDbDefault := True;
+  if ParamCount > 0 then
+  begin
+    PassedDbFile := ParamStr(1);
+    if FileExists(PassedDbFile) then
+      FDbFileName := PassedDbFile;
+  end;
+
+end;
+
+procedure TMainForm.SavetoFile;
+var
+  Conf: TJSONConfig;
+  //Count: integer;
+begin
+  //Conf.SetValue(TIMER_TITLE, );
+  Conf := TJSONConfig.Create(nil);
+  Conf.Formatted:=true;
+  FClocks.SaveClocks(Conf);
+  Conf.Filename := FDbFileName;
+  //Conf.Flush;
+  Conf.Free;
+end;
+
+procedure TMainForm.LoadfromFile;
+var
+  Conf: TJSONConfig;
+  TotalCount, Count: integer;
+  NewTimerClock: TTimerClock;
+  Hours, Mins, Secs: word;
+  Order: TIdList;
+  OrderString: TStringList;
+  Pos: string;
+begin
+  Order := nil;
+  OrderString := nil;
+
+  if FileExists(FDbFileName) then
+  begin
+
+    Conf := TJSONConfig.Create(nil);
+    Conf.FileName := FDbFileName;
+    //FClocks.LoadClocks(Conf);
+    TotalCount := Conf.GetValue(TIMER_CONF_COUNT, 0);
+    for Count := 0 to TotalCount - 1 do
+    begin
+      NewTimerClock := FClocks.AddTimer;
+      NewTimerClock.Widget.Caption :=
+        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_TITLE, 'Countdown timer');
+      Hours := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_HOURS, 0);
+      Mins := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_MINUTES, 0);
+      Secs := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_SECONDS, 0);
+      //TODO: Remove hardcoding
+      NewTimerClock.Widget.Duration :=
+        EncodeDateTime(2000, 1, 1, Hours, Mins, Secs, 0);
+      NewTimerClock.Notifier :=
+        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_NOTIFIER, False);
+      //NewTimerClock.AddSubscription(FFormWidget);
+      //NewTimerClock.Widget.OnSelect:=@ClockSelected;
+      PostTimerCreation(NewTimerClock);
+    end;
+    Order := TIdList.Create;
+    OrderString := TStringList.Create;
+
+    if not Conf.GetValue(TIMER_CONF_ORDER, OrderString, '0') then
+      ShowMessage('Getting order failed');
+
+    for Pos in OrderString do
+    begin
+      Order.Add(StrToInt(Pos));
+    end;
+
+    FClocks.Widget.SetOrder(Order);
+
+    Conf.Free;
+    OrderString.Free;
+    Order.Free;
+    //FClocks.Widget.Reorder;
+  end;
 end;
 
 

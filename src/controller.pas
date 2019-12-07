@@ -19,7 +19,12 @@ Boston, MA  02110-1301, USA.
 
 }
 unit controller;
+interface
+implementation
+begin
 
+end.
+{*
 {$mode objfpc}{$H+}
 //{$INTERFACES CORBA}
 interface
@@ -264,4 +269,4 @@ begin
 end;
 
 
-end.
+end.*}

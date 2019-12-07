@@ -35,8 +35,8 @@ timeralertform, aboutform
 
 {$R *.res}
 
-var
-  AppController: TController;
+//var
+  //AppController: TController;
   //FormWidget: TMainForm;
   //DefaultConfig: TDefaultConfig;
 begin
@@ -46,21 +46,23 @@ begin
   InitSettings;
 
   //FormWidget := TMainFormWidget.Create();
-  AppController := TController.Create();
-  AppController.ProcessCommandline;
+  //AppController := TController.Create();
+
 
   Application.CreateForm(TMainForm, MainForm);
+  MainForm.ProcessCommandline;
 
   //MainFormWidget.FormView.Form := TMainWindow(Application.MainForm);
   //FormWidget.Form := TMainForm(Application.MainForm);
-  AppController.FormWidget := MainForm;
-  AppController.LoadfromFile;
+  //AppController.FormWidget := MainForm;
+
   Application.CreateForm(TfrmOptions, frmOptions);
   Application.CreateForm(TfrmTimerAlert, frmTimerAlert);
   Application.CreateForm(TfrmAbout, frmAbout);
+  MainForm.LoadfromFile;
   Application.Run;
 
-  AppController.Destroy;
+//  AppController.Destroy;
   //FormWidget.Destroy;
   CleanupSettings;
 end.
