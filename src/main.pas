@@ -35,10 +35,10 @@ const
   TICON_GREEN_INDEX: integer = 2;
   TRAY_PROGRESS_ICON_COUNT = 24;
 
-  TRAY_OUTLINE_COLOUR = $3333f2;//$5A9E60;
-  TRAY_BG_COLOUR = $c6c6f5;//$DAEADB;
+  TRAY_OUTLINE_COLOUR = $3333f2; //$5A9E60;
+  TRAY_BG_COLOUR = $c6c6f5; //$DAEADB;
   TRAY_CENTRE_COLOUR = TRAY_BG_COLOUR;
-  PROGRESS_COLOUR = $7a2a41;//1A1AB0;
+  PROGRESS_COLOUR = $7a2a41; //1A1AB0;
 
   PROGRESS_COMPLETED = 2.0;
 
@@ -98,6 +98,7 @@ type
     ToolButton6: TToolButton;
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
+    procedure aiExportExecute(Sender: TObject);
     procedure aiNewAlarmExecute(Sender: TObject);
     procedure aiAboutExecute(Sender: TObject);
     procedure aiNewTimerExecute(Sender: TObject);
@@ -106,6 +107,7 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure sbxClocksClick(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
     procedure tbShowModalAlertClick(Sender: TObject);
@@ -121,16 +123,16 @@ type
     FClocks: TClocks;
     FDbFileName: string;
     FDbDefault: boolean;
-    function GetClocks: TClocksWidget;
+    //function GetClocks: TClocksWidget;
     procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
     procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
     //procedure SetDeleteEnabled(AValue: boolean);
     //procedure SetForm(AValue: TMainForm);
     //procedure SetMoveDownEnabled(AValue: boolean);
     //procedure SetMoveUpEnabled(AValue: boolean);
-    procedure FormShow(Sender: TObject);
+    //procedure FormShow(Sender: TObject);
     procedure UpdateAlertFormSettings;
-    procedure ExportToFile(Sender: TObject);
+    //procedure ExportToFile(Sender: TObject);
     procedure PostTimerCreation(AValue: TTimerClock);
     procedure SetListButtonsStatus;
   public
@@ -142,8 +144,8 @@ type
     OnClockMoveDown: TNotifyEvent;
     OnEXport: TNotifyEvent;
     //property Clocks: TClocksWidget read FClockWidget;
-    procedure NewTimerAdded(Sender: TObject);
-    procedure NewAlarmAdded(Sender: TObject);
+    //procedure NewTimerAdded(Sender: TObject);
+    //procedure NewAlarmAdded(Sender: TObject);
     procedure ClockDeleted(Sender: TObject);
     procedure ClockMovedUp(Sender: TObject);
     procedure ClockMovedDown(Sender: TObject);
@@ -151,7 +153,7 @@ type
     procedure TimerFinished(Id: integer);
     procedure ProgressUpdate(Progress: single);
     //procedure OptionsEdit(Sender: TObject);
-    procedure ExportClicked(Sender: TObject);
+    //procedure ExportClicked(Sender: TObject);
     procedure OptionsFormClosed();
     function GetExportFileName: string;
     //property Form: TMainForm read FForm write SetForm;
@@ -213,15 +215,15 @@ begin
 
   //Self.AlphaBlend:=True;
   //Self.AlphaBlendValue:=50;
-  {TODO: Add these to the form}
-  aiNewTimer.OnExecute := @NewTimerAdded;
-  aiNewAlarm.OnExecute := @NewAlarmAdded;
+  //aiNewTimer.OnExecute := @NewTimerAdded;
+  //aiNewAlarm.OnExecute := @NewAlarmAdded;
   //aiOptions.OnExecute := @OptionsEdit;
+  {TODO: Add actions for delete, clock up and down}
   sbDelete.OnClick := @ClockDeleted;
   sbMoveClockUp.OnClick := @ClockMovedUp;
   sbMoveClockDown.OnClick := @ClockMovedDown;
-  aiExport.OnExecute := @ExportClicked;
-  OnShow := @FormShow;
+  //aiExport.OnExecute := @ExportClicked;
+  //OnShow := @FormShow;
 
 
   TrayIconSize := TRAY_BASE_WIDTH;
@@ -301,8 +303,13 @@ begin
 end;
 
 procedure TMainForm.aiNewTimerExecute(Sender: TObject);
+var
+  Added: TTimerClock;
 begin
-
+  {*if OnNewTimer <> nil then
+    OnNewTimer(Sender);*}
+  Added := FClocks.AddTimer;
+  PostTimerCreation(Added);
 end;
 
 procedure TMainForm.aiOptionsExecute(Sender: TObject);
@@ -352,6 +359,23 @@ begin
 
 end;
 
+procedure TMainForm.aiExportExecute(Sender: TObject);
+var
+  FileName: string;
+  Conf: TJSONConfig;
+begin
+  SavetoFile;
+  FileName := '';
+  FileName := GetExportFileName;
+  if FileName <> '' then
+  begin
+    Conf := TJSONConfig.Create(nil);
+    FClocks.SaveClocks(Conf);
+    Conf.Filename := FileName;
+    Conf.Free;
+  end;
+end;
+
 procedure TMainForm.FormDestroy(Sender: TObject);
 var
   Count: integer;
@@ -369,6 +393,12 @@ begin
   FClocks.Destroy;
   FClockWidget.Free;
   end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+  UpdateAlertFormSettings;
+end;
+
 
 procedure TMainForm.sbxClocksClick(Sender: TObject);
 begin
@@ -390,10 +420,10 @@ begin
   GlobalUserConfig.ShowTrayAlert := tbShowTrayAlert.Down;
 end;
 
-function TMainForm.GetClocks: TClocksWidget;
+{*function TMainForm.GetClocks: TClocksWidget;
 begin
   Result := FClockWidget;
-end;
+end;*}
 
 procedure TMainForm.DrawBaseIconBackground(Bmp: TBGRABitmap);
 var
@@ -474,11 +504,11 @@ begin
   sbMoveClockUp.Enabled := Avalue;
 end;*}
 
-procedure TMainForm.FormShow(Sender: TObject);
+{8procedure TMainForm.FormShow(Sender: TObject);
 begin
   //frmOptions.OnClose := @OptionsFormClosed;
   UpdateAlertFormSettings;
-end;
+end;*}
 
 procedure TMainForm.UpdateAlertFormSettings;
 begin
@@ -490,7 +520,7 @@ begin
   end;
 end;
 
-procedure TMainForm.ExportToFile(Sender: TObject);
+{*procedure TMainForm.ExportToFile(Sender: TObject);
 var
   FileName: string;
   Conf: TJSONConfig;
@@ -505,7 +535,7 @@ begin
     Conf.Filename := FileName;
     Conf.Free;
   end;
-end;
+end;*}
 
 procedure TMainForm.PostTimerCreation(AValue: TTimerClock);
 begin
@@ -520,17 +550,17 @@ begin
   sbMoveClockUp.Enabled:= FClocks.Widget.CanSelectedMoveUp;
 end;
 
-procedure TMainForm.NewTimerAdded(Sender: TObject);
+{*procedure TMainForm.NewTimerAdded(Sender: TObject);
 var
   Added: TTimerClock;
 begin
-  {*if OnNewTimer <> nil then
-    OnNewTimer(Sender);*}
+  {if OnNewTimer <> nil then
+    OnNewTimer(Sender);}
   Added := FClocks.AddTimer;
   PostTimerCreation(Added);
-end;
+end; *}
 
-{TODO: This method NewAlarmAdded is not needed}
+{*
 procedure TMainForm.NewAlarmAdded(Sender: TObject);
 begin
   if OnNewAlarm <> nil then
@@ -541,7 +571,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnNewAlarm was found to be Nil');
-end;
+end; *}
 
 procedure TMainForm.ClockDeleted(Sender: TObject);
 begin
@@ -556,6 +586,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnClockDelete was found to be Nil');*}
+  FClocks.DeleteSelected;
   SetListButtonsStatus;
 end;
 
@@ -665,12 +696,12 @@ begin
 
 end;
 
-{8procedure TMainForm.OptionsEdit(Sender: TObject);
+{*procedure TMainForm.OptionsEdit(Sender: TObject);
 begin
   frmOptions.ShowModal;
 end;*}
 
-procedure TMainForm.ExportClicked(Sender: TObject);
+{*procedure TMainForm.ExportClicked(Sender: TObject);
 begin
   if OnExport <> nil then
   begin
@@ -682,7 +713,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnExport was found to be Nil');
-end;
+end;*}
 
 procedure TMainForm.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
 begin
