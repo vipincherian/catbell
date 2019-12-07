@@ -124,10 +124,10 @@ type
     function GetClocks: TClocksWidget;
     procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
     procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
-    procedure SetDeleteEnabled(AValue: boolean);
+    //procedure SetDeleteEnabled(AValue: boolean);
     //procedure SetForm(AValue: TMainForm);
-    procedure SetMoveDownEnabled(AValue: boolean);
-    procedure SetMoveUpEnabled(AValue: boolean);
+    //procedure SetMoveDownEnabled(AValue: boolean);
+    //procedure SetMoveUpEnabled(AValue: boolean);
     procedure FormShow(Sender: TObject);
     procedure UpdateAlertFormSettings;
     procedure ExportToFile(Sender: TObject);
@@ -458,7 +458,7 @@ begin
   end;
 end;
 
-{TODO: This method is not needed}
+{*
 procedure TMainForm.SetDeleteEnabled(AValue: boolean);
 begin
   sbDelete.Enabled := AValue;
@@ -472,7 +472,7 @@ end;
 procedure TMainForm.SetMoveUpEnabled(AValue: boolean);
 begin
   sbMoveClockUp.Enabled := Avalue;
-end;
+end;*}
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
@@ -515,9 +515,9 @@ end;
 
 procedure TMainForm.SetListButtonsStatus;
 begin
-  SetDeleteEnabled(FClocks.AnySelected);
-  SetMoveDownEnabled(FClocks.Widget.CanSelectedMovDown);
-  setMoveUpEnabled(FClocks.Widget.CanSelectedMoveUp);
+  sbDelete.Enabled := FClocks.AnySelected;
+  sbMoveClockDown.Enabled:=FClocks.Widget.CanSelectedMovDown;
+  sbMoveClockUp.Enabled:= FClocks.Widget.CanSelectedMoveUp;
 end;
 
 procedure TMainForm.NewTimerAdded(Sender: TObject);
