@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Dialogs, jsonConf, dateutils, clocks, clockswidget,
-  mainformwidget, main, observers;
+  main, observers;
 
 type
 
@@ -36,12 +36,12 @@ type
 
   private
     FClocks: TClocks;
-    FFormWidget: TMainFormWidget;
+    FFormWidget: TMainForm;
     FDbFileName: string;
     FDbDefault: boolean;
 
     procedure NewTimerAdded(Sender: TObject);
-    procedure SetForm(AValue: TMainFormWidget);
+    procedure SetForm(AValue: TMainForm);
     procedure ClockDeleted(Sender: TObject);
     procedure ClockSelected(Sender: TObject);
     procedure ClocksMovedUp(Sender: TObject);
@@ -57,7 +57,7 @@ type
     procedure SavetoFile;
     procedure LoadfromFile;
     property Clocks: TClocks read FClocks;
-    property FormWidget: TMainFormWidget read FFormWidget write SetForm;
+    property FormWidget: TMainForm read FFormWidget write SetForm;
     //property ListButtonsEnabled: boolean write SetListButtonsEnabled;
   end;
 
@@ -79,7 +79,7 @@ begin
 end;
 
 
-procedure TController.SetForm(AValue: TMainFormWidget);
+procedure TController.SetForm(AValue: TMainForm);
 begin
   if FFormWidget = AValue then
     Exit;

@@ -19,10 +19,16 @@ Boston, MA  02110-1301, USA.
 
 }
 unit mainformwidget;
+interface
+implementation
+begin
 
+end.
+
+{*
 {$mode objfpc}{$H+}
 //{$INTERFACES CORBA}
-interface
+
 
 uses
   Classes, SysUtils, Dialogs, Graphics, IntfGraphics, Forms, LCLIntf,
@@ -521,3 +527,4 @@ end;
 
 
 end.
+*}
