@@ -345,7 +345,6 @@ object MainForm: TMainForm
       ClientHeight = 263
       ClientWidth = 671
       TabOrder = 1
-      OnClick = sbxClocksClick
       object hdrTimers: THeaderControl
         Left = 0
         Height = 24
@@ -484,7 +483,7 @@ object MainForm: TMainForm
   end
   object mmMain: TMainMenu
     Images = ilMainSmall
-    left = 504
+    left = 488
     top = 96
     object miAlarm: TMenuItem
       Caption = '&Clock'
@@ -739,7 +738,7 @@ object MainForm: TMainForm
   object ilMain: TImageList
     Height = 24
     Width = 24
-    left = 504
+    left = 488
     top = 48
     Bitmap = {
       4C690900000018000000180000008B95EE008D96EDFF8D96EDFF8D96EDFF8D96
@@ -1593,12 +1592,29 @@ object MainForm: TMainForm
     }
   end
   object tiMain: TTrayIcon
-    left = 504
-    top = 144
+    OnClick = tiMainClick
+    OnMouseUp = tiMainMouseUp
+    left = 488
+    top = 152
   end
   object sdgExport: TSaveDialog
     Filter = 'Catbell timers|*.ccq'
     left = 544
     top = 150
+  end
+  object pmTray: TPopupMenu
+    left = 608
+    top = 89
+    object pmiShowWindow: TMenuItem
+      Caption = 'Show window'
+      OnClick = pmiShowWindowClick
+    end
+    object MenuItem8: TMenuItem
+      Caption = '-'
+    end
+    object pmiQuit: TMenuItem
+      Action = aiQuit
+      Caption = 'Quit'
+    end
   end
 end

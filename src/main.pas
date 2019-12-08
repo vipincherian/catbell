@@ -71,6 +71,9 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem5: TMenuItem;
+    pmiShowWindow: TMenuItem;
+    pmiExit: TMenuItem;
+    MenuItem8: TMenuItem;
     miToolsOptions: TMenuItem;
     miTools: TMenuItem;
     MenuItem3: TMenuItem;
@@ -81,6 +84,7 @@ type
     miNewTimer: TMenuItem;
     pnlBorder: TPanel;
     pnlClocks: TPanel;
+    pmTray: TPopupMenu;
     sdgExport: TSaveDialog;
     sbMoveClockUp: TSpeedButton;
     sbMoveClockDown: TSpeedButton;
@@ -110,10 +114,13 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure sbxClocksClick(Sender: TObject);
+    procedure pmiShowWindowClick(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
     procedure tbShowModalAlertClick(Sender: TObject);
     procedure tbShowTrayAlertClick(Sender: TObject);
+    procedure tiMainClick(Sender: TObject);
+    procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
 
   private
     { private declarations }
@@ -408,10 +415,11 @@ begin
   UpdateAlertFormSettings;
 end;
 
-
-procedure TMainForm.sbxClocksClick(Sender: TObject);
+procedure TMainForm.pmiShowWindowClick(Sender: TObject);
 begin
-
+  if Self.WindowState = wsMinimized then
+     Self.WindowState:=wsNormal;
+  Self.Show;
 end;
 
 procedure TMainForm.tbProgressAutoClick(Sender: TObject);
@@ -427,6 +435,18 @@ end;
 procedure TMainForm.tbShowTrayAlertClick(Sender: TObject);
 begin
   GlobalUserConfig.ShowTrayAlert := tbShowTrayAlert.Down;
+end;
+
+procedure TMainForm.tiMainClick(Sender: TObject);
+begin
+  ShowMessage('Hehe');
+end;
+
+procedure TMainForm.tiMainMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+    pmTray.PopUp;
 end;
 
 {*function TMainForm.GetClocks: TClocksWidget;

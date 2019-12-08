@@ -495,7 +495,7 @@ begin
   FObservers := TListTimerObservers.Create;
 
   FShortTimer := TTimer.Create(nil);
-  FShortTimer.Interval := 20;
+  FShortTimer.Interval := 200;
   FShortTimer.Enabled := False;
   FShortTimer.OnTimer := @OnShortTimer;
 
