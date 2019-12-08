@@ -108,6 +108,7 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure sbxClocksClick(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
@@ -397,6 +398,11 @@ begin
   //FClockWidget.Free;
   end;
 
+procedure TMainForm.FormResize(Sender: TObject);
+begin
+  ResetHeaderSections;
+end;
+
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   UpdateAlertFormSettings;
@@ -559,7 +565,8 @@ var
   Ids: TIdList;
   Id: longword;
   Timer: TfraTimer;
-  Filled: Integer;
+  Filled: Integer = 0;
+  Temp: Integer;
 begin
   Ids:=TIdList.Create;
   FClocks.GetAllIdS(Ids);
@@ -570,7 +577,28 @@ begin
     // Find the
     hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
     Inc(Filled, hdrTimers.Sections.Items[0].Width);
-    hdrTimers.Sections.Items[1].Width := Timer.dtpSet.Left + Timer.dtpSet.Width - hdrTimers.Sections.Items[0].Left - hdrTimers.Sections.Items[0].Width;
+    Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
+    Temp := Temp + ((Timer.bbPlay.Left - Temp) div 2) - Filled;
+    hdrTimers.Sections.Items[1].Width := Temp;
+    Inc(Filled, hdrTimers.Sections.Items[1].Width);
+    Temp := Timer.bbStop.Left + Timer.bbStop.Width;
+    Temp := Temp + ((Timer.lblCountdown.Left - Temp) div 2) - Filled;
+    hdrTimers.Sections.Items[2].Width := Temp;
+    Inc(Filled, Temp);
+
+    Temp := Timer.lblCountdown.Left + Timer.lblCountdown.Width;
+    Temp := Temp + ((Timer.sbNotify.Left - Temp) div 2) - Filled;
+    hdrTimers.Sections.Items[3].Width := Temp;
+    Inc(Filled, Temp);
+
+    Temp := Timer.sbNotify.Left + Timer.sbNotify.Width;
+    Temp := Temp + ((Timer.bbEdit.Left - Temp) div 2) - Filled;
+    hdrTimers.Sections.Items[4].Width := Temp;
+    Inc(Filled, Temp);
+
+    Temp := sbxClocks.Width - Filled;
+    hdrTimers.Sections.Items[5].Width := Temp;
+    Inc(Filled, Temp);
   end;
   Ids.Free;
 end;

@@ -2,10 +2,10 @@ object fraTimer: TfraTimer
   Left = 0
   Height = 38
   Top = 0
-  Width = 706
+  Width = 722
   Anchors = [akTop, akLeft, akRight]
   ClientHeight = 38
-  ClientWidth = 706
+  ClientWidth = 722
   TabOrder = 0
   DesignLeft = 247
   DesignTop = 159
@@ -21,13 +21,13 @@ object fraTimer: TfraTimer
     Left = 65
     Height = 23
     Top = 8
-    Width = 303
+    Width = 263
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 1
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 604
+    Left = 556
     Height = 15
     Top = 11
     Width = 48
@@ -48,7 +48,7 @@ object fraTimer: TfraTimer
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 376
+    Left = 338
     Height = 23
     Top = 8
     Width = 65
@@ -73,7 +73,7 @@ object fraTimer: TfraTimer
   end
   object sbNotify: TSpeedButton
     Cursor = crHandPoint
-    Left = 669
+    Left = 625
     Height = 30
     Hint = 'Show progress through icons.'
     Top = 4
@@ -87,7 +87,7 @@ object fraTimer: TfraTimer
     ParentShowHint = False
   end
   object bbPlay: TBitBtn
-    Left = 448
+    Left = 410
     Height = 30
     Top = 4
     Width = 40
@@ -172,7 +172,7 @@ object fraTimer: TfraTimer
     TabOrder = 3
   end
   object bbPause: TBitBtn
-    Left = 496
+    Left = 458
     Height = 30
     Top = 4
     Width = 40
@@ -258,7 +258,7 @@ object fraTimer: TfraTimer
     TabOrder = 4
   end
   object bbStop: TBitBtn
-    Left = 544
+    Left = 506
     Height = 30
     Top = 4
     Width = 40
@@ -342,6 +342,14 @@ object fraTimer: TfraTimer
       0000000000000000000000000000000000000000000000000000
     }
     TabOrder = 5
+  end
+  object bbEdit: TBitBtn
+    Left = 674
+    Height = 30
+    Top = 4
+    Width = 40
+    Anchors = [akTop, akRight]
+    TabOrder = 6
   end
   object ilTimer: TImageList
     Height = 24

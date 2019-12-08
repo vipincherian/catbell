@@ -15,6 +15,7 @@ object MainForm: TMainForm
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
   OnShow = FormShow
   LCLVersion = '2.0.6.0'
   object tlbMain: TToolBar
@@ -360,6 +361,30 @@ object MainForm: TMainForm
           item
             Alignment = taLeftJustify
             Text = 'Title'
+            Width = 30
+            Visible = True
+          end        
+          item
+            Alignment = taLeftJustify
+            Text = 'Controls'
+            Width = 30
+            Visible = True
+          end        
+          item
+            Alignment = taLeftJustify
+            Text = 'Status'
+            Width = 30
+            Visible = True
+          end        
+          item
+            Alignment = taLeftJustify
+            Text = 'On icon'
+            Width = 30
+            Visible = True
+          end        
+          item
+            Alignment = taLeftJustify
+            Text = 'Edit'
             Width = 30
             Visible = True
           end>

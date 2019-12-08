@@ -61,6 +61,7 @@ type
     alTimer: TActionList;
     bbPlay: TBitBtn;
     bbPause: TBitBtn;
+    bbEdit: TBitBtn;
     bbStop: TBitBtn;
     cbSelect: TCheckBox;
     dtpSet: TDateTimePicker;
