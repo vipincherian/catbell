@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
-  observers, clockswidget, settings, optionsform, aboutform, BGRABitmap,
+  observers, settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf, timerframe;
 
 const
@@ -133,7 +133,7 @@ type
     //procedure FormShow(Sender: TObject);
     procedure UpdateAlertFormSettings;
     //procedure ExportToFile(Sender: TObject);
-    procedure PostTimerCreation(AValue: TTimerClock);
+    procedure PostTimerCreation(AValue: TfraTimer);
     procedure SetListButtonsStatus;
   public
     { public declarations }
@@ -305,7 +305,7 @@ end;
 
 procedure TMainForm.aiNewTimerExecute(Sender: TObject);
 var
-  Added: TTimerClock;
+  Added: TfraTimer;
 begin
   {*if OnNewTimer <> nil then
     OnNewTimer(Sender);*}
@@ -538,10 +538,10 @@ begin
   end;
 end;*}
 
-procedure TMainForm.PostTimerCreation(AValue: TTimerClock);
+procedure TMainForm.PostTimerCreation(AValue: TfraTimer);
 begin
   AValue.AddSubscription(Self);
-  AValue.Widget.OnSelect := @ClockSelected;
+  AValue.OnSelect := @ClockSelected;
 end;
 
 procedure TMainForm.SetListButtonsStatus;
@@ -789,7 +789,7 @@ procedure TMainForm.LoadfromFile;
 var
   Conf: TJSONConfig;
   TotalCount, Count: integer;
-  NewTimerClock: TTimerClock;
+  NewTimerClock: TfraTimer;
   Hours, Mins, Secs: word;
   Order: TIdList;
   OrderString: TStringList;
@@ -808,7 +808,7 @@ begin
     for Count := 0 to TotalCount - 1 do
     begin
       NewTimerClock := FClocks.AddTimer;
-      NewTimerClock.Widget.Caption :=
+      NewTimerClock.Caption :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
         '/' + TIMER_CONF_TITLE, 'Countdown timer');
       Hours := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
@@ -818,7 +818,7 @@ begin
       Secs := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
         '/' + TIMER_CONF_SECONDS, 0);
       //TODO: Remove hardcoding
-      NewTimerClock.Widget.Duration :=
+      NewTimerClock.Duration :=
         EncodeDateTime(2000, 1, 1, Hours, Mins, Secs, 0);
       NewTimerClock.Notifier :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +

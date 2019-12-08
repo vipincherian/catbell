@@ -49,7 +49,7 @@ type
 
 
   { TTimerClock }
-
+  {*
   TTimerClock = class(TInterfacedObject, ITimerSubject)
   private
     FWidget: TfraTimer;
@@ -88,9 +88,9 @@ type
     property Selected: boolean read GetSelected;
     property Notifier: boolean read FNotifier write SetNotifier;
     property Running: boolean read FRunning;
-  end;
+  end; *}
 
-  TClockList = specialize TFPGMap<longword, TTimerClock>;
+  TClockList = specialize TFPGMap<longword, TfraTimer>;
 
   TClockWidgetList = specialize TFPGMap<longword, TfraTimer>;
   //TListTimerClockWidgets = specialize TFPGList<TfraTimer>;
@@ -100,7 +100,7 @@ type
   private
     FClockList: TClockList;
     FScrollBox: TScrollBox;
-    FClockWidgets: TClockWidgetList;
+    //FClockWidgets: TClockWidgetList;
     FOrder: TIdList;
     //FActiveTimers: TListTimerClockWidgets;
     FCounterClockID: TSequence;
@@ -112,7 +112,7 @@ type
     procedure SetScrollBox(AValue: TScrollBox);
     procedure Reorder;
   public
-    function AddTimer(): TTimerClock;
+    function AddTimer(): TfraTimer;
     constructor Create;
     destructor Destroy; override;
     procedure NotifyChange(Sender: TObject);
@@ -136,7 +136,7 @@ implementation
 
 
 { TTimerClock }
-
+{*
 
 procedure TTimerClock.SetWidget(AValue: TfraTimer);
 begin
@@ -395,7 +395,7 @@ procedure TTimerClock.RemoveSubscription(aObserver: ITimerObserver);
 begin
   FObservers.Remove(aObserver);
 end;
-
+*}
 
 { TClocks }
 
@@ -419,7 +419,7 @@ begin
   //EncounteredUnselected := False;
   for Id in FOrder do
   begin
-    if not FClockWidgets.KeyData[Id].Selected then
+    if not FClockList.KeyData[Id].Selected then
     begin
       if EncounteredSelected then
       begin
@@ -446,7 +446,7 @@ begin
   EncounteredUnselected := False;
   for Id in FOrder do
   begin
-    if FClockWidgets.KeyData[Id].Selected then
+    if FClockList.KeyData[Id].Selected then
     begin
       if EncounteredUnselected then
       begin
@@ -488,7 +488,7 @@ begin
   for Id in FOrder do
   begin
     //Index := FClockWidgets.IndexOf(Id);
-    TimerWidget := FClockWidgets.KeyData[Id];
+    TimerWidget := FClockList.KeyData[Id];
     //FScrollBox.Height:=Filled + Clock.Height;
     //FScrollBox.VertScrollBar.Range:=Filled + Clock.Height;
     TimerWidget.Top := Filled;
@@ -523,7 +523,7 @@ end;
 function TClocks.GetAnySelected: boolean;
 var
   Count: integer;
-  Clock: TTimerClock;
+  Clock: TfraTimer;
   //TimerClock: TTimerClock;
 begin
   for Count := 0 to FClockList.Count - 1 do
@@ -540,43 +540,44 @@ begin
   Result := False;
 end;
 
-function TClocks.AddTimer(): TTimerClock;
+function TClocks.AddTimer(): TfraTimer;
 var
-  NewTimer: TTimerClock;
+  //NewTimer: TTimerClock;
   Id: longword;
   NewWidget: TfraTimer;
 begin
-  NewTimer := TTimerClock.Create;
+  //NewTimer := TTimerClock.Create;
   Id := FCounterClockID.NextVal;
-  NewTimer.Id := Id;
+  //NewTimer.Id := Id;
 
   //NewWidget := FClocksWidget.AddTimer(Id);
   NewWidget := TfraTimer.Create(FScrollBox);
   NewWidget.Id:=Id;
-  FClockWidgets.Add(Id, NewWidget);
+  FClockList.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
   Reorder;
 
-  NewTimer.Widget := NewWidget;
-  NewTimer.OnNotifyChange := @NotifyChange;
+  //NewTimer.Widget := NewWidget;
+  NewWidget.OnNotifyChange := @NotifyChange;
   //NewTimer.AddSubscription(NewWidget.);
 
-  FClockList.Add(Id, NewTimer);
+  //FClockList.Add(Id, NewWidget);
   //NewWidget.Id:=Id;
-  NewWidget.OnPlay := @NewTimer.Start;
-  NewWidget.OnStop := @NewTimer.Stop;
-  NewWidget.OnPause := @NewTimer.Pause;
-  NewWidget.OnNotify := @NewTimer.NotifyChange;
+  {TODO: This section can be cleaned up}
+  NewWidget.OnPlay := @NewWidget.Start;
+  NewWidget.OnStop := @NewWidget.Stop;
+  NewWidget.OnPause := @NewWidget.Pause;
+  NewWidget.OnNotify := @NewWidget.NotifyChange;
   //NewWidget.OnSelect:=@ClockSelected;
 
-  Result := NewTimer;
+  Result := NewWidget;
 end;
 
 
 constructor TClocks.Create;
 begin
 
-  FClockWidgets := TClockWidgetList.Create;
+  //FClockList := TClockWidgetList.Create;
   FOrder := TIdList.Create;
 
   FClockList := TClockList.Create;
@@ -603,26 +604,26 @@ begin
   FClockList.Free;
 
   FOrder.Free;
-  for I := 0 to FClockWidgets.Count - 1 do
+  {for I := 0 to FClockWidgets.Count - 1 do
   begin
     //TODO: Is there a memory leak here?
     FClockWidgets.Data[i].Free;
-  end;
+  end;}
 
-  FClockWidgets.Free;
+  //FClockWidgets.Free;
 
   inherited Destroy;
 end;
 
 procedure TClocks.NotifyChange(Sender: TObject);
 var
-  TimerClock: TTimerClock;
-  Notifier: TTimerClock;
+  TimerClock: TfraTimer;
+  Notifier: TfraTimer;
   Count: integer;
 begin
 
-  Notifier := TTimerClock(Sender);
-  if not Notifier.Widget.NotifyEnabled then
+  Notifier := TfraTimer(Sender);
+  if not Notifier.NotifyEnabled then
   begin
     Notifier.PublishProgress(TIMER_PROGRESS_FINISHED);
     Notifier.Notifier := False;
@@ -637,7 +638,7 @@ begin
       ShowMessage('Clock is Nil');
     if TimerClock <> Notifier then
     begin
-      TimerClock.Widget.NotifyEnabled := False;
+      TimerClock.NotifyEnabled := False;
       if TimerClock.Notifier = True then
       begin
         TimerClock.Notifier := False;
@@ -655,7 +656,7 @@ end;
 
 procedure TClocks.SaveClocks(Conf: TJsonConfig);
 var
-  TimerClock: TTimerClock;
+  TimerClock: TfraTimer;
   Count: integer;
   OrderStrings: TStringList;
   Order: TIdList;
@@ -675,13 +676,13 @@ begin
       ShowMessage('Clock is Nil');
 
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
-      '/' + TIMER_CONF_TITLE, TimerClock.Widget.Caption);
+      '/' + TIMER_CONF_TITLE, TimerClock.Caption);
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
-      '/' + TIMER_CONF_HOURS, HourOf(TimerClock.Widget.Duration));
+      '/' + TIMER_CONF_HOURS, HourOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
-      '/' + TIMER_CONF_MINUTES, MinuteOf(TimerClock.Widget.Duration));
+      '/' + TIMER_CONF_MINUTES, MinuteOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
-      '/' + TIMER_CONF_SECONDS, SecondOf(TimerClock.Widget.Duration));
+      '/' + TIMER_CONF_SECONDS, SecondOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_NOTIFIER, TimerClock.Notifier);
 
@@ -711,7 +712,7 @@ end;
 procedure TClocks.DeleteSelected;
 var
   Id: longword;
-  TimerClock: TTimerClock;
+  TimerClock: TfraTimer;
   Count: integer;
   //Index: integer;
   IdList: TIdList;
@@ -731,17 +732,21 @@ begin
     if TimerClock.Running then
       TimerClock.Stop(Self);
 
-    if TimerClock.Widget.Selected then
+    if TimerClock.Selected then
     begin
-      RemoveTimer(TimerClock.Id);
+      //RemoveTimer(TimerClock.Id);
       IdList.Add(TimerClock.Id);
-      TimerClock.Free;
+      //TimerClock.Free;
     end;
 
   end;
 
   for Id in IdList do
-    FClockList.Remove(Id);
+  begin
+    RemoveTimer(Id);
+    //FClockList.Remove(Id);
+    //TimerClock.Free;
+  end;
   IdList.Free;
 
 end;
@@ -751,9 +756,9 @@ var
   RemovedTimer: TfraTimer;
   Index: integer;
 begin
-  Index := FClockWidgets.IndexOf(IdNew);
-  RemovedTimer := TfraTimer(FClockWidgets.Data[Index]);
-  FClockWidgets.Remove(IdNew);
+  Index := FClockList.IndexOf(IdNew);
+  RemovedTimer := TfraTimer(FClockList.Data[Index]);
+  FClockList.Remove(IdNew);
   FOrder.Remove(IdNew);
   RemovedTimer.Free;
   Reorder;
@@ -773,11 +778,11 @@ begin
       Continue;
     end;
 
-    if FClockWidgets.KeyData[Id].Selected then
+    if FClockList.KeyData[Id].Selected then
     begin
       {If x and y are selected, do not exchange, keep the order as it is}
-      if not (FClockWidgets.KeyData[FOrder.Items[Count - 1]].Selected and
-        FClockWidgets.KeyData[FOrder.Items[Count]].Selected) then
+      if not (FClockList.KeyData[FOrder.Items[Count - 1]].Selected and
+        FClockList.KeyData[FOrder.Items[Count]].Selected) then
         FOrder.Exchange(Count - 1, Count);
     end;
     Inc(Count);
@@ -792,7 +797,7 @@ var
   First: boolean;
 begin
   First := True;
-  for Count := (FClockWidgets.Count - 1) downto 0 do
+  for Count := (FClockList.Count - 1) downto 0 do
   begin
     if First then
     begin
@@ -800,11 +805,11 @@ begin
       Continue;
     end;
     Id := FOrder.Items[Count];
-    if FClockWidgets.KeyData[Id].Selected then
+    if FClockList.KeyData[Id].Selected then
     begin
       {If x and y are selected, do not exchange, keep the order as it is}
-      if not (FClockWidgets.KeyData[FOrder.Items[Count + 1]].Selected and
-        FClockWidgets.KeyData[FOrder.Items[Count]].Selected) then
+      if not (FClockList.KeyData[FOrder.Items[Count + 1]].Selected and
+        FClockList.KeyData[FOrder.Items[Count]].Selected) then
         FOrder.Exchange(Count + 1, Count);
     end;
 
@@ -837,7 +842,7 @@ end;
 
 function TClocks.GetClock(Id: longword): TfraTimer;
 begin
-  Result := FClockWidgets.KeyData[Id];
+  Result := FClockList.KeyData[Id];
 end;
 
 

@@ -35,12 +35,26 @@ const
   TIMER_IMG_NOTIFY_NO: integer = 3;
 
   CLOCK_HEIGHT = 38;
+  DEF_COUNTDOWN_CAPTION: string = '00:00:00';
+  TIMER_PROGRESS_FINISHED: single = 2.0;
+
+  TIMER_CONF_CLOCKS = 'clocks';
+  TIMER_CONF_TIMERS = 'timers';
+  TIMER_CONF_TITLE = 'timer_title';
+  TIMER_CONF_TIME = 'time';
+  TIMER_CONF_HOURS = 'hours';
+  TIMER_CONF_MINUTES = 'minutes';
+  TIMER_CONF_SECONDS = 'seconds';
+  TIMER_CONF_NOTIFIER = 'notifier';
+  //TIMER_CONF_ID = 'id';
+  TIMER_CONF_COUNT = 'count';
+  TIMER_CONF_ORDER = 'order';
 
 type
 
   { TfraTimer }
 
-  TfraTimer = class(TFrame)
+  TfraTimer = class(TFrame, ITimerSubject)
     cbSelect: TCheckBox;
     dtpSet: TDateTimePicker;
     edtTitle: TEdit;
@@ -59,6 +73,17 @@ type
     { private declarations }
     FId: longword;
     //FObservers: TTimerObserverList;
+    FShortTimer: TTimer;
+    FNotifier: boolean;
+
+    FOrigTickDuration: longword;
+    FStartTickCount: longword;
+    FEndTickCount: longword;
+    FPendingTickCount: longword;
+
+    FPaused: boolean;
+    FRunning: boolean;
+    FObservers: TListTimerObservers;
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
@@ -81,6 +106,7 @@ type
     procedure SetPlayButtonEnabled(AValue: boolean);
     procedure SetStopButtonEnabled(AValue: boolean);
     function GetId: longword;
+    procedure SetNotifier(AValue: boolean);
     {function GetTop: integer;
     procedure SetTop(AValue: integer);
     function GetHeight: integer;
@@ -90,6 +116,7 @@ type
   public
     { public declarations }
     OnNotifyClick: TNotifyEvent;
+    OnNotifyChange: TNotifyEvent;
     OnPlay: TNotifyEvent;
     OnStop: TNotifyEvent;
     OnPause: TNotifyEvent;
@@ -106,6 +133,18 @@ type
     property Id: longword read FId write SetId;
     procedure SetCounter(AValue: string);
     procedure CheckForZeroTime;
+
+    procedure OnShortTimer(Sender: TObject);
+    procedure Start(Sender: TObject);
+    procedure Pause(Sender: TObject);
+    procedure Stop(Sender: TObject);
+    procedure NotifyChange(Sender: TObject);
+    procedure Finish;
+    procedure PublishProgress(Percent: single);
+    procedure AddSubscription(aObserver: ITimerObserver);
+    procedure RemoveSubscription(aObserver: ITimerObserver);
+
+
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
     property PauseButtonEnabled: boolean read GetPauseButtonEnabled
@@ -123,6 +162,9 @@ type
     //property Top: integer read GetTop write SetTop;
     //property Height: integer read GetHeight write SetHeight;
     //property Width: integer read GetWidth write SetWidth;
+
+    property Notifier: boolean read FNotifier write SetNotifier;
+    property Running: boolean read FRunning;
   end;
 
 
@@ -278,6 +320,14 @@ begin
   Result := FId;
 end;
 
+procedure TfraTimer.SetNotifier(AValue: boolean);
+begin
+  if FNotifier = AValue then
+    Exit;
+  FNotifier := AValue;
+  NotifyEnabled := AValue;
+end;
+
 procedure TfraTimer.PlayClicked(Sender: TObject);
 begin
   //ShowMessage('In Widget');
@@ -414,11 +464,24 @@ begin
 
   ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap);
 
+  FRunning := False;
+  FPaused := False;
+  FNotifier := False;
+
+  FObservers := TListTimerObservers.Create;
+
+  FShortTimer := TTimer.Create(nil);
+  FShortTimer.Interval := 20;
+  FShortTimer.Enabled := False;
+  FShortTimer.OnTimer := @OnShortTimer;
+
 end;
 
 destructor TfraTimer.Destroy;
 begin
   Parent := Nil;
+  FShortTimer.Free;
+  FObservers.Free;
   inherited Destroy;
 end;
 
@@ -440,6 +503,214 @@ begin
   Seconds := SecondOf(TempDuration);
   // If Hours, Minutes, Seconds, all are zero then disable play button
   sbPlay.Enabled := not ((Hours = 0) and (Minutes = 0) and (Seconds = 0));
+end;
+
+procedure TfraTimer.OnShortTimer(Sender: TObject);
+var
+  Elapsed: longword;
+  ElapsedMilliseconds: longword;
+  Hours: integer;
+  Minutes: integer;
+  Seconds: integer;
+  //Observer: ITimerObserver;
+  CounterText: string;
+  Progress: single;
+begin
+  { If the countdown timer is not running, then default to 00:00:00}
+  if FRunning = False then
+    Counter := DEF_COUNTDOWN_CAPTION
+  //FEndTickCount
+  else if FPaused = False then
+  begin
+    ElapsedMilliseconds := FEndTickCount - GetTickCount64;
+    Elapsed := ElapsedMilliseconds div 1000;
+    if Elapsed <= 0 then
+    begin
+      {Stop(Self);
+      //TODO: 0 is not okay
+      //TODO: Title is hardcoded
+      for Observer in FObservers do
+        Observer.Finished(0, 'Countdown timer!', FWidget.Duration);}
+      Finish;
+      Exit;
+    end;
+    Seconds := Elapsed mod 60;
+    Minutes := Elapsed div 60;
+    Hours := Minutes div 60;
+    Minutes := Minutes mod 60;
+    CounterText := Format('%.2d', [Hours]) + ':' + Format('%.2d', [Minutes]) +
+      ':' + Format('%.2d', [Seconds]);
+
+    if Counter <> CounterText then
+      Counter := CounterText;
+
+    // Calculate percentage progress
+    if FNotifier then
+    begin
+      Progress := 1 - (ElapsedMilliseconds / FOrigTickDuration);
+      // Elapsed time can exceed total pending tick duration, in certain cases.
+      // The system could go on sleep mode while a timer is running
+      // (and while the timer event is being processed) and on
+      // waking up, the pre-caculated tick duration could have already been
+      // overshot. If that is the case, mark progress as zero, and the next
+      // timer event will mark it as completed.
+      if Progress < 0 then
+        Progress := 0;
+      Assert(Progress <= 1);
+      PUblishProgress(1 - (ElapsedMilliseconds / FOrigTickDuration));
+    end;
+
+  end;
+end;
+
+procedure TfraTimer.Start(Sender: TObject);
+var
+  TempDuration: TDateTime;
+  Hours: word;
+  Minutes: word;
+  Seconds: word;
+  //Milliseconds: word;
+begin
+  TempDuration := Duration;
+
+  Hours := HourOf(TempDuration);
+  Minutes := MinuteOf(TempDuration);
+  Seconds := SecondOf(TempDuration);
+
+  if (Hours = 0) and (Minutes = 0) and (Seconds = 0) then
+    Exit;
+
+  FShortTimer.Enabled := True;
+  if FPaused = False then
+  begin
+    FStartTickCount := GetTickCount64;
+
+    FEndTickCount :=
+      FStartTickCount + (((3600 * longword(Hours)) + (60 * longword(Minutes)) +
+      longword(Seconds)) * 1000);
+
+    FOrigTickDuration := FEndTickCount - FStartTickCount;
+    if GlobalUserConfig.AutoProgress = True then
+    begin
+      Notifier:=True;
+      NotifyChange(Self);
+    end;
+  end
+  else
+  begin
+    FStartTickCount := GetTickCount64;
+    FEndTickCount := FStartTickCount + FPendingTickCount;
+  end;
+
+  FRunning := True;
+  FPaused := False;
+
+ // with FWidget do
+  //begin
+    PlayButtonEnabled := False;
+    PauseButtonEnabled := True;
+    StopButtonEnabled := True;
+    DurationEnabled := False;
+    ImageGreyed := False;
+
+  //end;
+
+end;
+
+procedure TfraTimer.Pause(Sender: TObject);
+begin
+  //ShowMessage('Pause');
+  FShortTimer.Enabled := False;
+
+  FPendingTickCount := FEndTickCount - GetTickCount64;
+  if FPendingTickCount <= 0 then
+    Finish;
+
+  FPaused := True;
+  //with FWidget do
+  //begin
+    PlayButtonEnabled := True;
+    PauseButtonEnabled := False;
+    StopButtonEnabled := True;
+    DurationEnabled := False;
+  //end;
+
+end;
+
+procedure TfraTimer.Stop(Sender: TObject);
+begin
+
+  FRunning := False;
+  FPaused := False;
+  FShortTimer.Enabled := False;
+
+
+
+  //with FWidget do
+  //begin
+    PlayButtonEnabled := True;
+    PauseButtonEnabled := False;
+    StopButtonEnabled := False;
+    DurationEnabled := True;
+    ImageGreyed := True;
+    Counter := DEF_COUNTDOWN_CAPTION;
+  //end;
+
+  if FNotifier then
+    PublishProgress(TIMER_PROGRESS_FINISHED);
+
+  FEndTickCount := 0;
+  FOrigTickDuration := 0;
+  FStartTickCount := 0;
+end;
+
+procedure TfraTimer.NotifyChange(Sender: TObject);
+begin
+  if OnNotifyChange <> nil then
+  begin
+    OnNotifyChange(Self);
+    //ShowMessage('Change');
+  end
+  else
+    ShowMessage('Unexpected error at ' +
+{$I %FILE%}
+      +' ' +
+{$I %LINE%}
+      +': OnNotifyChange was found to be Nil');
+end;
+
+procedure TfraTimer.Finish;
+var
+  Observer: ITimerObserver;
+begin
+
+  for Observer in FObservers do
+  begin
+    Observer.TimerFinished(FId);
+  end;
+
+  if Notifier then
+    PublishProgress(TIMER_PROGRESS_FINISHED);
+  Stop(Self);
+end;
+
+procedure TfraTimer.PublishProgress(Percent: single);
+var
+  Observer: ITimerObserver;
+begin
+  for Observer in FObservers do
+    Observer.ProgressUpdate(Percent);
+
+end;
+
+procedure TfraTimer.AddSubscription(aObserver: ITimerObserver);
+begin
+  FObservers.Add(aObserver);
+end;
+
+procedure TfraTimer.RemoveSubscription(aObserver: ITimerObserver);
+begin
+  FObservers.Remove(aObserver);
 end;
 
 end.
