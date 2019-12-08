@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, dateutils, settings, observers;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -55,16 +55,23 @@ type
   { TfraTimer }
 
   TfraTimer = class(TFrame, ITimerSubject)
+    aiStop: TAction;
+    aiPause: TAction;
+    aiPlay: TAction;
+    alTimer: TActionList;
+    bbPlay: TBitBtn;
+    bbPause: TBitBtn;
+    bbStop: TBitBtn;
     cbSelect: TCheckBox;
     dtpSet: TDateTimePicker;
     edtTitle: TEdit;
     ilTimer: TImageList;
     imgTimer: TImage;
     lblCountdown: TLabel;
-    sbPlay: TSpeedButton;
-    sbPause: TSpeedButton;
-    sbStop: TSpeedButton;
     sbNotify: TSpeedButton;
+    procedure aiPauseExecute(Sender: TObject);
+    procedure aiPlayExecute(Sender: TObject);
+    procedure aiStopExecute(Sender: TObject);
     procedure dtpSetChange(Sender: TObject);
     procedure imgTimerClick(Sender: TObject);
     procedure sbNotifyClick(Sender: TObject);
@@ -180,6 +187,22 @@ begin
   CheckForZeroTime;
 end;
 
+procedure TfraTimer.aiPlayExecute(Sender: TObject);
+begin
+  PlayClicked(Sender);
+end;
+
+procedure TfraTimer.aiStopExecute(Sender: TObject);
+begin
+  Stopclicked(Sender);
+end;
+
+procedure TfraTimer.aiPauseExecute(Sender: TObject);
+begin
+  PauseClicked(Sender);
+end;
+
+
 procedure TfraTimer.imgTimerClick(Sender: TObject);
 begin
 
@@ -251,12 +274,12 @@ end;
 
 function TfraTimer.GetPauseButtonEnabled: boolean;
 begin
-  Result := sbPause.Enabled;
+  Result := bbPause.Enabled;
 end;
 
 function TfraTimer.GetPlayButtonEnabled: boolean;
 begin
-  Result := sbPlay.Enabled;
+  Result := bbPlay.Enabled;
 end;
 
 function TfraTimer.GetSelected: boolean;
@@ -266,7 +289,7 @@ end;
 
 function TfraTimer.GetStopButtonEnabled: boolean;
 begin
-  Result := sbStop.Enabled;
+  Result := bbStop.Enabled;
 end;
 
 procedure TfraTimer.SetCaption(AValue: string);
@@ -302,17 +325,17 @@ end;
 
 procedure TfraTimer.SetPauseButtonEnabled(AValue: boolean);
 begin
-  sbPause.Enabled := AValue;
+  bbPause.Enabled := AValue;
 end;
 
 procedure TfraTimer.SetPlayButtonEnabled(AValue: boolean);
 begin
-  sbPlay.Enabled := AValue;
+  bbPlay.Enabled := AValue;
 end;
 
 procedure TfraTimer.SetStopButtonEnabled(AValue: boolean);
 begin
-  sbStop.Enabled := AValue;
+  bbStop.Enabled := AValue;
 end;
 
 function TfraTimer.GetId: longword;
@@ -456,9 +479,9 @@ begin
   Parent := TWinControl(AOwner);
   //Name := Name + IntToStr(IdNew);
   //Id := IdNew;
-  sbPlay.OnClick := @PlayClicked;
-  sbStop.OnClick := @StopClicked;
-  sbPause.OnClick := @PauseClicked;
+  //sbPlay.OnClick := @PlayClicked;
+  //sbStop.OnClick := @StopClicked;
+  //sbPause.OnClick := @PauseClicked;
   OnNotifyClick := @NotifyClicked;
   cbSelect.OnChange := @ClockSelected;
 
@@ -475,6 +498,9 @@ begin
   FShortTimer.Enabled := False;
   FShortTimer.OnTimer := @OnShortTimer;
 
+  bbPlay.Caption:='';
+  bbPause.Caption:='';
+  bbStop.Caption:='';
 end;
 
 destructor TfraTimer.Destroy;
@@ -502,7 +528,7 @@ begin
   Minutes := MinuteOf(TempDuration);
   Seconds := SecondOf(TempDuration);
   // If Hours, Minutes, Seconds, all are zero then disable play button
-  sbPlay.Enabled := not ((Hours = 0) and (Minutes = 0) and (Seconds = 0));
+  bbPlay.Enabled := not ((Hours = 0) and (Minutes = 0) and (Seconds = 0));
 end;
 
 procedure TfraTimer.OnShortTimer(Sender: TObject);
@@ -517,10 +543,11 @@ var
   Progress: single;
 begin
   { If the countdown timer is not running, then default to 00:00:00}
-  if FRunning = False then
-    Counter := DEF_COUNTDOWN_CAPTION
+  //if FRunning = False then
+    //Counter := DEF_COUNTDOWN_CAPTION
   //FEndTickCount
-  else if FPaused = False then
+  //else if FPaused = False then
+  if FRunning and (FPaused = False) then
   begin
     ElapsedMilliseconds := FEndTickCount - GetTickCount64;
     Elapsed := ElapsedMilliseconds div 1000;
