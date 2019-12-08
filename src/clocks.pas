@@ -126,6 +126,7 @@ type
     procedure GetOrder(AValue: TIdList);
     procedure SetOrder(AValue: TIdList);
     function GetClock(Id: longword): TFraTimer;
+    function GetAllIdS(Ids: TIdList): boolean;
     property ScrollBox: TScrollBox read FScrollBox write SetScrollBox;
     property CanSelectedMoveUp: boolean read GetCanSelectedMoveUp;
     property CanSelectedMovDown: boolean read GetCanselectedMoveDown;
@@ -482,7 +483,8 @@ var
   CountTabOrder: integer;
 begin
   //Exit;
-  Filled := 0;
+  {TODO: Remove the hard coding of the header hight}
+  Filled := 24;
   //FScrollBox.AutoScroll:=False;
   //FScrollBox.Visible:=False;
   FScrollBox.Height := FOrder.Count * CLOCK_HEIGHT;
@@ -844,9 +846,19 @@ begin
   ReOrder;
 end;
 
-function TClocks.GetClock(Id: longword): TfraTimer;
+function TClocks.GetClock(Id: longword): TFraTimer;
 begin
   Result := FClockList.KeyData[Id];
+end;
+
+function TClocks.GetAllIdS(Ids: TIdList): boolean;
+var
+  Id: integer;
+begin
+  for Id in FOrder do
+  begin
+    Ids.Add(Id);
+  end;
 end;
 
 

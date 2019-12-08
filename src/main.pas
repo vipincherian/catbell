@@ -65,6 +65,7 @@ type
     aiAbout: TAction;
     alMain: TActionList;
     aiNewTimer: TAction;
+    hdrTimers: THeaderControl;
     ilMain: TImageList;
     ilMainSmall: TImageList;
     MenuItem1: TMenuItem;
@@ -135,6 +136,7 @@ type
     //procedure ExportToFile(Sender: TObject);
     procedure PostTimerCreation(AValue: TfraTimer);
     procedure SetListButtonsStatus;
+    procedure ResetHeaderSections;
   public
     { public declarations }
     OnNewTimer: TNotifyEvent;
@@ -542,6 +544,7 @@ procedure TMainForm.PostTimerCreation(AValue: TfraTimer);
 begin
   AValue.AddSubscription(Self);
   AValue.OnSelect := @ClockSelected;
+  ResetHeaderSections;
 end;
 
 procedure TMainForm.SetListButtonsStatus;
@@ -549,6 +552,27 @@ begin
   sbDelete.Enabled := FClocks.AnySelected;
   sbMoveClockDown.Enabled:=FClocks.CanSelectedMovDown;
   sbMoveClockUp.Enabled:= FClocks.CanSelectedMoveUp;
+end;
+
+procedure TMainForm.ResetHeaderSections;
+var
+  Ids: TIdList;
+  Id: longword;
+  Timer: TfraTimer;
+  Filled: Integer;
+begin
+  Ids:=TIdList.Create;
+  FClocks.GetAllIdS(Ids);
+  if Ids.Count > 0 then
+  begin
+    Id:=Ids.Items[0];
+    Timer:=FClocks.GetClock(Id);
+    // Find the
+    hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
+    Inc(Filled, hdrTimers.Sections.Items[0].Width);
+    hdrTimers.Sections.Items[1].Width := Timer.dtpSet.Left + Timer.dtpSet.Width - hdrTimers.Sections.Items[0].Left - hdrTimers.Sections.Items[0].Width;
+  end;
+  Ids.Free;
 end;
 
 {*procedure TMainForm.NewTimerAdded(Sender: TObject);

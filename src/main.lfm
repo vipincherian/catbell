@@ -337,12 +337,35 @@ object MainForm: TMainForm
       Height = 263
       Top = 1
       Width = 671
-      HorzScrollBar.Page = 1
-      VertScrollBar.Page = 1
+      HorzScrollBar.Page = 170
+      VertScrollBar.Page = 24
       Align = alClient
       BorderStyle = bsNone
+      ClientHeight = 263
+      ClientWidth = 671
       TabOrder = 1
       OnClick = sbxClocksClick
+      object hdrTimers: THeaderControl
+        Left = 0
+        Height = 24
+        Top = 0
+        Width = 671
+        DragReorder = False
+        Sections = <        
+          item
+            Alignment = taLeftJustify
+            Width = 30
+            Visible = True
+          end        
+          item
+            Alignment = taLeftJustify
+            Text = 'Title'
+            Width = 30
+            Visible = True
+          end>
+        Align = alTop
+        Enabled = False
+      end
     end
   end
   object sbDelete: TSpeedButton
