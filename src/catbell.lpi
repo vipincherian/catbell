@@ -108,6 +108,7 @@
         <Filename Value="editform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmEditTimer"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit13>
     </Units>
