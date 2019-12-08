@@ -23,7 +23,11 @@ unit clockswidget;
 {$mode objfpc}{$H+}
 
 interface
+implementation
+begin
 
+end.
+{*
 uses
   Classes, SysUtils, ExtCtrls, Dialogs, Forms, Graphics, LCLIntf,
   LCLType, fgl, timerframe;
@@ -105,7 +109,7 @@ type
 
   //TClockWidgetList = specialize TFPGMap<longword, TTimerClockWidget>;
 
-  //TIdList = specialize TFPGList<longword>;
+  //TIdList = specialize TFPGList<longword>;    *}
   {*
   { TClocksWidget }
 
@@ -132,7 +136,7 @@ type
     property CanSelectedMoveUp: boolean read GetCanSelectedMoveUp;
     property CanSelectedMovDown: boolean read GetCanselectedMoveDown;
 
-  end;      *}
+  end;
 
 
 
@@ -395,7 +399,7 @@ begin
   FFrame.Free;
   inherited Destroy;
 end;
-
+*}
 {*
 { TClocksWidget }
 

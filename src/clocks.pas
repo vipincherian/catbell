@@ -52,7 +52,7 @@ type
 
   TTimerClock = class(TInterfacedObject, ITimerSubject)
   private
-    FWidget: TTimerClockWidget;
+    FWidget: TfraTimer;
     FShortTimer: TTimer;
     FNotifier: boolean;
 
@@ -67,14 +67,14 @@ type
     FId: integer;
     procedure SetId(AValue: integer);
     procedure SetNotifier(AValue: boolean);
-    procedure SetWidget(AValue: TTimerClockWidget);
+    procedure SetWidget(AValue: TFraTimer);
     function GetSelected: boolean;
 
   public
     OnNotifyChange: TNotifyEvent;
     constructor Create();
     destructor Destroy; override;
-    property Widget: TTimerClockWidget read FWidget write SetWidget;
+    property Widget: TfraTimer read FWidget write SetWidget;
     property Id: integer read FId write SetId;
     procedure OnShortTimer(Sender: TObject);
     procedure Start(Sender: TObject);
@@ -92,7 +92,8 @@ type
 
   TClockList = specialize TFPGMap<longword, TTimerClock>;
 
-  TClockWidgetList = specialize TFPGMap<longword, TTimerClockWidget>;
+  TClockWidgetList = specialize TFPGMap<longword, TfraTimer>;
+  //TListTimerClockWidgets = specialize TFPGList<TfraTimer>;
   TIdList = specialize TFPGList<longword>;
   { TClocks }
   TClocks = class(TObject)
@@ -101,7 +102,7 @@ type
     FScrollBox: TScrollBox;
     FClockWidgets: TClockWidgetList;
     FOrder: TIdList;
-    FActiveTimers: TListTimerClockWidgets;
+    //FActiveTimers: TListTimerClockWidgets;
     FCounterClockID: TSequence;
     //FClocksWidget: TClocksWidget;
     function GetAnySelected: boolean;
@@ -124,7 +125,7 @@ type
     procedure MoveSelectedClocksDown;
     procedure GetOrder(AValue: TIdList);
     procedure SetOrder(AValue: TIdList);
-    function GetClock(Id: longword): TTimerClockWidget;
+    function GetClock(Id: longword): TFraTimer;
     property ScrollBox: TScrollBox read FScrollBox write SetScrollBox;
     property CanSelectedMoveUp: boolean read GetCanSelectedMoveUp;
     property CanSelectedMovDown: boolean read GetCanselectedMoveDown;
@@ -137,7 +138,7 @@ implementation
 { TTimerClock }
 
 
-procedure TTimerClock.SetWidget(AValue: TTimerClockWidget);
+procedure TTimerClock.SetWidget(AValue: TfraTimer);
 begin
   FWidget := AValue;
 end;
@@ -476,7 +477,7 @@ procedure TClocks.Reorder;
 var
   Id: longword;
   //Index: integer;
-  TimerWidget: TTimerClockWidget;
+  TimerWidget: TfraTimer;
   Filled: integer;
 begin
   //Exit;
@@ -543,14 +544,15 @@ function TClocks.AddTimer(): TTimerClock;
 var
   NewTimer: TTimerClock;
   Id: longword;
-  NewWidget: TTimerClockWidget;
+  NewWidget: TfraTimer;
 begin
   NewTimer := TTimerClock.Create;
   Id := FCounterClockID.NextVal;
   NewTimer.Id := Id;
 
   //NewWidget := FClocksWidget.AddTimer(Id);
-  NewWidget := TTimerClockWidget.Create(FScrollBox, Id);
+  NewWidget := TfraTimer.Create(FScrollBox);
+  NewWidget.Id:=Id;
   FClockWidgets.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
   Reorder;
@@ -578,7 +580,7 @@ begin
   FOrder := TIdList.Create;
 
   FClockList := TClockList.Create;
-  FActiveTimers := TListTimerClockWidgets.Create;
+  //FActiveTimers := TListTimerClockWidgets.Create;
 
   FCounterClockID := TSequence.Create;
   //FClocksWidget := nil;
@@ -597,7 +599,7 @@ begin
 
   FCounterClockID.Free;
 
-  FActiveTimers.Free;
+  //FActiveTimers.Free;
   FClockList.Free;
 
   FOrder.Free;
@@ -746,11 +748,11 @@ end;
 
 procedure TClocks.RemoveTimer(IdNew: longword);
 var
-  RemovedTimer: TTimerClockWidget;
+  RemovedTimer: TfraTimer;
   Index: integer;
 begin
   Index := FClockWidgets.IndexOf(IdNew);
-  RemovedTimer := TTimerClockWidget(FClockWidgets.Data[Index]);
+  RemovedTimer := TfraTimer(FClockWidgets.Data[Index]);
   FClockWidgets.Remove(IdNew);
   FOrder.Remove(IdNew);
   RemovedTimer.Free;
@@ -833,7 +835,7 @@ begin
   ReOrder;
 end;
 
-function TClocks.GetClock(Id: longword): TTimerClockWidget;
+function TClocks.GetClock(Id: longword): TfraTimer;
 begin
   Result := FClockWidgets.KeyData[Id];
 end;

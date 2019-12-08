@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, clockswidget, settings, optionsform, aboutform, BGRABitmap,
-  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf;
+  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf, timerframe;
 
 const
   TICON_RED_INDEX: integer = 1;
@@ -633,7 +633,7 @@ var
   Hours: word;
   Minutes: word;
   Seconds: word;
-  Widget: TTimerClockWidget;
+  Widget: TfraTimer;
   Duration: TDateTime;
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
