@@ -23,7 +23,7 @@ object fraTimer: TfraTimer
     Top = 8
     Width = 303
     Anchors = [akTop, akLeft, akRight]
-    TabOrder = 0
+    TabOrder = 1
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
@@ -45,7 +45,7 @@ object fraTimer: TfraTimer
     Height = 19
     Top = 8
     Width = 20
-    TabOrder = 1
+    TabOrder = 0
   end
   object dtpSet: TDateTimePicker
     Left = 376
@@ -93,7 +93,6 @@ object fraTimer: TfraTimer
     Width = 40
     Action = aiPlay
     Anchors = [akTop, akRight]
-    Caption = 'Start'
     Glyph.Data = {
       36090000424D3609000000000000360000002800000018000000180000000100
       2000000000000009000064000000640000000000000000000000000000000000

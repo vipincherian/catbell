@@ -479,12 +479,14 @@ var
   //Index: integer;
   TimerWidget: TfraTimer;
   Filled: integer;
+  CountTabOrder: integer;
 begin
   //Exit;
   Filled := 0;
   //FScrollBox.AutoScroll:=False;
   //FScrollBox.Visible:=False;
   FScrollBox.Height := FOrder.Count * CLOCK_HEIGHT;
+  CountTabOrder:=0;
   for Id in FOrder do
   begin
     //Index := FClockWidgets.IndexOf(Id);
@@ -492,6 +494,7 @@ begin
     //FScrollBox.Height:=Filled + Clock.Height;
     //FScrollBox.VertScrollBar.Range:=Filled + Clock.Height;
     TimerWidget.Top := Filled;
+    TimerWidget.TabOrder:=CountTabOrder;
     // + FScrollBox.VertScrollBar.Size - FScrollBox.VertScrollBar.Position;
     if FScrollBox.VertScrollBar.IsScrollBarVisible then
       TimerWidget.Width := FSCrollBox.Width - GetSystemMetrics(SM_CYVSCROLL)
@@ -499,6 +502,7 @@ begin
       TimerWidget.Width := FSCrollBox.Width;
     //Clock.He;
     Inc(Filled, TimerWidget.Height);
+    Inc(CountTabOrder);
     //if Clock.Kind = 'Timer' then
     //begin
     //TimerWidget := TTimerClockWidget(Clock);
