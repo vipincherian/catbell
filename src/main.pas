@@ -119,7 +119,7 @@ type
     FAppProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FTrayStoppedBitmap, FAppStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
-    FClockWidget: TClocksWidget;
+    //FClockWidget: TClocksWidget;
     FClocks: TClocks;
     FDbFileName: string;
     FDbDefault: boolean;
@@ -192,10 +192,11 @@ begin
   FDbDefault := True;
 
   //DoubleBuffered:=True;
-  FClockWidget := TClocksWidget.Create;
-  FClockWidget.ScrollBox := sbxClocks;
+  //FClockWidget := TClocksWidget.Create;
+  FClocks.ScrollBox := sbxClocks;
 
-  FClocks.Widget := FClockWidget;
+  //FClocks.Widget := FClockWidget;
+
   ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
   tiMain.Visible := True;
 
@@ -391,7 +392,7 @@ begin
   //inherited Destroy;
   SavetoFile;
   FClocks.Destroy;
-  FClockWidget.Free;
+  //FClockWidget.Free;
   end;
 
 procedure TMainForm.FormShow(Sender: TObject);
@@ -546,8 +547,8 @@ end;
 procedure TMainForm.SetListButtonsStatus;
 begin
   sbDelete.Enabled := FClocks.AnySelected;
-  sbMoveClockDown.Enabled:=FClocks.Widget.CanSelectedMovDown;
-  sbMoveClockUp.Enabled:= FClocks.Widget.CanSelectedMoveUp;
+  sbMoveClockDown.Enabled:=FClocks.CanSelectedMovDown;
+  sbMoveClockUp.Enabled:= FClocks.CanSelectedMoveUp;
 end;
 
 {*procedure TMainForm.NewTimerAdded(Sender: TObject);
@@ -602,7 +603,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnClockMoveUp was found to be Nil');*}
-  FClocks.Widget.MoveSelectedClocksUp;
+  FClocks.MoveSelectedClocksUp;
   SetListButtonsStatus;
 end;
 
@@ -618,7 +619,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnClockMoveDown was found to be Nil');*}
-  FClocks.Widget.MoveSelectedClocksDown;
+  FClocks.MoveSelectedClocksDown;
   SetListButtonsStatus;
 end;
 
@@ -637,7 +638,7 @@ var
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
 
-  Widget := FClockWidget.GetClock(Id);
+  Widget := FClocks.GetClock(Id);
   Duration := Widget.Duration;
 
   Hours := HourOf(Duration);
@@ -837,7 +838,7 @@ begin
       Order.Add(StrToInt(Pos));
     end;
 
-    FClocks.Widget.SetOrder(Order);
+    FClocks.SetOrder(Order);
 
     Conf.Free;
     OrderString.Free;

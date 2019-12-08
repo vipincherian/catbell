@@ -103,9 +103,10 @@ type
 
   TListTimerClockWidgets = specialize TFPGList<TTimerClockWidget>;
 
-  TClockWidgetList = specialize TFPGMap<longword, TTimerClockWidget>;
+  //TClockWidgetList = specialize TFPGMap<longword, TTimerClockWidget>;
 
-  TIdList = specialize TFPGList<longword>;
+  //TIdList = specialize TFPGList<longword>;
+  {*
   { TClocksWidget }
 
   TClocksWidget = class(TObject)
@@ -131,7 +132,7 @@ type
     property CanSelectedMoveUp: boolean read GetCanSelectedMoveUp;
     property CanSelectedMovDown: boolean read GetCanselectedMoveDown;
 
-  end;
+  end;      *}
 
 
 
@@ -395,6 +396,7 @@ begin
   inherited Destroy;
 end;
 
+{*
 { TClocksWidget }
 
 
@@ -636,7 +638,7 @@ function TClocksWidget.GetClock(Id: longword): TTimerClockWidget;
 begin
   Result := FClockWidgets.KeyData[Id];
 end;
-
+*}
 
 
 end.

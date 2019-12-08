@@ -25,8 +25,9 @@ unit clocks;
 interface
 
 uses
-  Classes, SysUtils, Dialogs, ExtCtrls, fgl, dateutils, jsonConf, clockswidget,
-  sequence, observers, settings;
+  Classes, SysUtils, Dialogs, Forms, ExtCtrls, fgl, dateutils, jsonConf, clockswidget,
+  sequence, observers, settings, Graphics, LCLIntf,
+  LCLType, timerframe;
 
 const
   DEF_COUNTDOWN_CAPTION: string = '00:00:00';
@@ -91,16 +92,24 @@ type
 
   TClockList = specialize TFPGMap<longword, TTimerClock>;
 
-
+  TClockWidgetList = specialize TFPGMap<longword, TTimerClockWidget>;
+  TIdList = specialize TFPGList<longword>;
   { TClocks }
   TClocks = class(TObject)
   private
     FClockList: TClockList;
+    FScrollBox: TScrollBox;
+    FClockWidgets: TClockWidgetList;
+    FOrder: TIdList;
     FActiveTimers: TListTimerClockWidgets;
     FCounterClockID: TSequence;
-    FClocksWidget: TClocksWidget;
+    //FClocksWidget: TClocksWidget;
     function GetAnySelected: boolean;
-    procedure SetWidget(AValue: TClocksWidget);
+    //procedure SetWidget(AValue: TClocksWidget);
+    function GetCanselectedMoveDown: boolean;
+    function GetCanSelectedMoveUp: boolean;
+    procedure SetScrollBox(AValue: TScrollBox);
+    procedure Reorder;
   public
     function AddTimer(): TTimerClock;
     constructor Create;
@@ -108,8 +117,17 @@ type
     procedure NotifyChange(Sender: TObject);
     procedure SaveClocks(Conf: TJsonConfig);
     procedure DeleteSelected;
-    property Widget: TClocksWidget read FClocksWidget write SetWidget;
+    //property Widget: TClocksWidget read FClocksWidget write SetWidget;
     property AnySelected: boolean read GetAnySelected;
+    procedure RemoveTimer(IdNew: longword);
+    procedure MoveSelectedClocksUp;
+    procedure MoveSelectedClocksDown;
+    procedure GetOrder(AValue: TIdList);
+    procedure SetOrder(AValue: TIdList);
+    function GetClock(Id: longword): TTimerClockWidget;
+    property ScrollBox: TScrollBox read FScrollBox write SetScrollBox;
+    property CanSelectedMoveUp: boolean read GetCanSelectedMoveUp;
+    property CanSelectedMovDown: boolean read GetCanselectedMoveDown;
 
   end;
 
@@ -380,13 +398,123 @@ end;
 
 { TClocks }
 
-procedure TClocks.SetWidget(AValue: TClocksWidget);
+{*procedure TClocks.SetWidget(AValue: TClocksWidget);
 begin
   if AValue = nil then
     Exit;
   if FClocksWidget = AValue then
     Exit;
   FClocksWidget := AValue;
+
+end;*}
+
+function TClocks.GetCanselectedMoveDown: boolean;
+var
+  Id: longword;
+  //Count: integer;
+  EncounteredSelected: boolean;
+begin
+  EncounteredSelected := False;
+  //EncounteredUnselected := False;
+  for Id in FOrder do
+  begin
+    if not FClockWidgets.KeyData[Id].Selected then
+    begin
+      if EncounteredSelected then
+      begin
+        Result := True;
+        Exit;
+      end;
+    end
+    else
+    begin
+      if not EncounteredSelected then
+        EncounteredSelected := True;
+    end;
+  end;
+  Result := False;
+end;
+
+function TClocks.GetCanSelectedMoveUp: boolean;
+var
+  Id: longword;
+  //Count: integer;
+  EncounteredUnselected: boolean;
+begin
+  //EncounteredSelected := False;
+  EncounteredUnselected := False;
+  for Id in FOrder do
+  begin
+    if FClockWidgets.KeyData[Id].Selected then
+    begin
+      if EncounteredUnselected then
+      begin
+        Result := True;
+        Exit;
+      end;
+    end
+    else
+    begin
+      if not EncounteredUnselected then
+        EncounteredUnselected := True;
+    end;
+  end;
+  Result := False;
+end;
+
+procedure TClocks.SetScrollBox(AValue: TScrollBox);
+begin
+  if AValue = nil then
+    Exit;
+  if FScrollBox = AValue then
+    Exit;
+  FScrollBox := AValue;
+  //OnTimerStart:=Nil;
+end;
+
+procedure TClocks.Reorder;
+var
+  Id: longword;
+  //Index: integer;
+  TimerWidget: TTimerClockWidget;
+  Filled: integer;
+begin
+  //Exit;
+  Filled := 0;
+  //FScrollBox.AutoScroll:=False;
+  //FScrollBox.Visible:=False;
+  FScrollBox.Height := FOrder.Count * CLOCK_HEIGHT;
+  for Id in FOrder do
+  begin
+    //Index := FClockWidgets.IndexOf(Id);
+    TimerWidget := FClockWidgets.KeyData[Id];
+    //FScrollBox.Height:=Filled + Clock.Height;
+    //FScrollBox.VertScrollBar.Range:=Filled + Clock.Height;
+    TimerWidget.Top := Filled;
+    // + FScrollBox.VertScrollBar.Size - FScrollBox.VertScrollBar.Position;
+    if FScrollBox.VertScrollBar.IsScrollBarVisible then
+      TimerWidget.Width := FSCrollBox.Width - GetSystemMetrics(SM_CYVSCROLL)
+    else
+      TimerWidget.Width := FSCrollBox.Width;
+    //Clock.He;
+    Inc(Filled, TimerWidget.Height);
+    //if Clock.Kind = 'Timer' then
+    //begin
+    //TimerWidget := TTimerClockWidget(Clock);
+
+    //TimerWidget.FFrame.lblCountdown.Hint := IntToStr(TimerWidget.FFrame.Top);
+    //end;
+
+  end;
+
+  //FScrollBox.AutoScroll:=True;
+  //FScrollBox.VertScrollBar.Range:=(FOrder.Count) * CLOCK_HEIGHT;
+
+  //FScrollBox.VertScrollBar.Range:=Filled ;
+  //FScrollBox.Refresh;
+  //FScrollBox.Visible:=True;
+  //FScrollBox.Repaint;
+  //FScrollBox.ReAlign;
 
 end;
 
@@ -411,7 +539,7 @@ begin
   Result := False;
 end;
 
-function TClocks.AddTimer: TTimerClock;
+function TClocks.AddTimer(): TTimerClock;
 var
   NewTimer: TTimerClock;
   Id: longword;
@@ -421,7 +549,11 @@ begin
   Id := FCounterClockID.NextVal;
   NewTimer.Id := Id;
 
-  NewWidget := FClocksWidget.AddTimer(Id);
+  //NewWidget := FClocksWidget.AddTimer(Id);
+  NewWidget := TTimerClockWidget.Create(FScrollBox, Id);
+  FClockWidgets.Add(Id, NewWidget);
+  FOrder.Insert(0, Id);
+  Reorder;
 
   NewTimer.Widget := NewWidget;
   NewTimer.OnNotifyChange := @NotifyChange;
@@ -439,13 +571,17 @@ begin
 end;
 
 
-constructor TClocks.Create();
+constructor TClocks.Create;
 begin
+
+  FClockWidgets := TClockWidgetList.Create;
+  FOrder := TIdList.Create;
+
   FClockList := TClockList.Create;
   FActiveTimers := TListTimerClockWidgets.Create;
 
   FCounterClockID := TSequence.Create;
-  FClocksWidget := nil;
+  //FClocksWidget := nil;
 
 end;
 
@@ -463,6 +599,16 @@ begin
 
   FActiveTimers.Free;
   FClockList.Free;
+
+  FOrder.Free;
+  for I := 0 to FClockWidgets.Count - 1 do
+  begin
+    //TODO: Is there a memory leak here?
+    FClockWidgets.Data[i].Free;
+  end;
+
+  FClockWidgets.Free;
+
   inherited Destroy;
 end;
 
@@ -517,7 +663,7 @@ begin
   Order := TIdList.Create;
   OrderStrings := TStringList.Create;
 
-  FClocksWidget.GetOrder(Order);
+  GetOrder(Order);
 
   Conf.SetValue(TIMER_CONF_COUNT, FClockList.Count);
   for Count := 0 to FClockList.Count - 1 do
@@ -585,7 +731,7 @@ begin
 
     if TimerClock.Widget.Selected then
     begin
-      FClocksWidget.RemoveTimer(TimerClock.Id);
+      RemoveTimer(TimerClock.Id);
       IdList.Add(TimerClock.Id);
       TimerClock.Free;
     end;
@@ -596,6 +742,100 @@ begin
     FClockList.Remove(Id);
   IdList.Free;
 
+end;
+
+procedure TClocks.RemoveTimer(IdNew: longword);
+var
+  RemovedTimer: TTimerClockWidget;
+  Index: integer;
+begin
+  Index := FClockWidgets.IndexOf(IdNew);
+  RemovedTimer := TTimerClockWidget(FClockWidgets.Data[Index]);
+  FClockWidgets.Remove(IdNew);
+  FOrder.Remove(IdNew);
+  RemovedTimer.Free;
+  Reorder;
+end;
+
+procedure TClocks.MoveSelectedClocksUp;
+var
+  Id: longword;
+  Count: integer;
+begin
+  Count := 0;
+  for Id in FOrder do
+  begin
+    if Count = 0 then
+    begin
+      Inc(Count);
+      Continue;
+    end;
+
+    if FClockWidgets.KeyData[Id].Selected then
+    begin
+      {If x and y are selected, do not exchange, keep the order as it is}
+      if not (FClockWidgets.KeyData[FOrder.Items[Count - 1]].Selected and
+        FClockWidgets.KeyData[FOrder.Items[Count]].Selected) then
+        FOrder.Exchange(Count - 1, Count);
+    end;
+    Inc(Count);
+  end;
+  Reorder;
+end;
+
+procedure TClocks.MoveSelectedClocksDown;
+var
+  Id: longword;
+  Count: integer;
+  First: boolean;
+begin
+  First := True;
+  for Count := (FClockWidgets.Count - 1) downto 0 do
+  begin
+    if First then
+    begin
+      First := False;
+      Continue;
+    end;
+    Id := FOrder.Items[Count];
+    if FClockWidgets.KeyData[Id].Selected then
+    begin
+      {If x and y are selected, do not exchange, keep the order as it is}
+      if not (FClockWidgets.KeyData[FOrder.Items[Count + 1]].Selected and
+        FClockWidgets.KeyData[FOrder.Items[Count]].Selected) then
+        FOrder.Exchange(Count + 1, Count);
+    end;
+
+  end;
+  Reorder;
+end;
+
+procedure TClocks.GetOrder(AValue: TIdList);
+var
+  Id: integer;
+begin
+  AValue.Clear;
+  for Id in FOrder do
+  begin
+    AValue.Add(Id);
+  end;
+end;
+
+procedure TClocks.SetOrder(AValue: TIdList);
+var
+  Id: integer;
+begin
+  FOrder.Clear;
+  for Id in AValue do
+  begin
+    FOrder.Add(Id);
+  end;
+  ReOrder;
+end;
+
+function TClocks.GetClock(Id: longword): TTimerClockWidget;
+begin
+  Result := FClockWidgets.KeyData[Id];
 end;
 
 
