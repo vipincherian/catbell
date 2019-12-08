@@ -214,10 +214,6 @@ type
     procedure RemoveTimer(IdNew: longword);
     procedure MoveSelectedClocksUp;
     procedure MoveSelectedClocksDown;
-    procedure GetOrder(AValue: TIdList);
-    procedure SetOrder(AValue: TIdList);
-    function GetClock(Id: longword): TFraTimer;
-    function GetAllIdS(Ids: TIdList): boolean;
   end;
 
 var
@@ -644,18 +640,18 @@ end;
 
 procedure TMainForm.ResetHeaderSections;
 var
-  Ids: TIdList;
+  //Ids: TIdList;
   Id: longword;
   Timer: TfraTimer;
   Filled: Integer = 0;
   Temp: Integer;
 begin
-  Ids:=TIdList.Create;
-  GetAllIdS(Ids);
-  if Ids.Count > 0 then
+  //Ids:=TIdList.Create;
+  //GetAllIdS(Ids);
+  if FOrder.Count > 0 then
   begin
-    Id:=Ids.Items[0];
-    Timer:=GetClock(Id);
+    Id:=FOrder.Items[0];
+    Timer:=FTimerFrames.KeyData[Id];
     // Find the
     hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
     Inc(Filled, hdrTimers.Sections.Items[0].Width);
@@ -682,7 +678,7 @@ begin
     hdrTimers.Sections.Items[5].Width := Temp;
     Inc(Filled, Temp);
   end;
-  Ids.Free;
+  //Ids.Free;
 end;
 
 function TMainForm.GetAnySelected: boolean;
@@ -898,7 +894,7 @@ var
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
 
-  Widget := GetClock(Id);
+  Widget := FTimerFrames.KeyData[Id];
   Duration := Widget.Duration;
 
   Hours := HourOf(Duration);
@@ -1051,11 +1047,11 @@ var
   TotalCount, Count: integer;
   NewTimerClock: TfraTimer;
   Hours, Mins, Secs: word;
-  Order: TIdList;
+  //Order: TIdList;
   OrderString: TStringList;
   Pos: string;
 begin
-  Order := nil;
+  //Order := nil;
   OrderString := nil;
 
   if FileExists(FDbFileName) then
@@ -1087,7 +1083,7 @@ begin
       //NewTimerClock.Widget.OnSelect:=@ClockSelected;
       PostTimerCreation(NewTimerClock);
     end;
-    Order := TIdList.Create;
+    //Order := TIdList.Create;
     OrderString := TStringList.Create;
 
     if not Conf.GetValue(TIMER_CONF_ORDER, OrderString, '0') then
@@ -1095,14 +1091,14 @@ begin
 
     for Pos in OrderString do
     begin
-      Order.Add(StrToInt(Pos));
+      FOrder.Add(StrToInt(Pos));
     end;
 
-    SetOrder(Order);
+    //SetOrder(Order);
 
     Conf.Free;
     OrderString.Free;
-    Order.Free;
+    //Order.Free;
     //FClocks.Widget.Reorder;
   end;
 end;
@@ -1184,14 +1180,14 @@ var
   TimerClock: TfraTimer;
   Count: integer;
   OrderStrings: TStringList;
-  Order: TIdList;
+  //Order: TIdList;
   Id: longword;
   Index: integer;
 begin
-  Order := TIdList.Create;
+  //Order := TIdList.Create;
   OrderStrings := TStringList.Create;
 
-  GetOrder(Order);
+  //GetOrder(Order);
 
   Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
   for Count := 0 to FTimerFrames.Count - 1 do
@@ -1216,22 +1212,22 @@ begin
       The saved order has actual IDs (TimerClock.Id). These have to be
       translated to the new IDs (Count + 1)}
 
-    Index := Order.IndexOf(TimerClock.Id);
+    Index := FOrder.IndexOf(TimerClock.Id);
     Assert(Index >= 0);
-    Order.Items[Index] := Count + 1;
+    FOrder.Items[Index] := Count + 1;
 
   end;
 
 
 
 
-  for Id in Order do
+  for Id in FOrder do
     OrderStrings.Add(IntToStr(Id));
 
   Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
 
   OrderStrings.Free;
-  Order.Free;
+  //Order.Free;
 end;
 
 procedure TMainForm.DeleteSelected;
@@ -1340,44 +1336,6 @@ begin
 
   end;
   Reorder;
-end;
-
-procedure TMainForm.GetOrder(AValue: TIdList);
-var
-  Id: integer;
-begin
-  AValue.Clear;
-  for Id in FOrder do
-  begin
-    AValue.Add(Id);
-  end;
-end;
-
-procedure TMainForm.SetOrder(AValue: TIdList);
-var
-  Id: integer;
-begin
-  FOrder.Clear;
-  for Id in AValue do
-  begin
-    FOrder.Add(Id);
-  end;
-  ReOrder;
-end;
-
-function TMainForm.GetClock(Id: longword): TFraTimer;
-begin
-  Result := FTimerFrames.KeyData[Id];
-end;
-
-function TMainForm.GetAllIdS(Ids: TIdList): boolean;
-var
-  Id: integer;
-begin
-  for Id in FOrder do
-  begin
-    Ids.Add(Id);
-  end;
 end;
 
 
