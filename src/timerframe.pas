@@ -123,6 +123,7 @@ type
     procedure SetWidth(AValue: integer);   }
   public
     { public declarations }
+    {TODO: Review these two events and remove dynamic bindings}
     OnNotifyClick: TNotifyEvent;
     OnNotifyChange: TNotifyEvent;
     OnPlay: TNotifyEvent;
@@ -499,14 +500,14 @@ begin
   FShortTimer.Enabled := False;
   FShortTimer.OnTimer := @OnShortTimer;
 
-  bbPlay.Caption:='';
-  bbPause.Caption:='';
-  bbStop.Caption:='';
+  bbPlay.Caption := '';
+  bbPause.Caption := '';
+  bbStop.Caption := '';
 end;
 
 destructor TfraTimer.Destroy;
 begin
-  Parent := Nil;
+  Parent := nil;
   FShortTimer.Free;
   FObservers.Free;
   inherited Destroy;
@@ -545,7 +546,7 @@ var
 begin
   { If the countdown timer is not running, then default to 00:00:00}
   //if FRunning = False then
-    //Counter := DEF_COUNTDOWN_CAPTION
+  //Counter := DEF_COUNTDOWN_CAPTION
   //FEndTickCount
   //else if FPaused = False then
   if FRunning and (FPaused = False) then
@@ -620,7 +621,7 @@ begin
     FOrigTickDuration := FEndTickCount - FStartTickCount;
     if GlobalUserConfig.AutoProgress = True then
     begin
-      Notifier:=True;
+      Notifier := True;
       NotifyChange(Self);
     end;
   end
@@ -633,13 +634,13 @@ begin
   FRunning := True;
   FPaused := False;
 
- // with FWidget do
+  // with FWidget do
   //begin
-    PlayButtonEnabled := False;
-    PauseButtonEnabled := True;
-    StopButtonEnabled := True;
-    DurationEnabled := False;
-    ImageGreyed := False;
+  PlayButtonEnabled := False;
+  PauseButtonEnabled := True;
+  StopButtonEnabled := True;
+  DurationEnabled := False;
+  ImageGreyed := False;
 
   //end;
 
@@ -657,10 +658,10 @@ begin
   FPaused := True;
   //with FWidget do
   //begin
-    PlayButtonEnabled := True;
-    PauseButtonEnabled := False;
-    StopButtonEnabled := True;
-    DurationEnabled := False;
+  PlayButtonEnabled := True;
+  PauseButtonEnabled := False;
+  StopButtonEnabled := True;
+  DurationEnabled := False;
   //end;
 
 end;
@@ -676,12 +677,12 @@ begin
 
   //with FWidget do
   //begin
-    PlayButtonEnabled := True;
-    PauseButtonEnabled := False;
-    StopButtonEnabled := False;
-    DurationEnabled := True;
-    ImageGreyed := True;
-    Counter := DEF_COUNTDOWN_CAPTION;
+  PlayButtonEnabled := True;
+  PauseButtonEnabled := False;
+  StopButtonEnabled := False;
+  DurationEnabled := True;
+  ImageGreyed := True;
+  Counter := DEF_COUNTDOWN_CAPTION;
   //end;
 
   if FNotifier then

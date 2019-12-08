@@ -28,9 +28,11 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, settings, optionsform, aboutform, BGRABitmap,
-  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf, timerframe, fgl, sequence;
+  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf,
+  timerframe, fgl, sequence;
 
 const
+  FORM_MIN_SIZE = 600;
   TICON_RED_INDEX: integer = 1;
   TICON_GREEN_INDEX: integer = 2;
   TRAY_PROGRESS_ICON_COUNT = 24;
@@ -145,7 +147,7 @@ type
     procedure tbShowTrayAlertClick(Sender: TObject);
     procedure tiMainClick(Sender: TObject);
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      Shift: TShiftState; X, Y: integer);
 
   private
     { private declarations }
@@ -196,7 +198,7 @@ type
     //procedure ClockDeleted(Sender: TObject);
     //procedure ClockMovedUp(Sender: TObject);
     //procedure ClockMovedDown(Sender: TObject);
-     procedure ClockSelected(Sender: TObject);
+    procedure ClockSelected(Sender: TObject);
     procedure TimerFinished(Id: integer);
     procedure ProgressUpdate(Progress: single);
     //procedure OptionsEdit(Sender: TObject);
@@ -241,6 +243,8 @@ var
   InSet: integer;
 begin
   FOrder := TIdList.Create;
+  Constraints.MinWidth := FORM_MIN_SIZE;
+  ;
 
   FTimerFrames := TTimerFrameList.Create;
   //FActiveTimers := TListTimerClockWidgets.Create;
@@ -289,9 +293,9 @@ begin
   //aiExport.OnExecute := @ExportClicked;
   //OnShow := @FormShow;
 
-  sbDelete.Caption:='';
-  sbMoveClockDown.Caption:='';
-  sbMoveClockUp.Caption:='';
+  sbDelete.Caption := '';
+  sbMoveClockDown.Caption := '';
+  sbMoveClockUp.Caption := '';
 
 
   TrayIconSize := TRAY_BASE_WIDTH;
@@ -366,7 +370,6 @@ begin
 
     bmp.Free;
   end;
-
 
 end;
 
@@ -447,7 +450,7 @@ end;
 procedure TMainForm.aiMoveDownExecute(Sender: TObject);
 begin
   MoveSelectedClocksDown;
-  SetListButtonsStatus
+  SetListButtonsStatus;
 end;
 
 procedure TMainForm.aiMoveUpExecute(Sender: TObject);
@@ -491,7 +494,7 @@ begin
 
   FOrder.Free;
   //FClockWidget.Free;
-  end;
+end;
 
 procedure TMainForm.FormResize(Sender: TObject);
 begin
@@ -506,7 +509,7 @@ end;
 procedure TMainForm.pmiShowWindowClick(Sender: TObject);
 begin
   if Self.WindowState = wsMinimized then
-     Self.WindowState:=wsNormal;
+    Self.WindowState := wsNormal;
   Self.Show;
 end;
 
@@ -531,7 +534,7 @@ begin
 end;
 
 procedure TMainForm.tiMainMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 begin
   if Button = mbRight then
     pmTray.PopUp;
@@ -664,8 +667,8 @@ end;
 procedure TMainForm.SetListButtonsStatus;
 begin
   sbDelete.Enabled := AnySelected;
-  sbMoveClockDown.Enabled:=GetCanSelectedMoveDown;
-  sbMoveClockUp.Enabled:= getCanSelectedMoveUp;
+  sbMoveClockDown.Enabled := GetCanSelectedMoveDown;
+  sbMoveClockUp.Enabled := getCanSelectedMoveUp;
 end;
 
 procedure TMainForm.ResetHeaderSections;
@@ -673,15 +676,15 @@ var
   //Ids: TIdList;
   Id: longword;
   Timer: TfraTimer;
-  Filled: Integer = 0;
-  Temp: Integer;
+  Filled: integer = 0;
+  Temp: integer;
 begin
   //Ids:=TIdList.Create;
   //GetAllIdS(Ids);
   if FOrder.Count > 0 then
   begin
-    Id:=FOrder.Items[0];
-    Timer:=FTimerFrames.KeyData[Id];
+    Id := FOrder.Items[0];
+    Timer := FTimerFrames.KeyData[Id];
     // Find the
     hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
     Inc(Filled, hdrTimers.Sections.Items[0].Width);
@@ -800,7 +803,7 @@ begin
   //FScrollBox.AutoScroll:=False;
   //FScrollBox.Visible:=False;
   sbxClocks.Height := FOrder.Count * CLOCK_HEIGHT;
-  CountTabOrder:=0;
+  CountTabOrder := 0;
   for Id in FOrder do
   begin
     //Index := FClockWidgets.IndexOf(Id);
@@ -808,7 +811,7 @@ begin
     //FScrollBox.Height:=Filled + Clock.Height;
     //FScrollBox.VertScrollBar.Range:=Filled + Clock.Height;
     TimerWidget.Top := Filled;
-    TimerWidget.TabOrder:=CountTabOrder;
+    TimerWidget.TabOrder := CountTabOrder;
     // + FScrollBox.VertScrollBar.Size - FScrollBox.VertScrollBar.Position;
     if sbxClocks.VertScrollBar.IsScrollBarVisible then
       TimerWidget.Width := sbxClocks.Width - GetSystemMetrics(SM_CYVSCROLL)
@@ -1064,7 +1067,7 @@ var
 begin
   //Conf.SetValue(TIMER_TITLE, );
   Conf := TJSONConfig.Create(nil);
-  Conf.Formatted:=true;
+  Conf.Formatted := True;
   SaveClocks(Conf);
   Conf.Filename := FDbFileName;
   //Conf.Flush;
@@ -1144,7 +1147,7 @@ begin
 
   //NewWidget := FClocksWidget.AddTimer(Id);
   NewWidget := TfraTimer.Create(sbxClocks);
-  NewWidget.Id:=Id;
+  NewWidget.Id := Id;
   FTimerFrames.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
   Reorder;
