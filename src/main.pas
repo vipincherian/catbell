@@ -87,6 +87,9 @@ type
     aiAbout: TAction;
     alMain: TActionList;
     aiNewTimer: TAction;
+    bbDelete: TBitBtn;
+    bbMoveUp: TBitBtn;
+    bbMoveDown: TBitBtn;
     hdrTimers: THeaderControl;
     ilMain: TImageList;
     ilMainSmall: TImageList;
@@ -109,9 +112,6 @@ type
     pnlClocks: TPanel;
     pmTray: TPopupMenu;
     sdgExport: TSaveDialog;
-    sbMoveClockUp: TSpeedButton;
-    sbMoveClockDown: TSpeedButton;
-    sbDelete: TSpeedButton;
     sbxClocks: TScrollBox;
     stbMain: TStatusBar;
     tlbMain: TToolBar;
@@ -293,9 +293,16 @@ begin
   //aiExport.OnExecute := @ExportClicked;
   //OnShow := @FormShow;
 
-  sbDelete.Caption := '';
-  sbMoveClockDown.Caption := '';
-  sbMoveClockUp.Caption := '';
+  //sbDelete.Caption := '';
+  //sbMoveClockDown.Caption := '';
+  //sbMoveClockUp.Caption := '';
+  bbDelete.Caption:='';
+  bbMoveUp.Caption:='';
+  bbMoveDown.Caption:='';
+
+  bbDelete.Enabled:=False;
+  bbMoveUp.Enabled:=False;
+  bbMoveDown.Enabled:=False;
 
 
   TrayIconSize := TRAY_BASE_WIDTH;
@@ -667,9 +674,12 @@ end;
 
 procedure TMainForm.SetListButtonsStatus;
 begin
-  sbDelete.Enabled := AnySelected;
-  sbMoveClockDown.Enabled := GetCanSelectedMoveDown;
-  sbMoveClockUp.Enabled := getCanSelectedMoveUp;
+  //sbDelete.Enabled := AnySelected;
+  bbDelete.Enabled:=AnySelected;
+  //sbMoveClockDown.Enabled := GetCanSelectedMoveDown;
+  //sbMoveClockUp.Enabled := getCanSelectedMoveUp;
+  bbMoveUp.Enabled:=getCanSelectedMoveUp;
+  bbMoveDown.Enabled:=GetCanselectedMoveDown;
 end;
 
 procedure TMainForm.ResetHeaderSections;
