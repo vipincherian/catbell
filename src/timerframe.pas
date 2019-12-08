@@ -126,14 +126,14 @@ type
     {TODO: Review these two events and remove dynamic bindings}
     OnNotifyClick: TNotifyEvent;
     OnNotifyChange: TNotifyEvent;
-    OnPlay: TNotifyEvent;
-    OnStop: TNotifyEvent;
-    OnPause: TNotifyEvent;
+    //OnPlay: TNotifyEvent;
+    //OnStop: TNotifyEvent;
+    //OnPause: TNotifyEvent;
     OnNotify: TNotifyEvent;
     OnSelect: TNotifyEvent;
-    procedure PlayClicked(Sender: TObject);
-    procedure Stopclicked(Sender: TObject);
-    procedure PauseClicked(Sender: TObject);
+    //procedure PlayClicked(Sender: TObject);
+    //procedure Stopclicked(Sender: TObject);
+    //procedure PauseClicked(Sender: TObject);
     procedure NotifyClicked(Sender: TObject);
     procedure ClockSelected(Sender: TObject);
     procedure Hide;
@@ -191,17 +191,20 @@ end;
 
 procedure TfraTimer.aiPlayExecute(Sender: TObject);
 begin
-  PlayClicked(Sender);
+  //PlayClicked(Sender);
+  Start(Sender);
 end;
 
 procedure TfraTimer.aiStopExecute(Sender: TObject);
 begin
-  Stopclicked(Sender);
+  //Stopclicked(Sender);
+  Stop(Sender);
 end;
 
 procedure TfraTimer.aiPauseExecute(Sender: TObject);
 begin
-  PauseClicked(Sender);
+  //PauseClicked(Sender);
+  Pause(Sender);
 end;
 
 
@@ -353,7 +356,7 @@ begin
   NotifyEnabled := AValue;
 end;
 
-procedure TfraTimer.PlayClicked(Sender: TObject);
+{procedure TfraTimer.PlayClicked(Sender: TObject);
 begin
   //ShowMessage('In Widget');
   if OnPlay <> nil then
@@ -394,7 +397,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnPause was found to be Nil');
-end;
+end;}
 
 procedure TfraTimer.NotifyClicked(Sender: TObject);
 begin
@@ -476,7 +479,7 @@ begin
   ilTimer.GetBitmap(TIMER_IMG_NOTIFY_NO, sbNotify.Glyph);
   //teSet.
 
-  OnPlay := nil;
+  //OnPlay := nil;
 
   Parent := TWinControl(AOwner);
   //Name := Name + IntToStr(IdNew);

@@ -1159,9 +1159,9 @@ begin
   //FTimerFrames.Add(Id, NewWidget);
   //NewWidget.Id:=Id;
   {TODO: This section can be cleaned up}
-  NewWidget.OnPlay := @NewWidget.Start;
-  NewWidget.OnStop := @NewWidget.Stop;
-  NewWidget.OnPause := @NewWidget.Pause;
+  //NewWidget.OnPlay := @NewWidget.Start;
+  //NewWidget.OnStop := @NewWidget.Stop;
+  //NewWidget.OnPause := @NewWidget.Pause;
   NewWidget.OnNotify := @NewWidget.NotifyChange;
   //NewWidget.OnSelect:=@ClockSelected;
 
