@@ -23,6 +23,11 @@ unit clocks;
 {$mode objfpc}{$H+}
 
 interface
+implementation
+begin
+
+end.
+{*
 
 uses
   Classes, SysUtils, Dialogs, Forms, ExtCtrls, fgl, dateutils, jsonConf,
@@ -864,4 +869,4 @@ end;
 
 
 
-end.
+end.   *}

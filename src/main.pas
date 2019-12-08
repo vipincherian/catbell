@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, settings, optionsform, aboutform, BGRABitmap,
-  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf, timerframe;
+  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf, timerframe, fgl, sequence;
 
 const
   TICON_RED_INDEX: integer = 1;
@@ -53,7 +53,24 @@ const
 
   LAST_TRAY_ICON_DEFAULT = -1;
 
+  DEF_COUNTDOWN_CAPTION: string = '00:00:00';
+  TIMER_PROGRESS_FINISHED: single = 2.0;
+
+  TIMER_CONF_CLOCKS = 'clocks';
+  TIMER_CONF_TIMERS = 'timers';
+  TIMER_CONF_TITLE = 'timer_title';
+  TIMER_CONF_TIME = 'time';
+  TIMER_CONF_HOURS = 'hours';
+  TIMER_CONF_MINUTES = 'minutes';
+  TIMER_CONF_SECONDS = 'seconds';
+  TIMER_CONF_NOTIFIER = 'notifier';
+  //TIMER_CONF_ID = 'id';
+  TIMER_CONF_COUNT = 'count';
+  TIMER_CONF_ORDER = 'order';
+
 type
+  TTimerFrameList = specialize TFPGMap<longword, TfraTimer>;
+  TIdList = specialize TFPGList<longword>;
 
   { TMainForm }
 
@@ -129,10 +146,15 @@ type
     FTrayStoppedBitmap, FAppStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
     //FClockWidget: TClocksWidget;
-    FClocks: TClocks;
+    //FClocks: TClocks;
     FDbFileName: string;
     FDbDefault: boolean;
     //function GetClocks: TClocksWidget;
+
+    FTimerFrames: TTimerFrameList;
+    FOrder: TIdList;
+    FCounterClockID: TSequence;
+
     procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
     procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
     //procedure SetDeleteEnabled(AValue: boolean);
@@ -145,6 +167,13 @@ type
     procedure PostTimerCreation(AValue: TfraTimer);
     procedure SetListButtonsStatus;
     procedure ResetHeaderSections;
+
+    function GetAnySelected: boolean;
+    //procedure SetWidget(AValue: TClocksWidget);
+    function GetCanselectedMoveDown: boolean;
+    function GetCanSelectedMoveUp: boolean;
+    procedure Reorder;
+
   public
     { public declarations }
     OnNewTimer: TNotifyEvent;
@@ -175,6 +204,20 @@ type
     procedure SavetoFile;
     procedure LoadfromFile;
     //property Clocks: TClocks read FClocks;
+
+    function AddTimer(): TfraTimer;
+    procedure NotifyChange(Sender: TObject);
+    procedure SaveClocks(Conf: TJsonConfig);
+    procedure DeleteSelected;
+    //property Widget: TClocksWidget read FClocksWidget write SetWidget;
+    property AnySelected: boolean read GetAnySelected;
+    procedure RemoveTimer(IdNew: longword);
+    procedure MoveSelectedClocksUp;
+    procedure MoveSelectedClocksDown;
+    procedure GetOrder(AValue: TIdList);
+    procedure SetOrder(AValue: TIdList);
+    function GetClock(Id: longword): TFraTimer;
+    function GetAllIdS(Ids: TIdList): boolean;
   end;
 
 var
@@ -193,17 +236,23 @@ var
   TrayIconSize: integer;
   InSet: integer;
 begin
+  FOrder := TIdList.Create;
+
+  FTimerFrames := TTimerFrameList.Create;
+  //FActiveTimers := TListTimerClockWidgets.Create;
+
+  FCounterClockID := TSequence.Create;
 
   OnNewTimer := nil;
   OnEXport := nil;
   FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
 
-  FClocks := TClocks.Create;
+  //FClocks := TClocks.Create;
   FDbDefault := True;
 
   //DoubleBuffered:=True;
   //FClockWidget := TClocksWidget.Create;
-  FClocks.ScrollBox := sbxClocks;
+  //FClocks.ScrollBox := sbxClocks;
 
   //FClocks.Widget := FClockWidget;
 
@@ -319,7 +368,7 @@ var
 begin
   {*if OnNewTimer <> nil then
     OnNewTimer(Sender);*}
-  Added := FClocks.AddTimer;
+  Added := AddTimer;
   PostTimerCreation(Added);
 end;
 
@@ -381,7 +430,7 @@ begin
   if FileName <> '' then
   begin
     Conf := TJSONConfig.Create(nil);
-    FClocks.SaveClocks(Conf);
+    SaveClocks(Conf);
     Conf.Filename := FileName;
     Conf.Free;
   end;
@@ -390,6 +439,7 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 var
   Count: integer;
+  I: integer;
 begin
   for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
   begin
@@ -401,7 +451,19 @@ begin
 
   //inherited Destroy;
   SavetoFile;
-  FClocks.Destroy;
+  //FClocks.Destroy;
+
+  for I := 0 to FTimerFrames.Count - 1 do
+  begin
+    FTimerFrames.Data[i].Free;
+  end;
+
+  FCounterClockID.Free;
+
+  //FActiveTimers.Free;
+  FTimerFrames.Free;
+
+  FOrder.Free;
   //FClockWidget.Free;
   end;
 
@@ -575,9 +637,9 @@ end;
 
 procedure TMainForm.SetListButtonsStatus;
 begin
-  sbDelete.Enabled := FClocks.AnySelected;
-  sbMoveClockDown.Enabled:=FClocks.CanSelectedMovDown;
-  sbMoveClockUp.Enabled:= FClocks.CanSelectedMoveUp;
+  sbDelete.Enabled := AnySelected;
+  sbMoveClockDown.Enabled:=GetCanSelectedMoveDown;
+  sbMoveClockUp.Enabled:= getCanSelectedMoveUp;
 end;
 
 procedure TMainForm.ResetHeaderSections;
@@ -589,11 +651,11 @@ var
   Temp: Integer;
 begin
   Ids:=TIdList.Create;
-  FClocks.GetAllIdS(Ids);
+  GetAllIdS(Ids);
   if Ids.Count > 0 then
   begin
     Id:=Ids.Items[0];
-    Timer:=FClocks.GetClock(Id);
+    Timer:=GetClock(Id);
     // Find the
     hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
     Inc(Filled, hdrTimers.Sections.Items[0].Width);
@@ -621,6 +683,132 @@ begin
     Inc(Filled, Temp);
   end;
   Ids.Free;
+end;
+
+function TMainForm.GetAnySelected: boolean;
+var
+  Count: integer;
+  Clock: TfraTimer;
+  //TimerClock: TTimerClock;
+begin
+  for Count := 0 to FTimerFrames.Count - 1 do
+  begin
+    Clock := FTimerFrames.Data[Count];
+    if Clock = nil then
+      ShowMessage('Clock is Nil');
+    if Clock.Selected then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
+  Result := False;
+end;
+
+function TMainForm.GetCanselectedMoveDown: boolean;
+var
+  Id: longword;
+  //Count: integer;
+  EncounteredSelected: boolean;
+begin
+  EncounteredSelected := False;
+  //EncounteredUnselected := False;
+  for Id in FOrder do
+  begin
+    if not FTimerFrames.KeyData[Id].Selected then
+    begin
+      if EncounteredSelected then
+      begin
+        Result := True;
+        Exit;
+      end;
+    end
+    else
+    begin
+      if not EncounteredSelected then
+        EncounteredSelected := True;
+    end;
+  end;
+  Result := False;
+end;
+
+function TMainForm.GetCanSelectedMoveUp: boolean;
+var
+  Id: longword;
+  //Count: integer;
+  EncounteredUnselected: boolean;
+begin
+  //EncounteredSelected := False;
+  EncounteredUnselected := False;
+  for Id in FOrder do
+  begin
+    if FTimerFrames.KeyData[Id].Selected then
+    begin
+      if EncounteredUnselected then
+      begin
+        Result := True;
+        Exit;
+      end;
+    end
+    else
+    begin
+      if not EncounteredUnselected then
+        EncounteredUnselected := True;
+    end;
+  end;
+  Result := False;
+end;
+
+
+procedure TMainForm.Reorder;
+var
+  Id: longword;
+  //Index: integer;
+  TimerWidget: TfraTimer;
+  Filled: integer;
+  CountTabOrder: integer;
+begin
+  //Exit;
+  {TODO: Remove the hard coding of the header hight}
+  Filled := 24;
+  //FScrollBox.AutoScroll:=False;
+  //FScrollBox.Visible:=False;
+  sbxClocks.Height := FOrder.Count * CLOCK_HEIGHT;
+  CountTabOrder:=0;
+  for Id in FOrder do
+  begin
+    //Index := FClockWidgets.IndexOf(Id);
+    TimerWidget := FTimerFrames.KeyData[Id];
+    //FScrollBox.Height:=Filled + Clock.Height;
+    //FScrollBox.VertScrollBar.Range:=Filled + Clock.Height;
+    TimerWidget.Top := Filled;
+    TimerWidget.TabOrder:=CountTabOrder;
+    // + FScrollBox.VertScrollBar.Size - FScrollBox.VertScrollBar.Position;
+    if sbxClocks.VertScrollBar.IsScrollBarVisible then
+      TimerWidget.Width := sbxClocks.Width - GetSystemMetrics(SM_CYVSCROLL)
+    else
+      TimerWidget.Width := sbxClocks.Width;
+    //Clock.He;
+    Inc(Filled, TimerWidget.Height);
+    Inc(CountTabOrder);
+    //if Clock.Kind = 'Timer' then
+    //begin
+    //TimerWidget := TTimerClockWidget(Clock);
+
+    //TimerWidget.FFrame.lblCountdown.Hint := IntToStr(TimerWidget.FFrame.Top);
+    //end;
+
+  end;
+
+  //FScrollBox.AutoScroll:=True;
+  //FScrollBox.VertScrollBar.Range:=(FOrder.Count) * CLOCK_HEIGHT;
+
+  //FScrollBox.VertScrollBar.Range:=Filled ;
+  //FScrollBox.Refresh;
+  //FScrollBox.Visible:=True;
+  //FScrollBox.Repaint;
+  //FScrollBox.ReAlign;
+
 end;
 
 {*procedure TMainForm.NewTimerAdded(Sender: TObject);
@@ -659,7 +847,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnClockDelete was found to be Nil');*}
-  FClocks.DeleteSelected;
+  DeleteSelected;
   SetListButtonsStatus;
 end;
 
@@ -675,7 +863,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnClockMoveUp was found to be Nil');*}
-  FClocks.MoveSelectedClocksUp;
+  MoveSelectedClocksUp;
   SetListButtonsStatus;
 end;
 
@@ -691,7 +879,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnClockMoveDown was found to be Nil');*}
-  FClocks.MoveSelectedClocksDown;
+  MoveSelectedClocksDown;
   SetListButtonsStatus;
 end;
 
@@ -710,7 +898,7 @@ var
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
 
-  Widget := FClocks.GetClock(Id);
+  Widget := GetClock(Id);
   Duration := Widget.Duration;
 
   Hours := HourOf(Duration);
@@ -851,7 +1039,7 @@ begin
   //Conf.SetValue(TIMER_TITLE, );
   Conf := TJSONConfig.Create(nil);
   Conf.Formatted:=true;
-  FClocks.SaveClocks(Conf);
+  SaveClocks(Conf);
   Conf.Filename := FDbFileName;
   //Conf.Flush;
   Conf.Free;
@@ -879,7 +1067,7 @@ begin
     TotalCount := Conf.GetValue(TIMER_CONF_COUNT, 0);
     for Count := 0 to TotalCount - 1 do
     begin
-      NewTimerClock := FClocks.AddTimer;
+      NewTimerClock := AddTimer;
       NewTimerClock.Caption :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
         '/' + TIMER_CONF_TITLE, 'Countdown timer');
@@ -910,12 +1098,285 @@ begin
       Order.Add(StrToInt(Pos));
     end;
 
-    FClocks.SetOrder(Order);
+    SetOrder(Order);
 
     Conf.Free;
     OrderString.Free;
     Order.Free;
     //FClocks.Widget.Reorder;
+  end;
+end;
+
+function TMainForm.AddTimer(): TfraTimer;
+var
+  //NewTimer: TTimerClock;
+  Id: longword;
+  NewWidget: TfraTimer;
+begin
+  //NewTimer := TTimerClock.Create;
+  Id := FCounterClockID.NextVal;
+  //NewTimer.Id := Id;
+
+  //NewWidget := FClocksWidget.AddTimer(Id);
+  NewWidget := TfraTimer.Create(sbxClocks);
+  NewWidget.Id:=Id;
+  FTimerFrames.Add(Id, NewWidget);
+  FOrder.Insert(0, Id);
+  Reorder;
+
+  //NewTimer.Widget := NewWidget;
+  NewWidget.OnNotifyChange := @NotifyChange;
+  //NewTimer.AddSubscription(NewWidget.);
+
+  //FTimerFrames.Add(Id, NewWidget);
+  //NewWidget.Id:=Id;
+  {TODO: This section can be cleaned up}
+  NewWidget.OnPlay := @NewWidget.Start;
+  NewWidget.OnStop := @NewWidget.Stop;
+  NewWidget.OnPause := @NewWidget.Pause;
+  NewWidget.OnNotify := @NewWidget.NotifyChange;
+  //NewWidget.OnSelect:=@ClockSelected;
+
+  Result := NewWidget;
+end;
+
+procedure TMainForm.NotifyChange(Sender: TObject);
+var
+  TimerClock: TfraTimer;
+  Notifier: TfraTimer;
+  Count: integer;
+begin
+
+  Notifier := TfraTimer(Sender);
+  if not Notifier.NotifyEnabled then
+  begin
+    Notifier.PublishProgress(TIMER_PROGRESS_FINISHED);
+    Notifier.Notifier := False;
+    Exit;
+  end;
+
+
+  for Count := 0 to FTimerFrames.Count - 1 do
+  begin
+    TimerClock := FTimerFrames.Data[Count];
+    if TimerClock = nil then
+      ShowMessage('Clock is Nil');
+    if TimerClock <> Notifier then
+    begin
+      TimerClock.NotifyEnabled := False;
+      if TimerClock.Notifier = True then
+      begin
+        TimerClock.Notifier := False;
+        TimerClock.PublishProgress(TIMER_PROGRESS_FINISHED);
+      end;
+    end;
+
+  end;
+
+  Notifier.Notifier := True;
+  //TODO: Add PublishProgress here
+  //Notifier.OnShortTimer(Self);
+
+end;
+
+procedure TMainForm.SaveClocks(Conf: TJsonConfig);
+var
+  TimerClock: TfraTimer;
+  Count: integer;
+  OrderStrings: TStringList;
+  Order: TIdList;
+  Id: longword;
+  Index: integer;
+begin
+  Order := TIdList.Create;
+  OrderStrings := TStringList.Create;
+
+  GetOrder(Order);
+
+  Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
+  for Count := 0 to FTimerFrames.Count - 1 do
+  begin
+    TimerClock := FTimerFrames.Data[Count];
+    if TimerClock = nil then
+      ShowMessage('Clock is Nil');
+
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_TITLE, TimerClock.Caption);
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_HOURS, HourOf(TimerClock.Duration));
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_MINUTES, MinuteOf(TimerClock.Duration));
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_SECONDS, SecondOf(TimerClock.Duration));
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_NOTIFIER, TimerClock.Notifier);
+
+      { While saving, existing IDs of clocks are ignored. They are saved in the
+      order they are in the list. The position in the list becomes the new ID.
+      The saved order has actual IDs (TimerClock.Id). These have to be
+      translated to the new IDs (Count + 1)}
+
+    Index := Order.IndexOf(TimerClock.Id);
+    Assert(Index >= 0);
+    Order.Items[Index] := Count + 1;
+
+  end;
+
+
+
+
+  for Id in Order do
+    OrderStrings.Add(IntToStr(Id));
+
+  Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
+
+  OrderStrings.Free;
+  Order.Free;
+end;
+
+procedure TMainForm.DeleteSelected;
+var
+  Id: longword;
+  TimerClock: TfraTimer;
+  Count: integer;
+  //Index: integer;
+  IdList: TIdList;
+begin
+  IdList := TIdList.Create;
+
+  { FPGMap does not have an iterator. So removal of elements have to be done
+  with kid-gloves. A seperate list is created to hold IDs of elements to be
+  removed from the list. After iteration, removal is done in a separte loop}
+
+  for Count := 0 to FTimerFrames.Count - 1 do
+  begin
+    TimerClock := FTimerFrames.Data[Count];
+    if TimerClock = nil then
+      ShowMessage('Clock is Nil');
+
+    if TimerClock.Running then
+      TimerClock.Stop(Self);
+
+    if TimerClock.Selected then
+    begin
+      //RemoveTimer(TimerClock.Id);
+      IdList.Add(TimerClock.Id);
+      //TimerClock.Free;
+    end;
+
+  end;
+
+  for Id in IdList do
+  begin
+    RemoveTimer(Id);
+    //FTimerFrames.Remove(Id);
+    //TimerClock.Free;
+  end;
+  IdList.Free;
+
+end;
+
+procedure TMainForm.RemoveTimer(IdNew: longword);
+var
+  RemovedTimer: TfraTimer;
+  Index: integer;
+begin
+  Index := FTimerFrames.IndexOf(IdNew);
+  RemovedTimer := TfraTimer(FTimerFrames.Data[Index]);
+  FTimerFrames.Remove(IdNew);
+  FOrder.Remove(IdNew);
+  RemovedTimer.Free;
+  Reorder;
+end;
+
+procedure TMainForm.MoveSelectedClocksUp;
+var
+  Id: longword;
+  Count: integer;
+begin
+  Count := 0;
+  for Id in FOrder do
+  begin
+    if Count = 0 then
+    begin
+      Inc(Count);
+      Continue;
+    end;
+
+    if FTimerFrames.KeyData[Id].Selected then
+    begin
+      {If x and y are selected, do not exchange, keep the order as it is}
+      if not (FTimerFrames.KeyData[FOrder.Items[Count - 1]].Selected and
+        FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
+        FOrder.Exchange(Count - 1, Count);
+    end;
+    Inc(Count);
+  end;
+  Reorder;
+end;
+
+procedure TMainForm.MoveSelectedClocksDown;
+var
+  Id: longword;
+  Count: integer;
+  First: boolean;
+begin
+  First := True;
+  for Count := (FTimerFrames.Count - 1) downto 0 do
+  begin
+    if First then
+    begin
+      First := False;
+      Continue;
+    end;
+    Id := FOrder.Items[Count];
+    if FTimerFrames.KeyData[Id].Selected then
+    begin
+      {If x and y are selected, do not exchange, keep the order as it is}
+      if not (FTimerFrames.KeyData[FOrder.Items[Count + 1]].Selected and
+        FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
+        FOrder.Exchange(Count + 1, Count);
+    end;
+
+  end;
+  Reorder;
+end;
+
+procedure TMainForm.GetOrder(AValue: TIdList);
+var
+  Id: integer;
+begin
+  AValue.Clear;
+  for Id in FOrder do
+  begin
+    AValue.Add(Id);
+  end;
+end;
+
+procedure TMainForm.SetOrder(AValue: TIdList);
+var
+  Id: integer;
+begin
+  FOrder.Clear;
+  for Id in AValue do
+  begin
+    FOrder.Add(Id);
+  end;
+  ReOrder;
+end;
+
+function TMainForm.GetClock(Id: longword): TFraTimer;
+begin
+  Result := FTimerFrames.KeyData[Id];
+end;
+
+function TMainForm.GetAllIdS(Ids: TIdList): boolean;
+var
+  Id: integer;
+begin
+  for Id in FOrder do
+  begin
+    Ids.Add(Id);
   end;
 end;
 
