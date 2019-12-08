@@ -75,6 +75,9 @@ type
   { TMainForm }
 
   TMainForm = class(TForm, ITimerObserver)
+    aiMoveDown: TAction;
+    aiMoveUp: TAction;
+    aiDeleteTimer: TAction;
     aiExport: TAction;
     aiNewAlarm: TAction;
     aiOptions: TAction;
@@ -88,6 +91,7 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem5: TMenuItem;
+    pmiQuit: TMenuItem;
     pmiShowWindow: TMenuItem;
     pmiExit: TMenuItem;
     MenuItem8: TMenuItem;
@@ -120,7 +124,10 @@ type
     ToolButton6: TToolButton;
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
+    procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);
+    procedure aiMoveDownExecute(Sender: TObject);
+    procedure aiMoveUpExecute(Sender: TObject);
     procedure aiNewAlarmExecute(Sender: TObject);
     procedure aiAboutExecute(Sender: TObject);
     procedure aiNewTimerExecute(Sender: TObject);
@@ -185,9 +192,9 @@ type
     //property Clocks: TClocksWidget read FClockWidget;
     //procedure NewTimerAdded(Sender: TObject);
     //procedure NewAlarmAdded(Sender: TObject);
-    procedure ClockDeleted(Sender: TObject);
-    procedure ClockMovedUp(Sender: TObject);
-    procedure ClockMovedDown(Sender: TObject);
+    //procedure ClockDeleted(Sender: TObject);
+    //procedure ClockMovedUp(Sender: TObject);
+    //procedure ClockMovedDown(Sender: TObject);
      procedure ClockSelected(Sender: TObject);
     procedure TimerFinished(Id: integer);
     procedure ProgressUpdate(Progress: single);
@@ -275,11 +282,15 @@ begin
   //aiNewAlarm.OnExecute := @NewAlarmAdded;
   //aiOptions.OnExecute := @OptionsEdit;
   {TODO: Add actions for delete, clock up and down}
-  sbDelete.OnClick := @ClockDeleted;
-  sbMoveClockUp.OnClick := @ClockMovedUp;
-  sbMoveClockDown.OnClick := @ClockMovedDown;
+  //sbDelete.OnClick := @ClockDeleted;
+  //sbMoveClockUp.OnClick := @ClockMovedUp;
+  //sbMoveClockDown.OnClick := @ClockMovedDown;
   //aiExport.OnExecute := @ExportClicked;
   //OnShow := @FormShow;
+
+  sbDelete.Caption:='';
+  sbMoveClockDown.Caption:='';
+  sbMoveClockUp.Caption:='';
 
 
   TrayIconSize := TRAY_BASE_WIDTH;
@@ -430,6 +441,24 @@ begin
     Conf.Filename := FileName;
     Conf.Free;
   end;
+end;
+
+procedure TMainForm.aiMoveDownExecute(Sender: TObject);
+begin
+  MoveSelectedClocksDown;
+  SetListButtonsStatus
+end;
+
+procedure TMainForm.aiMoveUpExecute(Sender: TObject);
+begin
+  MoveSelectedClocksUp;
+  SetListButtonsStatus;
+end;
+
+procedure TMainForm.aiDeleteTimerExecute(Sender: TObject);
+begin
+  DeleteSelected;
+  SetListButtonsStatus;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -830,7 +859,7 @@ begin
       +': OnNewAlarm was found to be Nil');
 end; *}
 
-procedure TMainForm.ClockDeleted(Sender: TObject);
+{procedure TMainForm.ClockDeleted(Sender: TObject);
 begin
   //ShowMessage('Haha');
   {*if OnClockDelete <> nil then
@@ -845,9 +874,9 @@ begin
       +': OnClockDelete was found to be Nil');*}
   DeleteSelected;
   SetListButtonsStatus;
-end;
+end;}
 
-procedure TMainForm.ClockMovedUp(Sender: TObject);
+{procedure TMainForm.ClockMovedUp(Sender: TObject);
 begin
   {*if OnClockMoveUp <> nil then
   begin
@@ -861,9 +890,9 @@ begin
       +': OnClockMoveUp was found to be Nil');*}
   MoveSelectedClocksUp;
   SetListButtonsStatus;
-end;
+end;}
 
-procedure TMainForm.ClockMovedDown(Sender: TObject);
+{procedure TMainForm.ClockMovedDown(Sender: TObject);
 begin
   {*if OnClockMoveDown <> nil then
   begin
@@ -877,7 +906,7 @@ begin
       +': OnClockMoveDown was found to be Nil');*}
   MoveSelectedClocksDown;
   SetListButtonsStatus;
-end;
+end;                }
 
 procedure TMainForm.ClockSelected(Sender: TObject);
 begin
@@ -1094,16 +1123,6 @@ begin
     begin
       Order.Add(StrToInt(Pos));
     end;
-    //ShowMessage('After loadfromfile OrderString.Count' + IntToStr(OrderString.Count));
-    //ShowMessage('After loadfromfile Order.Count' + IntToStr(Order.Count));
-    //ShowMessage('After loadfromfile FOrder.Count' + IntToStr(FOrder.Count));
-
-    //for Id in Order do
-    //begin
-    //  FOrder.Add(Id);
-    //end;
-
-    //ShowMessage('After loadfromfile 2 ' + IntToStr(FOrder.Count));
 
     Conf.Free;
     OrderString.Free;

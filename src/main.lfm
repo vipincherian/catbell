@@ -136,9 +136,9 @@ object MainForm: TMainForm
     Cursor = crHandPoint
     Left = 688
     Height = 30
-    Hint = 'Move selected timers up'
     Top = 243
     Width = 31
+    Action = aiMoveUp
     Anchors = [akRight, akBottom]
     Enabled = False
     Flat = True
@@ -225,9 +225,9 @@ object MainForm: TMainForm
     Cursor = crHandPoint
     Left = 688
     Height = 30
-    Hint = 'Move selected timers down'
     Top = 275
     Width = 31
+    Action = aiMoveDown
     Anchors = [akRight, akBottom]
     Enabled = False
     Flat = True
@@ -396,9 +396,9 @@ object MainForm: TMainForm
     Cursor = crHandPoint
     Left = 688
     Height = 30
-    Hint = 'Delete selected timers'
     Top = 195
     Width = 31
+    Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
     Enabled = False
     Flat = True
@@ -733,6 +733,18 @@ object MainForm: TMainForm
     object aiExport: TAction
       Caption = 'aiExport'
       OnExecute = aiExportExecute
+    end
+    object aiDeleteTimer: TAction
+      Caption = 'aiDeleteTimer'
+      OnExecute = aiDeleteTimerExecute
+    end
+    object aiMoveUp: TAction
+      Caption = 'aiMoveUp'
+      OnExecute = aiMoveUpExecute
+    end
+    object aiMoveDown: TAction
+      Caption = 'aiMoveDown'
+      OnExecute = aiMoveDownExecute
     end
   end
   object ilMain: TImageList
