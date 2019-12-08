@@ -30,7 +30,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, SysUtils, datetimectrls, main, controller, mainformwidget, clocks,
   observers, sequence, clockswidget, timerframe, settings, optionsform, 
-timeralertform, aboutform
+timeralertform, aboutform, editform
   { you can add units after this };
 
 {$R *.res}
@@ -60,6 +60,7 @@ begin
   Application.CreateForm(TfrmTimerAlert, frmTimerAlert);
   Application.CreateForm(TfrmAbout, frmAbout);
   MainForm.LoadfromFile;
+  Application.CreateForm(TfrmEditTimer, frmEditTimer);
   Application.Run;
 
 //  AppController.Destroy;

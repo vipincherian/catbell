@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf,
-  timerframe, fgl, sequence;
+  timerframe, fgl, sequence, editform;
 
 const
   FORM_MIN_SIZE = 600;
@@ -379,6 +379,7 @@ var
 begin
   {*if OnNewTimer <> nil then
     OnNewTimer(Sender);*}
+  frmEditTimer.ShowModal;
   Added := AddTimer;
   PostTimerCreation(Added);
 end;
@@ -1142,6 +1143,7 @@ var
   NewWidget: TfraTimer;
 begin
   //NewTimer := TTimerClock.Create;
+  //frmEditTimer.ShowModal;
   Id := FCounterClockID.NextVal;
   //NewTimer.Id := Id;
 
