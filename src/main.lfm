@@ -136,7 +136,7 @@ object MainForm: TMainForm
     Cursor = crHandPoint
     Left = 688
     Height = 30
-    Top = 243
+    Top = 230
     Width = 31
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
@@ -225,7 +225,7 @@ object MainForm: TMainForm
     Cursor = crHandPoint
     Left = 688
     Height = 30
-    Top = 275
+    Top = 262
     Width = 31
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
@@ -312,19 +312,19 @@ object MainForm: TMainForm
   end
   object pnlBorder: TPanel
     Left = 8
-    Height = 265
+    Height = 248
     Top = 40
     Width = 673
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlBorder'
-    ClientHeight = 265
+    ClientHeight = 248
     ClientWidth = 673
     TabOrder = 1
     object pnlClocks: TPanel
       Left = 1
-      Height = 263
+      Height = 246
       Top = 1
       Width = 671
       Align = alClient
@@ -335,14 +335,14 @@ object MainForm: TMainForm
     end
     object sbxClocks: TScrollBox
       Left = 1
-      Height = 263
+      Height = 246
       Top = 1
       Width = 671
       HorzScrollBar.Page = 170
       VertScrollBar.Page = 24
       Align = alClient
       BorderStyle = bsNone
-      ClientHeight = 263
+      ClientHeight = 246
       ClientWidth = 671
       TabOrder = 1
       object hdrTimers: THeaderControl
@@ -396,7 +396,7 @@ object MainForm: TMainForm
     Cursor = crHandPoint
     Left = 688
     Height = 30
-    Top = 195
+    Top = 182
     Width = 31
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
@@ -480,6 +480,13 @@ object MainForm: TMainForm
     }
     ShowHint = True
     ParentShowHint = False
+  end
+  object stbMain: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 293
+    Width = 726
+    Panels = <>
   end
   object mmMain: TMainMenu
     Images = ilMainSmall

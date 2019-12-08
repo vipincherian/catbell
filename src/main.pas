@@ -111,6 +111,7 @@ type
     sbMoveClockDown: TSpeedButton;
     sbDelete: TSpeedButton;
     sbxClocks: TScrollBox;
+    stbMain: TStatusBar;
     tlbMain: TToolBar;
     ToolButton1: TToolButton;
     tiMain: TTrayIcon;
