@@ -1047,11 +1047,12 @@ var
   TotalCount, Count: integer;
   NewTimerClock: TfraTimer;
   Hours, Mins, Secs: word;
-  //Order: TIdList;
+  Order: TIdList;
   OrderString: TStringList;
   Pos: string;
+  Id: longword;
 begin
-  //Order := nil;
+  Order := nil;
   OrderString := nil;
 
   if FileExists(FDbFileName) then
@@ -1083,7 +1084,7 @@ begin
       //NewTimerClock.Widget.OnSelect:=@ClockSelected;
       PostTimerCreation(NewTimerClock);
     end;
-    //Order := TIdList.Create;
+    Order := TIdList.Create;
     OrderString := TStringList.Create;
 
     if not Conf.GetValue(TIMER_CONF_ORDER, OrderString, '0') then
@@ -1091,15 +1092,23 @@ begin
 
     for Pos in OrderString do
     begin
-      FOrder.Add(StrToInt(Pos));
+      Order.Add(StrToInt(Pos));
     end;
+    //ShowMessage('After loadfromfile OrderString.Count' + IntToStr(OrderString.Count));
+    //ShowMessage('After loadfromfile Order.Count' + IntToStr(Order.Count));
+    //ShowMessage('After loadfromfile FOrder.Count' + IntToStr(FOrder.Count));
 
-    //SetOrder(Order);
+    //for Id in Order do
+    //begin
+    //  FOrder.Add(Id);
+    //end;
+
+    //ShowMessage('After loadfromfile 2 ' + IntToStr(FOrder.Count));
 
     Conf.Free;
     OrderString.Free;
-    //Order.Free;
-    //FClocks.Widget.Reorder;
+    Order.Free;
+    Reorder;
   end;
 end;
 
@@ -1180,14 +1189,18 @@ var
   TimerClock: TfraTimer;
   Count: integer;
   OrderStrings: TStringList;
-  //Order: TIdList;
+  Order: TIdList;
   Id: longword;
   Index: integer;
 begin
-  //Order := TIdList.Create;
+  Order := TIdList.Create;
   OrderStrings := TStringList.Create;
 
   //GetOrder(Order);
+  for Id in FOrder do
+  begin
+    Order.Add(Id);
+  end;
 
   Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
   for Count := 0 to FTimerFrames.Count - 1 do
@@ -1212,22 +1225,22 @@ begin
       The saved order has actual IDs (TimerClock.Id). These have to be
       translated to the new IDs (Count + 1)}
 
-    Index := FOrder.IndexOf(TimerClock.Id);
+    Index := Order.IndexOf(TimerClock.Id);
     Assert(Index >= 0);
-    FOrder.Items[Index] := Count + 1;
+    Order.Items[Index] := Count + 1;
 
   end;
 
 
 
 
-  for Id in FOrder do
+  for Id in Order do
     OrderStrings.Add(IntToStr(Id));
 
   Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
-
+  //ShowMessage('After Savetofile ' + IntToStr(FOrder.Count));
   OrderStrings.Free;
-  //Order.Free;
+  Order.Free;
 end;
 
 procedure TMainForm.DeleteSelected;
