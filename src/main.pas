@@ -120,6 +120,9 @@ type
     tbShowTrayAlert: TToolButton;
     tbShowModalAlert: TToolButton;
     tbProgressAuto: TToolButton;
+    tbDelete: TToolButton;
+    tbMoveUP: TToolButton;
+    tbMoveDown: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
@@ -127,6 +130,7 @@ type
     ToolButton6: TToolButton;
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
+    ToolButton9: TToolButton;
     procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);
     procedure aiMoveDownExecute(Sender: TObject);
@@ -303,6 +307,10 @@ begin
   bbDelete.Enabled:=False;
   bbMoveUp.Enabled:=False;
   bbMoveDown.Enabled:=False;
+
+  tbDelete.Enabled:=False;
+  tbMoveUp.Enabled:=False;
+  tbMoveDown.Enabled:=False;
 
 
   TrayIconSize := TRAY_BASE_WIDTH;
@@ -676,10 +684,13 @@ procedure TMainForm.SetListButtonsStatus;
 begin
   //sbDelete.Enabled := AnySelected;
   bbDelete.Enabled:=AnySelected;
+  tbDelete.Enabled:=AnySelected;
   //sbMoveClockDown.Enabled := GetCanSelectedMoveDown;
   //sbMoveClockUp.Enabled := getCanSelectedMoveUp;
   bbMoveUp.Enabled:=getCanSelectedMoveUp;
   bbMoveDown.Enabled:=GetCanselectedMoveDown;
+  tbMoveUp.Enabled:=getCanSelectedMoveUp;
+  tbMoveDown.Enabled:=GetCanselectedMoveDown;
 end;
 
 procedure TMainForm.ResetHeaderSections;
