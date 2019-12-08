@@ -25,8 +25,8 @@ unit clocks;
 interface
 
 uses
-  Classes, SysUtils, Dialogs, Forms, ExtCtrls, fgl, dateutils, jsonConf, clockswidget,
-  sequence, observers, settings, Graphics, LCLIntf,
+  Classes, SysUtils, Dialogs, Forms, ExtCtrls, fgl, dateutils, jsonConf,
+  sequence, Graphics, LCLIntf,
   LCLType, timerframe;
 
 const
@@ -90,15 +90,15 @@ type
     property Running: boolean read FRunning;
   end; *}
 
-  TClockList = specialize TFPGMap<longword, TfraTimer>;
+  TTimerFrameList = specialize TFPGMap<longword, TfraTimer>;
 
-  TClockWidgetList = specialize TFPGMap<longword, TfraTimer>;
+  //TClockWidgetList = specialize TFPGMap<longword, TfraTimer>;
   //TListTimerClockWidgets = specialize TFPGList<TfraTimer>;
   TIdList = specialize TFPGList<longword>;
   { TClocks }
   TClocks = class(TObject)
   private
-    FClockList: TClockList;
+    FTimerFrames: TTimerFrameList;
     FScrollBox: TScrollBox;
     //FClockWidgets: TClockWidgetList;
     FOrder: TIdList;
@@ -420,7 +420,7 @@ begin
   //EncounteredUnselected := False;
   for Id in FOrder do
   begin
-    if not FClockList.KeyData[Id].Selected then
+    if not FTimerFrames.KeyData[Id].Selected then
     begin
       if EncounteredSelected then
       begin
@@ -447,7 +447,7 @@ begin
   EncounteredUnselected := False;
   for Id in FOrder do
   begin
-    if FClockList.KeyData[Id].Selected then
+    if FTimerFrames.KeyData[Id].Selected then
     begin
       if EncounteredUnselected then
       begin
@@ -492,7 +492,7 @@ begin
   for Id in FOrder do
   begin
     //Index := FClockWidgets.IndexOf(Id);
-    TimerWidget := FClockList.KeyData[Id];
+    TimerWidget := FTimerFrames.KeyData[Id];
     //FScrollBox.Height:=Filled + Clock.Height;
     //FScrollBox.VertScrollBar.Range:=Filled + Clock.Height;
     TimerWidget.Top := Filled;
@@ -532,9 +532,9 @@ var
   Clock: TfraTimer;
   //TimerClock: TTimerClock;
 begin
-  for Count := 0 to FClockList.Count - 1 do
+  for Count := 0 to FTimerFrames.Count - 1 do
   begin
-    Clock := FClockList.Data[Count];
+    Clock := FTimerFrames.Data[Count];
     if Clock = nil then
       ShowMessage('Clock is Nil');
     if Clock.Selected then
@@ -559,7 +559,7 @@ begin
   //NewWidget := FClocksWidget.AddTimer(Id);
   NewWidget := TfraTimer.Create(FScrollBox);
   NewWidget.Id:=Id;
-  FClockList.Add(Id, NewWidget);
+  FTimerFrames.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
   Reorder;
 
@@ -567,7 +567,7 @@ begin
   NewWidget.OnNotifyChange := @NotifyChange;
   //NewTimer.AddSubscription(NewWidget.);
 
-  //FClockList.Add(Id, NewWidget);
+  //FTimerFrames.Add(Id, NewWidget);
   //NewWidget.Id:=Id;
   {TODO: This section can be cleaned up}
   NewWidget.OnPlay := @NewWidget.Start;
@@ -583,10 +583,10 @@ end;
 constructor TClocks.Create;
 begin
 
-  //FClockList := TClockWidgetList.Create;
+  //FTimerFrames := TClockWidgetList.Create;
   FOrder := TIdList.Create;
 
-  FClockList := TClockList.Create;
+  FTimerFrames := TTimerFrameList.Create;
   //FActiveTimers := TListTimerClockWidgets.Create;
 
   FCounterClockID := TSequence.Create;
@@ -599,15 +599,15 @@ var
   I: integer;
 begin
   // Remove any unremoved clocks in the list
-  for I := 0 to FClockList.Count - 1 do
+  for I := 0 to FTimerFrames.Count - 1 do
   begin
-    FClockList.Data[i].Free;
+    FTimerFrames.Data[i].Free;
   end;
 
   FCounterClockID.Free;
 
   //FActiveTimers.Free;
-  FClockList.Free;
+  FTimerFrames.Free;
 
   FOrder.Free;
   {for I := 0 to FClockWidgets.Count - 1 do
@@ -637,9 +637,9 @@ begin
   end;
 
 
-  for Count := 0 to FClockList.Count - 1 do
+  for Count := 0 to FTimerFrames.Count - 1 do
   begin
-    TimerClock := FClockList.Data[Count];
+    TimerClock := FTimerFrames.Data[Count];
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
     if TimerClock <> Notifier then
@@ -674,10 +674,10 @@ begin
 
   GetOrder(Order);
 
-  Conf.SetValue(TIMER_CONF_COUNT, FClockList.Count);
-  for Count := 0 to FClockList.Count - 1 do
+  Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
+  for Count := 0 to FTimerFrames.Count - 1 do
   begin
-    TimerClock := FClockList.Data[Count];
+    TimerClock := FTimerFrames.Data[Count];
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
 
@@ -729,9 +729,9 @@ begin
   with kid-gloves. A seperate list is created to hold IDs of elements to be
   removed from the list. After iteration, removal is done in a separte loop}
 
-  for Count := 0 to FClockList.Count - 1 do
+  for Count := 0 to FTimerFrames.Count - 1 do
   begin
-    TimerClock := FClockList.Data[Count];
+    TimerClock := FTimerFrames.Data[Count];
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
 
@@ -750,7 +750,7 @@ begin
   for Id in IdList do
   begin
     RemoveTimer(Id);
-    //FClockList.Remove(Id);
+    //FTimerFrames.Remove(Id);
     //TimerClock.Free;
   end;
   IdList.Free;
@@ -762,9 +762,9 @@ var
   RemovedTimer: TfraTimer;
   Index: integer;
 begin
-  Index := FClockList.IndexOf(IdNew);
-  RemovedTimer := TfraTimer(FClockList.Data[Index]);
-  FClockList.Remove(IdNew);
+  Index := FTimerFrames.IndexOf(IdNew);
+  RemovedTimer := TfraTimer(FTimerFrames.Data[Index]);
+  FTimerFrames.Remove(IdNew);
   FOrder.Remove(IdNew);
   RemovedTimer.Free;
   Reorder;
@@ -784,11 +784,11 @@ begin
       Continue;
     end;
 
-    if FClockList.KeyData[Id].Selected then
+    if FTimerFrames.KeyData[Id].Selected then
     begin
       {If x and y are selected, do not exchange, keep the order as it is}
-      if not (FClockList.KeyData[FOrder.Items[Count - 1]].Selected and
-        FClockList.KeyData[FOrder.Items[Count]].Selected) then
+      if not (FTimerFrames.KeyData[FOrder.Items[Count - 1]].Selected and
+        FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
         FOrder.Exchange(Count - 1, Count);
     end;
     Inc(Count);
@@ -803,7 +803,7 @@ var
   First: boolean;
 begin
   First := True;
-  for Count := (FClockList.Count - 1) downto 0 do
+  for Count := (FTimerFrames.Count - 1) downto 0 do
   begin
     if First then
     begin
@@ -811,11 +811,11 @@ begin
       Continue;
     end;
     Id := FOrder.Items[Count];
-    if FClockList.KeyData[Id].Selected then
+    if FTimerFrames.KeyData[Id].Selected then
     begin
       {If x and y are selected, do not exchange, keep the order as it is}
-      if not (FClockList.KeyData[FOrder.Items[Count + 1]].Selected and
-        FClockList.KeyData[FOrder.Items[Count]].Selected) then
+      if not (FTimerFrames.KeyData[FOrder.Items[Count + 1]].Selected and
+        FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
         FOrder.Exchange(Count + 1, Count);
     end;
 
@@ -848,7 +848,7 @@ end;
 
 function TClocks.GetClock(Id: longword): TFraTimer;
 begin
-  Result := FClockList.KeyData[Id];
+  Result := FTimerFrames.KeyData[Id];
 end;
 
 function TClocks.GetAllIdS(Ids: TIdList): boolean;
