@@ -1,10 +1,10 @@
 object fraTimer: TfraTimer
   Left = 0
-  Height = 38
+  Height = 43
   Top = 0
   Width = 722
   Anchors = [akTop, akLeft, akRight]
-  ClientHeight = 38
+  ClientHeight = 43
   ClientWidth = 722
   TabOrder = 0
   DesignLeft = 247
@@ -12,25 +12,25 @@ object fraTimer: TfraTimer
   object imgTimer: TImage
     Left = 32
     Height = 24
-    Top = 7
+    Top = 10
     Width = 24
     OnClick = imgTimerClick
     ParentShowHint = False
   end
   object edtTitle: TEdit
     Left = 65
-    Height = 23
-    Top = 8
+    Height = 19
+    Top = 11
     Width = 263
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 1
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 556
-    Height = 15
+    Left = 551
+    Height = 13
     Top = 11
-    Width = 48
+    Width = 56
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
     Caption = '00:00:00'
@@ -42,16 +42,16 @@ object fraTimer: TfraTimer
   end
   object cbSelect: TCheckBox
     Left = 8
-    Height = 19
-    Top = 8
-    Width = 20
+    Height = 18
+    Top = 11
+    Width = 18
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 338
-    Height = 23
-    Top = 8
-    Width = 65
+    Left = 332
+    Height = 19
+    Top = 11
+    Width = 71
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -88,7 +88,7 @@ object fraTimer: TfraTimer
   end
   object bbPlay: TBitBtn
     Left = 410
-    Height = 30
+    Height = 36
     Top = 4
     Width = 40
     Action = aiPlay
@@ -173,7 +173,7 @@ object fraTimer: TfraTimer
   end
   object bbPause: TBitBtn
     Left = 458
-    Height = 30
+    Height = 36
     Top = 4
     Width = 40
     Action = aiPause
@@ -259,7 +259,7 @@ object fraTimer: TfraTimer
   end
   object bbStop: TBitBtn
     Left = 506
-    Height = 30
+    Height = 36
     Top = 4
     Width = 40
     Action = aiStop
@@ -345,7 +345,7 @@ object fraTimer: TfraTimer
   end
   object bbEdit: TBitBtn
     Left = 674
-    Height = 30
+    Height = 36
     Top = 4
     Width = 40
     Anchors = [akTop, akRight]
