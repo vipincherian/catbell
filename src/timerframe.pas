@@ -64,6 +64,7 @@ type
     bbEdit: TBitBtn;
     bbStop: TBitBtn;
     cbSelect: TCheckBox;
+    CheckBox1: TCheckBox;
     dtpSet: TDateTimePicker;
     edtTitle: TEdit;
     ilTimer: TImageList;

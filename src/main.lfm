@@ -200,36 +200,36 @@ object MainForm: TMainForm
         DragReorder = False
         Sections = <        
           item
-            Alignment = taLeftJustify
+            Alignment = taCenter
             Width = 30
             Visible = True
           end        
           item
-            Alignment = taLeftJustify
+            Alignment = taCenter
             Text = 'Title'
             Width = 30
             Visible = True
           end        
           item
-            Alignment = taLeftJustify
+            Alignment = taCenter
             Text = 'Controls'
             Width = 30
             Visible = True
           end        
           item
-            Alignment = taLeftJustify
+            Alignment = taCenter
             Text = 'Status'
             Width = 30
             Visible = True
           end        
           item
-            Alignment = taLeftJustify
+            Alignment = taCenter
             Text = 'On icon'
             Width = 30
             Visible = True
           end        
           item
-            Alignment = taLeftJustify
+            Alignment = taCenter
             Text = 'Edit'
             Width = 30
             Visible = True

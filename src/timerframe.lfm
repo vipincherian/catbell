@@ -73,7 +73,7 @@ object fraTimer: TfraTimer
   end
   object sbNotify: TSpeedButton
     Cursor = crHandPoint
-    Left = 625
+    Left = 617
     Height = 30
     Hint = 'Show progress through icons.'
     Top = 4
@@ -344,12 +344,20 @@ object fraTimer: TfraTimer
     TabOrder = 5
   end
   object bbEdit: TBitBtn
-    Left = 674
+    Left = 680
     Height = 36
     Top = 4
     Width = 40
     Anchors = [akTop, akRight]
     TabOrder = 6
+  end
+  object CheckBox1: TCheckBox
+    Left = 648
+    Height = 18
+    Top = 11
+    Width = 18
+    Anchors = [akTop, akRight]
+    TabOrder = 7
   end
   object ilTimer: TImageList
     Height = 24
