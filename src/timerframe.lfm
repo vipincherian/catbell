@@ -71,21 +71,6 @@ object fraTimer: TfraTimer
     MonthNames = 'Long'
     OnChange = dtpSetChange
   end
-  object sbNotify: TSpeedButton
-    Cursor = crHandPoint
-    Left = 616
-    Height = 30
-    Hint = 'Show progress through icons.'
-    Top = 4
-    Width = 31
-    AllowAllUp = True
-    Anchors = [akTop, akRight]
-    Flat = True
-    GroupIndex = 1
-    OnClick = sbNotifyClick
-    ShowHint = True
-    ParentShowHint = False
-  end
   object bbPlay: TBitBtn
     Left = 409
     Height = 29

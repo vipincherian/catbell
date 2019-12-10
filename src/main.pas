@@ -721,11 +721,11 @@ begin
     Inc(Filled, Temp);
 
     Temp := Timer.lblCountdown.Left + Timer.lblCountdown.Width;
-    Temp := Temp + ((Timer.sbNotify.Left - Temp) div 2) - Filled;
+    Temp := Temp + ((Timer.ckbIconProgress.Left - Temp) div 2) - Filled;
     hdrTimers.Sections.Items[3].Width := Temp;
     Inc(Filled, Temp);
 
-    Temp := Timer.sbNotify.Left + Timer.sbNotify.Width;
+    Temp := Timer.ckbIconProgress.Left + Timer.ckbIconProgress.Width;
     Temp := Temp + ((Timer.bbEdit.Left - Temp) div 2) - Filled;
     hdrTimers.Sections.Items[4].Width := Temp;
     Inc(Filled, Temp);

@@ -70,15 +70,14 @@ type
     ilTimer: TImageList;
     imgTimer: TImage;
     lblCountdown: TLabel;
-    sbNotify: TSpeedButton;
     procedure aiPauseExecute(Sender: TObject);
     procedure aiPlayExecute(Sender: TObject);
     procedure aiStopExecute(Sender: TObject);
     procedure ckbIconProgressChange(Sender: TObject);
     procedure dtpSetChange(Sender: TObject);
     procedure imgTimerClick(Sender: TObject);
-    procedure sbNotifyClick(Sender: TObject);
-    procedure UpdateNotifyButton;
+    //procedure sbNotifyClick(Sender: TObject);
+    //procedure UpdateNotifyButton;
   private
     { private declarations }
     FId: longword;
@@ -242,9 +241,9 @@ begin
 
 end;
 
-procedure TfraTimer.sbNotifyClick(Sender: TObject);
+{procedure TfraTimer.sbNotifyClick(Sender: TObject);
 begin
-  UpdateNotifyButton;
+  //UpdateNotifyButton;
   if OnNotifyClick <> nil then
     OnNotifyClick(Self)
   else
@@ -253,15 +252,15 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnNotifyClick was found to be Nil');
-end;
+end;}
 
-procedure TfraTimer.UpdateNotifyButton;
+{procedure TfraTimer.UpdateNotifyButton;
 begin
   if sbNotify.Down then
     ilTimer.GetBitmap(TIMER_IMG_NOTIFY_YES, sbNotify.Glyph)
   else
     ilTimer.GetBitmap(TIMER_IMG_NOTIFY_NO, sbNotify.Glyph);
-end;
+end;}
 
 
 procedure TfraTimer.SetId(AValue: longword);
@@ -518,7 +517,7 @@ begin
   end;
 
   //  sbNotify.Glyph;
-  ilTimer.GetBitmap(TIMER_IMG_NOTIFY_NO, sbNotify.Glyph);
+  //ilTimer.GetBitmap(TIMER_IMG_NOTIFY_NO, sbNotify.Glyph);
   //teSet.
 
   //OnPlay := nil;
