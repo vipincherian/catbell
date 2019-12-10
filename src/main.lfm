@@ -224,7 +224,7 @@ object MainForm: TMainForm
           end        
           item
             Alignment = taCenter
-            Text = 'On icon'
+            Text = 'Tray'
             Width = 30
             Visible = True
           end        
