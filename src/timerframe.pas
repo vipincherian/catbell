@@ -127,13 +127,13 @@ type
   public
     { public declarations }
     {TODO: Review these two events and remove dynamic bindings}
-    OnNotifyClick: TNotifyEvent;
-    OnNotifyChange: TNotifyEvent;
+    //OnNotifyClick: TNotifyEvent;
+    //OnNotifyChange: TNotifyEvent;
     OnProgressOnIconChanged: TNotifyEvent;
     //OnPlay: TNotifyEvent;
     //OnStop: TNotifyEvent;
     //OnPause: TNotifyEvent;
-    OnNotify: TNotifyEvent;
+    //OnNotify: TNotifyEvent;
     OnSelect: TNotifyEvent;
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
@@ -141,7 +141,7 @@ type
     //procedure PlayClicked(Sender: TObject);
     //procedure Stopclicked(Sender: TObject);
     //procedure PauseClicked(Sender: TObject);
-    procedure NotifyClicked(Sender: TObject);
+    //procedure NotifyClicked(Sender: TObject);
     procedure ClockSelected(Sender: TObject);
     procedure Hide;
     constructor Create(AOwner: TComponent); override;
@@ -440,7 +440,7 @@ begin
       +': OnPause was found to be Nil');
 end;}
 
-procedure TfraTimer.NotifyClicked(Sender: TObject);
+{procedure TfraTimer.NotifyClicked(Sender: TObject);
 begin
   if OnNotify <> nil then
   begin
@@ -452,7 +452,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnNotify was found to be Nil');
-end;
+end;}
 
 procedure TfraTimer.ClockSelected(Sender: TObject);
 begin
@@ -528,7 +528,7 @@ begin
   //sbPlay.OnClick := @PlayClicked;
   //sbStop.OnClick := @StopClicked;
   //sbPause.OnClick := @PauseClicked;
-  OnNotifyClick := @NotifyClicked;
+  //OnNotifyClick := @NotifyClicked;
   cbSelect.OnChange := @ClockSelected;
   OnProgressOnIconChanged := nil;
 
