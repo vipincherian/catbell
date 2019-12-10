@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -55,6 +55,8 @@ type
   { TfraTimer }
 
   TfraTimer = class(TFrame, ITimerSubject)
+    aiAdjust: TAction;
+    aiEdit: TAction;
     aiStop: TAction;
     aiPause: TAction;
     aiPlay: TAction;
@@ -63,6 +65,7 @@ type
     bbPause: TBitBtn;
     bbEdit: TBitBtn;
     bbStop: TBitBtn;
+    bbAdjust: TBitBtn;
     cbSelect: TCheckBox;
     ckbIconProgress: TCheckBox;
     dtpSet: TDateTimePicker;
@@ -70,6 +73,7 @@ type
     ilTimer: TImageList;
     imgTimer: TImage;
     lblCountdown: TLabel;
+    procedure aiEditExecute(Sender: TObject);
     procedure aiPauseExecute(Sender: TObject);
     procedure aiPlayExecute(Sender: TObject);
     procedure aiStopExecute(Sender: TObject);
@@ -233,6 +237,22 @@ procedure TfraTimer.aiPauseExecute(Sender: TObject);
 begin
   //PauseClicked(Sender);
   Pause(Sender);
+end;
+
+procedure TfraTimer.aiEditExecute(Sender: TObject);
+var
+  Hour, Min, Sec, Milli : Word;
+begin
+  frmEditTimer.Specs.Description:=edtTitle.Text;
+  DecodeTime(dtpSet.Time, Hour, Min, Sec, Milli);
+  frmEditTimer.Specs.DurationHours:=Hour;
+  frmEditTimer.Specs.DurationMinutes:=Min;
+  frmEditTimer.Specs.DurationSeconds:=Sec;
+  if frmEditTimer.ShowForEdit then
+  begin
+    Caption:=frmEditTimer.Specs.Description;
+    dtpSet.Time:= EncodeTime(frmEditTimer.Specs.DurationHours, frmEditTimer.Specs.DurationMinutes, frmEditTimer.Specs.DurationSeconds,0);
+  end;
 end;
 
 

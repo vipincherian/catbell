@@ -392,12 +392,28 @@ end;
 procedure TMainForm.aiNewTimerExecute(Sender: TObject);
 var
   Added: TfraTimer;
+  //Proceed: boolean;
 begin
   {*if OnNewTimer <> nil then
     OnNewTimer(Sender);*}
-  frmEditTimer.ShowModal;
-  Added := AddTimer;
-  PostTimerCreation(Added);
+
+  with GlobalUserConfig do
+  begin
+    //dtpSet.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
+    //  DefaultTimerSecs, 0);
+    frmEditTimer.Specs.DurationHours := DefaultTimerHours;
+    frmEditTimer.Specs.DurationMinutes:= DefaultTimerMins;
+    frmEditTimer.Specs.DurationSeconds:=DefaultTimerSecs;
+    frmEditTimer.Specs.Description := DefaultTimerTitle;
+  end;
+
+  if frmEditTimer.ShowForAdd then
+  begin
+    Added := AddTimer;
+    Added.Caption:=frmEditTimer.Specs.Description;
+    Added.dtpSet.Time:= EncodeTime(frmEditTimer.Specs.DurationHours, frmEditTimer.Specs.DurationMinutes, frmEditTimer.Specs.DurationSeconds,0);
+    PostTimerCreation(Added);
+  end;
 end;
 
 procedure TMainForm.aiOptionsExecute(Sender: TObject);
@@ -715,7 +731,8 @@ begin
     Temp := Temp + ((Timer.bbPlay.Left - Temp) div 2) - Filled;
     hdrTimers.Sections.Items[1].Width := Temp;
     Inc(Filled, hdrTimers.Sections.Items[1].Width);
-    Temp := Timer.bbStop.Left + Timer.bbStop.Width;
+
+    Temp := Timer.bbAdjust.Left + Timer.bbAdjust.Width;
     Temp := Temp + ((Timer.lblCountdown.Left - Temp) div 2) - Filled;
     hdrTimers.Sections.Items[2].Width := Temp;
     Inc(Filled, Temp);

@@ -9,7 +9,7 @@ object MainForm: TMainForm
   VertScrollBar.Range = 152
   ActiveControl = pnlBorder
   Caption = 'CAT Bell'
-  ClientHeight = 317
+  ClientHeight = 315
   ClientWidth = 726
   Menu = mmMain
   OnCloseQuery = FormCloseQuery
@@ -159,19 +159,19 @@ object MainForm: TMainForm
   end
   object pnlBorder: TPanel
     Left = 8
-    Height = 249
+    Height = 247
     Top = 40
     Width = 664
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlBorder'
-    ClientHeight = 249
+    ClientHeight = 247
     ClientWidth = 664
     TabOrder = 1
     object pnlClocks: TPanel
       Left = 1
-      Height = 247
+      Height = 245
       Top = 1
       Width = 662
       Align = alClient
@@ -182,14 +182,14 @@ object MainForm: TMainForm
     end
     object sbxClocks: TScrollBox
       Left = 1
-      Height = 247
+      Height = 245
       Top = 1
       Width = 662
       HorzScrollBar.Page = 170
       VertScrollBar.Page = 24
       Align = alClient
       BorderStyle = bsNone
-      ClientHeight = 247
+      ClientHeight = 245
       ClientWidth = 662
       TabOrder = 1
       object hdrTimers: THeaderControl
@@ -241,15 +241,15 @@ object MainForm: TMainForm
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 20
-    Top = 297
+    Height = 15
+    Top = 300
     Width = 726
     Panels = <>
   end
   object bbDelete: TBitBtn
     Left = 680
     Height = 30
-    Top = 179
+    Top = 177
     Width = 37
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
@@ -334,7 +334,7 @@ object MainForm: TMainForm
   object bbMoveUp: TBitBtn
     Left = 680
     Height = 30
-    Top = 219
+    Top = 217
     Width = 37
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
@@ -419,7 +419,7 @@ object MainForm: TMainForm
   object bbMoveDown: TBitBtn
     Left = 680
     Height = 30
-    Top = 259
+    Top = 257
     Width = 37
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
