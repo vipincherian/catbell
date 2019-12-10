@@ -64,7 +64,7 @@ type
     bbEdit: TBitBtn;
     bbStop: TBitBtn;
     cbSelect: TCheckBox;
-    CheckBox1: TCheckBox;
+    ckbIconProgress: TCheckBox;
     dtpSet: TDateTimePicker;
     edtTitle: TEdit;
     ilTimer: TImageList;
@@ -74,6 +74,7 @@ type
     procedure aiPauseExecute(Sender: TObject);
     procedure aiPlayExecute(Sender: TObject);
     procedure aiStopExecute(Sender: TObject);
+    procedure ckbIconProgressChange(Sender: TObject);
     procedure dtpSetChange(Sender: TObject);
     procedure imgTimerClick(Sender: TObject);
     procedure sbNotifyClick(Sender: TObject);
@@ -83,7 +84,7 @@ type
     FId: longword;
     //FObservers: TTimerObserverList;
     FShortTimer: TTimer;
-    FNotifier: boolean;
+    //FNotifier: boolean;
 
     FOrigTickDuration: longword;
     FStartTickCount: longword;
@@ -93,13 +94,14 @@ type
     FPaused: boolean;
     FRunning: boolean;
     FObservers: TListTimerObservers;
+    //function GetShowProgressOnIcon: boolean;
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
     function GetDuration: TDateTime;
     function GetDurationEnabled: boolean;
     function GetImageGreyed: boolean;
-    function GetNotifyEnabled: boolean;
+    function GetIsProgressOnIcon: boolean;
     function GetPauseButtonEnabled: boolean;
     function GetPlayButtonEnabled: boolean;
     function GetSelected: boolean;
@@ -110,12 +112,13 @@ type
     procedure SetDurationEnabled(AValue: boolean);
     //procedure SetId(AValue: longword);
     procedure SetImageGreyed(AValue: boolean);
-    procedure SetNotifyEnabled(AValue: boolean);
+    procedure SetIsProgressOnIcon(AValue: boolean);
     procedure SetPauseButtonEnabled(AValue: boolean);
     procedure SetPlayButtonEnabled(AValue: boolean);
+    //procedure SetShowProgressOnIcon(AValue: boolean);
     procedure SetStopButtonEnabled(AValue: boolean);
     function GetId: longword;
-    procedure SetNotifier(AValue: boolean);
+    //procedure SetNotifier(AValue: boolean);
     {function GetTop: integer;
     procedure SetTop(AValue: integer);
     function GetHeight: integer;
@@ -127,11 +130,15 @@ type
     {TODO: Review these two events and remove dynamic bindings}
     OnNotifyClick: TNotifyEvent;
     OnNotifyChange: TNotifyEvent;
+    OnProgressOnIconChanged: TNotifyEvent;
     //OnPlay: TNotifyEvent;
     //OnStop: TNotifyEvent;
     //OnPause: TNotifyEvent;
     OnNotify: TNotifyEvent;
     OnSelect: TNotifyEvent;
+    // Callback on progress-on-icon checkbox change only if
+    // this variable is true. Used to avoid unending triggering of events.
+    CallbackOnProgressOnIconChange: boolean;
     //procedure PlayClicked(Sender: TObject);
     //procedure Stopclicked(Sender: TObject);
     //procedure PauseClicked(Sender: TObject);
@@ -148,7 +155,7 @@ type
     procedure Start(Sender: TObject);
     procedure Pause(Sender: TObject);
     procedure Stop(Sender: TObject);
-    procedure NotifyChange(Sender: TObject);
+    //procedure NotifyChange(Sender: TObject);
     procedure Finish;
     procedure PublishProgress(Percent: single);
     procedure AddSubscription(aObserver: ITimerObserver);
@@ -166,14 +173,16 @@ type
     property DurationEnabled: boolean read GetDurationEnabled write SetDurationEnabled;
     property Caption: string read GetCaption write SetCaption;
     property ImageGreyed: boolean read GetImageGreyed write SetImageGreyed;
-    property NotifyEnabled: boolean read GetNotifyEnabled write SetNotifyEnabled;
+    property IsProgressOnIcon: boolean read GetIsProgressOnIcon
+      write SetIsProgressOnIcon;
+    //property ShowProgressOnIcon: boolean read GetShowProgressOnIcon write SetShowProgressOnIcon;
     property Selected: boolean read GetSelected;
     //property Id: longword read GetId write SetId;
     //property Top: integer read GetTop write SetTop;
     //property Height: integer read GetHeight write SetHeight;
     //property Width: integer read GetWidth write SetWidth;
 
-    property Notifier: boolean read FNotifier write SetNotifier;
+    //property Notifier: boolean read FNotifier write SetNotifier;
     property Running: boolean read FRunning;
   end;
 
@@ -200,6 +209,25 @@ procedure TfraTimer.aiStopExecute(Sender: TObject);
 begin
   //Stopclicked(Sender);
   Stop(Sender);
+end;
+
+procedure TfraTimer.ckbIconProgressChange(Sender: TObject);
+begin
+  //if not ckbIconProgress.Checked then
+  //  Exit;
+  if CallbackOnProgressOnIconChange then
+  begin
+    if OnProgressOnIconChanged <> nil then
+    begin
+      OnProgressOnIconChanged(Self);
+    end
+    else
+      ShowMessage('Unexpected error at ' +
+{$I %FILE%}
+        +' ' +
+{$I %LINE%}
+        +': OnProgressOnIconChanged was found to be Nil');
+  end;
 end;
 
 procedure TfraTimer.aiPauseExecute(Sender: TObject);
@@ -248,6 +276,11 @@ begin
   //Id := IdNew;
 end;
 
+{function TfraTimer.GetShowProgressOnIcon: boolean;
+begin
+  Result:=ckbIconProgress.Checked;
+end;}
+
 function TfraTimer.GetCaption: string;
 begin
   Result := edtTitle.Text;
@@ -273,9 +306,10 @@ begin
   Result := imgTimer.Visible;
 end;
 
-function TfraTimer.GetNotifyEnabled: boolean;
+function TfraTimer.GetIsProgressOnIcon: boolean;
 begin
-  Result := sbNotify.Down;
+  //Result := sbNotify.Down;
+  Result := ckbIconProgress.Checked;
 end;
 
 function TfraTimer.GetPauseButtonEnabled: boolean;
@@ -323,10 +357,12 @@ begin
   //FFrame.imgTimer.Picture.Bitmap;
 end;
 
-procedure TfraTimer.SetNotifyEnabled(AValue: boolean);
+procedure TfraTimer.SetIsProgressOnIcon(AValue: boolean);
 begin
-  sbNotify.Down := AValue;
-  UpdateNotifyButton;
+  //sbNotify.Down := AValue;
+  ckbIconProgress.Checked := AValue;
+  //UpdateNotifyButton;
+  //FNotifier:=AValue;
 end;
 
 procedure TfraTimer.SetPauseButtonEnabled(AValue: boolean);
@@ -339,6 +375,11 @@ begin
   bbPlay.Enabled := AValue;
 end;
 
+{procedure TfraTimer.SetShowProgressOnIcon(AValue: boolean);
+begin
+  ckbIconProgress.Checked:=AValue;
+end;}
+
 procedure TfraTimer.SetStopButtonEnabled(AValue: boolean);
 begin
   bbStop.Enabled := AValue;
@@ -349,13 +390,13 @@ begin
   Result := FId;
 end;
 
-procedure TfraTimer.SetNotifier(AValue: boolean);
+{procedure TfraTimer.SetNotifier(AValue: boolean);
 begin
   if FNotifier = AValue then
     Exit;
   FNotifier := AValue;
-  NotifyEnabled := AValue;
-end;
+  IsProgressOnIcon := AValue;
+end;}
 
 {procedure TfraTimer.PlayClicked(Sender: TObject);
 begin
@@ -490,12 +531,13 @@ begin
   //sbPause.OnClick := @PauseClicked;
   OnNotifyClick := @NotifyClicked;
   cbSelect.OnChange := @ClockSelected;
+  OnProgressOnIconChanged := nil;
 
   ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap);
 
   FRunning := False;
   FPaused := False;
-  FNotifier := False;
+  //FNotifier := False;
 
   FObservers := TListTimerObservers.Create;
 
@@ -507,6 +549,8 @@ begin
   bbPlay.Caption := '';
   bbPause.Caption := '';
   bbStop.Caption := '';
+
+  CallbackOnProgressOnIconChange := True;
 end;
 
 destructor TfraTimer.Destroy;
@@ -578,7 +622,7 @@ begin
       Counter := CounterText;
 
     // Calculate percentage progress
-    if FNotifier then
+    if IsProgressOnIcon then
     begin
       Progress := 1 - (ElapsedMilliseconds / FOrigTickDuration);
       // Elapsed time can exceed total pending tick duration, in certain cases.
@@ -625,8 +669,8 @@ begin
     FOrigTickDuration := FEndTickCount - FStartTickCount;
     if GlobalUserConfig.AutoProgress = True then
     begin
-      Notifier := True;
-      NotifyChange(Self);
+      IsProgressOnIcon := True;
+      //NotifyChange(Self);
     end;
   end
   else
@@ -689,7 +733,7 @@ begin
   Counter := DEF_COUNTDOWN_CAPTION;
   //end;
 
-  if FNotifier then
+  if IsProgressOnIcon then
     PublishProgress(TIMER_PROGRESS_FINISHED);
 
   FEndTickCount := 0;
@@ -697,7 +741,7 @@ begin
   FStartTickCount := 0;
 end;
 
-procedure TfraTimer.NotifyChange(Sender: TObject);
+{procedure TfraTimer.NotifyChange(Sender: TObject);
 begin
   if OnNotifyChange <> nil then
   begin
@@ -710,7 +754,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnNotifyChange was found to be Nil');
-end;
+end;}
 
 procedure TfraTimer.Finish;
 var
@@ -722,7 +766,7 @@ begin
     Observer.TimerFinished(FId);
   end;
 
-  if Notifier then
+  if IsProgressOnIcon then
     PublishProgress(TIMER_PROGRESS_FINISHED);
   Stop(Self);
 end;

@@ -220,7 +220,8 @@ type
     //property Clocks: TClocks read FClocks;
 
     function AddTimer(): TfraTimer;
-    procedure NotifyChange(Sender: TObject);
+    //procedure NotifyChange(Sender: TObject);
+    procedure HandleTimerFrameIconProgressChange(Sender: TObject);
     procedure SaveClocks(Conf: TJsonConfig);
     procedure DeleteSelected;
     //property Widget: TClocksWidget read FClocksWidget write SetWidget;
@@ -300,17 +301,17 @@ begin
   //sbDelete.Caption := '';
   //sbMoveClockDown.Caption := '';
   //sbMoveClockUp.Caption := '';
-  bbDelete.Caption:='';
-  bbMoveUp.Caption:='';
-  bbMoveDown.Caption:='';
+  bbDelete.Caption := '';
+  bbMoveUp.Caption := '';
+  bbMoveDown.Caption := '';
 
-  bbDelete.Enabled:=False;
-  bbMoveUp.Enabled:=False;
-  bbMoveDown.Enabled:=False;
+  bbDelete.Enabled := False;
+  bbMoveUp.Enabled := False;
+  bbMoveDown.Enabled := False;
 
-  tbDelete.Enabled:=False;
-  tbMoveUp.Enabled:=False;
-  tbMoveDown.Enabled:=False;
+  tbDelete.Enabled := False;
+  tbMoveUp.Enabled := False;
+  tbMoveDown.Enabled := False;
 
 
   TrayIconSize := TRAY_BASE_WIDTH;
@@ -683,14 +684,14 @@ end;
 procedure TMainForm.SetListButtonsStatus;
 begin
   //sbDelete.Enabled := AnySelected;
-  bbDelete.Enabled:=AnySelected;
-  tbDelete.Enabled:=AnySelected;
+  bbDelete.Enabled := AnySelected;
+  tbDelete.Enabled := AnySelected;
   //sbMoveClockDown.Enabled := GetCanSelectedMoveDown;
   //sbMoveClockUp.Enabled := getCanSelectedMoveUp;
-  bbMoveUp.Enabled:=getCanSelectedMoveUp;
-  bbMoveDown.Enabled:=GetCanselectedMoveDown;
-  tbMoveUp.Enabled:=getCanSelectedMoveUp;
-  tbMoveDown.Enabled:=GetCanselectedMoveDown;
+  bbMoveUp.Enabled := getCanSelectedMoveUp;
+  bbMoveDown.Enabled := GetCanselectedMoveDown;
+  tbMoveUp.Enabled := getCanSelectedMoveUp;
+  tbMoveDown.Enabled := GetCanselectedMoveDown;
 end;
 
 procedure TMainForm.ResetHeaderSections;
@@ -732,6 +733,10 @@ begin
     Temp := sbxClocks.Width - Filled;
     hdrTimers.Sections.Items[5].Width := Temp;
     Inc(Filled, Temp);
+  end
+  else
+  begin
+    Filled := 0;
   end;
   //Ids.Free;
 end;
@@ -1132,7 +1137,7 @@ begin
       //TODO: Remove hardcoding
       NewTimerClock.Duration :=
         EncodeDateTime(2000, 1, 1, Hours, Mins, Secs, 0);
-      NewTimerClock.Notifier :=
+      NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
         '/' + TIMER_CONF_NOTIFIER, False);
       //NewTimerClock.AddSubscription(FFormWidget);
@@ -1176,7 +1181,8 @@ begin
   Reorder;
 
   //NewTimer.Widget := NewWidget;
-  NewWidget.OnNotifyChange := @NotifyChange;
+  //NewWidget.OnNotifyChange := @NotifyChange;
+  NewWidget.OnProgressOnIconChanged := @HandleTimerFrameIconProgressChange;
   //NewTimer.AddSubscription(NewWidget.);
 
   //FTimerFrames.Add(Id, NewWidget);
@@ -1185,24 +1191,24 @@ begin
   //NewWidget.OnPlay := @NewWidget.Start;
   //NewWidget.OnStop := @NewWidget.Stop;
   //NewWidget.OnPause := @NewWidget.Pause;
-  NewWidget.OnNotify := @NewWidget.NotifyChange;
+  //NewWidget.OnNotify := @NewWidget.NotifyChange;
   //NewWidget.OnSelect:=@ClockSelected;
 
   Result := NewWidget;
 end;
 
-procedure TMainForm.NotifyChange(Sender: TObject);
+{procedure TMainForm.NotifyChange(Sender: TObject);
 var
   TimerClock: TfraTimer;
   Notifier: TfraTimer;
   Count: integer;
 begin
-
+  ShowMessage('Hehe');
   Notifier := TfraTimer(Sender);
-  if not Notifier.NotifyEnabled then
+  if not Notifier.IsProgressOnIcon then
   begin
     Notifier.PublishProgress(TIMER_PROGRESS_FINISHED);
-    Notifier.Notifier := False;
+    Notifier.IsProgressOnIcon := False;
     Exit;
   end;
 
@@ -1214,19 +1220,51 @@ begin
       ShowMessage('Clock is Nil');
     if TimerClock <> Notifier then
     begin
-      TimerClock.NotifyEnabled := False;
-      if TimerClock.Notifier = True then
+      TimerClock.IsProgressOnIcon := False;
+      if TimerClock.IsProgressOnIcon = True then
       begin
-        TimerClock.Notifier := False;
+        TimerClock.IsProgressOnIcon := False;
         TimerClock.PublishProgress(TIMER_PROGRESS_FINISHED);
       end;
     end;
 
   end;
 
-  Notifier.Notifier := True;
+  Notifier.IsProgressOnIcon := True;
   //TODO: Add PublishProgress here
   //Notifier.OnShortTimer(Self);
+
+end;}
+
+// Procedure to handle if
+procedure TMainForm.HandleTimerFrameIconProgressChange(Sender: TObject);
+var
+  SenderTimer: TfraTimer;
+  Temp: TfraTimer;
+  Count: integer;
+begin
+  SenderTimer := TfraTimer(Sender);
+
+  if not SenderTimer.IsProgressOnIcon then
+  begin
+    SenderTimer.PublishProgress(TIMER_PROGRESS_FINISHED);
+    //Notifier.IsProgressOnIcon := False;
+    Exit;
+  end;
+
+  // For all timers other than the sender, uncheck if checked
+  for Count := 0 to FTimerFrames.Count - 1 do
+  begin
+    Temp := FTimerFrames.Data[Count];
+    if Temp <> SenderTimer then
+      if Temp.IsProgressOnIcon then
+      begin
+        Temp.CallbackOnProgressOnIconChange := False;
+        Temp.IsProgressOnIcon := False;
+        Temp.CallbackOnProgressOnIconChange := True;
+        Temp.PublishProgress(TIMER_PROGRESS_FINISHED);
+      end;
+  end;
 
 end;
 
@@ -1264,7 +1302,7 @@ begin
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_SECONDS, SecondOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
-      '/' + TIMER_CONF_NOTIFIER, TimerClock.Notifier);
+      '/' + TIMER_CONF_NOTIFIER, TimerClock.IsProgressOnIcon);
 
       { While saving, existing IDs of clocks are ignored. They are saved in the
       order they are in the list. The position in the list becomes the new ID.

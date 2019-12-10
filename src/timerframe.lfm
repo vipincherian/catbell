@@ -1,36 +1,36 @@
 object fraTimer: TfraTimer
   Left = 0
-  Height = 43
+  Height = 35
   Top = 0
-  Width = 722
+  Width = 721
   Anchors = [akTop, akLeft, akRight]
-  ClientHeight = 43
-  ClientWidth = 722
+  ClientHeight = 35
+  ClientWidth = 721
   TabOrder = 0
-  DesignLeft = 247
+  DesignLeft = 248
   DesignTop = 159
   object imgTimer: TImage
     Left = 32
     Height = 24
-    Top = 10
+    Top = 5
     Width = 24
     OnClick = imgTimerClick
     ParentShowHint = False
   end
   object edtTitle: TEdit
     Left = 65
-    Height = 19
-    Top = 11
-    Width = 263
+    Height = 21
+    Top = 7
+    Width = 262
     Anchors = [akTop, akLeft, akRight]
     TabOrder = 1
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 551
+    Left = 558
     Height = 13
     Top = 11
-    Width = 56
+    Width = 48
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
     Caption = '00:00:00'
@@ -42,16 +42,16 @@ object fraTimer: TfraTimer
   end
   object cbSelect: TCheckBox
     Left = 8
-    Height = 18
-    Top = 11
-    Width = 18
+    Height = 17
+    Top = 9
+    Width = 20
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 332
-    Height = 19
-    Top = 11
-    Width = 71
+    Left = 335
+    Height = 21
+    Top = 7
+    Width = 67
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -73,7 +73,7 @@ object fraTimer: TfraTimer
   end
   object sbNotify: TSpeedButton
     Cursor = crHandPoint
-    Left = 617
+    Left = 616
     Height = 30
     Hint = 'Show progress through icons.'
     Top = 4
@@ -87,9 +87,9 @@ object fraTimer: TfraTimer
     ParentShowHint = False
   end
   object bbPlay: TBitBtn
-    Left = 410
-    Height = 36
-    Top = 4
+    Left = 409
+    Height = 29
+    Top = 3
     Width = 40
     Action = aiPlay
     Anchors = [akTop, akRight]
@@ -172,9 +172,9 @@ object fraTimer: TfraTimer
     TabOrder = 3
   end
   object bbPause: TBitBtn
-    Left = 458
-    Height = 36
-    Top = 4
+    Left = 457
+    Height = 29
+    Top = 3
     Width = 40
     Action = aiPause
     Anchors = [akTop, akRight]
@@ -258,9 +258,9 @@ object fraTimer: TfraTimer
     TabOrder = 4
   end
   object bbStop: TBitBtn
-    Left = 506
-    Height = 36
-    Top = 4
+    Left = 505
+    Height = 29
+    Top = 3
     Width = 40
     Action = aiStop
     Anchors = [akTop, akRight]
@@ -344,19 +344,20 @@ object fraTimer: TfraTimer
     TabOrder = 5
   end
   object bbEdit: TBitBtn
-    Left = 680
-    Height = 36
-    Top = 4
+    Left = 679
+    Height = 25
+    Top = 5
     Width = 40
     Anchors = [akTop, akRight]
     TabOrder = 6
   end
-  object CheckBox1: TCheckBox
-    Left = 648
-    Height = 18
-    Top = 11
-    Width = 18
+  object ckbIconProgress: TCheckBox
+    Left = 645
+    Height = 17
+    Top = 9
+    Width = 20
     Anchors = [akTop, akRight]
+    OnChange = ckbIconProgressChange
     TabOrder = 7
   end
   object ilTimer: TImageList
