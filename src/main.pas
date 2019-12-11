@@ -66,6 +66,10 @@ const
   TIMER_CONF_MINUTES = 'minutes';
   TIMER_CONF_SECONDS = 'seconds';
   TIMER_CONF_NOTIFIER = 'notifier';
+
+  TIMER_CONF_MODALALERT = 'modal_alert';
+  TIMER_CONF_TRAYNOTIFiCATION = 'tray_notification';
+
   //TIMER_CONF_ID = 'id';
   TIMER_CONF_COUNT = 'count';
   TIMER_CONF_ORDER = 'order';
@@ -405,8 +409,8 @@ begin
       DefaultTimerSecs, 0);
     frmEditTimer.Description := DefaultTimerTitle;
     {TODO: This should be read from config}
-    frmEditTimer.TrayNotification:=ShowModalAlert;
-    frmEditTimer.ModalAlert:=ShowTrayAlert;
+    frmEditTimer.TrayNotification:=ShowTrayAlert;
+    frmEditTimer.ModalAlert:=ShowModalAlert;
   end;
 
   if frmEditTimer.ShowForAdd then
@@ -982,7 +986,7 @@ begin
   Minutes := MinuteOf(Duration);
   Seconds := SecondOf(Duration);
 
-  if GlobalUserConfig.ShowTrayAlert then
+  if Widget.TrayNotification then
   begin
     tiMain.BalloonHint :=
       Widget.Caption + ' completed. (' + Format('%.2d', [Hours]) +
@@ -990,7 +994,7 @@ begin
     tiMain.ShowBalloonHint;
   end;
 
-  if GlobalUserConfig.ShowModalAlert then
+  if Widget.ModalAlert then
   begin
     frmTimerAlert.stxAdditional.Caption :=
       Widget.Caption + ' completed. (' + Format('%.2d', [Hours]) +
@@ -1161,6 +1165,14 @@ begin
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
         '/' + TIMER_CONF_NOTIFIER, False);
+
+      NewTimerClock.ModalAlert :=
+        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_MODALALERT, False);
+      NewTimerClock.TrayNotification :=
+        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_TRAYNOTIFiCATION, False);
+
       //NewTimerClock.AddSubscription(FFormWidget);
       //NewTimerClock.Widget.OnSelect:=@ClockSelected;
       PostTimerCreation(NewTimerClock);
@@ -1324,7 +1336,10 @@ begin
       '/' + TIMER_CONF_SECONDS, SecondOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_NOTIFIER, TimerClock.IsProgressOnIcon);
-
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_MODALALERT, TimerClock.ModalAlert);
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_TRAYNOTIFiCATION, TimerClock.TrayNotification);
       { While saving, existing IDs of clocks are ignored. They are saved in the
       order they are in the list. The position in the list becomes the new ID.
       The saved order has actual IDs (TimerClock.Id). These have to be
