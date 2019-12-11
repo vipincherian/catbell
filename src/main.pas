@@ -1209,8 +1209,9 @@ begin
   NewWidget.Id := Id;
   if not GlobalUserConfig.AllowTimerTitleEdit then
   begin
+    NewWidget.edtTitle.Color:=clForm;
     NewWidget.edtTitle.ReadOnly:=True;
-    NewWidget.edtTitle.Color:=clBtnFace;
+    //NewWidget.edtTitle.ParentColor:=True;
   end;
   FTimerFrames.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
