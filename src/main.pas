@@ -121,8 +121,6 @@ type
     tlbMain: TToolBar;
     ToolButton1: TToolButton;
     tiMain: TTrayIcon;
-    tbShowTrayAlert: TToolButton;
-    tbShowModalAlert: TToolButton;
     tbProgressAuto: TToolButton;
     tbDelete: TToolButton;
     tbMoveUP: TToolButton;
@@ -151,8 +149,8 @@ type
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
-    procedure tbShowModalAlertClick(Sender: TObject);
-    procedure tbShowTrayAlertClick(Sender: TObject);
+    //procedure tbShowModalAlertClick(Sender: TObject);
+    //procedure tbShowTrayAlertClick(Sender: TObject);
     procedure tiMainClick(Sender: TObject);
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
@@ -283,8 +281,8 @@ begin
     Width := LastPos.Width;
     Height := LastPos.Height;
 
-    tbShowModalAlert.Down := ShowModalAlert;
-    tbShowTrayAlert.Down := ShowTrayAlert;
+    //tbShowModalAlert.Down := ShowModalAlert;
+    //tbShowTrayAlert.Down := ShowTrayAlert;
 
     tbProgressAuto.Down := AutoProgress;
   end;
@@ -451,8 +449,8 @@ begin
   with GlobalUserConfig do
   begin
     LastPos := CurrPos;
-    ShowModalAlert := tbShowModalAlert.Down;
-    ShowTrayAlert := tbShowTrayAlert.Down;
+    //ShowModalAlert := tbShowModalAlert.Down;
+    //ShowTrayAlert := tbShowTrayAlert.Down;
     AutoProgress := tbProgressAuto.Down;
   end;
 
@@ -559,15 +557,15 @@ begin
   GlobalUserConfig.AutoProgress := tbProgressAuto.Down;
 end;
 
-procedure TMainForm.tbShowModalAlertClick(Sender: TObject);
+{procedure TMainForm.tbShowModalAlertClick(Sender: TObject);
 begin
   GlobalUserConfig.ShowModalAlert := tbShowModalAlert.Down;
-end;
+end;}
 
-procedure TMainForm.tbShowTrayAlertClick(Sender: TObject);
+{procedure TMainForm.tbShowTrayAlertClick(Sender: TObject);
 begin
   GlobalUserConfig.ShowTrayAlert := tbShowTrayAlert.Down;
-end;
+end;}
 
 procedure TMainForm.tiMainClick(Sender: TObject);
 begin
@@ -1064,7 +1062,7 @@ begin
   to the changed options}
   with GlobalUserConfig do
   begin
-    if tbShowModalAlert.Down <> ShowModalAlert then
+    {if tbShowModalAlert.Down <> ShowModalAlert then
     begin
       tbShowModalAlert.Down := ShowModalAlert;
       tbShowModalAlertClick(Self);
@@ -1074,7 +1072,7 @@ begin
     begin
       tbShowTrayAlert.Down := ShowTrayAlert;
       tbShowTrayAlertClick(Self);
-    end;
+    end;}
 
     if tbProgressAuto.Down <> AutoProgress then
     begin

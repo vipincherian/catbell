@@ -168,14 +168,14 @@ end;
 
 procedure TfrmEditTimer.SetFTrayNotification(AValue: boolean);
 begin
-  if FTrayNotification=AValue then Exit;
+  //if FTrayNotification=AValue then Exit;
   FTrayNotification:=AValue;
   ckbTrayNotification.Checked:=AValue;
 end;
 
 procedure TfrmEditTimer.SetModalAlert(AValue: boolean);
 begin
-  if FModalAlert=AValue then Exit;
+  //if FModalAlert=AValue then Exit;
   FModalAlert:=AValue;
   ckbModalAlert.Checked:=AValue;
 end;
