@@ -10,18 +10,20 @@ uses
 
 type
   { TTimerSpecs }
-  TTimerSpecs = class(TObject)
+  {TTimerSpecs = class(TObject)
   private
   public
     DurationHours: integer;
     DurationMinutes: integer;
     DurationSeconds: integer;
+    //ModalAlert: boolean;
+    //TrayNotification: boolean;
     Description: string;
     ModalAlert: boolean;
     TrayNotification: boolean;
     constructor Create();
     destructor Destroy; override;
-  end;
+  end;}
 
   { TfrmEditTimer }
 
@@ -44,13 +46,25 @@ type
     procedure FormDestroy(Sender: TObject);
   private
     FProceed: boolean;
-    FSpecs: TTimerSpecs;
+    //FSpecs: TTimerSpecs;
+    FDuration: TTime;
+    FDescription: string;
+    FModalAlert: boolean;
+    FTrayNotification: boolean;
+    procedure SetDescription(AValue: string);
+    procedure SetDuration(AValue: TTime);
+    procedure SetFTrayNotification(AValue: boolean);
+    procedure SetModalAlert(AValue: boolean);
     function Validate: boolean;
   public
     function ShowAndGetSpecs: boolean;
     function ShowForAdd:boolean;
     function ShowForEdit:boolean;
-    property Specs: TTimerSpecs read FSpecs;
+    //property Specs: TTimerSpecs read FSpecs;
+    property Duration: TTime read FDuration write SetDuration;
+    property Description: string read FDescription write SetDescription;
+    property ModalAlert: boolean read FModalAlert write SetModalAlert;
+    property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
   end;
 
 
@@ -74,7 +88,7 @@ begin
   FDescription:=AValue;
 end;}
 
-constructor TTimerSpecs.Create();
+{constructor TTimerSpecs.Create();
 begin
 
 end;
@@ -82,7 +96,7 @@ end;
 destructor TTimerSpecs.Destroy;
 begin
   inherited Destroy;
-end;
+end;}
 
 { TfrmEditTimer }
 
@@ -90,11 +104,15 @@ procedure TfrmEditTimer.FormCreate(Sender: TObject);
 begin
   FProceed:=False;
 
-  FSpecs:=TTimerSpecs.Create();
-  FSpecs.DurationHours:=0;
+  //FSpecs:=TTimerSpecs.Create();
+{  FSpecs.DurationHours:=0;
   FSpecs.DurationMinutes:=10;
   FSpecs.DurationSeconds:=0;
-  FSpecs.Description:='Countdown Timer';
+  FSpecs.Description:='Countdown Timer';}
+  FDuration:=EncodeTime(0, 10, 0,0);
+  FDescription:=' ';
+  FModalAlert:=True;
+  FTrayNotification:=True;
 
 end;
 
@@ -102,11 +120,14 @@ procedure TfrmEditTimer.bbSaveClick(Sender: TObject);
 var
   Hour, Min, Sec, Milli : Word;
 begin
-  FSpecs.Description:=edtDescription.Text;
-  DecodeTime(dtpDuration.Time, Hour, Min, Sec, Milli);
+  FDescription:=edtDescription.Text;
+  {DecodeTime(dtpDuration.Time, Hour, Min, Sec, Milli);
   FSpecs.DurationHours:=Hour;
   FSpecs.DurationMinutes:=Min;
-  FSpecs.DurationSeconds:=Sec;
+  FSpecs.DurationSeconds:=Sec;}
+  FDuration:=dtpDuration.Time;
+  FModalAlert:=ckbModalAlert.Checked;
+  FTrayNotification:=ckbTrayNotification.Checked;
   FProceed:=True;
   Close;
 end;
@@ -118,7 +139,7 @@ end;
 
 procedure TfrmEditTimer.FormDestroy(Sender: TObject);
 begin
-  FSpecs.Free;
+  //FSpecs.Free;
 end;
 
 function TfrmEditTimer.Validate: boolean;
@@ -131,11 +152,41 @@ begin
 
 end;
 
+procedure TfrmEditTimer.SetDescription(AValue: string);
+begin
+  if FDescription=AValue then Exit;
+  FDescription:=AValue;
+  edtDescription.Text:=AValue;
+end;
+
+procedure TfrmEditTimer.SetDuration(AValue: TTime);
+begin
+  if FDuration=AValue then Exit;
+  FDuration:=AValue;
+  dtpDuration.Time:=AValue;
+end;
+
+procedure TfrmEditTimer.SetFTrayNotification(AValue: boolean);
+begin
+  if FTrayNotification=AValue then Exit;
+  FTrayNotification:=AValue;
+  ckbTrayNotification.Checked:=AValue;
+end;
+
+procedure TfrmEditTimer.SetModalAlert(AValue: boolean);
+begin
+  if FModalAlert=AValue then Exit;
+  FModalAlert:=AValue;
+  ckbModalAlert.Checked:=AValue;
+end;
+
 function TfrmEditTimer.ShowAndGetSpecs: boolean;
 begin
   FProceed:=False;
-  edtDescription.Text:=FSpecs.Description;
+  {edtDescription.Text:=FSpecs.Description;
   dtpDuration.Time := EncodeTime(FSpecs.DurationHours, FSpecs.DurationMinutes,  FSpecs.DurationSeconds, 0);
+  ckbModalAlert.Checked:=FSpecs.ModalAlert;
+  ckbTrayNotification.Checked:=Specs.TrayNotification; }
   ShowModal;
   Result:=FProceed;
 end;

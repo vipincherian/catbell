@@ -11,7 +11,7 @@ object frmEditTimer: TfrmEditTimer
   LCLVersion = '2.0.6.0'
   object edtDescription: TEdit
     Left = 112
-    Height = 19
+    Height = 21
     Top = 8
     Width = 320
     Anchors = [akTop, akLeft, akRight]
@@ -21,7 +21,7 @@ object frmEditTimer: TfrmEditTimer
     Left = 32
     Height = 13
     Top = 8
-    Width = 72
+    Width = 60
     Alignment = taRightJustify
     Caption = 'Description :'
     ParentColor = False
@@ -30,7 +30,7 @@ object frmEditTimer: TfrmEditTimer
     Left = 46
     Height = 13
     Top = 40
-    Width = 56
+    Width = 48
     Alignment = taRightJustify
     Caption = 'Duration :'
     ParentColor = False
@@ -39,14 +39,14 @@ object frmEditTimer: TfrmEditTimer
     Left = 41
     Height = 13
     Top = 120
-    Width = 60
+    Width = 51
     Alignment = taRightJustify
     Caption = 'Audio file :'
     ParentColor = False
   end
   object edtAudioFile: TEdit
     Left = 112
-    Height = 19
+    Height = 21
     Top = 120
     Width = 240
     Anchors = [akTop, akLeft, akRight]
@@ -64,17 +64,17 @@ object frmEditTimer: TfrmEditTimer
   end
   object ckbModalAlert: TCheckBox
     Left = 112
-    Height = 18
+    Height = 17
     Top = 72
-    Width = 120
+    Width = 102
     Caption = 'Show modal alert'
     TabOrder = 2
   end
   object ckbTrayNotification: TCheckBox
     Left = 112
-    Height = 18
+    Height = 17
     Top = 96
-    Width = 117
+    Width = 102
     Caption = 'Show notification'
     TabOrder = 3
   end
@@ -82,7 +82,7 @@ object frmEditTimer: TfrmEditTimer
     Left = 11
     Height = 13
     Top = 72
-    Width = 90
+    Width = 75
     Alignment = taRightJustify
     Caption = 'On completion :'
     ParentColor = False
@@ -109,9 +109,9 @@ object frmEditTimer: TfrmEditTimer
   end
   object dtpDuration: TDateTimePicker
     Left = 112
-    Height = 19
+    Height = 21
     Top = 40
-    Width = 71
+    Width = 67
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780

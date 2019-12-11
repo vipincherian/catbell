@@ -85,6 +85,9 @@ type
   private
     { private declarations }
     FId: longword;
+
+    FModalAlert: boolean;
+    FTrayNotification: boolean;
     //FObservers: TTimerObserverList;
     FShortTimer: TTimer;
     //FNotifier: boolean;
@@ -116,11 +119,13 @@ type
     //procedure SetId(AValue: longword);
     procedure SetImageGreyed(AValue: boolean);
     procedure SetIsProgressOnIcon(AValue: boolean);
+    procedure SetModalAlert(AValue: boolean);
     procedure SetPauseButtonEnabled(AValue: boolean);
     procedure SetPlayButtonEnabled(AValue: boolean);
     //procedure SetShowProgressOnIcon(AValue: boolean);
     procedure SetStopButtonEnabled(AValue: boolean);
     function GetId: longword;
+    procedure SetTrayNotification(AValue: boolean);
     //procedure SetNotifier(AValue: boolean);
     {function GetTop: integer;
     procedure SetTop(AValue: integer);
@@ -187,6 +192,8 @@ type
 
     //property Notifier: boolean read FNotifier write SetNotifier;
     property Running: boolean read FRunning;
+    property ModalAlert: boolean read FModalAlert write SetModalAlert;
+    property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
   end;
 
 
@@ -243,15 +250,16 @@ procedure TfraTimer.aiEditExecute(Sender: TObject);
 var
   Hour, Min, Sec, Milli : Word;
 begin
-  frmEditTimer.Specs.Description:=edtTitle.Text;
-  DecodeTime(dtpSet.Time, Hour, Min, Sec, Milli);
-  frmEditTimer.Specs.DurationHours:=Hour;
-  frmEditTimer.Specs.DurationMinutes:=Min;
-  frmEditTimer.Specs.DurationSeconds:=Sec;
+  frmEditTimer.Description:=edtTitle.Text;
+  frmEditTimer.Duration:=dtpSet.Time;
+  frmEditTimer.TrayNotification:= FTrayNotification;
+  frmEditTimer.ModalAlert:=FModalAlert;
   if frmEditTimer.ShowForEdit then
   begin
-    Caption:=frmEditTimer.Specs.Description;
-    dtpSet.Time:= EncodeTime(frmEditTimer.Specs.DurationHours, frmEditTimer.Specs.DurationMinutes, frmEditTimer.Specs.DurationSeconds,0);
+    Caption:=frmEditTimer.Description;
+    dtpSet.Time:= frmEditTimer.Duration;
+    FTrayNotification:=frmEditTimer.TrayNotification;
+    FModalAlert:=frmEditTimer.ModalAlert;
   end;
 end;
 
@@ -384,6 +392,12 @@ begin
   //FNotifier:=AValue;
 end;
 
+procedure TfraTimer.SetModalAlert(AValue: boolean);
+begin
+  if FModalAlert=AValue then Exit;
+  FModalAlert:=AValue;
+end;
+
 procedure TfraTimer.SetPauseButtonEnabled(AValue: boolean);
 begin
   bbPause.Enabled := AValue;
@@ -407,6 +421,12 @@ end;
 function TfraTimer.GetId: longword;
 begin
   Result := FId;
+end;
+
+procedure TfraTimer.SetTrayNotification(AValue: boolean);
+begin
+  if FTrayNotification=AValue then Exit;
+  FTrayNotification:=AValue;
 end;
 
 {procedure TfraTimer.SetNotifier(AValue: boolean);

@@ -401,17 +401,21 @@ begin
   begin
     //dtpSet.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
     //  DefaultTimerSecs, 0);
-    frmEditTimer.Specs.DurationHours := DefaultTimerHours;
-    frmEditTimer.Specs.DurationMinutes:= DefaultTimerMins;
-    frmEditTimer.Specs.DurationSeconds:=DefaultTimerSecs;
-    frmEditTimer.Specs.Description := DefaultTimerTitle;
+    frmEditTimer.Duration:=EncodeTime(DefaultTimerHours, DefaultTimerMins,
+      DefaultTimerSecs, 0);
+    frmEditTimer.Description := DefaultTimerTitle;
+    {TODO: This should be read from config}
+    frmEditTimer.TrayNotification:=ShowModalAlert;
+    frmEditTimer.ModalAlert:=ShowTrayAlert;
   end;
 
   if frmEditTimer.ShowForAdd then
   begin
     Added := AddTimer;
-    Added.Caption:=frmEditTimer.Specs.Description;
-    Added.dtpSet.Time:= EncodeTime(frmEditTimer.Specs.DurationHours, frmEditTimer.Specs.DurationMinutes, frmEditTimer.Specs.DurationSeconds,0);
+    Added.Caption:=frmEditTimer.Description;
+    Added.dtpSet.Time:= frmEditTimer.Duration;
+    Added.ModalAlert:=frmEditTimer.ModalAlert;
+    Added.TrayNotification:=frmEditTimer.TrayNotification;
     PostTimerCreation(Added);
   end;
 end;
