@@ -28,7 +28,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, SysUtils, datetimectrls, main, clocks,
+  Forms, SysUtils, datetimectrls, main,
   observers, sequence, timerframe, settings, optionsform, 
 timeralertform, aboutform, editform
   { you can add units after this };

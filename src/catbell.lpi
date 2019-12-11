@@ -36,7 +36,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="10">
       <Unit0>
         <Filename Value="catbell.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -49,56 +49,52 @@
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="clocks.pas"/>
+        <Filename Value="observers.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
       <Unit3>
-        <Filename Value="observers.pas"/>
+        <Filename Value="sequence.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="sequence.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit4>
-      <Unit5>
         <Filename Value="timerframe.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="fraTimer"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-      </Unit5>
-      <Unit6>
+      </Unit4>
+      <Unit5>
         <Filename Value="settings.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit6>
-      <Unit7>
+      </Unit5>
+      <Unit6>
         <Filename Value="optionsform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmOptions"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit7>
-      <Unit8>
+      </Unit6>
+      <Unit7>
         <Filename Value="timeralertform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmTimerAlert"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit8>
-      <Unit9>
+      </Unit7>
+      <Unit8>
         <Filename Value="aboutform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmAbout"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit9>
-      <Unit10>
+      </Unit8>
+      <Unit9>
         <Filename Value="editform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmEditTimer"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit10>
+      </Unit9>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
