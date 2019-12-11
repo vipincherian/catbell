@@ -54,6 +54,7 @@ type
     ShowTrayAlert: boolean;
     AutoProgress: boolean;
     QueryExit: boolean;
+    AllowTimerTitleEdit: boolean;
     DefaultTimerTitle: string;
     DefaultTimerHours: integer;
     DefaultTimerMins: integer;
@@ -116,6 +117,9 @@ const
 
   QUERY_EXIT = 'query_exit';
   DEF_QUERY_EXIT = True;
+
+  ALLOW_TIMERTITLE_EDIT = 'allow_timertitle_edit';
+  DEF_ALLOW_TIMERTITLE_EDIT = False;
 
   TIMER_TITLE = 'timer_title';
   DEF_TIMER_TITLE = 'Countdown timer';
@@ -198,6 +202,7 @@ begin
     //ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
     AutoProgress := FConf.GetValue(AUTO_PROGRESS, AutoProgress);
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
+    AllowTimerTitleEdit:=FConf.GetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
     DefaultTimerTitle := FConf.GetValue(TIMER_TITLE, DefaultTimerTitle);
     DefaultTimerHours := FConf.GetValue(TIMER_HOURS, DefaultTimerHours);
     DefaultTimerMins := FConf.GetValue(TIMER_MINS, DefaultTimerMins);
@@ -222,6 +227,7 @@ begin
   FConf.SetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
   FConf.SetValue(AUTO_PROGRESS, AutoProgress);
   FConf.SetValue(QUERY_EXIT, QueryExit);
+  FConf.SetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
   Fconf.SetValue(TIMER_TITLE, DefaultTimerTitle);
   FConf.SetValue(TIMER_HOURS, DefaultTimerHours);
   FConf.SetValue(TIMER_MINS, DefaultTimerMins);

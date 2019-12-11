@@ -36,10 +36,11 @@ type
     bbtnDefault: TBitBtn;
     bbtnCancel: TBitBtn;
     bbtnSave: TBitBtn;
-    cbQueryExit: TCheckBox;
+    ckbQueryExit: TCheckBox;
     cbTrayAlert: TCheckBox;
     cbModalAlert: TCheckBox;
     cbAutoProgress: TCheckBox;
+    ckbTimerTitleEditable: TCheckBox;
     crbBackgroundModal: TColorButton;
     crbCaptionModal: TColorButton;
     crbSubtextModal: TColorButton;
@@ -95,7 +96,8 @@ procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
 begin
   with Config do
   begin
-    cbQueryExit.Checked := QueryExit;
+    ckbQueryExit.Checked := QueryExit;
+    ckbTimerTitleEditable.Checked:=AllowTimerTitleEdit;
 
     edtDefaultTitle.Text := DefaultTimerTitle;
     dtpDefaultTime.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
@@ -116,7 +118,8 @@ procedure TfrmOptions.GetConfigFromControls(Config: TUserConfig);
 begin
   with Config do
   begin
-    QueryExit := cbQueryExit.Checked;
+    QueryExit := ckbQueryExit.Checked;
+    AllowTimerTitleEdit:=ckbTimerTitleEditable.Checked;
     DefaultTimerTitle := edtDefaultTitle.Text;
     DefaultTimerHours := HourOf(dtpDefaultTime.Time);
     DefaultTimerMins := MinuteOf(dtpDefaultTime.Time);
@@ -176,7 +179,7 @@ begin
   end;
 
 
-  {cbQueryExit.Checked := DEF_QUERY_EXIT;
+  {ckbQueryExit.Checked := DEF_QUERY_EXIT;
 
   edtDefaultTitle.Text := DEF_TIMER_TITLE;
   dtpDefaultTime.Time := EncodeTime(DEF_TIMER_HOURS, DEF_TIMER_MINS,
@@ -196,7 +199,7 @@ procedure TfrmOptions.bbtnSaveClick(Sender: TObject);
 begin
   {with GlobalUserConfig do
   begin
-    QueryExit := cbQueryExit.Checked;
+    QueryExit := ckbQueryExit.Checked;
     DefaultTimerTitle := edtDefaultTitle.Text;
     DefaultTimerHours := HourOf(dtpDefaultTime.Time);
     DefaultTimerMins := MinuteOf(dtpDefaultTime.Time);

@@ -1207,6 +1207,11 @@ begin
   //NewWidget := FClocksWidget.AddTimer(Id);
   NewWidget := TfraTimer.Create(sbxClocks);
   NewWidget.Id := Id;
+  if not GlobalUserConfig.AllowTimerTitleEdit then
+  begin
+    NewWidget.edtTitle.ReadOnly:=True;
+    NewWidget.edtTitle.Color:=clBtnFace;
+  end;
   FTimerFrames.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
   Reorder;

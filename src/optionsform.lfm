@@ -47,7 +47,7 @@ object frmOptions: TfrmOptions
   }
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '2.0.6.0'
   object PageControl1: TPageControl
     Left = 8
     Height = 272
@@ -66,15 +66,15 @@ object frmOptions: TfrmOptions
       ImageIndex = 1
       object GroupBox1: TGroupBox
         Left = 8
-        Height = 48
+        Height = 88
         Top = 8
         Width = 392
         Anchors = [akTop, akLeft, akRight]
-        Caption = 'Closure'
-        ClientHeight = 30
+        Caption = 'Application'
+        ClientHeight = 70
         ClientWidth = 388
         TabOrder = 0
-        object cbQueryExit: TCheckBox
+        object ckbQueryExit: TCheckBox
           Left = 16
           Height = 17
           Top = 8
@@ -82,21 +82,29 @@ object frmOptions: TfrmOptions
           Caption = 'Prompt before exiting appliation'
           TabOrder = 0
         end
+        object ckbTimerTitleEditable: TCheckBox
+          Left = 16
+          Height = 17
+          Top = 32
+          Width = 185
+          Caption = 'Allow in-place editing of timer title.'
+          TabOrder = 1
+        end
       end
       object GroupBox2: TGroupBox
         Left = 8
-        Height = 160
-        Top = 64
+        Height = 120
+        Top = 104
         Width = 392
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Modal timer completion alert'
-        ClientHeight = 142
+        ClientHeight = 102
         ClientWidth = 388
         TabOrder = 1
         object Label3: TLabel
           Left = 13
           Height = 13
-          Top = 15
+          Top = 10
           Width = 98
           Caption = 'Background colour : '
           ParentColor = False
@@ -105,7 +113,7 @@ object frmOptions: TfrmOptions
           Cursor = crHandPoint
           Left = 128
           Height = 25
-          Top = 8
+          Top = 3
           Width = 75
           BorderWidth = 2
           ButtonColorSize = 16
@@ -115,7 +123,7 @@ object frmOptions: TfrmOptions
         object StaticText1: TStaticText
           Left = 13
           Height = 17
-          Top = 48
+          Top = 43
           Width = 98
           Caption = 'Caption colour :'
           TabOrder = 0
@@ -123,7 +131,7 @@ object frmOptions: TfrmOptions
         object StaticText2: TStaticText
           Left = 13
           Height = 17
-          Top = 80
+          Top = 75
           Width = 91
           Caption = 'Sub text colour :'
           TabOrder = 1
@@ -132,7 +140,7 @@ object frmOptions: TfrmOptions
           Cursor = crHandPoint
           Left = 128
           Height = 25
-          Top = 40
+          Top = 35
           Width = 75
           BorderWidth = 2
           ButtonColorSize = 16
@@ -143,7 +151,7 @@ object frmOptions: TfrmOptions
           Cursor = crHandPoint
           Left = 128
           Height = 25
-          Top = 72
+          Top = 67
           Width = 75
           BorderWidth = 2
           ButtonColorSize = 16
@@ -229,16 +237,16 @@ object frmOptions: TfrmOptions
           Left = 13
           Height = 17
           Top = 12
-          Width = 269
-          Caption = 'Show system tray notification when timer completes'
+          Width = 244
+          Caption = 'Enable system tray notification for new timers.'
           TabOrder = 0
         end
         object cbModalAlert: TCheckBox
           Left = 13
           Height = 17
           Top = 42
-          Width = 251
-          Caption = 'Show a modal popup alert when timer completes'
+          Width = 217
+          Caption = 'Enable modal popup alert for new timers.'
           TabOrder = 1
         end
         object cbAutoProgress: TCheckBox
