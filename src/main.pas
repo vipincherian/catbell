@@ -715,12 +715,12 @@ end;*}
 
 procedure TMainForm.UpdateAlertFormSettings;
 begin
-  with GlobalUserConfig do
+  {with GlobalUserConfig do
   begin
     frmTimerAlert.Color := ModalBackgroundColour;
     frmTimerAlert.stxMessage.Font.Color := ModalCaptionColour;
     frmTimerAlert.stxAdditional.Font.Color := ModalSubtextColour;
-  end;
+  end;}
 end;
 
 {*procedure TMainForm.ExportToFile(Sender: TObject);

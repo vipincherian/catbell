@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform, graphics;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform, graphics, math;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -661,11 +661,12 @@ begin
       //TODO: Title is hardcoded
       for Observer in FObservers do
         Observer.Finished(0, 'Countdown timer!', FWidget.Duration);}
+      Counter := DEF_COUNTDOWN_CAPTION;
       Finish;
       Exit;
     end;
     ElapsedMilliseconds := FEndTickCount - CurrTickCount;
-    Elapsed := ElapsedMilliseconds div 1000;
+    Elapsed := Ceil(ElapsedMilliseconds / 1000);
     //WriteLn('Elapsed in ms is ' + IntToStr(ElapsedMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
 
     Seconds := Elapsed mod 60;

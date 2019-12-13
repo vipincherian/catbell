@@ -39,8 +39,10 @@ implementation
 
 procedure TfrmTimerAlert.FormCreate(Sender: TObject);
 begin
-  BorderStyle := bsNone;
+  //BorderStyle := bsNone;
   OnShow := @FormShow;
+  AlphaBlend:=True;
+  AlphaBlendValue:=50;
 end;
 
 procedure TfrmTimerAlert.FormShow(Sender: TObject);
