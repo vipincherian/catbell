@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform;
+  timerframe, fgl, sequence, editform, math;
 
 const
   FORM_MIN_SIZE = 600;
@@ -1070,8 +1070,10 @@ begin
   else
   begin
     // TODO: Which is correct? Round ro Trunc?
-    Index := Trunc(Progress * 24.0);
-    if Index = 24 then
+    //WriteLn('Progress is ' + FloatToStr(Progress));
+    Index := Floor(Progress * 24.0);
+    //WriteLn('Index is ' + IntToStr(Index));
+    if Index >= 24 then
       Index := 23;
     Assert((Index >= 0) and (Index < TRAY_PROGRESS_ICON_COUNT));
     if FLastTrayIconIndex <> Index then

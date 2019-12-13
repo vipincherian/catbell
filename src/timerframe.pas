@@ -637,6 +637,7 @@ procedure TfraTimer.OnShortTimer(Sender: TObject);
 var
   Elapsed: longword;
   ElapsedMilliseconds: longword;
+  CurrTickCount: longword;
   Hours: integer;
   Minutes: integer;
   Seconds: integer;
@@ -651,9 +652,9 @@ begin
   //else if FPaused = False then
   if FRunning and (FPaused = False) then
   begin
-    ElapsedMilliseconds := FEndTickCount - GetTickCount64;
-    Elapsed := ElapsedMilliseconds div 1000;
-    if Elapsed <= 0 then
+    CurrTickCount := GetTickCount64;
+
+    if FEndTickCount <= CurrTickCount then
     begin
       {Stop(Self);
       //TODO: 0 is not okay
@@ -663,6 +664,10 @@ begin
       Finish;
       Exit;
     end;
+    ElapsedMilliseconds := FEndTickCount - CurrTickCount;
+    Elapsed := ElapsedMilliseconds div 1000;
+    //WriteLn('Elapsed in ms is ' + IntToStr(ElapsedMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
+
     Seconds := Elapsed mod 60;
     Minutes := Elapsed div 60;
     Hours := Minutes div 60;
