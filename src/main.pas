@@ -1025,6 +1025,7 @@ var
   Seconds: word;
   Widget: TfraTimer;
   Duration: TDateTime;
+  Message: string;
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
 
@@ -1045,9 +1046,12 @@ begin
 
   if Widget.ModalAlert then
   begin
-    frmTimerAlert.stxAdditional.Caption :=
+    Message :=
       Widget.Caption + ' completed. (' + Format('%.2d', [Hours]) +
       ':' + Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
+    //frmTimerAlert.stxAdditional.Caption := Message;
+    frmTimerAlert.lbMessages.Items.Add(Message);
+
     if not frmTimerAlert.Showing then
       frmTimerAlert.ShowModal;
   end;

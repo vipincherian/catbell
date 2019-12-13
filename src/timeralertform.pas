@@ -5,21 +5,21 @@ unit timeralertform;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls, LCLType, ExtCtrls;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  LCLType, ExtCtrls, Buttons;
 
 type
 
   { TfrmTimerAlert }
 
   TfrmTimerAlert = class(TForm)
-    stxMessage: TStaticText;
-    stxAdditional: TStaticText;
+    bbClose: TBitBtn;
+    lbMessages: TListBox;
     FTimer: TTimer;
-    procedure FormClick(Sender: TObject);
+    procedure bbCloseClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure stxAdditionalClick(Sender: TObject);
-    procedure stxMessageClick(Sender: TObject);
   private
     { private declarations }
   protected
@@ -40,7 +40,7 @@ implementation
 procedure TfrmTimerAlert.FormCreate(Sender: TObject);
 begin
   //BorderStyle := bsNone;
-  OnShow := @FormShow;
+  //OnShow := @FormShow;
   AlphaBlend:=True;
   AlphaBlendValue:=50;
 end;
@@ -52,25 +52,21 @@ begin
   //FTimer.Interval:=2000;
 end;
 
-procedure TfrmTimerAlert.stxAdditionalClick(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TfrmTimerAlert.stxMessageClick(Sender: TObject);
-begin
-  Close;
-end;
-
 procedure TfrmTimerAlert.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
   Params.Style := Params.Style or WS_THICKFRAME;
 end;
 
-procedure TfrmTimerAlert.FormClick(Sender: TObject);
+procedure TfrmTimerAlert.bbCloseClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmTimerAlert.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  lbMessages.Items.Clear;
 end;
 
 end.

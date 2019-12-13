@@ -1,40 +1,33 @@
 object frmTimerAlert: TfrmTimerAlert
   Cursor = crHandPoint
   Left = 431
-  Height = 63
+  Height = 146
   Top = 254
   Width = 350
-  Caption = 'frmTimerAlert'
-  ClientHeight = 63
+  Caption = 'Timer Finished'
+  ClientHeight = 146
   ClientWidth = 350
-  OnClick = FormClick
+  OnClose = FormClose
   OnCreate = FormCreate
+  OnShow = FormShow
   LCLVersion = '2.0.6.0'
-  object stxMessage: TStaticText
-    Cursor = crHandPoint
-    Left = 0
-    Height = 17
-    Top = 5
-    Width = 351
-    Alignment = taCenter
-    Caption = 'Timer Finished'
-    Color = clDefault
-    Font.Style = [fsBold]
-    OnClick = stxMessageClick
-    ParentFont = False
-    ParentColor = False
+  object lbMessages: TListBox
+    Left = 8
+    Height = 96
+    Top = 8
+    Width = 336
+    ItemHeight = 0
+    ScrollWidth = 334
     TabOrder = 0
+    TopIndex = -1
   end
-  object stxAdditional: TStaticText
-    Cursor = crHandPoint
-    Left = 0
-    Height = 17
-    Top = 32
-    Width = 350
-    Alignment = taCenter
-    Caption = 'stxAdditional'
-    OnClick = stxAdditionalClick
-    ParentFont = False
+  object bbClose: TBitBtn
+    Left = 136
+    Height = 30
+    Top = 112
+    Width = 75
+    Caption = 'bbClose'
+    OnClick = bbCloseClick
     TabOrder = 1
   end
 end
