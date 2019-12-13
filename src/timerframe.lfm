@@ -7,7 +7,6 @@ object fraTimer: TfraTimer
   ClientHeight = 39
   ClientWidth = 708
   TabOrder = 0
-  TabStop = True
   DesignLeft = 248
   DesignTop = 159
   object imgTimer: TImage
@@ -337,7 +336,7 @@ object fraTimer: TfraTimer
     Width = 32
     Action = aiEdit
     Anchors = [akTop, akRight]
-    TabOrder = 6
+    TabOrder = 8
   end
   object ckbIconProgress: TCheckBox
     Left = 634
@@ -431,7 +430,7 @@ object fraTimer: TfraTimer
       C8B94D58C8D64D58C8EB4D58C8EB4D58C8D64E57C8B84C58C9684A55CA180000
       0000000000000000000000000000000000000000000000000000
     }
-    TabOrder = 8
+    TabOrder = 6
   end
   object ilTimer: TImageList
     Height = 24
