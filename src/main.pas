@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, settings, optionsform, aboutform, BGRABitmap,
-  BGRABitmapTypes, FPimage, timeralertform, dateutils, clocks, jsonConf,
+  BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
   timerframe, fgl, sequence, editform;
 
 const
@@ -1056,6 +1056,9 @@ begin
 end;*}
 
 procedure TMainForm.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
+var
+  Temp: TfraTimer;
+  Count: integer;
 begin
 
   {Once the options form is closed, tool buttons have to be set according
@@ -1078,6 +1081,11 @@ begin
     begin
       tbProgressAuto.Down := AutoProgress;
       tbProgressAutoClick(Self);
+    end;
+    for Count := 0 to FTimerFrames.Count - 1 do
+    begin
+      Temp := FTimerFrames.Data[Count];
+      Temp.TitleEditable:=AllowTimerTitleEdit;
     end;
   end;
 
@@ -1207,12 +1215,13 @@ begin
   //NewWidget := FClocksWidget.AddTimer(Id);
   NewWidget := TfraTimer.Create(sbxClocks);
   NewWidget.Id := Id;
-  if not GlobalUserConfig.AllowTimerTitleEdit then
+  NewWidget.TitleEditable:=GlobalUserConfig.AllowTimerTitleEdit ;
+  {if not GlobalUserConfig.AllowTimerTitleEdit then
   begin
     NewWidget.edtTitle.Color:=clForm;
     NewWidget.edtTitle.ReadOnly:=True;
     //NewWidget.edtTitle.ParentColor:=True;
-  end;
+  end;}
   FTimerFrames.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
   Reorder;

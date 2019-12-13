@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform, graphics;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -88,6 +88,7 @@ type
 
     FModalAlert: boolean;
     FTrayNotification: boolean;
+    FTitleEditable: boolean;
     //FObservers: TTimerObserverList;
     FShortTimer: TTimer;
     //FNotifier: boolean;
@@ -125,6 +126,7 @@ type
     //procedure SetShowProgressOnIcon(AValue: boolean);
     procedure SetStopButtonEnabled(AValue: boolean);
     function GetId: longword;
+    procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
     //procedure SetNotifier(AValue: boolean);
     {function GetTop: integer;
@@ -194,6 +196,7 @@ type
     property Running: boolean read FRunning;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
+    property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
   end;
 
 
@@ -421,6 +424,16 @@ end;
 function TfraTimer.GetId: longword;
 begin
   Result := FId;
+end;
+
+procedure TfraTimer.SetTitleEditable(AValue: boolean);
+begin
+  FTitleEditable:=AValue;
+  edtTitle.ReadOnly:=(not AValue);
+  if Avalue then
+    edtTitle.Color:=clDefault
+  else
+    edtTitle.Color:=clForm;
 end;
 
 procedure TfraTimer.SetTrayNotification(AValue: boolean);
