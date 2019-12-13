@@ -42,7 +42,7 @@ type
   private
     //FFileName: string;
     FDefaultPos: TRect;
-    FLastPos: TRect;
+    //FLastPosNormal: TRect;
 
     //FConf: TJSONConfig;
     //procedure Save;
@@ -53,6 +53,8 @@ type
     ShowModalAlert: boolean;
     ShowTrayAlert: boolean;
     AutoProgress: boolean;
+    LastPosNormal: TRect;
+    LastPosRestored: TRect;
     QueryExit: boolean;
     AllowTimerTitleEdit: boolean;
     DefaultTimerTitle: string;
@@ -62,13 +64,14 @@ type
     ModalBackgroundColour: integer;
     ModalCaptionColour: integer;
     ModalSubtextColour: integer;
+    LastWindowState: TWindowState;
     constructor Create();
     destructor Destroy; override;
     //procedure Load;
     //procedure Flush;
     procedure CopyFrom(From: TUserConfig);
     function CompareWith(From: TUserConfig): boolean;
-    property LastPos: TRect read FLastPos write FLastPos;
+    //property LastPosNormal: TRect read FLastPosNormal write FLastPosNormal;
     //property FileName: string read FFileName write SetFileName;
   end;
 
@@ -101,10 +104,13 @@ const
   TIMER_INIT_TITLE = 'timer_init_title';
   DEF_TIMER_INIT_TITLE = 'Countdown timer';
 
-  LAST_POS_TOP = 'last_pos_x';
-  LAST_POS_LEFT = 'last_pos_y';
-  LAST_POS_BOTTOM = 'last_pos_bottom';
-  LAST_POS_RIGHT = 'last_pos_right';
+  LAST_POS_TOP = 'x';
+  LAST_POS_LEFT = 'y';
+  LAST_POS_BOTTOM = 'bottom';
+  LAST_POS_RIGHT = 'right';
+
+  LAST_POS_NORMAL = 'last_pos/normal/';
+  LAST_POS_RESTORED = 'last_pos/restored/';
 
 
   SHOW_MODAL_ALERT = 'show_modal_alert';
@@ -141,6 +147,9 @@ const
 
   MODAL_SUB_COLOUR = 'modal_sub_colour';
   DEF_MODAL_SUB_COLOUR = clSilver;
+
+  WINDOW_STATE = 'window_state';
+  DEF_WINDOW_STATE = Integer(wsNormal);
 
 
 procedure InitSettings;
@@ -193,10 +202,19 @@ begin
     CreateAnew;
   end;
   try
-    FLastPos.Top := FConf.GetValue(LAST_POS_TOP, FDefaultPos.Top);
-    FLastPos.Left := FConf.GetValue(LAST_POS_LEFT, FDefaultPos.Left);
-    FLastPos.Right := FConf.GetValue(LAST_POS_RIGHT, FDefaultPos.Right);
-    FLastPos.Bottom := FConf.GetValue(LAST_POS_BOTTOM, FDefaultPos.Bottom);
+    LastPosNormal.Top := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_TOP, FDefaultPos.Top);
+    LastPosNormal.Left := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_LEFT, FDefaultPos.Left);
+    LastPosNormal.Right := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_RIGHT, FDefaultPos.Right);
+    LastPosNormal.Bottom := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_BOTTOM, FDefaultPos.Bottom);
+
+    LastPosRestored.Top := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_TOP, FDefaultPos.Top);
+    LastPosRestored.Left := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_LEFT, FDefaultPos.Left);
+    LastPosRestored.Right := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_RIGHT, FDefaultPos.Right);
+    LastPosRestored.Bottom := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_BOTTOM, FDefaultPos.Bottom);
+
+    LastWindowState:=TWindowState(FConf.GetValue(WINDOW_STATE, DEF_WINDOW_STATE));
+
+    {TODO: Is the defaulting correct here?}
     ShowModalAlert := FConf.GetValue(SHOW_MODAL_ALERT, ShowModalAlert);
     ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
     //ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
@@ -219,10 +237,18 @@ end;
 
 procedure TUserFileConfig.Save;
 begin
-  FConf.SetValue(LAST_POS_TOP, FLastPos.Top);
-  FConf.SetValue(LAST_POS_LEFT, FLastPos.Left);
-  FConf.SetValue(LAST_POS_RIGHT, FLastPos.Right);
-  FConf.SetValue(LAST_POS_BOTTOM, FLastPos.Bottom);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_TOP, LastPosNormal.Top);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_LEFT, LastPosNormal.Left);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_RIGHT, LastPosNormal.Right);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_BOTTOM, LastPosNormal.Bottom);
+
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_TOP, LastPosRestored.Top);
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_LEFT, LastPosRestored.Left);
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_RIGHT, LastPosRestored.Right);
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_BOTTOM, LastPosRestored.Bottom);
+
+  FConf.SetValue(WINDOW_STATE, Integer(LastWindowState));
+
   FConf.SetValue(SHOW_MODAL_ALERT, ShowModalAlert);
   FConf.SetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
   FConf.SetValue(AUTO_PROGRESS, AutoProgress);
@@ -239,10 +265,18 @@ end;
 
 procedure TUserFileConfig.CreateAnew;
 begin
-  FConf.SetValue(LAST_POS_TOP, FDefaultPos.Top);
-  FConf.SetValue(LAST_POS_LEFT, FDefaultPos.Left);
-  FConf.SetValue(LAST_POS_RIGHT, FDefaultPos.Right);
-  FConf.SetValue(LAST_POS_BOTTOM, FDefaultPos.Bottom);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_TOP, FDefaultPos.Top);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_LEFT, FDefaultPos.Left);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_RIGHT, FDefaultPos.Right);
+  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_BOTTOM, FDefaultPos.Bottom);
+
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_TOP, FDefaultPos.Top);
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_LEFT, FDefaultPos.Left);
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_RIGHT, FDefaultPos.Right);
+  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_BOTTOM, FDefaultPos.Bottom);
+
+  FConf.SetValue(WINDOW_STATE, DEF_WINDOW_STATE);
+
   FConf.SetValue(SHOW_MODAL_ALERT, DEF_SHOW_MODAL_ALERT);
   FConf.SetValue(SHOW_TRAY_ALERT, DEF_SHOW_TRAY_ALERT);
   FConf.SetValue(AUTO_PROGRESS, DEF_AUTO_PROGRESS);

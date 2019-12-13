@@ -142,6 +142,7 @@ type
     procedure aiNewTimerExecute(Sender: TObject);
     procedure aiOptionsExecute(Sender: TObject);
     procedure aiQuitExecute(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -274,18 +275,6 @@ begin
   ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
   tiMain.Visible := True;
 
-  with GlobalUserConfig do
-  begin
-    Top := LastPos.Top;
-    Left := LastPos.Left;
-    Width := LastPos.Width;
-    Height := LastPos.Height;
-
-    //tbShowModalAlert.Down := ShowModalAlert;
-    //tbShowTrayAlert.Down := ShowTrayAlert;
-
-    tbProgressAuto.Down := AutoProgress;
-  end;
 
 
   //Self.AlphaBlend:=True;
@@ -389,6 +378,8 @@ begin
     bmp.Free;
   end;
 
+
+
 end;
 
 procedure TMainForm.aiNewTimerExecute(Sender: TObject);
@@ -434,25 +425,42 @@ begin
   Close;
 end;
 
-procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
-  CurrPos: TRect;
+  CurrPosNormal, CurrPosRestored: TRect;
+begin
+  //TODO: This should be moved to form close?
+  CurrPosNormal.Top := Top;
+  CurrPosNormal.Left := Left;
+  //CurrPosNormal.Right := CurrPosNormal.Left + Width;
+  CurrPosNormal.Width:=Width;
+  CurrPosNormal.Height:=Height;
+  //CurrPosNormal.Bottom := CurrPosNormal.Top + Height;
+
+  CurrPosRestored.Top:=RestoredTop;
+  CurrPosRestored.Left:=RestoredLeft;
+  CurrPosRestored.Width:=RestoredWidth;
+  CurrPosRestored.Height:=RestoredHeight;
+
+  with GlobalUserConfig do
+  begin
+    LastPosNormal := CurrPosNormal;
+    LastPosRestored := CurrPosRestored;
+    //ShowModalAlert := tbShowModalAlert.Down;
+    //ShowTrayAlert := tbShowTrayAlert.Down;
+    AutoProgress := tbProgressAuto.Down;
+    LastWindowState:=WindowState;
+  end;
+end;
+
+procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+{var
+  CurrPosNormal, CurrPosRestored: TRect;}
 begin
   if GlobalUserConfig.QueryExit then
     CanClose := MessageDlg('Do you really want to close the application?',
       mtConfirmation, [mbYes, mbNo], 0) = mrYes;
-  //TODO: This should be moved to form close?
-  CurrPos.Top := Top;
-  CurrPos.Left := Left;
-  CurrPos.Right := CurrPos.Left + Width;
-  CurrPos.Bottom := CurrPos.Top + Height;
-  with GlobalUserConfig do
-  begin
-    LastPos := CurrPos;
-    //ShowModalAlert := tbShowModalAlert.Down;
-    //ShowTrayAlert := tbShowTrayAlert.Down;
-    AutoProgress := tbProgressAuto.Down;
-  end;
+
 
 end;
 
@@ -542,6 +550,37 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
+  with GlobalUserConfig do
+  begin
+    if LastWindowState = wsMaximized then begin
+      WindowState := wsNormal;
+      BoundsRect := Bounds(
+        LastPosRestored.Left,
+        LastPosRestored.Top,
+        LastPosRestored.Width,
+        LastPosRestored.Height);
+      WindowState := wsMaximized;
+    end
+    else
+    begin
+      WindowState := wsNormal;
+      BoundsRect := Bounds(
+        LastPosNormal.Left,
+        LastPosNormal.Top,
+        LastPosNormal.Width,
+        LastPosNormal.Height);
+    end;
+    {Top := LastPosNormal.Top;
+    Left := LastPosNormal.Left;
+    Width := LastPosNormal.Width;
+    Height := LastPosNormal.Height;}
+
+    //tbShowModalAlert.Down := ShowModalAlert;
+    //tbShowTrayAlert.Down := ShowTrayAlert;
+
+    tbProgressAuto.Down := AutoProgress;
+
+  end;
   UpdateAlertFormSettings;
 end;
 
