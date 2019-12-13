@@ -1818,6 +1818,7 @@ object MainForm: TMainForm
   end
   object tiMain: TTrayIcon
     OnClick = tiMainClick
+    OnDblClick = tiMainDblClick
     OnMouseUp = tiMainMouseUp
     left = 488
     top = 152

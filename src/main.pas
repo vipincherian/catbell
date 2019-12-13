@@ -153,6 +153,7 @@ type
     //procedure tbShowModalAlertClick(Sender: TObject);
     //procedure tbShowTrayAlertClick(Sender: TObject);
     procedure tiMainClick(Sender: TObject);
+    procedure tiMainDblClick(Sender: TObject);
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
 
@@ -190,6 +191,7 @@ type
     function GetCanselectedMoveDown: boolean;
     function GetCanSelectedMoveUp: boolean;
     procedure Reorder;
+    procedure ShowInForeground;
 
   public
     { public declarations }
@@ -586,9 +588,7 @@ end;
 
 procedure TMainForm.pmiShowWindowClick(Sender: TObject);
 begin
-  if Self.WindowState = wsMinimized then
-    Self.WindowState := wsNormal;
-  Self.Show;
+  ShowInForeground;
 end;
 
 procedure TMainForm.tbProgressAutoClick(Sender: TObject);
@@ -608,7 +608,12 @@ end;}
 
 procedure TMainForm.tiMainClick(Sender: TObject);
 begin
-  ShowMessage('Hehe');
+  ShowInForeground;
+end;
+
+procedure TMainForm.tiMainDblClick(Sender: TObject);
+begin
+  ShowInForeground;
 end;
 
 procedure TMainForm.tiMainMouseUp(Sender: TObject; Button: TMouseButton;
@@ -927,6 +932,13 @@ begin
   //FScrollBox.Repaint;
   //FScrollBox.ReAlign;
 
+end;
+
+procedure TMainForm.ShowInForeground;
+begin
+  if WindowState = wsMinimized then
+    WindowState := wsNormal;
+  Show;
 end;
 
 {*procedure TMainForm.NewTimerAdded(Sender: TObject);
