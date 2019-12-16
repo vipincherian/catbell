@@ -13,8 +13,8 @@ object frmTimerAlert: TfrmTimerAlert
   LCLVersion = '2.0.6.0'
   object lbMessages: TListBox
     Left = 8
-    Height = 96
-    Top = 8
+    Height = 80
+    Top = 24
     Width = 336
     ItemHeight = 0
     ScrollWidth = 334
@@ -29,5 +29,13 @@ object frmTimerAlert: TfrmTimerAlert
     Caption = 'bbClose'
     OnClick = bbCloseClick
     TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 8
+    Height = 13
+    Top = 8
+    Width = 187
+    Caption = 'The following timers completed:-'
+    ParentColor = False
   end
 end

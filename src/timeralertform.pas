@@ -14,6 +14,7 @@ type
 
   TfrmTimerAlert = class(TForm)
     bbClose: TBitBtn;
+    Label1: TLabel;
     lbMessages: TListBox;
     FTimer: TTimer;
     procedure bbCloseClick(Sender: TObject);

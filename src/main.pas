@@ -1045,7 +1045,7 @@ begin
   if Widget.ModalAlert then
   begin
     Message :=
-      Widget.Caption + ' completed. (' + Format('%.2d', [Hours]) +
+      Widget.Caption + ' (' + Format('%.2d', [Hours]) +
       ':' + Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
     //frmTimerAlert.stxAdditional.Caption := Message;
     frmTimerAlert.lbMessages.Items.Add(Message);
