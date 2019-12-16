@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  DateTimePicker;
+  DateTimePicker, settings;
 
 type
   { TTimerSpecs }
@@ -109,10 +109,14 @@ begin
   FSpecs.DurationMinutes:=10;
   FSpecs.DurationSeconds:=0;
   FSpecs.Description:='Countdown Timer';}
-  FDuration:=EncodeTime(0, 10, 0,0);
-  FDescription:=' ';
-  FModalAlert:=True;
-  FTrayNotification:=True;
+  with GlobalUserConfig do
+  begin
+    FDuration:=EncodeTime(DefaultTimerHours, DefaultTimerMins, DefaultTimerSecs,0);
+    FDescription:=DefaultTimerTitle;
+    FModalAlert:=ShowModalAlert;
+    FTrayNotification:=ShowTrayAlert;
+  end;
+
 
 end;
 
@@ -154,14 +158,12 @@ end;
 
 procedure TfrmEditTimer.SetDescription(AValue: string);
 begin
-  if FDescription=AValue then Exit;
   FDescription:=AValue;
   edtDescription.Text:=AValue;
 end;
 
 procedure TfrmEditTimer.SetDuration(AValue: TTime);
 begin
-  if FDuration=AValue then Exit;
   FDuration:=AValue;
   dtpDuration.Time:=AValue;
 end;
