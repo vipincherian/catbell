@@ -1374,23 +1374,33 @@ var
   TimerClock: TfraTimer;
   Count: integer;
   OrderStrings: TStringList;
-  Order: TIdList;
+  //Order: TIdList;
   Id: longword;
-  Index: integer;
+  //Index: integer;
 begin
-  Order := TIdList.Create;
+  //Order := TIdList.Create;
   OrderStrings := TStringList.Create;
 
   //GetOrder(Order);
-  for Id in FOrder do
+  {for Id in FOrder do
   begin
     Order.Add(Id);
-  end;
+  end;}
+
+  // While saving, existing IDs of clocks are ignored.
+  // New IDs are generated in sequence.
 
   Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
+
+  if FOrder.Count <> FTimerFrames.Count then
+     ShowMessage('FOrder.Count does not match FTimerFrames.Count');
+
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
-    TimerClock := FTimerFrames.Data[Count];
+    // FOrder has the order of IDs, but in reverse order.
+    Id := FOrder[FTimerFrames.Count - Count - 1];
+    TimerClock := FTimerFrames.KeyData[Id];
+
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
 
@@ -1408,27 +1418,23 @@ begin
       '/' + TIMER_CONF_MODALALERT, TimerClock.ModalAlert);
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_TRAYNOTIFiCATION, TimerClock.TrayNotification);
-      { While saving, existing IDs of clocks are ignored. They are saved in the
-      order they are in the list. The position in the list becomes the new ID.
-      The saved order has actual IDs (TimerClock.Id). These have to be
-      translated to the new IDs (Count + 1)}
 
-    Index := Order.IndexOf(TimerClock.Id);
-    Assert(Index >= 0);
-    Order.Items[Index] := Count + 1;
+    // Add the new ID at the beginning of the list
+    OrderStrings.Insert(0, IntToStr(Count+1));
+
+    //Index := FOrder.IndexOf(TimerClock.Id);
+    //Assert(Index >= 0);
+    //Order.Items[Index] := Count + 1;
 
   end;
 
-
-
-
-  for Id in Order do
-    OrderStrings.Add(IntToStr(Id));
+  {for Id in FOrder do
+    OrderStrings.Add(IntToStr(Id));}
 
   Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
   //ShowMessage('After Savetofile ' + IntToStr(FOrder.Count));
   OrderStrings.Free;
-  Order.Free;
+  //Order.Free;
 end;
 
 procedure TMainForm.DeleteSelected;
