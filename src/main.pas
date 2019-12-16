@@ -380,8 +380,6 @@ begin
     bmp.Free;
   end;
 
-
-
 end;
 
 procedure TMainForm.aiNewTimerExecute(Sender: TObject);

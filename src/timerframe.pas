@@ -819,6 +819,8 @@ var
   Observer: ITimerObserver;
 begin
 
+  //WriteLn('At TfraTimer.Finish');
+  Stop(Self);
   for Observer in FObservers do
   begin
     Observer.TimerFinished(FId);
@@ -826,7 +828,7 @@ begin
 
   if IsProgressOnIcon then
     PublishProgress(TIMER_PROGRESS_FINISHED);
-  Stop(Self);
+
 end;
 
 procedure TfraTimer.PublishProgress(Percent: single);

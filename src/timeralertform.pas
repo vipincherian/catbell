@@ -41,7 +41,7 @@ procedure TfrmTimerAlert.FormCreate(Sender: TObject);
 begin
   //BorderStyle := bsNone;
   //OnShow := @FormShow;
-  AlphaBlend:=True;
+  //AlphaBlend:=True;
   AlphaBlendValue:=50;
 end;
 
