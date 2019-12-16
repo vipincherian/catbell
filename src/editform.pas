@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  DateTimePicker, settings;
+  DateTimePicker, settings, dateutils;
 
 type
   { TTimerSpecs }
@@ -42,6 +42,8 @@ type
     Label4: TLabel;
     procedure bbCancelClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
+    procedure dtpDurationChange(Sender: TObject);
+    procedure edtDescriptionChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
@@ -117,6 +119,7 @@ begin
     FTrayNotification:=ShowTrayAlert;
   end;
 
+  bbSave.Enabled:=Validate;
 
 end;
 
@@ -136,6 +139,16 @@ begin
   Close;
 end;
 
+procedure TfrmEditTimer.dtpDurationChange(Sender: TObject);
+begin
+  bbSave.Enabled:=Validate;
+end;
+
+procedure TfrmEditTimer.edtDescriptionChange(Sender: TObject);
+begin
+  bbSave.Enabled:=Validate;
+end;
+
 procedure TfrmEditTimer.bbCancelClick(Sender: TObject);
 begin
   Close;
@@ -147,12 +160,26 @@ begin
 end;
 
 function TfrmEditTimer.Validate: boolean;
+var
+  Hours, Minutes, Seconds: word;
 begin
   if edtDescription.Text = '' then
   begin
     Result := False;
     Exit;
   end;
+
+  Hours:= HourOf(dtpDuration.Time);
+  Minutes:= MinuteOf(dtpDuration.Time);
+  Seconds:= SecondOf(dtpDuration.Time);
+
+  if((Hours = 0) and (Minutes = 0) and (Seconds = 0)) then
+  begin
+    Result := False;
+    Exit;
+  end;
+
+  Result:= True;
 
 end;
 
