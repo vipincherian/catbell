@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  LCLType, ExtCtrls, Buttons;
+  LCLType, ExtCtrls, Buttons, LazLogger;
 
 type
 
@@ -67,7 +67,9 @@ end;
 procedure TfrmTimerAlert.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
+  //DebugLn('Entering FormClose');
   lbMessages.Items.Clear;
+  //DebugLn('Exiting FormClose');
 end;
 
 end.

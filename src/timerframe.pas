@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform, graphics, math;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform, graphics, math, LazLogger;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -90,7 +90,7 @@ type
     FTrayNotification: boolean;
     FTitleEditable: boolean;
     //FObservers: TTimerObserverList;
-    FShortTimer: TTimer;
+    //FShortTimer: TTimer;
     //FNotifier: boolean;
 
     FOrigTickDuration: longword;
@@ -146,6 +146,8 @@ type
     //OnPause: TNotifyEvent;
     //OnNotify: TNotifyEvent;
     OnSelect: TNotifyEvent;
+    OnTimerStart: TNotifyEvent;
+    OnTimerPause: TNotifyEvent;
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
     CallbackOnProgressOnIconChange: boolean;
@@ -161,7 +163,7 @@ type
     procedure SetCounter(AValue: string);
     procedure CheckForZeroTime;
 
-    procedure OnShortTimer(Sender: TObject);
+    procedure HandleTimerTrigger();
     procedure Start(Sender: TObject);
     procedure Pause(Sender: TObject);
     procedure Stop(Sender: TObject);
@@ -593,10 +595,10 @@ begin
 
   FObservers := TListTimerObservers.Create;
 
-  FShortTimer := TTimer.Create(nil);
+  {FShortTimer := TTimer.Create(nil);
   FShortTimer.Interval := 200;
   FShortTimer.Enabled := False;
-  FShortTimer.OnTimer := @OnShortTimer;
+  FShortTimer.OnTimer := @HandleTimerTrigger;}
 
   bbPlay.Caption := '';
   bbPause.Caption := '';
@@ -608,7 +610,7 @@ end;
 destructor TfraTimer.Destroy;
 begin
   Parent := nil;
-  FShortTimer.Free;
+  //FShortTimer.Free;
   FObservers.Free;
   inherited Destroy;
 end;
@@ -633,7 +635,7 @@ begin
   bbPlay.Enabled := not ((Hours = 0) and (Minutes = 0) and (Seconds = 0));
 end;
 
-procedure TfraTimer.OnShortTimer(Sender: TObject);
+procedure TfraTimer.HandleTimerTrigger();
 var
   Elapsed: longword;
   ElapsedMilliseconds: longword;
@@ -715,7 +717,7 @@ begin
   if (Hours = 0) and (Minutes = 0) and (Seconds = 0) then
     Exit;
 
-  FShortTimer.Enabled := True;
+  //FShortTimer.Enabled := True;
   if FPaused = False then
   begin
     FStartTickCount := GetTickCount64;
@@ -750,12 +752,15 @@ begin
 
   //end;
 
+  if OnTimerStart <> Nil then
+     OnTimerStart(Self);
+
 end;
 
 procedure TfraTimer.Pause(Sender: TObject);
 begin
   //ShowMessage('Pause');
-  FShortTimer.Enabled := False;
+  //FShortTimer.Enabled := False;
 
   FPendingTickCount := FEndTickCount - GetTickCount64;
   if FPendingTickCount <= 0 then
@@ -769,6 +774,8 @@ begin
   StopButtonEnabled := True;
   DurationEnabled := False;
   //end;
+  if OnTimerPause <> Nil then
+     OnTimerPause(Self);
 
 end;
 
@@ -777,7 +784,7 @@ begin
 
   FRunning := False;
   FPaused := False;
-  FShortTimer.Enabled := False;
+  //FShortTimer.Enabled := False;
 
 
 
@@ -820,6 +827,8 @@ var
 begin
 
   //WriteLn('At TfraTimer.Finish');
+  //DebugLn('Entering TfraTimer.Finish');
+  //DebugLn('Entering TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
   Stop(Self);
   for Observer in FObservers do
   begin
@@ -829,6 +838,7 @@ begin
   if IsProgressOnIcon then
     PublishProgress(TIMER_PROGRESS_FINISHED);
 
+  //DebugLn('Exiting TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
 end;
 
 procedure TfraTimer.PublishProgress(Percent: single);

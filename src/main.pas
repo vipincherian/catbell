@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   observers, settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, math;
+  timerframe, fgl, sequence, editform, math, LazLogger;
 
 const
   FORM_MIN_SIZE = 600;
@@ -75,7 +75,8 @@ const
   TIMER_CONF_ORDER = 'order';
 
 type
-  TTimerFrameList = specialize TFPGMap<longword, TfraTimer>;
+  TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
+  TTimerFrameList =  specialize TFPGList<TfraTimer>;
   TIdList = specialize TFPGList<longword>;
 
   { TMainForm }
@@ -169,9 +170,12 @@ type
     FDbDefault: boolean;
     //function GetClocks: TClocksWidget;
 
-    FTimerFrames: TTimerFrameList;
+    FTimerFrames: TTimerFrameMap;
+    FActiveTimerFrames: TTimerFrameList;
     FOrder: TIdList;
     FCounterClockID: TSequence;
+
+    FShortTimer: TTimer;
 
     procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
     procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
@@ -209,6 +213,8 @@ type
     //procedure ClockMovedDown(Sender: TObject);
     procedure ClockSelected(Sender: TObject);
     procedure TimerFinished(Id: integer);
+    procedure TimerPaused(Sender: TObject);
+    procedure TimerStarted(Sender:TObject);
     procedure ProgressUpdate(Progress: single);
     //procedure OptionsEdit(Sender: TObject);
     //procedure ExportClicked(Sender: TObject);
@@ -234,6 +240,7 @@ type
     procedure RemoveTimer(IdNew: longword);
     procedure MoveSelectedClocksUp;
     procedure MoveSelectedClocksDown;
+    procedure OnShortTimer(Sender: TObject);
   end;
 
 var
@@ -256,7 +263,8 @@ begin
   Constraints.MinWidth := FORM_MIN_SIZE;
   ;
 
-  FTimerFrames := TTimerFrameList.Create;
+  FTimerFrames := TTimerFrameMap.Create;
+  FActiveTimerFrames := TTimerFrameList.Create;
   //FActiveTimers := TListTimerClockWidgets.Create;
 
   FCounterClockID := TSequence.Create;
@@ -309,6 +317,11 @@ begin
 
   TrayIconSize := TRAY_BASE_WIDTH;
   TrayIconSize := GetSystemMetrics(SM_CXSMICON);
+
+  FShortTimer := TTimer.Create(nil);
+  FShortTimer.Interval := 200;
+  FShortTimer.Enabled := False;
+  FShortTimer.OnTimer := @OnShortTimer;
 
   bmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
 
@@ -537,9 +550,12 @@ begin
   FCounterClockID.Free;
 
   //FActiveTimers.Free;
+  FActiveTimerFrames.Free;
   FTimerFrames.Free;
 
   FOrder.Free;
+
+  FShortTimer.Free;
   //FClockWidget.Free;
 end;
 
@@ -1024,8 +1040,12 @@ var
   Widget: TfraTimer;
   Duration: TDateTime;
   Message: string;
+  Index: integer;
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
+
+  //DebugLn('Entering TimerFinished');
+  //DebugLn('Timer ID - ' + InttoStr(Id));
 
   Widget := FTimerFrames.KeyData[Id];
   Duration := Widget.Duration;
@@ -1033,6 +1053,19 @@ begin
   Hours := HourOf(Duration);
   Minutes := MinuteOf(Duration);
   Seconds := SecondOf(Duration);
+
+  try
+    //Index := FActiveTimerFrames.IndexOf(Id);
+    //if Index <> -1 then
+    //begin
+      FActiveTimerFrames.Remove(Widget);
+    //end;
+    FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
+
+  except
+    on E: Exception do
+      ShowMessage( 'Error(1): '+ E.ClassName + #13#10 + E.Message );
+  end;
 
   if Widget.TrayNotification then
   begin
@@ -1050,8 +1083,51 @@ begin
     //frmTimerAlert.stxAdditional.Caption := Message;
     frmTimerAlert.lbMessages.Items.Add(Message);
 
-    if not frmTimerAlert.Showing then
-      frmTimerAlert.ShowModal;
+    //if not frmTimerAlert.Showing then
+    if frmTimerAlert.WindowState = wsMinimized then
+      frmTimerAlert.WindowState:=wsNormal;
+    frmTimerAlert.ShowOnTop;
+  end;
+  //DebugLn('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
+
+end;
+
+procedure TMainForm.TimerPaused(Sender: TObject);
+var
+  TimerFrame: TfraTimer;
+  Index: integer;
+begin
+  TimerFrame := TfraTimer(Sender);
+  try
+    //Index := FActiveTimerFrames.IndexOf(TimerFrame.Id);
+    //if Index <> -1 then
+    //begin
+      FActiveTimerFrames.Remove(TimerFrame);
+    //end;
+    FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
+  except
+    on E: Exception do
+      ShowMessage( 'Error (2): '+ E.ClassName + #13#10 + E.Message );
+  end;
+
+end;
+
+procedure TMainForm.TimerStarted(Sender: TObject);
+var
+  TimerFrame: TfraTimer;
+  Index: integer;
+begin
+  try
+    TimerFrame := TfraTimer(Sender);
+    FShortTimer.Enabled := True;
+    Index := FActiveTimerFrames.IndexOf(TimerFrame);
+    if Index = -1 then
+    begin
+      FActiveTimerFrames.Add(TimerFrame);
+    end;
+  except
+    on E: Exception do
+      ShowMessage( 'Error (3): '+ E.ClassName + #13#10 + E.Message );
   end;
 
 end;
@@ -1271,6 +1347,8 @@ begin
   NewWidget := TfraTimer.Create(sbxClocks);
   NewWidget.Id := Id;
   NewWidget.TitleEditable:=GlobalUserConfig.AllowTimerTitleEdit ;
+  NewWidget.OnTimerStart:=@TimerStarted;
+  NewWidget.OnTimerPause:=@TimerPaused;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
   begin
     NewWidget.edtTitle.Color:=clForm;
@@ -1543,6 +1621,28 @@ begin
 
   end;
   Reorder;
+end;
+
+procedure TMainForm.OnShortTimer(Sender: TObject);
+var
+  TimerFrame: TfraTimer;
+  Count: integer;
+begin
+  //for TimerFrame in FActiveTimerFrames.K;
+  //DebugLn('Timer fired. ');
+  //DebugLn('' + IntToStr(FActiveTimerFrames.Count) + ' active timers');
+  if FActiveTimerFrames.Count = 0 then
+    Exit;
+  try
+    for TimerFrame in FActiveTimerFrames do
+    begin
+      TimerFrame.HandleTimerTrigger();
+    end;
+  except
+    on E: Exception do
+      ShowMessage( 'Error (4): '+ E.ClassName + #13#10 + E.Message );
+  end;
+
 end;
 
 
