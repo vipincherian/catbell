@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Menus,
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
-  observers, settings, optionsform, aboutform, BGRABitmap,
+  settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
   timerframe, fgl, sequence, editform, math, LazLogger;
 
@@ -81,7 +81,7 @@ type
 
   { TMainForm }
 
-  TMainForm = class(TForm, ITimerObserver)
+  TMainForm = class(TForm)
     aiMoveDown: TAction;
     aiMoveUp: TAction;
     aiDeleteTimer: TAction;
@@ -212,10 +212,11 @@ type
     //procedure ClockMovedUp(Sender: TObject);
     //procedure ClockMovedDown(Sender: TObject);
     procedure ClockSelected(Sender: TObject);
-    procedure TimerFinished(Id: integer);
+    procedure TimerFinished(Sender: TObject);
     procedure TimerPaused(Sender: TObject);
-    procedure TimerStarted(Sender:TObject);
+    procedure TimerStarted(Sender: TObject);
     procedure ProgressUpdate(Progress: single);
+    procedure TimerProgressUpdated(Sender: TObject);
     //procedure OptionsEdit(Sender: TObject);
     //procedure ExportClicked(Sender: TObject);
     procedure OptionsFormClosed();
@@ -756,7 +757,7 @@ end;*}
 
 procedure TMainForm.PostTimerCreation(AValue: TfraTimer);
 begin
-  AValue.AddSubscription(Self);
+  //AValue.AddSubscription(Self);
   AValue.OnSelect := @ClockSelected;
   ResetHeaderSections;
 end;
@@ -1032,7 +1033,7 @@ begin
   SetListButtonsStatus;
 end;
 
-procedure TMainForm.TimerFinished(Id: integer);
+procedure TMainForm.TimerFinished(Sender: TObject);
 var
   Hours: word;
   Minutes: word;
@@ -1040,14 +1041,15 @@ var
   Widget: TfraTimer;
   Duration: TDateTime;
   Message: string;
-  Index: integer;
+  Id: longword;
 begin
   //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
 
   //DebugLn('Entering TimerFinished');
   //DebugLn('Timer ID - ' + InttoStr(Id));
 
-  Widget := FTimerFrames.KeyData[Id];
+  Widget := TfraTimer(Sender);
+  Id := Widget.Id;
   Duration := Widget.Duration;
 
   Hours := HourOf(Duration);
@@ -1165,6 +1167,14 @@ begin
     end;
   end;
 
+end;
+
+procedure TMainForm.TimerProgressUpdated(Sender: TObject);
+var
+  TimerFrame: TfraTimer;
+begin
+  TimerFrame:=TfraTimer(Sender);
+  ProgressUpdate(TimerFrame.Progress);
 end;
 
 {*procedure TMainForm.OptionsEdit(Sender: TObject);
@@ -1349,6 +1359,8 @@ begin
   NewWidget.TitleEditable:=GlobalUserConfig.AllowTimerTitleEdit ;
   NewWidget.OnTimerStart:=@TimerStarted;
   NewWidget.OnTimerPause:=@TimerPaused;
+  NewWidget.OnTimerStop:=@TimerFinished;
+  NewWidget.OnTimerProgressUpdate:=@TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
   begin
     NewWidget.edtTitle.Color:=clForm;

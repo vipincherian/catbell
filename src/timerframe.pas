@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, observers, editform, graphics, math, LazLogger;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, editform, graphics, math, LazLogger;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -54,7 +54,7 @@ type
 
   { TfraTimer }
 
-  TfraTimer = class(TFrame, ITimerSubject)
+  TfraTimer = class(TFrame)
     aiAdjust: TAction;
     aiEdit: TAction;
     aiStop: TAction;
@@ -100,7 +100,9 @@ type
 
     FPaused: boolean;
     FRunning: boolean;
-    FObservers: TListTimerObservers;
+
+    FProgress: single;
+    //FObservers: TListTimerObservers;
     //function GetShowProgressOnIcon: boolean;
     procedure SetId(AValue: longword);
     function GetCaption: string;
@@ -148,6 +150,8 @@ type
     OnSelect: TNotifyEvent;
     OnTimerStart: TNotifyEvent;
     OnTimerPause: TNotifyEvent;
+    OnTimerStop: TNotifyEvent;
+    OnTimerProgressUpdate: TNotifyEvent;
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
     CallbackOnProgressOnIconChange: boolean;
@@ -170,8 +174,8 @@ type
     //procedure NotifyChange(Sender: TObject);
     procedure Finish;
     procedure PublishProgress(Percent: single);
-    procedure AddSubscription(aObserver: ITimerObserver);
-    procedure RemoveSubscription(aObserver: ITimerObserver);
+    //procedure AddSubscription(aObserver: ITimerObserver);
+    //procedure RemoveSubscription(aObserver: ITimerObserver);
 
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
@@ -199,6 +203,7 @@ type
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
+    property Progress: single read FProgress;
   end;
 
 
@@ -563,6 +568,7 @@ constructor TfraTimer.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FId := 0;
+  FProgress:=0.0;
   //teSet.Time := EncodeTime(0, GlobalDefault.TimerInitMins, 0, 0);
   with GlobalUserConfig do
   begin
@@ -593,7 +599,7 @@ begin
   FPaused := False;
   //FNotifier := False;
 
-  FObservers := TListTimerObservers.Create;
+  //FObservers := TListTimerObservers.Create;
 
   {FShortTimer := TTimer.Create(nil);
   FShortTimer.Interval := 200;
@@ -611,7 +617,7 @@ destructor TfraTimer.Destroy;
 begin
   Parent := nil;
   //FShortTimer.Free;
-  FObservers.Free;
+  //FObservers.Free;
   inherited Destroy;
 end;
 
@@ -645,7 +651,7 @@ var
   Seconds: integer;
   //Observer: ITimerObserver;
   CounterText: string;
-  Progress: single;
+  ProgressPercentage: single;
 begin
   { If the countdown timer is not running, then default to 00:00:00}
   //if FRunning = False then
@@ -681,19 +687,19 @@ begin
     if Counter <> CounterText then
       Counter := CounterText;
 
-    // Calculate percentage progress
+    // Calculate percentage ProgressPercentage
     if IsProgressOnIcon then
     begin
-      Progress := 1 - (ElapsedMilliseconds / FOrigTickDuration);
+      ProgressPercentage := 1 - (ElapsedMilliseconds / FOrigTickDuration);
       // Elapsed time can exceed total pending tick duration, in certain cases.
       // The system could go on sleep mode while a timer is running
       // (and while the timer event is being processed) and on
       // waking up, the pre-caculated tick duration could have already been
-      // overshot. If that is the case, mark progress as zero, and the next
+      // overshot. If that is the case, mark ProgressPercentage as zero, and the next
       // timer event will mark it as completed.
-      if Progress < 0 then
-        Progress := 0;
-      Assert(Progress <= 1);
+      if ProgressPercentage < 0 then
+        ProgressPercentage := 0;
+      Assert(ProgressPercentage <= 1);
       PUblishProgress(1 - (ElapsedMilliseconds / FOrigTickDuration));
     end;
 
@@ -822,18 +828,21 @@ begin
 end;}
 
 procedure TfraTimer.Finish;
-var
-  Observer: ITimerObserver;
+{var
+  Observer: ITimerObserver;}
 begin
 
   //WriteLn('At TfraTimer.Finish');
   //DebugLn('Entering TfraTimer.Finish');
   //DebugLn('Entering TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
   Stop(Self);
-  for Observer in FObservers do
+
+  if OnTimerStop <> Nil then
+    OnTimerStop(Self);
+  {for Observer in FObservers do
   begin
     Observer.TimerFinished(FId);
-  end;
+  end;}
 
   if IsProgressOnIcon then
     PublishProgress(TIMER_PROGRESS_FINISHED);
@@ -842,15 +851,18 @@ begin
 end;
 
 procedure TfraTimer.PublishProgress(Percent: single);
-var
-  Observer: ITimerObserver;
+{var
+  Observer: ITimerObserver;}
 begin
-  for Observer in FObservers do
-    Observer.ProgressUpdate(Percent);
+  //for Observer in FObservers do
+  //  Observer.ProgressUpdate(Percent);
+  FProgress:=Percent;
+  if OnTimerProgressUpdate <> Nil then
+    OnTimerProgressUpdate(Self);
 
 end;
 
-procedure TfraTimer.AddSubscription(aObserver: ITimerObserver);
+{procedure TfraTimer.AddSubscription(aObserver: ITimerObserver);
 begin
   FObservers.Add(aObserver);
 end;
@@ -858,6 +870,6 @@ end;
 procedure TfraTimer.RemoveSubscription(aObserver: ITimerObserver);
 begin
   FObservers.Remove(aObserver);
-end;
+end;}
 
 end.
