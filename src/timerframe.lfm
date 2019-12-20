@@ -3,7 +3,7 @@ object fraTimer: TfraTimer
   Height = 39
   Top = 0
   Width = 708
-  Anchors = [akTop, akLeft, akRight]
+  Align = alTop
   ClientHeight = 39
   ClientWidth = 708
   TabOrder = 0
