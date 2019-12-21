@@ -7,6 +7,8 @@ object frmTimerAdjust: TfrmTimerAdjust
   Caption = 'Adjust timer'
   ClientHeight = 112
   ClientWidth = 304
+  OnCreate = FormCreate
+  OnShow = FormShow
   LCLVersion = '2.0.6.0'
   object cmbOptions: TComboBox
     Left = 8
@@ -34,7 +36,7 @@ object frmTimerAdjust: TfrmTimerAdjust
     OnClick = bbApplyClick
     TabOrder = 1
   end
-  object dtpAdjust: TDateTimePicker
+  object dtpDiff: TDateTimePicker
     Left = 8
     Height = 19
     Top = 40
@@ -47,6 +49,28 @@ object frmTimerAdjust: TfrmTimerAdjust
     TextForNullDate = 'NULL'
     LeadingZeros = True
     Kind = dtkTime
+    TimeFormat = tf24
+    TimeDisplay = tdHMS
+    DateMode = dmComboBox
+    Date = 43820
+    Time = 0.339435011570458
+    UseDefaultSeparators = True
+    HideDateTimeParts = []
+    MonthNames = 'Long'
+  end
+  object dtpTill: TDateTimePicker
+    Left = 88
+    Height = 19
+    Top = 40
+    Width = 151
+    CenturyFrom = 1941
+    MaxDate = 2958465
+    MinDate = -53780
+    TabOrder = 3
+    TrailingSeparator = False
+    TextForNullDate = 'NULL'
+    LeadingZeros = True
+    Kind = dtkDateTime
     TimeFormat = tf24
     TimeDisplay = tdHMS
     DateMode = dmComboBox

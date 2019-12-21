@@ -906,9 +906,9 @@ begin
     ADJUST_SHORTEN:
       //frmTimerAdjust.dtpAdjust.Time:=;
     begin
-      Hours := HourOf(frmTimerAdjust.dtpAdjust.Time);
-      Mins := MinuteOf(frmTimerAdjust.dtpAdjust.Time);
-      Secs := SecondOf(frmTimerAdjust.dtpAdjust.Time);
+      Hours := HourOf(frmTimerAdjust.dtpDiff.Time);
+      Mins := MinuteOf(frmTimerAdjust.dtpDiff.Time);
+      Secs := SecondOf(frmTimerAdjust.dtpDiff.Time);
 
       if (Hours = 0) and (Mins = 0) and (Secs = 0) then
       begin
@@ -965,9 +965,9 @@ begin
     end;
     ADJUST_EXTEND:
     begin
-      Hours := HourOf(frmTimerAdjust.dtpAdjust.Time);
-      Mins := MinuteOf(frmTimerAdjust.dtpAdjust.Time);
-      Secs := SecondOf(frmTimerAdjust.dtpAdjust.Time);
+      Hours := HourOf(frmTimerAdjust.dtpDiff.Time);
+      Mins := MinuteOf(frmTimerAdjust.dtpDiff.Time);
+      Secs := SecondOf(frmTimerAdjust.dtpDiff.Time);
 
       if (Hours = 0) and (Mins = 0) and (Secs = 0) then
       begin

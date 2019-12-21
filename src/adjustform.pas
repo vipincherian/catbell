@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  DateTimePicker;
+  DateTimePicker, dateutils;
 
 type
 
@@ -35,17 +35,21 @@ type
   TfrmTimerAdjust = class(TForm)
     bbApply: TBitBtn;
     cmbOptions: TComboBox;
-    dtpAdjust: TDateTimePicker;
+    dtpDiff: TDateTimePicker;
+    dtpTill: TDateTimePicker;
     procedure bbApplyClick(Sender: TObject);
     procedure cmbOptionsChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
-
+    procedure SetTillDateTime;
   public
     OnAdjust: TNotifyEvent;
   end;
 
 var
   frmTimerAdjust: TfrmTimerAdjust;
+
 const
   ADJUST_SHORTEN = 0;
   ADJUST_EXTEND = 1;
@@ -61,19 +65,47 @@ procedure TfrmTimerAdjust.cmbOptionsChange(Sender: TObject);
 begin
   case cmbOptions.ItemIndex of
     ADJUST_SHORTEN:
-      dtpAdjust.Kind := dtkTime;
+    begin
+      dtpDiff.Show;
+      dtpTill.Hide;
+    end;
     ADJUST_EXTEND:
-      dtpAdjust.Kind := dtkTime;
+    begin
+      dtpDiff.Show;
+      dtpTill.Hide;
+    end;
     ADJUST_STOPBY:
-      dtpAdjust.Kind := dtkDateTime;
+    begin
+      dtpDiff.Hide;
+      dtpTill.Show;
+      SetTillDateTime;
+    end;
   end;
+end;
+
+procedure TfrmTimerAdjust.FormCreate(Sender: TObject);
+begin
+  dtpDiff.Show;
+  dtpTill.Hide;
+  dtpTill.Left := dtpDiff.Left;
+  dtpDiff.Time:=EncodeTime(0, 5, 0, 0);
+  SetTillDateTime;
+end;
+
+procedure TfrmTimerAdjust.FormShow(Sender: TObject);
+begin
+  SetTillDateTime;
+end;
+
+procedure TfrmTimerAdjust.SetTillDateTime;
+begin
+  dtpTill.DateTime := IncMinute(Now, 5);
 end;
 
 procedure TfrmTimerAdjust.bbApplyClick(Sender: TObject);
 begin
-  if OnAdjust <> Nil then
+  if OnAdjust <> nil then
     OnAdjust(Self);
 end;
 
 end.
-
