@@ -3,17 +3,17 @@ object frmTimerAlert: TfrmTimerAlert
   Left = 431
   Height = 146
   Top = 254
-  Width = 350
+  Width = 336
   BorderStyle = bsDialog
   Caption = 'Timer Finished'
   ClientHeight = 146
-  ClientWidth = 350
+  ClientWidth = 336
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   LCLVersion = '2.0.6.0'
   object lbMessages: TListBox
-    Left = 16
+    Left = 8
     Height = 80
     Top = 24
     Width = 320
@@ -23,7 +23,7 @@ object frmTimerAlert: TfrmTimerAlert
     TopIndex = -1
   end
   object bbClose: TBitBtn
-    Left = 136
+    Left = 131
     Height = 30
     Top = 112
     Width = 75

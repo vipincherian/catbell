@@ -352,8 +352,8 @@ object fraTimer: TfraTimer
     Height = 32
     Top = 3
     Width = 32
+    Action = aiAdjust
     Anchors = [akTop, akRight]
-    Caption = 'aiAbout'
     Glyph.Data = {
       36090000424D3609000000000000360000002800000018000000180000000100
       2000000000000009000064000000640000000000000000000000000000000000
@@ -430,6 +430,7 @@ object fraTimer: TfraTimer
       C8B94D58C8D64D58C8EB4D58C8EB4D58C8D64E57C8B84C58C9684A55CA180000
       0000000000000000000000000000000000000000000000000000
     }
+    OnClick = bbAdjustClick
     TabOrder = 6
   end
   object ilTimer: TImageList
@@ -749,6 +750,7 @@ object fraTimer: TfraTimer
     end
     object aiAdjust: TAction
       Caption = 'aiAdjust'
+      OnExecute = aiAdjustExecute
     end
   end
 end

@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, editform, graphics, math, LazLogger;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, editform, graphics, math, LazLogger, adjustform;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -73,10 +73,12 @@ type
     ilTimer: TImageList;
     imgTimer: TImage;
     lblCountdown: TLabel;
+    procedure aiAdjustExecute(Sender: TObject);
     procedure aiEditExecute(Sender: TObject);
     procedure aiPauseExecute(Sender: TObject);
     procedure aiPlayExecute(Sender: TObject);
     procedure aiStopExecute(Sender: TObject);
+    procedure bbAdjustClick(Sender: TObject);
     procedure ckbIconProgressChange(Sender: TObject);
     procedure dtpSetChange(Sender: TObject);
     procedure imgTimerClick(Sender: TObject);
@@ -231,6 +233,11 @@ begin
   Stop(Sender);
 end;
 
+procedure TfraTimer.bbAdjustClick(Sender: TObject);
+begin
+
+end;
+
 procedure TfraTimer.ckbIconProgressChange(Sender: TObject);
 begin
   //if not ckbIconProgress.Checked then
@@ -271,6 +278,11 @@ begin
     FTrayNotification:=frmEditTimer.TrayNotification;
     FModalAlert:=frmEditTimer.ModalAlert;
   end;
+end;
+
+procedure TfraTimer.aiAdjustExecute(Sender: TObject);
+begin
+  frmTimerAdjust.ShowModal;
 end;
 
 
