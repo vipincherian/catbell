@@ -667,6 +667,9 @@ begin
   bbPlay.Caption := '';
   bbPause.Caption := '';
   bbStop.Caption := '';
+  bbAdjust.Caption := '';
+  bbAdjust.Enabled:=False;
+  bbEdit.Caption:='';
 
   CallbackOnProgressOnIconChange := True;
 end;
@@ -779,7 +782,7 @@ begin
   StopButtonEnabled := True;
   DurationEnabled := False;
   ImageGreyed := False;
-
+  bbAdjust.Enabled := True;
   //end;
 
   if OnTimerStart <> nil then
@@ -826,6 +829,7 @@ begin
   DurationEnabled := True;
   ImageGreyed := True;
   Counter := DEF_COUNTDOWN_CAPTION;
+  bbAdjust.Enabled := False;
   //end;
 
   if IsProgressOnIcon then
