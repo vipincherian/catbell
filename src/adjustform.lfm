@@ -20,7 +20,6 @@ object frmTimerAdjust: TfrmTimerAdjust
     Items.Strings = (
       'Shorten timer by'
       'Extend timer by'
-      'Complete timer by'
     )
     OnChange = cmbOptionsChange
     Style = csDropDownList

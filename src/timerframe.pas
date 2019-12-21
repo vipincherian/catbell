@@ -287,6 +287,16 @@ end;
 procedure TfraTimer.aiAdjustExecute(Sender: TObject);
 begin
   frmTimerAdjust.OnAdjust := @AdjustTimer;
+  if not FPaused then
+  begin
+    if frmTimerAdjust.cmbOptions.Items.Count <= 2 then
+      frmTimerAdjust.cmbOptions.Items.Add(ADJUST_STOPBY_TEXT);
+  end
+  else
+  begin
+    if frmTimerAdjust.cmbOptions.Items.Count = 3 then
+      frmTimerAdjust.cmbOptions.Items.Delete(ADJUST_STOPBY);
+  end;
   frmTimerAdjust.ShowModal;
 end;
 
@@ -894,8 +904,11 @@ procedure TfraTimer.AdjustTimer(Sender: TObject);
 var
   Hours, Mins, Secs: word;
   NewEndTickCount, NewPendingTickCount, currTickCount, Adjustment: longword;
+  Diff: Int64;
 begin
 
+  // If the timer is not running, there is nothing to do
+  // We should not even be in such a situation, but that is a different
   if not FRunning then
   begin
     frmTimerAdjust.Close;
@@ -995,7 +1008,10 @@ begin
       frmTimerAdjust.Close;
     end;
     ADJUST_STOPBY:
-      ;//dtpAdjust.Kind := dtkDateTime;
+    begin
+      ;//Diff := MilliSecondsBetween(Now, frmTimerAdjust.dtpTill.DateTime);
+
+    end;
   end;
 end;
 
