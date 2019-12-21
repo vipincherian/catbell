@@ -903,8 +903,9 @@ end;
 procedure TfraTimer.AdjustTimer(Sender: TObject);
 var
   Hours, Mins, Secs: word;
-  NewEndTickCount, NewPendingTickCount, currTickCount, Adjustment: longword;
+  NewEndTickCount, NewPendingTickCount, CurrTickCount, Adjustment: longword;
   Diff: Int64;
+  EndTime: TDateTime;
 begin
 
   // If the timer is not running, there is nothing to do
@@ -1010,7 +1011,34 @@ begin
     ADJUST_STOPBY:
     begin
       ;//Diff := MilliSecondsBetween(Now, frmTimerAdjust.dtpTill.DateTime);
+      CurrTickCount:=GetTickCount64;
+      if CurrTickCount >= FEndTickCount then
+        Exit;
+      EndTime :=  IncMilliSecond(Now, (FEndTickCount - CurrTickCount));
 
+      // If extension
+      if EndTime < frmTimerAdjust.dtpTill.DateTime then
+      begin
+        Diff := MilliSecondsBetween(EndTime, frmTimerAdjust.dtpTill.DateTime);
+        Inc(FEndTickCount, Diff);
+        Inc(FOrigTickDuration, Diff);
+      end
+      else // If shortening
+      begin
+        Diff := MilliSecondsBetween(frmTimerAdjust.dtpTill.DateTime, EndTime);
+        NewEndTickCount:=FEndTickCount - Diff;
+        if NewEndTickCount <= CurrTickCount then
+        begin
+          if MessageDlg('Confirm', 'This will stop the timer',
+            mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+          begin
+            Exit;
+          end;
+        end;
+        FEndTickCount:=NewEndTickCount;
+      end;
+      HandleTimerTrigger();
+      frmTimerAdjust.Close;
     end;
   end;
 end;
