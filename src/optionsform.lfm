@@ -61,51 +61,51 @@ object frmOptions: TfrmOptions
     OnChange = PageControl1Change
     object tsInterface: TTabSheet
       Caption = 'Interface'
-      ClientHeight = 245
-      ClientWidth = 416
+      ClientHeight = 246
+      ClientWidth = 422
       ImageIndex = 1
       object GroupBox1: TGroupBox
         Left = 8
         Height = 88
         Top = 8
-        Width = 392
+        Width = 398
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Application'
-        ClientHeight = 70
-        ClientWidth = 388
+        ClientHeight = 74
+        ClientWidth = 396
         TabOrder = 0
         object ckbQueryExit: TCheckBox
           Left = 16
-          Height = 17
+          Height = 18
           Top = 8
-          Width = 173
+          Width = 202
           Caption = 'Prompt before exiting appliation'
           TabOrder = 0
         end
         object ckbTimerTitleEditable: TCheckBox
           Left = 16
-          Height = 17
+          Height = 18
           Top = 32
-          Width = 185
+          Width = 217
           Caption = 'Allow in-place editing of timer title.'
           TabOrder = 1
         end
       end
       object GroupBox2: TGroupBox
         Left = 8
-        Height = 120
+        Height = 121
         Top = 104
-        Width = 392
+        Width = 398
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Modal timer completion alert'
-        ClientHeight = 102
-        ClientWidth = 388
+        ClientHeight = 107
+        ClientWidth = 396
         TabOrder = 1
         object Label3: TLabel
           Left = 13
           Height = 13
           Top = 10
-          Width = 98
+          Width = 118
           Caption = 'Background colour : '
           ParentColor = False
         end
@@ -162,8 +162,8 @@ object frmOptions: TfrmOptions
     end
     object tsTimers: TTabSheet
       Caption = 'Timers'
-      ClientHeight = 245
-      ClientWidth = 416
+      ClientHeight = 246
+      ClientWidth = 422
       ImageIndex = 0
       object Defaults: TGroupBox
         Left = 8
@@ -172,8 +172,8 @@ object frmOptions: TfrmOptions
         Width = 392
         Anchors = [akTop, akLeft, akRight]
         Caption = 'For new timers'
-        ClientHeight = 70
-        ClientWidth = 388
+        ClientHeight = 74
+        ClientWidth = 390
         TabOrder = 0
         object Label1: TLabel
           Left = 13
@@ -230,8 +230,8 @@ object frmOptions: TfrmOptions
         Width = 393
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Alerts'
-        ClientHeight = 110
-        ClientWidth = 389
+        ClientHeight = 114
+        ClientWidth = 391
         TabOrder = 2
         object cbTrayAlert: TCheckBox
           Left = 13
