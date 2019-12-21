@@ -95,6 +95,7 @@
         <Filename Value="adjustform.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmTimerAdjust"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit9>
     </Units>

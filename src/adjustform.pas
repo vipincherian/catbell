@@ -36,11 +36,12 @@ type
     bbApply: TBitBtn;
     cmbOptions: TComboBox;
     dtpAdjust: TDateTimePicker;
+    procedure bbApplyClick(Sender: TObject);
     procedure cmbOptionsChange(Sender: TObject);
   private
 
   public
-
+    OnAdjust: TNotifyEvent;
   end;
 
 var
@@ -66,6 +67,12 @@ begin
     ADJUST_STOPBY:
       dtpAdjust.Kind := dtkDateTime;
   end;
+end;
+
+procedure TfrmTimerAdjust.bbApplyClick(Sender: TObject);
+begin
+  if OnAdjust <> Nil then
+    OnAdjust(Self);
 end;
 
 end.

@@ -26,7 +26,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings, editform, graphics, math, LazLogger, adjustform;
+  Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
+  editform, Graphics, Math, LazLogger, adjustform;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -132,6 +133,7 @@ type
     function GetId: longword;
     procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
+    procedure UpdateProgress(const PendingMilliseconds: longword);
     //procedure SetNotifier(AValue: boolean);
     {function GetTop: integer;
     procedure SetTop(AValue: integer);
@@ -154,6 +156,7 @@ type
     OnTimerPause: TNotifyEvent;
     OnTimerStop: TNotifyEvent;
     OnTimerProgressUpdate: TNotifyEvent;
+
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
     CallbackOnProgressOnIconChange: boolean;
@@ -178,6 +181,7 @@ type
     procedure PublishProgress(Percent: single);
     //procedure AddSubscription(aObserver: ITimerObserver);
     //procedure RemoveSubscription(aObserver: ITimerObserver);
+    procedure AdjustTimer(Sender: TObject);
 
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
@@ -265,23 +269,24 @@ end;
 
 procedure TfraTimer.aiEditExecute(Sender: TObject);
 var
-  Hour, Min, Sec, Milli : Word;
+  Hour, Min, Sec, Milli: word;
 begin
-  frmEditTimer.Description:=edtTitle.Text;
-  frmEditTimer.Duration:=dtpSet.Time;
-  frmEditTimer.TrayNotification:= FTrayNotification;
-  frmEditTimer.ModalAlert:=FModalAlert;
+  frmEditTimer.Description := edtTitle.Text;
+  frmEditTimer.Duration := dtpSet.Time;
+  frmEditTimer.TrayNotification := FTrayNotification;
+  frmEditTimer.ModalAlert := FModalAlert;
   if frmEditTimer.ShowForEdit then
   begin
-    Caption:=frmEditTimer.Description;
-    dtpSet.Time:= frmEditTimer.Duration;
-    FTrayNotification:=frmEditTimer.TrayNotification;
-    FModalAlert:=frmEditTimer.ModalAlert;
+    Caption := frmEditTimer.Description;
+    dtpSet.Time := frmEditTimer.Duration;
+    FTrayNotification := frmEditTimer.TrayNotification;
+    FModalAlert := frmEditTimer.ModalAlert;
   end;
 end;
 
 procedure TfraTimer.aiAdjustExecute(Sender: TObject);
 begin
+  frmTimerAdjust.OnAdjust := @AdjustTimer;
   frmTimerAdjust.ShowModal;
 end;
 
@@ -416,8 +421,9 @@ end;
 
 procedure TfraTimer.SetModalAlert(AValue: boolean);
 begin
-  if FModalAlert=AValue then Exit;
-  FModalAlert:=AValue;
+  if FModalAlert = AValue then
+    Exit;
+  FModalAlert := AValue;
 end;
 
 procedure TfraTimer.SetPauseButtonEnabled(AValue: boolean);
@@ -447,18 +453,58 @@ end;
 
 procedure TfraTimer.SetTitleEditable(AValue: boolean);
 begin
-  FTitleEditable:=AValue;
-  edtTitle.ReadOnly:=(not AValue);
+  FTitleEditable := AValue;
+  edtTitle.ReadOnly := (not AValue);
   if Avalue then
-    edtTitle.Color:=clDefault
+    edtTitle.Color := clDefault
   else
-    edtTitle.Color:=clForm;
+    edtTitle.Color := clForm;
 end;
 
 procedure TfraTimer.SetTrayNotification(AValue: boolean);
 begin
-  if FTrayNotification=AValue then Exit;
-  FTrayNotification:=AValue;
+  if FTrayNotification = AValue then
+    Exit;
+  FTrayNotification := AValue;
+end;
+
+procedure TfraTimer.UpdateProgress(const PendingMilliseconds: longword);
+var
+  ProgressPercentage: single;
+  CounterText: string;
+  Seconds: integer;
+  Minutes: integer;
+  Hours: integer;
+  Elapsed: longword;
+begin
+  Elapsed := Ceil(PendingMilliseconds / 1000);
+  //WriteLn('Elapsed in ms is ' + IntToStr(PendingMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
+
+  Seconds := Elapsed mod 60;
+  Minutes := Elapsed div 60;
+  Hours := Minutes div 60;
+  Minutes := Minutes mod 60;
+  CounterText := Format('%.2d', [Hours]) + ':' + Format('%.2d', [Minutes]) +
+    ':' + Format('%.2d', [Seconds]);
+
+  if Counter <> CounterText then
+    Counter := CounterText;
+
+  // Calculate percentage ProgressPercentage
+  if IsProgressOnIcon then
+  begin
+    ProgressPercentage := 1 - (PendingMilliseconds / FOrigTickDuration);
+    // Elapsed time can exceed total pending tick duration, in certain cases.
+    // The system could go on sleep mode while a timer is running
+    // (and while the timer event is being processed) and on
+    // waking up, the pre-caculated tick duration could have already been
+    // overshot. If that is the case, mark ProgressPercentage as zero, and the next
+    // timer event will mark it as completed.
+    if ProgressPercentage < 0 then
+      ProgressPercentage := 0;
+    Assert(ProgressPercentage <= 1);
+    PUblishProgress(1 - (PendingMilliseconds / FOrigTickDuration));
+  end;
 end;
 
 {procedure TfraTimer.SetNotifier(AValue: boolean);
@@ -580,7 +626,7 @@ constructor TfraTimer.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FId := 0;
-  FProgress:=0.0;
+  FProgress := 0.0;
   //teSet.Time := EncodeTime(0, GlobalDefault.TimerInitMins, 0, 0);
   with GlobalUserConfig do
   begin
@@ -655,15 +701,8 @@ end;
 
 procedure TfraTimer.HandleTimerTrigger();
 var
-  Elapsed: longword;
-  ElapsedMilliseconds: longword;
+  PendingMilliseconds: longword;
   CurrTickCount: longword;
-  Hours: integer;
-  Minutes: integer;
-  Seconds: integer;
-  //Observer: ITimerObserver;
-  CounterText: string;
-  ProgressPercentage: single;
 begin
   { If the countdown timer is not running, then default to 00:00:00}
   //if FRunning = False then
@@ -685,35 +724,8 @@ begin
       Finish;
       Exit;
     end;
-    ElapsedMilliseconds := FEndTickCount - CurrTickCount;
-    Elapsed := Ceil(ElapsedMilliseconds / 1000);
-    //WriteLn('Elapsed in ms is ' + IntToStr(ElapsedMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
-
-    Seconds := Elapsed mod 60;
-    Minutes := Elapsed div 60;
-    Hours := Minutes div 60;
-    Minutes := Minutes mod 60;
-    CounterText := Format('%.2d', [Hours]) + ':' + Format('%.2d', [Minutes]) +
-      ':' + Format('%.2d', [Seconds]);
-
-    if Counter <> CounterText then
-      Counter := CounterText;
-
-    // Calculate percentage ProgressPercentage
-    if IsProgressOnIcon then
-    begin
-      ProgressPercentage := 1 - (ElapsedMilliseconds / FOrigTickDuration);
-      // Elapsed time can exceed total pending tick duration, in certain cases.
-      // The system could go on sleep mode while a timer is running
-      // (and while the timer event is being processed) and on
-      // waking up, the pre-caculated tick duration could have already been
-      // overshot. If that is the case, mark ProgressPercentage as zero, and the next
-      // timer event will mark it as completed.
-      if ProgressPercentage < 0 then
-        ProgressPercentage := 0;
-      Assert(ProgressPercentage <= 1);
-      PUblishProgress(1 - (ElapsedMilliseconds / FOrigTickDuration));
-    end;
+    PendingMilliseconds := FEndTickCount - CurrTickCount;
+    UpdateProgress(PendingMilliseconds);
 
   end;
 end;
@@ -770,8 +782,8 @@ begin
 
   //end;
 
-  if OnTimerStart <> Nil then
-     OnTimerStart(Self);
+  if OnTimerStart <> nil then
+    OnTimerStart(Self);
 
 end;
 
@@ -792,8 +804,8 @@ begin
   StopButtonEnabled := True;
   DurationEnabled := False;
   //end;
-  if OnTimerPause <> Nil then
-     OnTimerPause(Self);
+  if OnTimerPause <> nil then
+    OnTimerPause(Self);
 
 end;
 
@@ -849,7 +861,7 @@ begin
   //DebugLn('Entering TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
   Stop(Self);
 
-  if OnTimerStop <> Nil then
+  if OnTimerStop <> nil then
     OnTimerStop(Self);
   {for Observer in FObservers do
   begin
@@ -868,10 +880,119 @@ procedure TfraTimer.PublishProgress(Percent: single);
 begin
   //for Observer in FObservers do
   //  Observer.ProgressUpdate(Percent);
-  FProgress:=Percent;
-  if OnTimerProgressUpdate <> Nil then
+  FProgress := Percent;
+  if OnTimerProgressUpdate <> nil then
     OnTimerProgressUpdate(Self);
 
+end;
+
+procedure TfraTimer.AdjustTimer(Sender: TObject);
+var
+  Hours, Mins, Secs: word;
+  NewEndTickCount, NewPendingTickCount, currTickCount, Adjustment: longword;
+begin
+
+  if not FRunning then
+  begin
+    frmTimerAdjust.Close;
+    Exit;
+  end;
+
+  case frmTimerAdjust.cmbOptions.ItemIndex of
+    ADJUST_SHORTEN:
+      //frmTimerAdjust.dtpAdjust.Time:=;
+    begin
+      Hours := HourOf(frmTimerAdjust.dtpAdjust.Time);
+      Mins := MinuteOf(frmTimerAdjust.dtpAdjust.Time);
+      Secs := SecondOf(frmTimerAdjust.dtpAdjust.Time);
+
+      if (Hours = 0) and (Mins = 0) and (Secs = 0) then
+      begin
+        frmTimerAdjust.Close;
+        Exit;
+      end;
+
+      Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
+        longword(Secs)) * 1000);
+      if FPaused = False then
+      begin
+        if Adjustment > FEndTickCount then
+        begin
+          if MessageDlg('Confirm', 'This will stop the timer',
+            mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+            Exit;
+          // Adjustment is too large and cannot be used for computations
+          // As a circumvention, set NewEndTickCount to 0;
+          NewEndTickCount := 0;
+        end
+        else
+        begin
+          NewEndTickCount := FEndTickCount - Adjustment;
+          CurrTickCount := GetTickCount64;
+          if CurrTickCount >= NewEndTickCount then
+          begin
+            if MessageDlg('Confirm', 'This will stop the timer',
+              mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+              Exit;
+          end;
+        end;
+        FEndTickCount := NewEndTickCount;
+        HandleTimerTrigger();
+      end
+      else  // If paused
+      begin
+        if Adjustment > FPendingTickCount then
+        begin
+          if MessageDlg('Confirm', 'This will stop the timer',
+            mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+            Exit;
+          // Adjustment is too large and cannot be used for computations
+          // As a circumvention, set NewEndTickCount to 0;
+          NewPendingTickCount := 0;
+        end
+        else
+        begin
+          NewPendingTickCount := FPendingTickCount - Adjustment;
+        end;
+        FPendingTickCount := NewPendingTickCount;
+        UpdateProgress(FPendingTickCount);
+      end;
+      frmTimerAdjust.Close;
+    end;
+    ADJUST_EXTEND:
+    begin
+      Hours := HourOf(frmTimerAdjust.dtpAdjust.Time);
+      Mins := MinuteOf(frmTimerAdjust.dtpAdjust.Time);
+      Secs := SecondOf(frmTimerAdjust.dtpAdjust.Time);
+
+      if (Hours = 0) and (Mins = 0) and (Secs = 0) then
+      begin
+        frmTimerAdjust.Close;
+        Exit;
+      end;
+
+      Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
+        longword(Secs)) * 1000);
+      Inc(FOrigTickDuration, Adjustment);
+      if FPaused = False then
+      begin
+        //FEndTickCount:= FEndTickCount + Adjustment;
+        Inc(FEndTickCount, Adjustment);
+        //FOrigTickDuration := FOrigTickDuration + Adjustment;
+        HandleTimerTrigger();
+      end
+      else
+      begin
+        //FPendingTickCount:=FPendingTickCount + Adjustment;
+        Inc(FPendingTickCount, Adjustment);
+        //FOrigTickDuration := FOrigTickDuration + Adjustment;
+        UpdateProgress(FPendingTickCount);
+      end;
+      frmTimerAdjust.Close;
+    end;
+    ADJUST_STOPBY:
+      ;//dtpAdjust.Kind := dtkDateTime;
+  end;
 end;
 
 {procedure TfraTimer.AddSubscription(aObserver: ITimerObserver);
