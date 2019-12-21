@@ -297,6 +297,7 @@ begin
     if frmTimerAdjust.cmbOptions.Items.Count = 3 then
       frmTimerAdjust.cmbOptions.Items.Delete(ADJUST_STOPBY);
   end;
+  frmTimerAdjust.cmbOptions.ItemIndex:=0;
   frmTimerAdjust.ShowModal;
 end;
 
