@@ -20,3 +20,5 @@ alert_tray_on.svg|24
 notify_progress_on.svg|24
 notify_progress_off.svg|24
 notify_progress_auto.svg|24
+pencil.svg|24
+wrench.svg|24

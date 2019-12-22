@@ -14,8 +14,11 @@
    viewBox="0 0 177.16535 177.16535"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="pause.svg">
+   inkscape:version="0.92.4 (unknown)"
+   sodipodi:docname="pause.svg"
+   inkscape:export-filename="J:\work\fpc\catbell\res\controls\play.png"
+   inkscape:export-xdpi="12.218804"
+   inkscape:export-ydpi="12.218804">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -25,11 +28,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="70.85221"
-     inkscape:cy="22.947229"
+     inkscape:zoom="0.7"
+     inkscape:cx="-138.86358"
+     inkscape:cy="191.39021"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:object-paths="true"
      inkscape:snap-intersection-paths="true"
@@ -38,10 +41,15 @@
      inkscape:snap-midpoints="true"
      inkscape:snap-nodes="false"
      inkscape:window-width="1366"
-     inkscape:window-height="697"
-     inkscape:window-x="-4"
-     inkscape:window-y="-4"
-     inkscape:window-maximized="1" />
+     inkscape:window-height="723"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:bbox-nodes="true"
+     inkscape:bbox-paths="true" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -50,7 +58,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -61,42 +69,32 @@
      transform="translate(0,-875.19685)"
      style="display:inline">
     <circle
-       style="opacity:1;fill:#e8ae42;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="path4136"
-       cx="88.582664"
+       style="display:inline;opacity:1;fill:#5795be;fill-opacity:1;fill-rule:evenodd;stroke:#515151;stroke-width:11.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4136-3"
+       cx="88.582672"
        cy="963.77954"
-       r="88.388351" />
+       r="80.575455" />
+    <circle
+       style="opacity:1;fill:#e8ae42;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:6.3812499;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4136"
+       cx="88.723488"
+       cy="963.76416"
+       r="80.575455" />
     <path
-       style="opacity:1;fill:#e8ae42;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 86.599609,883.41797 c -43.178012,-0.0583 -81.414032,40.53358 -78.4257809,83.69336 1.4086969,38.60217 33.6534909,74.05637 72.6484379,76.74607 35.066084,3.3323 71.480654,-18.3008 83.169924,-51.96092 13.12969,-34.93743 -1.07357,-78.65568 -34.14588,-96.99673 -13.00021,-7.7256 -28.01823,-11.82582 -43.246701,-11.48178 z"
-       id="circle4138"
-       inkscape:connector-curvature="0" />
-    <path
-       style="opacity:1;fill:#ffffff;fill-opacity:0.39215686;fill-rule:evenodd;stroke:none;stroke-width:7;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 88.582031,8.2128906 c -0.660739,-0.00177 -1.32074,-0.00714 -1.982422,0.00781 C 43.421592,8.1624031 5.1855767,48.754277 8.1738281,91.914062 9.5825252,130.51624 41.827314,165.97046 80.822266,168.66016 c 2.582904,0.24545 5.172649,0.33863 7.759765,0.31836 l 0,-160.7656294 z"
-       transform="translate(0,875.19685)"
-       id="path4159"
+       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:0.39215687;fill-rule:evenodd;stroke:none;stroke-width:6.3812499;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 88.723488,883.1886 A 80.575454,80.575454 0 0 0 8.1479248,963.76416 80.575454,80.575454 0 0 0 88.723488,1044.3397 Z"
+       id="path4136-6"
        inkscape:connector-curvature="0" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="hollow_control"
-     style="display:none">
-    <path
-       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 135.84414,88.582671 -75.062692,-41.436554 0,41.436554 0,41.436549 75.062692,-41.436549 z"
-       id="path4154"
-       inkscape:connector-curvature="0" />
-  </g>
-  <g
-     style="display:inline"
-     inkscape:label="pause_button"
-     id="g4215"
-     inkscape:groupmode="layer">
+     style="display:inline">
     <g
+       style="display:inline"
        id="g4238"
-       transform="translate(-2.737849,0)">
+       transform="translate(-2.7378413,6.0197245e-6)">
       <rect
          y="47.042061"
          x="56.900463"
