@@ -298,6 +298,8 @@ begin
       frmTimerAdjust.cmbOptions.Items.Delete(ADJUST_STOPBY);
   end;
   frmTimerAdjust.cmbOptions.ItemIndex:=0;
+  frmTimerAdjust.dtpDiff.Show;
+  frmTimerAdjust.dtpTill.Hide;
   frmTimerAdjust.ShowModal;
 end;
 
