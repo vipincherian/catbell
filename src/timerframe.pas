@@ -275,7 +275,7 @@ begin
   frmEditTimer.Duration := dtpSet.Time;
   frmEditTimer.TrayNotification := FTrayNotification;
   frmEditTimer.ModalAlert := FModalAlert;
-  if frmEditTimer.ShowForEdit then
+  if frmEditTimer.ShowForEdit(Self) then
   begin
     Caption := frmEditTimer.Description;
     dtpSet.Time := frmEditTimer.Duration;
@@ -801,6 +801,9 @@ begin
   if OnTimerStart <> nil then
     OnTimerStart(Self);
 
+  if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
+    frmEditTimer.dtpDuration.Enabled:=True;
+
 end;
 
 procedure TfraTimer.Pause(Sender: TObject);
@@ -851,6 +854,9 @@ begin
   FEndTickCount := 0;
   FOrigTickDuration := 0;
   FStartTickCount := 0;
+
+  if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
+    frmEditTimer.dtpDuration.Enabled:=True;
 end;
 
 {procedure TfraTimer.NotifyChange(Sender: TObject);

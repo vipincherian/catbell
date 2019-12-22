@@ -33,7 +33,7 @@ object frmTimerAdjust: TfrmTimerAdjust
     Width = 75
     Caption = 'Apply'
     OnClick = bbApplyClick
-    TabOrder = 1
+    TabOrder = 3
   end
   object dtpDiff: TDateTimePicker
     Left = 8
@@ -43,7 +43,7 @@ object frmTimerAdjust: TfrmTimerAdjust
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
-    TabOrder = 2
+    TabOrder = 1
     TrailingSeparator = False
     TextForNullDate = 'NULL'
     LeadingZeros = True
@@ -65,7 +65,7 @@ object frmTimerAdjust: TfrmTimerAdjust
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
-    TabOrder = 3
+    TabOrder = 2
     TrailingSeparator = False
     TextForNullDate = 'NULL'
     LeadingZeros = True

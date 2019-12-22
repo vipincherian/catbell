@@ -66,6 +66,7 @@ type
     procedure edtDescriptionChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FProceed: boolean;
     //FSpecs: TTimerSpecs;
@@ -73,6 +74,7 @@ type
     FDescription: string;
     FModalAlert: boolean;
     FTrayNotification: boolean;
+    FId: longword;
     procedure SetDescription(AValue: string);
     procedure SetDuration(AValue: TTime);
     procedure SetFTrayNotification(AValue: boolean);
@@ -80,13 +82,14 @@ type
     function Validate: boolean;
   public
     function ShowAndGetSpecs: boolean;
-    function ShowForAdd:boolean;
-    function ShowForEdit:boolean;
+    function ShowForAdd :boolean;
+    function ShowForEdit (Sender: TFrame):boolean;
     //property Specs: TTimerSpecs read FSpecs;
     property Duration: TTime read FDuration write SetDuration;
     property Description: string read FDescription write SetDescription;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
     property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
+    property Id: longword read FId;
   end;
 
 
@@ -94,6 +97,9 @@ var
   frmEditTimer: TfrmEditTimer;
 
 implementation
+
+uses
+  timerframe;
 
 {$R *.lfm}
 
@@ -144,8 +150,8 @@ begin
 end;
 
 procedure TfrmEditTimer.bbSaveClick(Sender: TObject);
-var
-  Hour, Min, Sec, Milli : Word;
+{var
+  Hour, Min, Sec, Milli : Word;}
 begin
   FDescription:=edtDescription.Text;
   {DecodeTime(dtpDuration.Time, Hour, Min, Sec, Milli);
@@ -177,6 +183,11 @@ end;
 procedure TfrmEditTimer.FormDestroy(Sender: TObject);
 begin
   //FSpecs.Free;
+end;
+
+procedure TfrmEditTimer.FormShow(Sender: TObject);
+begin
+
 end;
 
 function TfrmEditTimer.Validate: boolean;
@@ -243,13 +254,23 @@ end;
 function TfrmEditTimer.ShowForAdd: boolean;
 begin
   Self.Caption:='Add Timer';
+  FId := longword(-1);
   Result:=ShowAndGetSpecs;
 end;
 
-function TfrmEditTimer.ShowForEdit: boolean;
+function TfrmEditTimer.ShowForEdit(Sender: TFrame): boolean;
+var
+  Widget: TfraTimer;
 begin
-  Self.Caption:='Edit Timer';
+  if Sender = Nil then
+    Exit;
+  Widget := TfraTimer(Sender);
+  Fid := Widget.Id;
+  Caption:='Edit Timer';
+  if Widget.Running then
+    dtpDuration.Enabled:=False;
   Result:=ShowAndGetSpecs;
+  FId := longword(-1);
 end;
 
 end.
