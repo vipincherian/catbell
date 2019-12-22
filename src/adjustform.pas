@@ -34,10 +34,12 @@ type
 
   TfrmTimerAdjust = class(TForm)
     bbApply: TBitBtn;
+    bbCancel: TBitBtn;
     cmbOptions: TComboBox;
     dtpDiff: TDateTimePicker;
     dtpTill: TDateTimePicker;
     procedure bbApplyClick(Sender: TObject);
+    procedure bbCancelClick(Sender: TObject);
     procedure cmbOptionsChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -107,6 +109,11 @@ procedure TfrmTimerAdjust.bbApplyClick(Sender: TObject);
 begin
   if OnAdjust <> nil then
     OnAdjust(Self);
+end;
+
+procedure TfrmTimerAdjust.bbCancelClick(Sender: TObject);
+begin
+  Close;
 end;
 
 end.

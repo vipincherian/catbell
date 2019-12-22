@@ -27,7 +27,7 @@ object frmTimerAdjust: TfrmTimerAdjust
     Text = 'Shorten timer by'
   end
   object bbApply: TBitBtn
-    Left = 115
+    Left = 224
     Height = 30
     Top = 72
     Width = 75
@@ -78,5 +78,14 @@ object frmTimerAdjust: TfrmTimerAdjust
     UseDefaultSeparators = True
     HideDateTimeParts = []
     MonthNames = 'Long'
+  end
+  object bbCancel: TBitBtn
+    Left = 8
+    Height = 30
+    Top = 72
+    Width = 75
+    Caption = 'Cancel'
+    OnClick = bbCancelClick
+    TabOrder = 4
   end
 end
