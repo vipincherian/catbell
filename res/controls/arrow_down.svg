@@ -14,7 +14,7 @@
    viewBox="0 0 177.16535 177.16535"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.4 (unknown)"
    sodipodi:docname="arrow_down.svg">
   <defs
      id="defs4" />
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.8083334"
-     inkscape:cx="8.8045082"
-     inkscape:cy="67.104254"
+     inkscape:cx="14.153581"
+     inkscape:cy="75.088733"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -45,9 +45,9 @@
      inkscape:snap-midpoints="true"
      inkscape:bbox-nodes="true"
      inkscape:window-width="1366"
-     inkscape:window-height="697"
-     inkscape:window-x="-4"
-     inkscape:window-y="-4"
+     inkscape:window-height="723"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -57,7 +57,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -67,13 +67,18 @@
      id="layer1"
      transform="translate(0,-875.19688)">
     <path
-       style="opacity:1;fill:#5795be;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 88.583743,1020.9264 c -6.821678,0 -13.643052,-2.6138 -18.870174,-7.8409 L 8.8396799,952.21375 c -10.4542478,-10.45424 -10.4542446,-27.2861 0,-37.74035 10.4542451,-10.4542 27.2861021,-10.4542 37.7403491,0 L 88.583743,956.47498 130.5853,914.4734 c 10.45426,-10.4542 27.28611,-10.4542 37.74036,0 10.45424,10.45425 10.45424,27.28611 0,37.74035 l -60.87175,60.87175 c -5.22712,5.2271 -12.048488,7.8409 -18.870167,7.8409 z"
+       style="opacity:1;fill:#5795be;fill-opacity:1;fill-rule:evenodd;stroke:#404040;stroke-width:11.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 88.583662,1016.6196 c -6.31035,0 -12.62042,-2.4179 -17.45573,-7.2532 L 14.816917,953.05736 c -9.6706302,-9.67057 -9.6706302,-25.24087 0,-34.91146 9.67064,-9.6706 25.240835,-9.6706 34.911475,0 l 38.85527,38.85326 38.853288,-38.85326 c 9.67065,-9.6706 25.24085,-9.6706 34.91148,0 9.67063,9.67059 9.67063,25.24089 0,34.91146 l -56.30904,56.30904 c -4.83532,4.8353 -11.145378,7.2532 -17.455728,7.2532 z"
+       id="rect5024-5"
+       inkscape:connector-curvature="0" />
+    <path
+       style="opacity:1;fill:#5795be;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.92504376;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 88.583671,1016.6196 c -6.310351,0 -12.62042,-2.4179 -17.455737,-7.2532 L 14.816921,953.05736 c -9.6706375,-9.67064 -9.6706345,-25.24088 0,-34.91146 9.670634,-9.6706 25.240839,-9.6706 34.911475,0 l 38.855275,38.85327 38.853279,-38.85327 c 9.67065,-9.6706 25.24085,-9.6706 34.91148,0 9.67063,9.67058 9.67063,25.24082 0,34.91146 l -56.30903,56.30904 c -4.83532,4.8353 -11.145377,7.2532 -17.455729,7.2532 z"
        id="rect5024"
        inkscape:connector-curvature="0" />
     <path
-       style="opacity:1;fill:#ffffff;fill-opacity:0.31372549;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 88.581593,1020.9264 c -6.82096,-6e-4 -13.641451,-2.6143 -18.868024,-7.8409 L 8.8396744,952.21375 c -10.4542437,-10.45425 -10.4542327,-27.28615 0,-37.74035 10.4542546,-10.4542 27.2861076,-10.4542 37.7403546,0 l 42.001564,41.99942 0,64.45358 z"
+       style="opacity:1;fill:#ffffff;fill-opacity:0.31372549;fill-rule:evenodd;stroke:none;stroke-width:0.92504376;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 88.581682,1016.6195 c -6.309686,-5e-4 -12.618939,-2.4183 -17.453748,-7.2531 L 14.816916,953.05736 c -9.6706338,-9.67065 -9.6706236,-25.24088 0,-34.91146 9.670643,-9.6706 25.240844,-9.6706 34.91148,0 l 38.853286,38.85127 z"
        id="rect5024-9"
        inkscape:connector-curvature="0" />
   </g>

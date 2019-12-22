@@ -267,8 +267,8 @@ begin
   Widget := TfraTimer(Sender);
   Fid := Widget.Id;
   Caption:='Edit Timer';
-  if Widget.Running then
-    dtpDuration.Enabled:=False;
+  //if Widget.Running then
+  dtpDuration.Enabled:=(not Widget.Running);
   Result:=ShowAndGetSpecs;
   FId := longword(-1);
 end;
