@@ -2,15 +2,15 @@ object MainForm: TMainForm
   Left = 347
   Height = 336
   Top = 174
-  Width = 726
+  Width = 654
   HorzScrollBar.Page = 152
   HorzScrollBar.Range = 152
   VertScrollBar.Page = 152
   VertScrollBar.Range = 152
   ActiveControl = pnlBorder
-  Caption = 'CAT Bell'
+  Caption = 'Catbell'
   ClientHeight = 315
-  ClientWidth = 726
+  ClientWidth = 654
   Menu = mmMain
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
@@ -23,7 +23,7 @@ object MainForm: TMainForm
     Left = 0
     Height = 34
     Top = 0
-    Width = 726
+    Width = 654
     ButtonHeight = 30
     ButtonWidth = 31
     Caption = 'tlbMain'
@@ -154,19 +154,19 @@ object MainForm: TMainForm
     Left = 8
     Height = 247
     Top = 40
-    Width = 664
+    Width = 592
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlBorder'
     ClientHeight = 247
-    ClientWidth = 664
+    ClientWidth = 592
     TabOrder = 1
     object pnlClocks: TPanel
       Left = 1
       Height = 245
       Top = 1
-      Width = 662
+      Width = 590
       Align = alClient
       BevelOuter = bvNone
       Caption = 'pnlClocks'
@@ -177,19 +177,19 @@ object MainForm: TMainForm
       Left = 1
       Height = 245
       Top = 1
-      Width = 662
+      Width = 590
       HorzScrollBar.Page = 170
       VertScrollBar.Page = 24
       Align = alClient
       BorderStyle = bsNone
       ClientHeight = 245
-      ClientWidth = 662
+      ClientWidth = 590
       TabOrder = 1
       object hdrTimers: THeaderControl
         Left = 0
         Height = 24
         Top = 0
-        Width = 662
+        Width = 590
         DragReorder = False
         Sections = <        
           item
@@ -236,15 +236,15 @@ object MainForm: TMainForm
     Left = 0
     Height = 15
     Top = 300
-    Width = 726
+    Width = 654
     Panels = <>
   end
   object bbDelete: TBitBtn
-    Left = 680
-    Height = 30
+    Left = 613
+    Height = 32
     Hint = 'Delete the sected timer(s)'
     Top = 177
-    Width = 37
+    Width = 32
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
     Images = ilMain
@@ -254,11 +254,11 @@ object MainForm: TMainForm
     TabOrder = 3
   end
   object bbMoveUp: TBitBtn
-    Left = 680
-    Height = 30
+    Left = 613
+    Height = 32
     Hint = 'Move the selected timer(s) up'
     Top = 217
-    Width = 37
+    Width = 32
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
     Images = ilMain
@@ -268,11 +268,11 @@ object MainForm: TMainForm
     TabOrder = 4
   end
   object bbMoveDown: TBitBtn
-    Left = 680
-    Height = 30
+    Left = 613
+    Height = 32
     Hint = 'Move the selected timer(s) down'
     Top = 257
-    Width = 37
+    Width = 32
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
     Images = ilMain

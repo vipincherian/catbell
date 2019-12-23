@@ -27,20 +27,24 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls;
+  StdCtrls, ComCtrls, Buttons;
 
 type
 
   { TfrmAbout }
 
   TfrmAbout = class(TForm)
+    bbClose: TBitBtn;
     Image1: TImage;
-    StaticText1: TStaticText;
-    StaticText2: TStaticText;
-    StaticText3: TStaticText;
-    StaticText4: TStaticText;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Panel1: TPanel;
+    procedure bbCloseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Image1Click(Sender: TObject);
+    procedure Label4Click(Sender: TObject);
     procedure StaticText1Click(Sender: TObject);
     procedure StaticText3Click(Sender: TObject);
   private
@@ -63,9 +67,19 @@ begin
 
 end;
 
+procedure TfrmAbout.Label4Click(Sender: TObject);
+begin
+
+end;
+
 procedure TfrmAbout.FormDestroy(Sender: TObject);
 begin
 
+end;
+
+procedure TfrmAbout.bbCloseClick(Sender: TObject);
+begin
+  Close;
 end;
 
 procedure TfrmAbout.StaticText1Click(Sender: TObject);
