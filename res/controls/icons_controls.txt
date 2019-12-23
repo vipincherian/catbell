@@ -15,10 +15,6 @@ eye.svg|16
 home.svg|16
 cancel.svg|16
 hourglass_flat.svg|16,24_g
-alert_modal_on.svg|24
-alert_tray_on.svg|24
-notify_progress_on.svg|24
-notify_progress_off.svg|24
 notify_progress_auto.svg|24
 pencil.svg|16,24
 wrench.svg|16,24
