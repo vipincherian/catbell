@@ -4,7 +4,7 @@ delete.svg|24
 hourglass.svg|16,24,32,48,256
 options.svg|16,24_g
 pause.svg|24
-play.svg|24
+play.svg|24,24_g
 stop.svg|24
 help.svg|16,24
 off.svg|16,24
