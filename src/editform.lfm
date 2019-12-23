@@ -95,7 +95,10 @@ object frmEditTimer: TfrmEditTimer
     Top = 168
     Width = 75
     Anchors = [akLeft, akBottom]
-    Caption = '&Cancel'
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
     OnClick = bbCancelClick
     TabOrder = 7
   end
@@ -105,7 +108,10 @@ object frmEditTimer: TfrmEditTimer
     Top = 168
     Width = 75
     Anchors = [akRight, akBottom]
-    Caption = '&Save'
+    Default = True
+    DefaultCaption = True
+    Kind = bkOK
+    ModalResult = 1
     OnClick = bbSaveClick
     TabOrder = 6
   end

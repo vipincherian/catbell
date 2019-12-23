@@ -31,7 +31,10 @@ object frmTimerAdjust: TfrmTimerAdjust
     Height = 30
     Top = 72
     Width = 75
-    Caption = 'Apply'
+    Default = True
+    DefaultCaption = True
+    Kind = bkOK
+    ModalResult = 1
     OnClick = bbApplyClick
     TabOrder = 3
   end
@@ -84,7 +87,10 @@ object frmTimerAdjust: TfrmTimerAdjust
     Height = 30
     Top = 72
     Width = 75
-    Caption = 'Cancel'
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
     OnClick = bbCancelClick
     TabOrder = 4
   end

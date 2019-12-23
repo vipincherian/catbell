@@ -75,7 +75,7 @@ object fraTimer: TfraTimer
   object bbPlay: TBitBtn
     Left = 415
     Height = 32
-    Hint = 'Start timer'
+    Hint = 'Start the timer'
     Top = 3
     Width = 32
     Action = aiPlay
@@ -90,6 +90,7 @@ object fraTimer: TfraTimer
   object bbPause: TBitBtn
     Left = 451
     Height = 32
+    Hint = 'Pause the timer'
     Top = 3
     Width = 32
     Action = aiPause
@@ -173,11 +174,14 @@ object fraTimer: TfraTimer
     }
     Images = ilTimer
     ImageIndex = 3
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 4
   end
   object bbStop: TBitBtn
     Left = 487
     Height = 32
+    Hint = 'Stop the timer'
     Top = 3
     Width = 32
     Action = aiStop
@@ -261,11 +265,14 @@ object fraTimer: TfraTimer
     }
     Images = ilTimer
     ImageIndex = 4
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 5
   end
   object bbEdit: TBitBtn
     Left = 671
     Height = 32
+    Hint = 'Edit the timer'
     Top = 5
     Width = 32
     Action = aiEdit
@@ -348,6 +355,8 @@ object fraTimer: TfraTimer
     }
     Images = ilTimer
     ImageIndex = 6
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 8
   end
   object ckbIconProgress: TCheckBox
@@ -362,6 +371,7 @@ object fraTimer: TfraTimer
   object bbAdjust: TBitBtn
     Left = 524
     Height = 32
+    Hint = 'Tweak this run of the timer'
     Top = 3
     Width = 32
     Action = aiAdjust
@@ -445,6 +455,8 @@ object fraTimer: TfraTimer
     Images = ilTimer
     ImageIndex = 5
     OnClick = bbAdjustClick
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 6
   end
   object ilTimer: TImageList
