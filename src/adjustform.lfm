@@ -12,10 +12,10 @@ object frmTimerAdjust: TfrmTimerAdjust
   LCLVersion = '2.0.6.0'
   object cmbOptions: TComboBox
     Left = 8
-    Height = 21
+    Height = 23
     Top = 8
     Width = 288
-    ItemHeight = 0
+    ItemHeight = 15
     ItemIndex = 0
     Items.Strings = (
       'Shorten timer by'
@@ -33,6 +33,7 @@ object frmTimerAdjust: TfrmTimerAdjust
     Width = 75
     Default = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkOK
     ModalResult = 1
     OnClick = bbApplyClick
@@ -40,9 +41,9 @@ object frmTimerAdjust: TfrmTimerAdjust
   end
   object dtpDiff: TDateTimePicker
     Left = 8
-    Height = 19
+    Height = 23
     Top = 40
-    Width = 71
+    Width = 65
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -62,9 +63,9 @@ object frmTimerAdjust: TfrmTimerAdjust
   end
   object dtpTill: TDateTimePicker
     Left = 88
-    Height = 19
+    Height = 23
     Top = 40
-    Width = 151
+    Width = 137
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -89,6 +90,7 @@ object frmTimerAdjust: TfrmTimerAdjust
     Width = 75
     Cancel = True
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkCancel
     ModalResult = 2
     OnClick = bbCancelClick
