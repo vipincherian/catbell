@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, math, LazLogger;
+  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages;
 
 const
   FORM_MIN_SIZE = 600;
@@ -74,9 +74,12 @@ const
   TIMER_CONF_COUNT = 'count';
   TIMER_CONF_ORDER = 'order';
 
+  //WM_USER = $400;
+  UM_AFTERSHOW = LM_USER;
+
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
-  TTimerFrameList =  specialize TFPGList<TfraTimer>;
+  TTimerFrameList = specialize TFPGList<TfraTimer>;
   TIdList = specialize TFPGList<longword>;
 
   { TMainForm }
@@ -190,7 +193,7 @@ type
     //procedure SetMoveDownEnabled(AValue: boolean);
     //procedure SetMoveUpEnabled(AValue: boolean);
     //procedure FormShow(Sender: TObject);
-    procedure UpdateAlertFormSettings;
+    //procedure UpdateAlertFormSettings;
     //procedure ExportToFile(Sender: TObject);
     procedure PostTimerCreation(AValue: TfraTimer);
     procedure SetListButtonsStatus;
@@ -248,6 +251,7 @@ type
     procedure MoveSelectedClocksUp;
     procedure MoveSelectedClocksDown;
     procedure OnShortTimer(Sender: TObject);
+    procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
   end;
 
 var
@@ -330,10 +334,10 @@ begin
   FShortTimer.Enabled := False;
   FShortTimer.OnTimer := @OnShortTimer;
 
-  FReference := TfraTimer.Create(Nil);
+  FReference := TfraTimer.Create(nil);
   FReference.Visible := False;
-  FReference.Align:=alNone;
-  FReference.Anchors:=[];
+  FReference.Align := alNone;
+  FReference.Anchors := [];
 
   bmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
 
@@ -419,21 +423,21 @@ begin
   begin
     //dtpSet.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
     //  DefaultTimerSecs, 0);
-    frmEditTimer.Duration:=EncodeTime(DefaultTimerHours, DefaultTimerMins,
+    frmEditTimer.Duration := EncodeTime(DefaultTimerHours, DefaultTimerMins,
       DefaultTimerSecs, 0);
     frmEditTimer.Description := DefaultTimerTitle;
     {TODO: This should be read from config}
-    frmEditTimer.TrayNotification:=ShowTrayAlert;
-    frmEditTimer.ModalAlert:=ShowModalAlert;
+    frmEditTimer.TrayNotification := ShowTrayAlert;
+    frmEditTimer.ModalAlert := ShowModalAlert;
   end;
 
   if frmEditTimer.ShowForAdd then
   begin
     Added := AddTimer;
-    Added.Caption:=frmEditTimer.Description;
-    Added.dtpSet.Time:= frmEditTimer.Duration;
-    Added.ModalAlert:=frmEditTimer.ModalAlert;
-    Added.TrayNotification:=frmEditTimer.TrayNotification;
+    Added.Caption := frmEditTimer.Description;
+    Added.dtpSet.Time := frmEditTimer.Duration;
+    Added.ModalAlert := frmEditTimer.ModalAlert;
+    Added.TrayNotification := frmEditTimer.TrayNotification;
     PostTimerCreation(Added);
   end;
 end;
@@ -458,14 +462,14 @@ begin
   CurrPosNormal.Top := Top;
   CurrPosNormal.Left := Left;
   //CurrPosNormal.Right := CurrPosNormal.Left + Width;
-  CurrPosNormal.Width:=Width;
-  CurrPosNormal.Height:=Height;
+  CurrPosNormal.Width := Width;
+  CurrPosNormal.Height := Height;
   //CurrPosNormal.Bottom := CurrPosNormal.Top + Height;
 
-  CurrPosRestored.Top:=RestoredTop;
-  CurrPosRestored.Left:=RestoredLeft;
-  CurrPosRestored.Width:=RestoredWidth;
-  CurrPosRestored.Height:=RestoredHeight;
+  CurrPosRestored.Top := RestoredTop;
+  CurrPosRestored.Left := RestoredLeft;
+  CurrPosRestored.Width := RestoredWidth;
+  CurrPosRestored.Height := RestoredHeight;
 
   with GlobalUserConfig do
   begin
@@ -474,7 +478,7 @@ begin
     //ShowModalAlert := tbShowModalAlert.Down;
     //ShowTrayAlert := tbShowTrayAlert.Down;
     AutoProgress := tbProgressAuto.Down;
-    LastWindowState:=WindowState;
+    LastWindowState := WindowState;
   end;
 end;
 
@@ -485,7 +489,6 @@ begin
   if GlobalUserConfig.QueryExit then
     CanClose := MessageDlg('Do you really want to close the application?',
       mtConfirmation, [mbYes, mbNo], 0) = mrYes;
-
 
 end;
 
@@ -582,24 +585,23 @@ procedure TMainForm.FormShow(Sender: TObject);
 begin
   with GlobalUserConfig do
   begin
-    if LastWindowState = wsMaximized then begin
+    if LastWindowState = wsMaximized then
+    begin
       WindowState := wsNormal;
-      BoundsRect := Bounds(
-        LastPosRestored.Left,
-        LastPosRestored.Top,
-        LastPosRestored.Width,
-        LastPosRestored.Height);
+      BoundsRect := Bounds(LastPosRestored.Left, LastPosRestored.Top,
+        LastPosRestored.Width, LastPosRestored.Height);
       WindowState := wsMaximized;
     end
     else
     begin
       WindowState := wsNormal;
-      BoundsRect := Bounds(
-        LastPosNormal.Left,
-        LastPosNormal.Top,
-        LastPosNormal.Width,
-        LastPosNormal.Height);
+      BoundsRect := Bounds(LastPosNormal.Left, LastPosNormal.Top,
+        LastPosNormal.Width, LastPosNormal.Height);
     end;
+
+    {if FTimerFrames.Count = 0 then
+      aiNewTimer.Execute;}
+    PostMessage(Handle, UM_AFTERSHOW, 0, 0);
     {Top := LastPosNormal.Top;
     Left := LastPosNormal.Left;
     Width := LastPosNormal.Width;
@@ -611,7 +613,7 @@ begin
     tbProgressAuto.Down := AutoProgress;
 
   end;
-  UpdateAlertFormSettings;
+  //UpdateAlertFormSettings;
 end;
 
 procedure TMainForm.pmiShowWindowClick(Sender: TObject);
@@ -741,7 +743,7 @@ begin
   UpdateAlertFormSettings;
 end;*}
 
-procedure TMainForm.UpdateAlertFormSettings;
+{procedure TMainForm.UpdateAlertFormSettings;
 begin
   {with GlobalUserConfig do
   begin
@@ -749,7 +751,7 @@ begin
     frmTimerAlert.stxMessage.Font.Color := ModalCaptionColour;
     frmTimerAlert.stxAdditional.Font.Color := ModalSubtextColour;
   end;}
-end;
+end;}
 
 {*procedure TMainForm.ExportToFile(Sender: TObject);
 var
@@ -811,43 +813,43 @@ begin
     //FReference.Repaint;
     Timer := FReference;
   end;
-    // Find the
-    hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
-    Inc(Filled, hdrTimers.Sections.Items[0].Width);
+  // Find the
+  hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
+  Inc(Filled, hdrTimers.Sections.Items[0].Width);
 
-    Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
-    Inc(Temp,  ((Timer.bbPlay.Left - Temp) div 2));
+  Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
+  Inc(Temp, ((Timer.bbPlay.Left - Temp) div 2));
 
     { If there are no timers added, we are using FReference as a reference.
     It is an invisible frame and is not under the scrollbar hence its width and
     the scrollbar's may not be the same. This needs to be taken into account,
     and an adjustment of (sbxClocks.Width - Timer.Width) needs to be made.}
 
-    Inc(Temp, sbxClocks.Width - Timer.Width - Filled);
-    //Temp := Temp - Filled;
-    hdrTimers.Sections.Items[1].Width := Temp;
+  Inc(Temp, sbxClocks.Width - Timer.Width - Filled);
+  //Temp := Temp - Filled;
+  hdrTimers.Sections.Items[1].Width := Temp;
 
-    Inc(Filled, hdrTimers.Sections.Items[1].Width- (sbxClocks.Width - Timer.Width));
-    //Filled := Filled - (sbxClocks.Width - Timer.Width);
+  Inc(Filled, hdrTimers.Sections.Items[1].Width - (sbxClocks.Width - Timer.Width));
+  //Filled := Filled - (sbxClocks.Width - Timer.Width);
 
-    Temp := Timer.bbAdjust.Left + Timer.bbAdjust.Width;
-    Temp := Temp + ((Timer.lblCountdown.Left - Temp) div 2) - Filled;
-    hdrTimers.Sections.Items[2].Width := Temp;
-    Inc(Filled, Temp);
+  Temp := Timer.bbAdjust.Left + Timer.bbAdjust.Width;
+  Temp := Temp + ((Timer.lblCountdown.Left - Temp) div 2) - Filled;
+  hdrTimers.Sections.Items[2].Width := Temp;
+  Inc(Filled, Temp);
 
-    Temp := Timer.lblCountdown.Left + Timer.lblCountdown.Width;
-    Temp := Temp + ((Timer.ckbIconProgress.Left - Temp) div 2) - Filled;
-    hdrTimers.Sections.Items[3].Width := Temp;
-    Inc(Filled, Temp);
+  Temp := Timer.lblCountdown.Left + Timer.lblCountdown.Width;
+  Temp := Temp + ((Timer.ckbIconProgress.Left - Temp) div 2) - Filled;
+  hdrTimers.Sections.Items[3].Width := Temp;
+  Inc(Filled, Temp);
 
-    Temp := Timer.ckbIconProgress.Left + Timer.ckbIconProgress.Width;
-    Temp := Temp + ((Timer.bbEdit.Left - Temp) div 2) - Filled;
-    hdrTimers.Sections.Items[4].Width := Temp;
-    Inc(Filled, Temp);
+  Temp := Timer.ckbIconProgress.Left + Timer.ckbIconProgress.Width;
+  Temp := Temp + ((Timer.bbEdit.Left - Temp) div 2) - Filled;
+  hdrTimers.Sections.Items[4].Width := Temp;
+  Inc(Filled, Temp);
 
-    Temp := Timer.Width - Filled;
-    hdrTimers.Sections.Items[5].Width := Temp;
-    Inc(Filled, Temp);
+  Temp := Timer.Width - Filled;
+  hdrTimers.Sections.Items[5].Width := Temp;
+  Inc(Filled, Temp);
 
   //Ids.Free;
 end;
@@ -942,7 +944,7 @@ begin
   //FScrollBox.Visible:=False;
   //sbxClocks.Height := FOrder.Count * CLOCK_HEIGHT;
   CountTabOrder := 0;
-  hdrTimers.Top:=0;
+  hdrTimers.Top := 0;
   for Id in FOrder do
   begin
     //Index := FClockWidgets.IndexOf(Id);
@@ -1090,13 +1092,13 @@ begin
     //Index := FActiveTimerFrames.IndexOf(Id);
     //if Index <> -1 then
     //begin
-      FActiveTimerFrames.Remove(Widget);
+    FActiveTimerFrames.Remove(Widget);
     //end;
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
 
   except
     on E: Exception do
-      ShowMessage( 'Error(1): '+ E.ClassName + #13#10 + E.Message );
+      ShowMessage('Error(1): ' + E.ClassName + #13#10 + E.Message);
   end;
 
   if Widget.TrayNotification then
@@ -1110,14 +1112,14 @@ begin
   if Widget.ModalAlert then
   begin
     Message :=
-      Widget.Caption + ' (' + Format('%.2d', [Hours]) +
-      ':' + Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
+      Widget.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
+      Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
     //frmTimerAlert.stxAdditional.Caption := Message;
     frmTimerAlert.lbMessages.Items.Add(Message);
 
     //if not frmTimerAlert.Showing then
     if frmTimerAlert.WindowState = wsMinimized then
-      frmTimerAlert.WindowState:=wsNormal;
+      frmTimerAlert.WindowState := wsNormal;
     frmTimerAlert.ShowOnTop;
   end;
   //DebugLn('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
@@ -1134,12 +1136,12 @@ begin
     //Index := FActiveTimerFrames.IndexOf(TimerFrame.Id);
     //if Index <> -1 then
     //begin
-      FActiveTimerFrames.Remove(TimerFrame);
+    FActiveTimerFrames.Remove(TimerFrame);
     //end;
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
   except
     on E: Exception do
-      ShowMessage( 'Error (2): '+ E.ClassName + #13#10 + E.Message );
+      ShowMessage('Error (2): ' + E.ClassName + #13#10 + E.Message);
   end;
 
 end;
@@ -1159,7 +1161,7 @@ begin
     end;
   except
     on E: Exception do
-      ShowMessage( 'Error (3): '+ E.ClassName + #13#10 + E.Message );
+      ShowMessage('Error (3): ' + E.ClassName + #13#10 + E.Message);
   end;
 
 end;
@@ -1203,7 +1205,7 @@ procedure TMainForm.TimerProgressUpdated(Sender: TObject);
 var
   TimerFrame: TfraTimer;
 begin
-  TimerFrame:=TfraTimer(Sender);
+  TimerFrame := TfraTimer(Sender);
   ProgressUpdate(TimerFrame.Progress);
 end;
 
@@ -1256,11 +1258,11 @@ begin
     for Count := 0 to FTimerFrames.Count - 1 do
     begin
       Temp := FTimerFrames.Data[Count];
-      Temp.TitleEditable:=AllowTimerTitleEdit;
+      Temp.TitleEditable := AllowTimerTitleEdit;
     end;
   end;
 
-  UpdateAlertFormSettings;
+  //UpdateAlertFormSettings;
 end;
 
 function TMainForm.GetExportFileName: string;
@@ -1309,13 +1311,13 @@ var
   TotalCount, Count: integer;
   NewTimerClock: TfraTimer;
   Hours, Mins, Secs: word;
-  Order: TIdList;
-  OrderString: TStringList;
-  Pos: string;
-  Id: longword;
+  //Order: TIdList;
+  //OrderString: TStringList;
+  //Pos: string;
+  //Id: longword;
 begin
-  Order := nil;
-  OrderString := nil;
+  //Order := nil;
+  //OrderString := nil;
 
   if FileExists(FDbFileName) then
   begin
@@ -1324,6 +1326,7 @@ begin
     Conf.FileName := FDbFileName;
     //FClocks.LoadClocks(Conf);
     TotalCount := Conf.GetValue(TIMER_CONF_COUNT, 0);
+
     for Count := 0 to TotalCount - 1 do
     begin
       NewTimerClock := AddTimer;
@@ -1353,21 +1356,21 @@ begin
       //NewTimerClock.AddSubscription(FFormWidget);
       //NewTimerClock.Widget.OnSelect:=@ClockSelected;
       PostTimerCreation(NewTimerClock);
+
+      {Order := TIdList.Create;
+      OrderString := TStringList.Create;
+
+      if not Conf.GetValue(TIMER_CONF_ORDER, OrderString, '0') then
+        ShowMessage('Getting order failed');
+
+      for Pos in OrderString do
+      begin
+        Order.Add(StrToInt(Pos));
+      end;  }
     end;
-    Order := TIdList.Create;
-    OrderString := TStringList.Create;
-
-    if not Conf.GetValue(TIMER_CONF_ORDER, OrderString, '0') then
-      ShowMessage('Getting order failed');
-
-    for Pos in OrderString do
-    begin
-      Order.Add(StrToInt(Pos));
-    end;
-
     Conf.Free;
-    OrderString.Free;
-    Order.Free;
+    //OrderString.Free;
+    //Order.Free;
     Reorder;
   end;
 end;
@@ -1386,11 +1389,11 @@ begin
   //NewWidget := FClocksWidget.AddTimer(Id);
   NewWidget := TfraTimer.Create(sbxClocks);
   NewWidget.Id := Id;
-  NewWidget.TitleEditable:=GlobalUserConfig.AllowTimerTitleEdit ;
-  NewWidget.OnTimerStart:=@TimerStarted;
-  NewWidget.OnTimerPause:=@TimerPaused;
-  NewWidget.OnTimerStop:=@TimerFinished;
-  NewWidget.OnTimerProgressUpdate:=@TimerProgressUpdated;
+  NewWidget.TitleEditable := GlobalUserConfig.AllowTimerTitleEdit;
+  NewWidget.OnTimerStart := @TimerStarted;
+  NewWidget.OnTimerPause := @TimerPaused;
+  NewWidget.OnTimerStop := @TimerFinished;
+  NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
   begin
     NewWidget.edtTitle.Color:=clForm;
@@ -1513,7 +1516,7 @@ begin
   Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
 
   if FOrder.Count <> FTimerFrames.Count then
-     ShowMessage('FOrder.Count does not match FTimerFrames.Count');
+    ShowMessage('FOrder.Count does not match FTimerFrames.Count');
 
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
@@ -1540,7 +1543,7 @@ begin
       '/' + TIMER_CONF_TRAYNOTIFiCATION, TimerClock.TrayNotification);
 
     // Add the new ID at the beginning of the list
-    OrderStrings.Insert(0, IntToStr(Count+1));
+    OrderStrings.Insert(0, IntToStr(Count + 1));
 
     //Index := FOrder.IndexOf(TimerClock.Id);
     //Assert(Index >= 0);
@@ -1682,9 +1685,14 @@ begin
     end;
   except
     on E: Exception do
-      ShowMessage( 'Error (4): '+ E.ClassName + #13#10 + E.Message );
+      ShowMessage('Error (4): ' + E.ClassName + #13#10 + E.Message);
   end;
+end;
 
+procedure TMainForm.AfterShow(var Msg: TLMessage);
+begin
+  if FTimerFrames.Count = 0 then
+    aiNewTimer.Execute;
 end;
 
 
