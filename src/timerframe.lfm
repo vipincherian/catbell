@@ -28,7 +28,7 @@ object fraTimer: TfraTimer
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 563
+    Left = 567
     Height = 13
     Top = 11
     Width = 56
