@@ -548,7 +548,7 @@ end;
 
 procedure TMainForm.CreateBitmaps;
 var
-  FinalBmp: TBGRABitmap;
+  FinalBmp, HiresBmp: TBGRABitmap;
   InSet: integer;
   TrayIconSize, AppIconSize: integer;
   Stream: TResourceStream;
@@ -557,45 +557,34 @@ begin
   TrayIconSize := GetSystemMetrics(SM_CXSMICON);
   AppIconSize := GetSystemMetrics(SM_CXICON);
 
-  // Read
+  // Read the image in resources to a stream
   Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
-  FinalBmp := TBGRABitmap.Create(Stream);
-  BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize,
-    rmFineResample) as TBGRABitmap);
-  //FinalBmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
 
-  //DrawBaseIconBackground(FinalBmp);
-  //DrawBaseIconForeground(FinalBmp);
+  { Create one hi-res image and then resize it and assign}
+  HiresBmp := TBGRABitmap.Create(Stream);
+
+  FinalBmp := HiresBmp.Resample(TrayIconSize, TrayIconSize,
+    rmFineResample) as TBGRABitmap;
 
   FTrayStoppedBitmap := TIcon.Create;
   FTrayStoppedBitmap.Assign(FinalBmp.Bitmap);
 
   FinalBmp.Free;
-  //UnscaledBmp.Free;
 
-
-  //TempBmp.Free;
-
-
-  //FinalBmp := TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
-  Stream.Seek(0, soFromBeginning);
-  FinalBmp := TBGRABitmap.Create(Stream);
-  BGRAReplace(FinalBmp, FinalBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE,
-    rmFineResample) as TBGRABitmap);
-  //DrawBaseIconBackground(FinalBmp);
-  //DrawBaseIconForeground(FinalBmp);
+  FinalBmp := HiresBmp.Resample(AppIconSize, AppIconSize,
+    rmFineResample) as TBGRABitmap;
 
   FAppStoppedBitmap := TIcon.Create;
   FAppStoppedBitmap.Assign(FinalBmp.Bitmap);
 
   FinalBmp.Free;
-  //UnscaledBmp.Free;
 
   ProgressUpdate(PROGRESS_COMPLETED);
-
+  HiresBmp.Free;
   Stream.Free;
-  Stream := TResourceStream.Create(hInstance, '256_PROGRESS_BASE', RT_RCDATA);
 
+
+  Stream := TResourceStream.Create(hInstance, '256_PROGRESS_BASE', RT_RCDATA);
   InSet := 3;
 
   for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
@@ -604,13 +593,11 @@ begin
     //FinalBmp :=
     //TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
     Stream.Seek(0, soFromBeginning);
-    FinalBmp := TBGRABitmap.Create(Stream);
-    BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize,
-      rmFineResample) as TBGRABitmap);
-    //DebugLn('Revised width is ' + FinalBmp.Width);
+    HiResBmp := TBGRABitmap.Create(Stream);
+    //BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize,
+    //  rmFineResample) as TBGRABitmap);
 
-    //DrawBaseIconBackground(FinalBmp);
-    with FinalBmp do
+    with HiResBmp do
     begin
 
       CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
@@ -619,45 +606,31 @@ begin
        {CanvasBGRA.Pie(InSet, InSet, (TrayIconSize - InSet),
          (TrayIconSize - InSet), 90 * RAD_MULTIPLIER,
          -(15 * RAD_MULTIPLIER * (Count - 1)));}
-      CanvasBGRA.Pie((Inset * TrayIconSize) div TRAY_BASE_WIDTH,
-        (Inset * TrayIconSize) div TRAY_BASE_WIDTH,
-        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
-        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
+      CanvasBGRA.Pie((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
+        (Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
+        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
+        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
         90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
     end;
     //DrawBaseIconForeground(FinalBmp);
-    FTrayProgressIcons[Count] := TIcon.Create;
 
+    FinalBmp:=HiresBmp.Resample(TrayIconSize, TrayIconSize,
+      rmFineResample) as TBGRABitmap;
+
+    FTrayProgressIcons[Count] := TIcon.Create;
     FTrayProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
     FinalBmp.Free;
-    //UnscaledBmp.Free;
 
-    //FinalBmp :=
-    //  TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
-    Stream.Seek(0, soFromBeginning);
-    FinalBmp := TBGRABitmap.Create(Stream);
-    BGRAReplace(FinalBmp, FinalBmp.Resample(AppIconSize, AppIconSize,
-      rmFineResample) as TBGRABitmap);
-    //DrawBaseIconBackground(FinalBmp);
-    with FinalBmp do
-    begin
+    FinalBmp:=HiresBmp.Resample(AppIconSize, AppIconSize,
+      rmFineResample) as TBGRABitmap;
 
-      CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
-      CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
-
-      CanvasBGRA.Pie((Inset * AppIconSize) div TRAY_BASE_WIDTH,
-        (Inset * AppIconSize) div TRAY_BASE_WIDTH,
-        (AppIconSize - ((Inset * AppIconSize) div TRAY_BASE_WIDTH)),
-        (AppIconSize - ((Inset * AppIconSize) div TRAY_BASE_WIDTH)),
-        90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
-    end;
     //DrawBaseIconForeground(FinalBmp);
     FAppProgressIcons[Count] := TIcon.Create;
     FAppProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
     FinalBmp.Free;
-    //UnscaledBmp.Free;
+    HiresBmp.Free;
   end;
   Stream.Free;
 end;
@@ -982,7 +955,7 @@ begin
   if (Progress > 1.99) and (Progress < 2.01) then
   begin
     tiMain.Icon.Assign(FTrayStoppedBitmap);
-    Icon.Assign(FAppStoppedBitmap);
+    Icon.Assign(FTrayStoppedBitmap);
     Application.Icon.Assign(FAppStoppedBitmap);
     FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
 
