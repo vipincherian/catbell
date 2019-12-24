@@ -290,6 +290,11 @@ begin
   tbMoveUp.Enabled := False;
   tbMoveDown.Enabled := False;
 
+  bbDelete.DoubleBuffered:=True;
+  bbMoveUp.DoubleBuffered:=True;
+  bbMoveDown.DoubleBuffered:=True;
+  DoubleBuffered:=True;
+
 
   //TrayIconSize := TRAY_BASE_WIDTH;
 

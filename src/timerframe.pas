@@ -686,6 +686,14 @@ begin
   bbAdjust.Enabled:=False;
   bbEdit.Caption:='';
 
+  bbPlay.DoubleBuffered:=True;
+  bbPause.DoubleBuffered:=True;
+  bbStop.DoubleBuffered:=True;
+  bbAdjust.DoubleBuffered:=True;
+  bbEdit.DoubleBuffered:=True;
+  DoubleBuffered:=True;
+
+
   CallbackOnProgressOnIconChange := True;
 end;
 

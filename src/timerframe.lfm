@@ -19,7 +19,7 @@ object fraTimer: TfraTimer
   end
   object edtTitle: TEdit
     Left = 65
-    Height = 19
+    Height = 23
     Top = 7
     Width = 263
     Anchors = [akTop, akLeft, akRight]
@@ -28,10 +28,10 @@ object fraTimer: TfraTimer
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 567
-    Height = 13
+    Left = 575
+    Height = 15
     Top = 11
-    Width = 56
+    Width = 48
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
     Caption = '00:00:00'
@@ -43,16 +43,16 @@ object fraTimer: TfraTimer
   end
   object cbSelect: TCheckBox
     Left = 8
-    Height = 18
+    Height = 19
     Top = 9
-    Width = 18
+    Width = 20
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 337
-    Height = 19
+    Left = 343
+    Height = 23
     Top = 7
-    Width = 71
+    Width = 65
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -360,10 +360,10 @@ object fraTimer: TfraTimer
     TabOrder = 8
   end
   object ckbIconProgress: TCheckBox
-    Left = 636
-    Height = 18
+    Left = 634
+    Height = 19
     Top = 9
-    Width = 18
+    Width = 20
     Anchors = [akTop, akRight]
     OnChange = ckbIconProgressChange
     TabOrder = 7
