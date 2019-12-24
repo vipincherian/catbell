@@ -550,11 +550,12 @@ procedure TMainForm.CreateBitmaps;
 var
   FinalBmp: TBGRABitmap;
   InSet: integer;
-  TrayIconSize: integer;
+  TrayIconSize, AppIconSize: integer;
   Stream: TResourceStream;
   Count: integer;
 begin
   TrayIconSize := GetSystemMetrics(SM_CXSMICON);
+  AppIconSize := GetSystemMetrics(SM_CXICON);
 
   // Read
   Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
@@ -636,7 +637,7 @@ begin
     //  TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
     Stream.Seek(0, soFromBeginning);
     FinalBmp := TBGRABitmap.Create(Stream);
-    BGRAReplace(FinalBmp, FinalBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE,
+    BGRAReplace(FinalBmp, FinalBmp.Resample(AppIconSize, AppIconSize,
       rmFineResample) as TBGRABitmap);
     //DrawBaseIconBackground(FinalBmp);
     with FinalBmp do
@@ -645,10 +646,10 @@ begin
       CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
       CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
 
-      CanvasBGRA.Pie((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
-        (Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
-        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
-        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
+      CanvasBGRA.Pie((Inset * AppIconSize) div TRAY_BASE_WIDTH,
+        (Inset * AppIconSize) div TRAY_BASE_WIDTH,
+        (AppIconSize - ((Inset * AppIconSize) div TRAY_BASE_WIDTH)),
+        (AppIconSize - ((Inset * AppIconSize) div TRAY_BASE_WIDTH)),
         90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
     end;
     //DrawBaseIconForeground(FinalBmp);
