@@ -5,3 +5,5 @@
 /src/*.res
 /src/catbell.lps
 **/*.dll
+**/*.wav
+**/*.ogg

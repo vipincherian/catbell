@@ -1,11 +1,11 @@
 object frmEditTimer: TfrmEditTimer
   Left = 351
-  Height = 203
+  Height = 245
   Top = 238
   Width = 440
   BorderStyle = bsSingle
   Caption = 'Edit Timer'
-  ClientHeight = 203
+  ClientHeight = 245
   ClientWidth = 440
   Icon.Data = {
     7E04000000000100010010100000010020006804000016000000280000001000
@@ -133,7 +133,7 @@ object frmEditTimer: TfrmEditTimer
   object bbCancel: TBitBtn
     Left = 8
     Height = 30
-    Top = 168
+    Top = 210
     Width = 75
     Anchors = [akLeft, akBottom]
     Cancel = True
@@ -146,7 +146,7 @@ object frmEditTimer: TfrmEditTimer
   object bbSave: TBitBtn
     Left = 357
     Height = 30
-    Top = 168
+    Top = 210
     Width = 75
     Anchors = [akRight, akBottom]
     Default = True
@@ -178,6 +178,22 @@ object frmEditTimer: TfrmEditTimer
     HideDateTimeParts = []
     MonthNames = 'Long'
     OnChange = dtpDurationChange
+  end
+  object lblLengthText: TLabel
+    Left = 136
+    Height = 15
+    Top = 152
+    Width = 97
+    Caption = 'Length (seconds) :'
+    ParentColor = False
+  end
+  object lblLenthVal: TLabel
+    Left = 240
+    Height = 15
+    Top = 152
+    Width = 5
+    Caption = '?'
+    ParentColor = False
   end
   object odgAudio: TOpenDialog
     left = 243
