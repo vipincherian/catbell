@@ -60,8 +60,10 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    odgAudio: TOpenDialog;
     procedure bbCancelClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
+    procedure bbSelectAudioFileClick(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
     procedure edtDescriptionChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -163,6 +165,18 @@ begin
   FTrayNotification:=ckbTrayNotification.Checked;
   FProceed:=True;
   Close;
+end;
+
+procedure TfrmEditTimer.bbSelectAudioFileClick(Sender: TObject);
+var
+  FileName: string;
+begin
+  odgAudio.InitialDir:='.';
+  odgAudio.Options := [ofFileMustExist];
+  odgAudio.Filter:='Supported audio files|*.wav,*.ogg|All files|*.*';
+  if odgAudio.Execute then
+     FileName:=odgAudio.FileName;
+  ShowMessage(FileName);
 end;
 
 procedure TfrmEditTimer.dtpDurationChange(Sender: TObject);

@@ -59,7 +59,6 @@ object frmTimerAlert: TfrmTimerAlert
     ItemHeight = 0
     ScrollWidth = 318
     TabOrder = 0
-    TopIndex = -1
   end
   object bbClose: TBitBtn
     Left = 131
@@ -67,6 +66,7 @@ object frmTimerAlert: TfrmTimerAlert
     Top = 112
     Width = 75
     DefaultCaption = True
+    GlyphShowMode = gsmAlways
     Kind = bkClose
     ModalResult = 11
     OnClick = bbCloseClick
@@ -74,9 +74,9 @@ object frmTimerAlert: TfrmTimerAlert
   end
   object Label1: TLabel
     Left = 8
-    Height = 13
+    Height = 15
     Top = 8
-    Width = 187
+    Width = 177
     Caption = 'The following timers completed:-'
     ParentColor = False
   end

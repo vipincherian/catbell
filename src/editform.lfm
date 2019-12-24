@@ -52,7 +52,7 @@ object frmEditTimer: TfrmEditTimer
   LCLVersion = '2.0.6.0'
   object edtDescription: TEdit
     Left = 112
-    Height = 19
+    Height = 23
     Top = 8
     Width = 320
     Anchors = [akTop, akLeft, akRight]
@@ -61,34 +61,34 @@ object frmEditTimer: TfrmEditTimer
   end
   object Label1: TLabel
     Left = 32
-    Height = 13
+    Height = 15
     Top = 8
-    Width = 72
+    Width = 66
     Alignment = taRightJustify
     Caption = 'Description :'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 46
-    Height = 13
+    Height = 15
     Top = 40
-    Width = 56
+    Width = 52
     Alignment = taRightJustify
     Caption = 'Duration :'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 41
-    Height = 13
+    Height = 15
     Top = 120
-    Width = 60
+    Width = 57
     Alignment = taRightJustify
     Caption = 'Audio file :'
     ParentColor = False
   end
   object edtAudioFile: TEdit
     Left = 112
-    Height = 19
+    Height = 23
     Top = 120
     Width = 240
     Anchors = [akTop, akLeft, akRight]
@@ -102,29 +102,30 @@ object frmEditTimer: TfrmEditTimer
     Width = 75
     Anchors = [akTop, akRight]
     Caption = 'Select'
+    OnClick = bbSelectAudioFileClick
     TabOrder = 5
   end
   object ckbModalAlert: TCheckBox
     Left = 112
-    Height = 18
+    Height = 19
     Top = 72
-    Width = 120
+    Width = 112
     Caption = 'Show modal alert'
     TabOrder = 2
   end
   object ckbTrayNotification: TCheckBox
     Left = 112
-    Height = 18
+    Height = 19
     Top = 96
-    Width = 117
+    Width = 113
     Caption = 'Show notification'
     TabOrder = 3
   end
   object Label4: TLabel
     Left = 11
-    Height = 13
+    Height = 15
     Top = 72
-    Width = 90
+    Width = 86
     Alignment = taRightJustify
     Caption = 'On completion :'
     ParentColor = False
@@ -157,9 +158,9 @@ object frmEditTimer: TfrmEditTimer
   end
   object dtpDuration: TDateTimePicker
     Left = 112
-    Height = 19
+    Height = 23
     Top = 40
-    Width = 71
+    Width = 65
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -177,5 +178,9 @@ object frmEditTimer: TfrmEditTimer
     HideDateTimeParts = []
     MonthNames = 'Long'
     OnChange = dtpDurationChange
+  end
+  object odgAudio: TOpenDialog
+    left = 243
+    top = 55
   end
 end
