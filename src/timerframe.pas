@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
-  editform, Graphics, Math, LazLogger, adjustform;
+  editform, Graphics, Math, LazLogger, adjustform, sndfile, ctypes, LMessages, LCLIntf;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -50,6 +50,8 @@ const
   //TIMER_CONF_ID = 'id';
   TIMER_CONF_COUNT = 'count';
   TIMER_CONF_ORDER = 'order';
+
+  UM_PLAY_AUDIO = LM_USER + 1;
 
 type
 
@@ -105,6 +107,9 @@ type
     FRunning: boolean;
 
     FProgress: single;
+
+    FAudioFile: string;
+    FAudioLength: double;
     //FObservers: TListTimerObservers;
     //function GetShowProgressOnIcon: boolean;
     procedure SetId(AValue: longword);
@@ -182,7 +187,8 @@ type
     //procedure AddSubscription(aObserver: ITimerObserver);
     //procedure RemoveSubscription(aObserver: ITimerObserver);
     procedure AdjustTimer(Sender: TObject);
-
+    function SetAudioFile(AValue: string; out Error: string): boolean;
+    procedure PlayAudio(var Msg: TLMessage); message UM_PLAY_AUDIO;
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
@@ -210,6 +216,7 @@ type
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
+    property AudioFile: string read FAudioFile;
   end;
 
 
@@ -272,17 +279,20 @@ end;
 procedure TfraTimer.aiEditExecute(Sender: TObject);
 var
   Hour, Min, Sec, Milli: word;
+  ErrorText: string;
 begin
   frmEditTimer.Description := edtTitle.Text;
   frmEditTimer.Duration := dtpSet.Time;
   frmEditTimer.TrayNotification := FTrayNotification;
   frmEditTimer.ModalAlert := FModalAlert;
+  frmEditTimer.SetAudioFile(FAudioFile, ErrorText);
   if frmEditTimer.ShowForEdit(Self) then
   begin
     Caption := frmEditTimer.Description;
     dtpSet.Time := frmEditTimer.Duration;
     FTrayNotification := frmEditTimer.TrayNotification;
     FModalAlert := frmEditTimer.ModalAlert;
+    FAudioFile:=frmEditTimer.AudioFile;
   end;
 end;
 
@@ -867,6 +877,8 @@ begin
 
   if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
     frmEditTimer.dtpDuration.Enabled:=True;
+
+  PostMessage(Handle, UM_PLAY_AUDIO, 0, 0);
 end;
 
 {procedure TfraTimer.NotifyChange(Sender: TObject);
@@ -1061,6 +1073,63 @@ begin
       frmTimerAdjust.Close;
     end;
   end;
+end;
+
+function TfraTimer.SetAudioFile(AValue: string; out Error: string): boolean;
+var
+  Info: SF_INFO;
+  SoundFile: PSndFile;
+begin
+  Result := False;
+  Info.format := 0;
+
+  if AValue = '' then
+  begin
+    FAudioFile:='';
+    FAudioLength:=-1.0;;
+    //lblLengthText.Visible:=False;
+    //edtAudioFile.Text:='';
+    //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
+    //lblLenthVal.Visible:=False;
+    Result := True;
+    Exit;
+  end;
+  SoundFile := sf_open(PChar(AValue), SFM_READ, @Info);
+  if (SoundFile = nil) then
+  begin
+    DebugLn('Error in sf_open');
+    //sf_perror(nil);
+    //ReadKey;
+    //exit;
+    Error:='SoundFile is nil';
+    Exit;
+  end;
+  DebugLn(IntToHex(Info.format, 8));
+  DebugLn(IntToStr(Info.channels));
+  DebugLn(IntToStr(Info.frames));
+  DebugLn(IntToStr(Info.samplerate));
+  DebugLn(IntToStr(Info.sections));
+  FAudioLength:=(Info.frames) / (Info.samplerate);
+  //ShowMessage('length is ' + FloatToStr(AudioLength));
+
+  FAudioFile:=AValue;
+
+  sf_close(SoundFile);
+
+
+    //lblLengthText.Visible:=True;
+    //edtAudioFile.Text:=FAudioFile;
+    //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
+    //lblLenthVal.Visible:=True;
+    Result := True;
+
+end;
+
+procedure TfraTimer.PlayAudio(var Msg: TLMessage);
+begin
+  DebugLn('Playing audio');
+  Sleep(5000);
+  DebugLn('Played audio');
 end;
 
 {procedure TfraTimer.AddSubscription(aObserver: ITimerObserver);

@@ -81,13 +81,13 @@ type
     FId: longword;
     FAudioFile: string;
     FAudioLength: double;
-    procedure SetAudioFile(AValue: string);
+
     procedure SetDescription(AValue: string);
     procedure SetDuration(AValue: TTime);
     procedure SetFTrayNotification(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
     function Validate: boolean;
-    function VerifyAudioFile(const FileName: string): boolean;
+    //function VerifyAudioFile(const FileName: string): boolean;
   public
     function ShowAndGetSpecs: boolean;
     function ShowForAdd :boolean;
@@ -96,9 +96,10 @@ type
     property Duration: TTime read FDuration write SetDuration;
     property Description: string read FDescription write SetDescription;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
-    property AudioFile: string read FAudioFile write SetAudioFile;
+    property AudioFile: string read FAudioFile;
     property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
     property Id: longword read FId;
+    function SetAudioFile(AValue: string; out Error: string): boolean;
   end;
 
 
@@ -180,15 +181,7 @@ procedure TfrmEditTimer.bbSelectAudioFileClick(Sender: TObject);
 var
   FileName: string;
   ErrorText: string;
-  //PaErrCode: PaError;
 
-  //Stream: PPaStream;
-  //StreamParams: PaStreamParameters;
-  subFormat: cint;
-  //AudBuffer: array of double;
-  //AudBuffer: array[0..2047] of double;
-  AudBuffer: pointer;
-  readCount: cint;
 begin
   odgAudio.InitialDir:='.';
   odgAudio.Options := [ofFileMustExist];
@@ -196,13 +189,11 @@ begin
   if odgAudio.Execute then
   begin
      FileName:=odgAudio.FileName;
-     if VerifyAudioFile(FileName) then
+     if not SetAudioFile(FileName, ErrorText) then
      begin
-       lblLengthText.Visible:=True;
-       edtAudioFile.Text:=FileName;
-       lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
-       lblLenthVal.Visible:=True;
-     end;
+
+       ShowMessage(ErrorText);
+       end;
 
 
   end;
@@ -258,22 +249,40 @@ begin
 
 end;
 
-function TfrmEditTimer.VerifyAudioFile(const FileName: string): boolean;
+
+procedure TfrmEditTimer.SetDescription(AValue: string);
+begin
+  FDescription:=AValue;
+  edtDescription.Text:=AValue;
+end;
+
+function TfrmEditTimer.SetAudioFile(AValue: string; out Error: string): boolean;
 var
-  //AudioLength: double;
   Info: SF_INFO;
   SoundFile: PSndFile;
 begin
-  Result:=False;
+  Result := False;
   Info.format := 0;
-  SoundFile := sf_open(PChar(FileName), SFM_READ, @Info);
+
+  if AValue = '' then
+  begin
+    FAudioFile:='';
+    FAudioLength:=-1;;
+    lblLengthText.Visible:=False;
+    edtAudioFile.Text:='';
+    //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
+    lblLenthVal.Visible:=False;
+    Result := True;
+    Exit;
+  end;
+  SoundFile := sf_open(PChar(AValue), SFM_READ, @Info);
   if (SoundFile = nil) then
   begin
     DebugLn('Error in sf_open');
     //sf_perror(nil);
     //ReadKey;
     //exit;
-    ShowMessage('SoundFile is nil');
+    Error:='SoundFile is nil';
     Exit;
   end;
   DebugLn(IntToHex(Info.format, 8));
@@ -284,29 +293,17 @@ begin
   FAudioLength:=(Info.frames) / (Info.samplerate);
   //ShowMessage('length is ' + FloatToStr(AudioLength));
 
-  FAudioFile:=FileName;
+  FAudioFile:=AValue;
 
   sf_close(SoundFile);
-  Result := True;
-end;
 
-procedure TfrmEditTimer.SetDescription(AValue: string);
-begin
-  FDescription:=AValue;
-  edtDescription.Text:=AValue;
-end;
-
-procedure TfrmEditTimer.SetAudioFile(AValue: string);
-begin
-  if VerifyAudioFile(Avalue) then
-  begin
-    edtAudioFile.Text:=FAudioFile;
 
     lblLengthText.Visible:=True;
-    //lblLenthVal:=True;
-  end
-  else
-    FAudioFile:='';
+    edtAudioFile.Text:=FAudioFile;
+    lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
+    lblLenthVal.Visible:=True;
+    Result := True;
+
 end;
 
 procedure TfrmEditTimer.SetDuration(AValue: TTime);

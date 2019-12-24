@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages, LResources;
+  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages;
 
 const
   FORM_MIN_SIZE = 600;
@@ -68,6 +68,8 @@ const
   TIMER_CONF_MINUTES = 'minutes';
   TIMER_CONF_SECONDS = 'seconds';
   TIMER_CONF_NOTIFIER = 'notifier';
+
+  TIMER_CONF_AUDIOFILE = 'audio_file';
 
   TIMER_CONF_MODALALERT = 'modal_alert';
   TIMER_CONF_TRAYNOTIFiCATION = 'tray_notification';
@@ -290,10 +292,10 @@ begin
   tbMoveUp.Enabled := False;
   tbMoveDown.Enabled := False;
 
-  bbDelete.DoubleBuffered:=True;
-  bbMoveUp.DoubleBuffered:=True;
-  bbMoveDown.DoubleBuffered:=True;
-  DoubleBuffered:=True;
+  bbDelete.DoubleBuffered := True;
+  bbMoveUp.DoubleBuffered := True;
+  bbMoveDown.DoubleBuffered := True;
+  DoubleBuffered := True;
 
 
   //TrayIconSize := TRAY_BASE_WIDTH;
@@ -595,7 +597,7 @@ begin
 
   FinalBmp.Free;
 
-  ProgressUpdate(Nil, PROGRESS_COMPLETED);
+  ProgressUpdate(nil, PROGRESS_COMPLETED);
   HiresBmp.Free;
   Stream.Free;
 
@@ -641,8 +643,8 @@ begin
 
     FinalBmp.Free;
 
-    FinalBmp := HiresBmp.Resample(WIDGET_ICON_WIDTH, WIDGET_ICON_WIDTH, rmFineResample) as
-      TBGRABitmap;
+    FinalBmp := HiresBmp.Resample(WIDGET_ICON_WIDTH, WIDGET_ICON_WIDTH,
+      rmFineResample) as TBGRABitmap;
 
     //DrawBaseIconForeground(FinalBmp);
     FWidgetProgressIcons[Count] := TIcon.Create;
@@ -978,7 +980,7 @@ begin
     Icon.Assign(FTrayStoppedBitmap);
     Application.Icon.Assign(FAppStoppedBitmap);
     FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
-    if Widget <> Nil then
+    if Widget <> nil then
       Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   end
   else
@@ -998,7 +1000,7 @@ begin
       //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
       Application.Icon.Assign(FAppProgressIcons[Index + 1]);
       FLastTrayIconIndex := Index;
-      if Widget <> Nil then
+      if Widget <> nil then
         Widget.imgTimer.Picture.Assign(FWidgetProgressIcons[Index + 1]);
     end;
   end;
@@ -1096,6 +1098,9 @@ var
   TotalCount, Count: integer;
   NewTimerClock: TfraTimer;
   Hours, Mins, Secs: word;
+  ErrorText: string;
+  ErrorSummary: string;
+  Success: boolean;
   //Order: TIdList;
   //OrderString: TStringList;
   //Pos: string;
@@ -1130,6 +1135,13 @@ begin
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
         '/' + TIMER_CONF_NOTIFIER, False);
+
+      Success := NewTimerClock.SetAudioFile(Conf.GetValue(TIMER_CONF_TIMERS +
+        '/' + IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOFILE, ''), ErrorText);
+      if not Success then
+      begin
+        NewTimerClock.SetAudioFile('', ErrorText);
+      end;
 
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
@@ -1323,6 +1335,10 @@ begin
       '/' + TIMER_CONF_SECONDS, SecondOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_NOTIFIER, TimerClock.IsProgressOnIcon);
+
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/' + TIMER_CONF_AUDIOFILE, TimerClock.AudioFile);
+
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_MODALALERT, TimerClock.ModalAlert);
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
