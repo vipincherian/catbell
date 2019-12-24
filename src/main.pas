@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages;
+  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages, LResources;
 
 const
   FORM_MIN_SIZE = 600;
@@ -37,10 +37,10 @@ const
   TICON_GREEN_INDEX: integer = 2;
   TRAY_PROGRESS_ICON_COUNT = 24;
 
-  TRAY_OUTLINE_COLOUR = $3333f2; //$5A9E60;
-  TRAY_BG_COLOUR = $c6c6f5; //$DAEADB;
-  TRAY_CENTRE_COLOUR = TRAY_BG_COLOUR;
-  PROGRESS_COLOUR = $7a2a41; //1A1AB0;
+  //TRAY_OUTLINE_COLOUR = $3333f2; //$5A9E60;
+  //TRAY_BG_COLOUR = $c6c6f5; //$DAEADB;
+  //TRAY_CENTRE_COLOUR = TRAY_BG_COLOUR;
+  PROGRESS_COLOUR = $816691;
 
   PROGRESS_COMPLETED = 2.0;
 
@@ -186,8 +186,8 @@ type
     and reliable way to achieve the same functionality.}
     FReference: TfraTimer;
 
-    procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
-    procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
+    //procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
+    //procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
     //procedure SetDeleteEnabled(AValue: boolean);
     //procedure SetForm(AValue: TMainForm);
     //procedure SetMoveDownEnabled(AValue: boolean);
@@ -266,9 +266,11 @@ implementation
 procedure TMainForm.FormCreate(Sender: TObject);
 var
   Count: integer;
-  bmp: TBGRABitmap;
+  Stream: TResourceStream;
   TrayIconSize: integer;
   InSet: integer;
+  FinalBmp, UnscaledBmp: TBGRABitmap;
+  png:TPortableNetworkGraphic;
 begin
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_SIZE;
@@ -326,7 +328,7 @@ begin
   tbMoveDown.Enabled := False;
 
 
-  TrayIconSize := TRAY_BASE_WIDTH;
+  //TrayIconSize := TRAY_BASE_WIDTH;
   TrayIconSize := GetSystemMetrics(SM_CXSMICON);
 
   FShortTimer := TTimer.Create(nil);
@@ -339,58 +341,92 @@ begin
   FReference.Align := alNone;
   FReference.Anchors := [];
 
-  bmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
+  //TempBmp :=TBitmap.Create;
+  //FinalBmp := TBGRABitmap.Create(
+  //FinalBmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
+  Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
 
-  DrawBaseIconBackground(bmp);
-  DrawBaseIconForeground(bmp);
+  //png := TPortableNetworkGraphic.Create;
+  //png.LoadFromResourceName(HINSTANCE, 'progressbase');
+  //png.Free;
+  UnscaledBmp := TBGRABitmap.Create(Stream);
+  FinalBmp := UnscaledBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as TBGRABitmap;
+  //FinalBmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
+
+  //DrawBaseIconBackground(FinalBmp);
+  //DrawBaseIconForeground(FinalBmp);
 
   FTrayStoppedBitmap := TIcon.Create;
-  FTrayStoppedBitmap.Assign(bmp.Bitmap);
+  FTrayStoppedBitmap.Assign(FinalBmp.Bitmap);
 
-  bmp.Free;
+  FinalBmp.Free;
+  UnscaledBmp.Free;
 
 
-  bmp := TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
-  DrawBaseIconBackground(bmp);
-  DrawBaseIconForeground(bmp);
+  //TempBmp.Free;
+
+
+  //FinalBmp := TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
+  Stream.Seek(0, soFromBeginning);
+  UnscaledBmp := TBGRABitmap.Create(Stream);
+  FinalBmp := UnscaledBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE, rmFineResample) as TBGRABitmap;
+  //DrawBaseIconBackground(FinalBmp);
+  //DrawBaseIconForeground(FinalBmp);
 
   FAppStoppedBitmap := TIcon.Create;
-  FAppStoppedBitmap.Assign(bmp.Bitmap);
+  FAppStoppedBitmap.Assign(FinalBmp.Bitmap);
 
-  bmp.Free;
+  FinalBmp.Free;
+  UnscaledBmp.Free;
 
   ProgressUpdate(PROGRESS_COMPLETED);
 
-  InSet := 2;
+  Stream.Free;
+  Stream := TResourceStream.Create(hInstance, '256_PROGRESS_BASE', RT_RCDATA);
+
+  InSet := 3;
 
   for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
   begin
 
-    bmp :=
-      TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
+    //FinalBmp :=
+      //TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
+    Stream.Seek(0, soFromBeginning);
+    UnscaledBmp := TBGRABitmap.Create(Stream);
+    FinalBmp := UnscaledBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as TBGRABitmap;
+    //DebugLn('Revised width is ' + FinalBmp.Width);
 
-    DrawBaseIconBackground(bmp);
-    with bmp do
+    //DrawBaseIconBackground(FinalBmp);
+    with FinalBmp do
     begin
 
       CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
       CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
 
-      CanvasBGRA.Pie(InSet, InSet, (TRAY_BASE_WIDTH - InSet),
-        (TRAY_BASE_WIDTH - InSet), 90 * RAD_MULTIPLIER,
-        -(15 * RAD_MULTIPLIER * (Count - 1)));
+      {CanvasBGRA.Pie(InSet, InSet, (TrayIconSize - InSet),
+        (TrayIconSize - InSet), 90 * RAD_MULTIPLIER,
+        -(15 * RAD_MULTIPLIER * (Count - 1)));}
+      CanvasBGRA.Pie((Inset * TrayIconSize) div TRAY_BASE_WIDTH,
+        (Inset * TrayIconSize) div TRAY_BASE_WIDTH,
+        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
+        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
+        90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
     end;
-    DrawBaseIconForeground(bmp);
+    //DrawBaseIconForeground(FinalBmp);
     FTrayProgressIcons[Count] := TIcon.Create;
 
-    FTrayProgressIcons[Count].Assign(bmp.Bitmap);
+    FTrayProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
-    bmp.Free;
+    FinalBmp.Free;
+    UnscaledBmp.Free;
 
-    bmp :=
-      TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
-    DrawBaseIconBackground(bmp);
-    with bmp do
+    //FinalBmp :=
+    //  TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
+    Stream.Seek(0, soFromBeginning);
+    UnscaledBmp := TBGRABitmap.Create(Stream);
+    FinalBmp := UnscaledBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE, rmFineResample) as TBGRABitmap;
+    //DrawBaseIconBackground(FinalBmp);
+    with FinalBmp do
     begin
 
       CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
@@ -402,12 +438,14 @@ begin
         (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
         90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
     end;
-    DrawBaseIconForeground(bmp);
+    //DrawBaseIconForeground(FinalBmp);
     FAppProgressIcons[Count] := TIcon.Create;
-    FAppProgressIcons[Count].Assign(bmp.Bitmap);
+    FAppProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
-    bmp.Free;
+    FinalBmp.Free;
+    UnscaledBmp.Free;
   end;
+  Stream.Free;
 
 end;
 
@@ -658,7 +696,7 @@ begin
   Result := FClockWidget;
 end;*}
 
-procedure TMainForm.DrawBaseIconBackground(Bmp: TBGRABitmap);
+{procedure TMainForm.DrawBaseIconBackground(Bmp: TBGRABitmap);
 var
   TrayInset{, InnerRadius, OuterRadius}: integer;
   Size: integer;
@@ -686,9 +724,9 @@ begin
     Ellipse((Size div 2) - InnerRadius, (Size div 2) - InnerRadius,
       (Size div 2) + InnerRadius, (Size div 2) + InnerRadius); }
   end;
-end;
+end;}
 
-procedure TMainForm.DrawBaseIconForeground(Bmp: TBGRABitmap);
+{procedure TMainForm.DrawBaseIconForeground(Bmp: TBGRABitmap);
 var
   InnerRadius, OuterRadius: integer;
   Size: integer;
@@ -719,7 +757,7 @@ begin
     Pen.Opacity := 50;
     Pie(0, 0, Bmp.Width, Bmp.Width, -(60 * RAD_MULTIPLIER), (120 * RAD_MULTIPLIER));
   end;
-end;
+end;}
 
 {*
 procedure TMainForm.SetDeleteEnabled(AValue: boolean);
@@ -1694,6 +1732,5 @@ begin
   if FTimerFrames.Count = 0 then
     aiNewTimer.Execute;
 end;
-
 
 end.

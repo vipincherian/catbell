@@ -9,6 +9,10 @@
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
+      <Resources Count="2">
+        <Resource_0 FileName="../res/controls/256_progress_base.png" Type="RCDATA" ResourceName="256_PROGRESS_BASE"/>
+        <Resource_1 FileName="../res/controls/256_hourglass_flat.png" Type="RCDATA" ResourceName="256_HOURGLASS_FLAT"/>
+      </Resources>
     </General>
     <i18n>
       <EnableI18N LFM="False"/>
