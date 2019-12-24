@@ -112,7 +112,7 @@ type
     function GetCounter: string;
     function GetDuration: TDateTime;
     function GetDurationEnabled: boolean;
-    function GetImageGreyed: boolean;
+    //function GetImageGreyed: boolean;
     function GetIsProgressOnIcon: boolean;
     function GetPauseButtonEnabled: boolean;
     function GetPlayButtonEnabled: boolean;
@@ -123,7 +123,7 @@ type
     procedure SetDuration(AValue: TDateTime);
     procedure SetDurationEnabled(AValue: boolean);
     //procedure SetId(AValue: longword);
-    procedure SetImageGreyed(AValue: boolean);
+    //procedure SetImageGreyed(AValue: boolean);
     procedure SetIsProgressOnIcon(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
     procedure SetPauseButtonEnabled(AValue: boolean);
@@ -155,7 +155,7 @@ type
     OnTimerStart: TNotifyEvent;
     OnTimerPause: TNotifyEvent;
     OnTimerStop: TNotifyEvent;
-    OnTimerProgressUpdate: TNotifyEvent;
+    //OnTimerProgressUpdate: TNotifyEvent;
 
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
@@ -194,7 +194,7 @@ type
     property Duration: TDateTime read GetDuration write SetDuration;
     property DurationEnabled: boolean read GetDurationEnabled write SetDurationEnabled;
     property Caption: string read GetCaption write SetCaption;
-    property ImageGreyed: boolean read GetImageGreyed write SetImageGreyed;
+    //property ImageGreyed: boolean read GetImageGreyed write SetImageGreyed;
     property IsProgressOnIcon: boolean read GetIsProgressOnIcon
       write SetIsProgressOnIcon;
     //property ShowProgressOnIcon: boolean read GetShowProgressOnIcon write SetShowProgressOnIcon;
@@ -215,6 +215,8 @@ type
 
 implementation
 
+uses
+  main;
 {$R *.lfm}
 
 { TfraTimer }
@@ -368,10 +370,10 @@ begin
   Result := dtpSet.Enabled;
 end;
 
-function TfraTimer.GetImageGreyed: boolean;
+{function TfraTimer.GetImageGreyed: boolean;
 begin
   Result := imgTimer.Visible;
-end;
+end;}
 
 function TfraTimer.GetIsProgressOnIcon: boolean;
 begin
@@ -415,14 +417,14 @@ begin
   dtpSet.Enabled := AValue;
 end;
 
-procedure TfraTimer.SetImageGreyed(AValue: boolean);
+{procedure TfraTimer.SetImageGreyed(AValue: boolean);
 begin
-  if AValue then
+  ;{if AValue then
     ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap)
   else
-    ilTimer.GetBitmap(TIMER_IMG_COLOUR_TIMER, imgTimer.Picture.Bitmap);
+    ilTimer.GetBitmap(TIMER_IMG_COLOUR_TIMER, imgTimer.Picture.Bitmap);}
   //FFrame.imgTimer.Picture.Bitmap;
-end;
+end;}
 
 procedure TfraTimer.SetIsProgressOnIcon(AValue: boolean);
 begin
@@ -664,7 +666,7 @@ begin
   cbSelect.OnChange := @ClockSelected;
   OnProgressOnIconChanged := nil;
 
-  ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap);
+  //ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap);
 
   FRunning := False;
   FPaused := False;
@@ -794,7 +796,7 @@ begin
   PauseButtonEnabled := True;
   StopButtonEnabled := True;
   DurationEnabled := False;
-  ImageGreyed := False;
+  //ImageGreyed := False;
   bbAdjust.Enabled := True;
   //end;
 
@@ -843,7 +845,7 @@ begin
   PauseButtonEnabled := False;
   StopButtonEnabled := False;
   DurationEnabled := True;
-  ImageGreyed := True;
+  //ImageGreyed := True;
   Counter := DEF_COUNTDOWN_CAPTION;
   bbAdjust.Enabled := False;
   //end;
@@ -904,8 +906,9 @@ begin
   //for Observer in FObservers do
   //  Observer.ProgressUpdate(Percent);
   FProgress := Percent;
-  if OnTimerProgressUpdate <> nil then
-    OnTimerProgressUpdate(Self);
+  //if OnTimerProgressUpdate <> nil then
+  //  OnTimerProgressUpdate(Self);
+  MainForm.ProgressUpdate(Self, Percent);
 
 end;
 

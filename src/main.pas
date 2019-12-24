@@ -40,7 +40,7 @@ const
   //TRAY_OUTLINE_COLOUR = $3333f2; //$5A9E60;
   //TRAY_BG_COLOUR = $c6c6f5; //$DAEADB;
   //TRAY_CENTRE_COLOUR = TRAY_BG_COLOUR;
-  PROGRESS_COLOUR = $816691;
+  PROGRESS_COLOUR = $4352E2;
 
   PROGRESS_COMPLETED = 2.0;
 
@@ -48,6 +48,8 @@ const
   TRAY_CENTRE_INNER_RADIUS = 2;
   TRAY_CENTRE_OUTER_RADIUS = 4;
   TRAY_BASE_WIDTH = 16;
+
+  WIDGET_ICON_WIDTH = 24;
 
   RAD_MULTIPLIER = 16;
 
@@ -166,7 +168,7 @@ type
     FTrayProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FAppProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FWidgetProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
-    FTrayStoppedBitmap, FAppStoppedBitmap: TIcon;
+    FTrayStoppedBitmap, FAppStoppedBitmap, FWidgetStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
     //FClockWidget: TClocksWidget;
     //FClocks: TClocks;
@@ -212,8 +214,8 @@ type
     procedure TimerFinished(Sender: TObject);
     procedure TimerPaused(Sender: TObject);
     procedure TimerStarted(Sender: TObject);
-    procedure ProgressUpdate(Progress: single);
-    procedure TimerProgressUpdated(Sender: TObject);
+    procedure ProgressUpdate(Widget: TfraTimer; Progress: single);
+    //procedure TimerProgressUpdated(Sender: TObject);
 
     procedure OptionsFormClosed();
     function GetExportFileName: string;
@@ -444,10 +446,11 @@ begin
   begin
     FTrayProgressIcons[Count].Free;
     FAppProgressIcons[Count].Free;
+    FWidgetProgressIcons[Count].Free;
   end;
   FTrayStoppedBitmap.Free;
   FAppStoppedBitmap.Free;
-
+  FWidgetStoppedBitmap.Free;
   //inherited Destroy;
   SavetoFile;
   //FClocks.Destroy;
@@ -563,29 +566,37 @@ begin
   { Create one hi-res image and then resize it and assign}
   HiresBmp := TBGRABitmap.Create(Stream);
 
-  FinalBmp := HiresBmp.Resample(TrayIconSize, TrayIconSize,
-    rmFineResample) as TBGRABitmap;
+  FinalBmp := HiresBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as
+    TBGRABitmap;
 
   FTrayStoppedBitmap := TIcon.Create;
   FTrayStoppedBitmap.Assign(FinalBmp.Bitmap);
 
   FinalBmp.Free;
 
-  FinalBmp := HiresBmp.Resample(AppIconSize, AppIconSize,
-    rmFineResample) as TBGRABitmap;
+  FinalBmp := HiresBmp.Resample(AppIconSize, AppIconSize, rmFineResample) as
+    TBGRABitmap;
 
   FAppStoppedBitmap := TIcon.Create;
   FAppStoppedBitmap.Assign(FinalBmp.Bitmap);
 
   FinalBmp.Free;
 
-  ProgressUpdate(PROGRESS_COMPLETED);
+  FinalBmp := HiresBmp.Resample(WIDGET_ICON_WIDTH, WIDGET_ICON_WIDTH, rmFineResample) as
+    TBGRABitmap;
+
+  FWidgetStoppedBitmap := TIcon.Create;
+  FWidgetStoppedBitmap.Assign(FinalBmp.Bitmap);
+
+  FinalBmp.Free;
+
+  ProgressUpdate(Nil, PROGRESS_COMPLETED);
   HiresBmp.Free;
   Stream.Free;
 
 
   Stream := TResourceStream.Create(hInstance, '256_PROGRESS_BASE', RT_RCDATA);
-  InSet := 3;
+  InSet := 48;
 
   for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
   begin
@@ -603,33 +614,37 @@ begin
       CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
       CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
 
-       {CanvasBGRA.Pie(InSet, InSet, (TrayIconSize - InSet),
-         (TrayIconSize - InSet), 90 * RAD_MULTIPLIER,
-         -(15 * RAD_MULTIPLIER * (Count - 1)));}
-      CanvasBGRA.Pie((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
-        (Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
-        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
-        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
+      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
     end;
     //DrawBaseIconForeground(FinalBmp);
 
-    FinalBmp:=HiresBmp.Resample(TrayIconSize, TrayIconSize,
-      rmFineResample) as TBGRABitmap;
+    FinalBmp := HiresBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as
+      TBGRABitmap;
 
     FTrayProgressIcons[Count] := TIcon.Create;
     FTrayProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
     FinalBmp.Free;
 
-    FinalBmp:=HiresBmp.Resample(AppIconSize, AppIconSize,
-      rmFineResample) as TBGRABitmap;
+    FinalBmp := HiresBmp.Resample(AppIconSize, AppIconSize, rmFineResample) as
+      TBGRABitmap;
 
     //DrawBaseIconForeground(FinalBmp);
     FAppProgressIcons[Count] := TIcon.Create;
     FAppProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
     FinalBmp.Free;
+
+    FinalBmp := HiresBmp.Resample(WIDGET_ICON_WIDTH, WIDGET_ICON_WIDTH, rmFineResample) as
+      TBGRABitmap;
+
+    //DrawBaseIconForeground(FinalBmp);
+    FWidgetProgressIcons[Count] := TIcon.Create;
+    FWidgetProgressIcons[Count].Assign(FinalBmp.Bitmap);
+
+    FinalBmp.Free;
+
     HiresBmp.Free;
   end;
   Stream.Free;
@@ -947,7 +962,7 @@ begin
 
 end;
 
-procedure TMainForm.ProgressUpdate(Progress: single);
+procedure TMainForm.ProgressUpdate(Widget: TfraTimer; Progress: single);
 var
   //Bmp: TBitmap;
   Index: integer;
@@ -958,7 +973,8 @@ begin
     Icon.Assign(FTrayStoppedBitmap);
     Application.Icon.Assign(FAppStoppedBitmap);
     FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
-
+    if Widget <> Nil then
+      Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   end
   else
   begin
@@ -977,18 +993,20 @@ begin
       //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
       Application.Icon.Assign(FAppProgressIcons[Index + 1]);
       FLastTrayIconIndex := Index;
+      if Widget <> Nil then
+        Widget.imgTimer.Picture.Assign(FWidgetProgressIcons[Index + 1]);
     end;
   end;
 
 end;
 
-procedure TMainForm.TimerProgressUpdated(Sender: TObject);
+{procedure TMainForm.TimerProgressUpdated(Sender: TObject);
 var
   TimerFrame: TfraTimer;
 begin
   TimerFrame := TfraTimer(Sender);
   ProgressUpdate(TimerFrame.Progress);
-end;
+end;}
 
 procedure TMainForm.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
 var
@@ -1155,7 +1173,8 @@ begin
   NewWidget.OnTimerStart := @TimerStarted;
   NewWidget.OnTimerPause := @TimerPaused;
   NewWidget.OnTimerStop := @TimerFinished;
-  NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
+  NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
+  //NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
   begin
     NewWidget.edtTitle.Color:=clForm;
