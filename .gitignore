@@ -1,6 +1,7 @@
 /src/lib
 /src/backup
 /src/catbell
-/src/catbell.exe
+**/*.exe
 /src/*.res
 /src/catbell.lps
+**/*.dll
