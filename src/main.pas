@@ -177,6 +177,12 @@ type
 
     FShortTimer: TTimer;
 
+    { This is an invisible timer frame, the purpose of which
+    is to aid in resizing header sections when there are no timers
+    added. It is a waste of space, but I could not find a better
+    and reliable way to achieve the same functionality.}
+    FReference: TfraTimer;
+
     procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
     procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
     //procedure SetDeleteEnabled(AValue: boolean);
@@ -323,6 +329,11 @@ begin
   FShortTimer.Interval := 200;
   FShortTimer.Enabled := False;
   FShortTimer.OnTimer := @OnShortTimer;
+
+  FReference := TfraTimer.Create(Nil);
+  FReference.Visible := False;
+  FReference.Align:=alNone;
+  FReference.Anchors:=[];
 
   bmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
 
@@ -549,6 +560,8 @@ begin
   end;
 
   FCounterClockID.Free;
+
+  FReference.Free;
 
   //FActiveTimers.Free;
   FActiveTimerFrames.Free;
@@ -789,13 +802,33 @@ begin
   begin
     Id := FOrder.Items[0];
     Timer := FTimerFrames.KeyData[Id];
+  end
+  else
+  begin
+    //FReference.Width:=sbxClocks.ClientWidth;
+    //FReference.ReAlign;
+    //Freference.Refresh;
+    //FReference.Repaint;
+    Timer := FReference;
+  end;
     // Find the
     hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
     Inc(Filled, hdrTimers.Sections.Items[0].Width);
+
     Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
-    Temp := Temp + ((Timer.bbPlay.Left - Temp) div 2) - Filled;
+    Inc(Temp,  ((Timer.bbPlay.Left - Temp) div 2));
+
+    { If there are no timers added, we are using FReference as a reference.
+    It is an invisible frame and is not under the scrollbar hence its width and
+    the scrollbar's may not be the same. This needs to be taken into account,
+    and an adjustment of (sbxClocks.Width - Timer.Width) needs to be made.}
+
+    Inc(Temp, sbxClocks.Width - Timer.Width - Filled);
+    //Temp := Temp - Filled;
     hdrTimers.Sections.Items[1].Width := Temp;
-    Inc(Filled, hdrTimers.Sections.Items[1].Width);
+
+    Inc(Filled, hdrTimers.Sections.Items[1].Width- (sbxClocks.Width - Timer.Width));
+    //Filled := Filled - (sbxClocks.Width - Timer.Width);
 
     Temp := Timer.bbAdjust.Left + Timer.bbAdjust.Width;
     Temp := Temp + ((Timer.lblCountdown.Left - Temp) div 2) - Filled;
@@ -812,14 +845,10 @@ begin
     hdrTimers.Sections.Items[4].Width := Temp;
     Inc(Filled, Temp);
 
-    Temp := sbxClocks.Width - Filled;
+    Temp := Timer.Width - Filled;
     hdrTimers.Sections.Items[5].Width := Temp;
     Inc(Filled, Temp);
-  end
-  else
-  begin
-    Filled := 0;
-  end;
+
   //Ids.Free;
 end;
 
