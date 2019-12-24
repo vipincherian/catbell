@@ -165,6 +165,7 @@ type
     { private declarations }
     FTrayProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FAppProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
+    FWidgetProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FTrayStoppedBitmap, FAppStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
     //FClockWidget: TClocksWidget;
@@ -186,15 +187,7 @@ type
     and reliable way to achieve the same functionality.}
     FReference: TfraTimer;
 
-    //procedure DrawBaseIconBackground(Bmp: TBGRABitmap);
-    //procedure DrawBaseIconForeground(Bmp: TBGRABitmap);
-    //procedure SetDeleteEnabled(AValue: boolean);
-    //procedure SetForm(AValue: TMainForm);
-    //procedure SetMoveDownEnabled(AValue: boolean);
-    //procedure SetMoveUpEnabled(AValue: boolean);
-    //procedure FormShow(Sender: TObject);
-    //procedure UpdateAlertFormSettings;
-    //procedure ExportToFile(Sender: TObject);
+    procedure CreateBitmaps;
     procedure PostTimerCreation(AValue: TfraTimer);
     procedure SetListButtonsStatus;
     procedure ResetHeaderSections;
@@ -214,27 +207,17 @@ type
     OnClockMoveUp: TNotifyEvent;
     OnClockMoveDown: TNotifyEvent;
     OnEXport: TNotifyEvent;
-    //property Clocks: TClocksWidget read FClockWidget;
-    //procedure NewTimerAdded(Sender: TObject);
-    //procedure NewAlarmAdded(Sender: TObject);
-    //procedure ClockDeleted(Sender: TObject);
-    //procedure ClockMovedUp(Sender: TObject);
-    //procedure ClockMovedDown(Sender: TObject);
+
     procedure ClockSelected(Sender: TObject);
     procedure TimerFinished(Sender: TObject);
     procedure TimerPaused(Sender: TObject);
     procedure TimerStarted(Sender: TObject);
     procedure ProgressUpdate(Progress: single);
     procedure TimerProgressUpdated(Sender: TObject);
-    //procedure OptionsEdit(Sender: TObject);
-    //procedure ExportClicked(Sender: TObject);
+
     procedure OptionsFormClosed();
     function GetExportFileName: string;
-    //property Form: TMainForm read FForm write SetForm;
-    //property Clocks: TClocksWidget read GetClocks;
-    //property DeleteEnabled: boolean write SetDeleteEnabled;
-    //property MoveUpEnabled: boolean write SetMoveUpEnabled;
-    //property MoveDownEnabled: boolean write SetMoveDownEnabled;
+
     procedure ProcessCommandline;
     procedure SavetoFile;
     procedure LoadfromFile;
@@ -264,13 +247,8 @@ implementation
 { TMainForm }
 
 procedure TMainForm.FormCreate(Sender: TObject);
-var
-  Count: integer;
-  Stream: TResourceStream;
-  TrayIconSize: integer;
-  InSet: integer;
-  FinalBmp: TBGRABitmap;
-  png:TPortableNetworkGraphic;
+{var
+  png: TPortableNetworkGraphic;}
 begin
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_SIZE;
@@ -298,23 +276,6 @@ begin
   ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
   tiMain.Visible := True;
 
-
-
-  //Self.AlphaBlend:=True;
-  //Self.AlphaBlendValue:=50;
-  //aiNewTimer.OnExecute := @NewTimerAdded;
-  //aiNewAlarm.OnExecute := @NewAlarmAdded;
-  //aiOptions.OnExecute := @OptionsEdit;
-  {TODO: Add actions for delete, clock up and down}
-  //sbDelete.OnClick := @ClockDeleted;
-  //sbMoveClockUp.OnClick := @ClockMovedUp;
-  //sbMoveClockDown.OnClick := @ClockMovedDown;
-  //aiExport.OnExecute := @ExportClicked;
-  //OnShow := @FormShow;
-
-  //sbDelete.Caption := '';
-  //sbMoveClockDown.Caption := '';
-  //sbMoveClockUp.Caption := '';
   bbDelete.Caption := '';
   bbMoveUp.Caption := '';
   bbMoveDown.Caption := '';
@@ -329,7 +290,7 @@ begin
 
 
   //TrayIconSize := TRAY_BASE_WIDTH;
-  TrayIconSize := GetSystemMetrics(SM_CXSMICON);
+
 
   FShortTimer := TTimer.Create(nil);
   FShortTimer.Interval := 200;
@@ -341,111 +302,7 @@ begin
   FReference.Align := alNone;
   FReference.Anchors := [];
 
-  //TempBmp :=TBitmap.Create;
-  //FinalBmp := TBGRABitmap.Create(
-  //FinalBmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
-  Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
-
-  //png := TPortableNetworkGraphic.Create;
-  //png.LoadFromResourceName(HINSTANCE, 'progressbase');
-  //png.Free;
-  FinalBmp := TBGRABitmap.Create(Stream);
-  BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as TBGRABitmap);
-  //FinalBmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
-
-  //DrawBaseIconBackground(FinalBmp);
-  //DrawBaseIconForeground(FinalBmp);
-
-  FTrayStoppedBitmap := TIcon.Create;
-  FTrayStoppedBitmap.Assign(FinalBmp.Bitmap);
-
-  FinalBmp.Free;
-  //UnscaledBmp.Free;
-
-
-  //TempBmp.Free;
-
-
-  //FinalBmp := TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
-  Stream.Seek(0, soFromBeginning);
-  FinalBmp := TBGRABitmap.Create(Stream);
-  BGRAReplace(FinalBmp, FinalBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE, rmFineResample) as TBGRABitmap);
-  //DrawBaseIconBackground(FinalBmp);
-  //DrawBaseIconForeground(FinalBmp);
-
-  FAppStoppedBitmap := TIcon.Create;
-  FAppStoppedBitmap.Assign(FinalBmp.Bitmap);
-
-  FinalBmp.Free;
-  //UnscaledBmp.Free;
-
-  ProgressUpdate(PROGRESS_COMPLETED);
-
-  Stream.Free;
-  Stream := TResourceStream.Create(hInstance, '256_PROGRESS_BASE', RT_RCDATA);
-
-  InSet := 3;
-
-  for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
-  begin
-
-    //FinalBmp :=
-      //TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
-    Stream.Seek(0, soFromBeginning);
-    FinalBmp := TBGRABitmap.Create(Stream);
-    BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as TBGRABitmap);
-    //DebugLn('Revised width is ' + FinalBmp.Width);
-
-    //DrawBaseIconBackground(FinalBmp);
-    with FinalBmp do
-    begin
-
-      CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
-      CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
-
-      {CanvasBGRA.Pie(InSet, InSet, (TrayIconSize - InSet),
-        (TrayIconSize - InSet), 90 * RAD_MULTIPLIER,
-        -(15 * RAD_MULTIPLIER * (Count - 1)));}
-      CanvasBGRA.Pie((Inset * TrayIconSize) div TRAY_BASE_WIDTH,
-        (Inset * TrayIconSize) div TRAY_BASE_WIDTH,
-        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
-        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
-        90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
-    end;
-    //DrawBaseIconForeground(FinalBmp);
-    FTrayProgressIcons[Count] := TIcon.Create;
-
-    FTrayProgressIcons[Count].Assign(FinalBmp.Bitmap);
-
-    FinalBmp.Free;
-    //UnscaledBmp.Free;
-
-    //FinalBmp :=
-    //  TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
-    Stream.Seek(0, soFromBeginning);
-    FinalBmp := TBGRABitmap.Create(Stream);
-    BGRAReplace(FinalBmp, FinalBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE, rmFineResample) as TBGRABitmap);
-    //DrawBaseIconBackground(FinalBmp);
-    with FinalBmp do
-    begin
-
-      CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
-      CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
-
-      CanvasBGRA.Pie((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
-        (Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
-        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
-        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
-        90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
-    end;
-    //DrawBaseIconForeground(FinalBmp);
-    FAppProgressIcons[Count] := TIcon.Create;
-    FAppProgressIcons[Count].Assign(FinalBmp.Bitmap);
-
-    FinalBmp.Free;
-    //UnscaledBmp.Free;
-  end;
-  Stream.Free;
+  CreateBitmaps;
 
 end;
 
@@ -496,7 +353,7 @@ procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   CurrPosNormal, CurrPosRestored: TRect;
 begin
-  //TODO: This should be moved to form close?
+
   CurrPosNormal.Top := Top;
   CurrPosNormal.Left := Left;
   //CurrPosNormal.Right := CurrPosNormal.Left + Width;
@@ -664,16 +521,6 @@ begin
   GlobalUserConfig.AutoProgress := tbProgressAuto.Down;
 end;
 
-{procedure TMainForm.tbShowModalAlertClick(Sender: TObject);
-begin
-  GlobalUserConfig.ShowModalAlert := tbShowModalAlert.Down;
-end;}
-
-{procedure TMainForm.tbShowTrayAlertClick(Sender: TObject);
-begin
-  GlobalUserConfig.ShowTrayAlert := tbShowTrayAlert.Down;
-end;}
-
 procedure TMainForm.tiMainClick(Sender: TObject);
 begin
   ShowInForeground;
@@ -691,128 +538,127 @@ begin
     pmTray.PopUp;
 end;
 
-{*function TMainForm.GetClocks: TClocksWidget;
-begin
-  Result := FClockWidget;
-end;*}
-
-{procedure TMainForm.DrawBaseIconBackground(Bmp: TBGRABitmap);
-var
-  TrayInset{, InnerRadius, OuterRadius}: integer;
-  Size: integer;
-begin
-  Size := Bmp.Width;
-  TrayInset := (TRAY_OUTLINE_INSET * Size) div TRAY_BASE_WIDTH;
-  //InnerRadius := (TRAY_CENTRE_INNER_RADIUS * Size) div TRAY_BASE_WIDTH;
-  //InnerRadius := (TRAY_CENTRE_Inner_RADIUS * Size) div TRAY_BASE_WIDTH;
-  //Bmp := TBGRABitmap.Create(Size, Size, BGRAPixelTransparent);
-  //Bmp.SetSize(Size, Size);
-  with Bmp.CanvasBGRA do
-  begin
-    Brush.Color := TRAY_OUTLINE_COLOUR;
-    Pen.Color := TRAY_OUTLINE_COLOUR;
-    Ellipse(0, 0, Size, Size);
-    Brush.Color := TRAY_BG_COLOUR;
-    Pen.Color := TRAY_BG_COLOUR;
-    Ellipse(TrayInset, TrayInset, Size - TrayInset, Size - TrayInset);
-    {Brush.Color := TRAY_OUTLINE_COLOUR;
-    Pen.Color := TRAY_OUTLINE_COLOUR;
-    Ellipse((Size div 2) - InnerRadius, (Size div 2) - InnerRadius,
-      (Size div 2) + InnerRadius, (Size div 2) + InnerRadius);
-    Brush.Color := TRAY_BG_COLOUR;
-    Pen.Color := TRAY_BG_COLOUR;
-    Ellipse((Size div 2) - InnerRadius, (Size div 2) - InnerRadius,
-      (Size div 2) + InnerRadius, (Size div 2) + InnerRadius); }
-  end;
-end;}
-
-{procedure TMainForm.DrawBaseIconForeground(Bmp: TBGRABitmap);
-var
-  InnerRadius, OuterRadius: integer;
-  Size: integer;
-begin
-  Size := Bmp.Width;
-  InnerRadius := (TRAY_CENTRE_INNER_RADIUS * Size) div TRAY_BASE_WIDTH;
-  OuterRadius := (TRAY_CENTRE_OUTER_RADIUS * Size) div TRAY_BASE_WIDTH;
-  with Bmp.CanvasBGRA do
-  begin
-    Brush.Color := TRAY_OUTLINE_COLOUR;
-    Pen.Color := TRAY_OUTLINE_COLOUR;
-    Ellipse((Size div 2) - OuterRadius, (Size div 2) - OuterRadius,
-      (Size div 2) + OuterRadius, (Size div 2) + OuterRadius);
-    Brush.Color := TRAY_CENTRE_COLOUR;
-    Pen.Color := TRAY_CENTRE_COLOUR;
-    Ellipse((Size div 2) - InnerRadius, (Size div 2) - InnerRadius,
-      (Size div 2) + InnerRadius, (Size div 2) + InnerRadius);
-
-    Brush.Color := clWhite;
-    Brush.Opacity := 80;
-    Pen.Color := clWhite;
-    Pen.Opacity := 80;
-    Pie(0, 0, Bmp.Width, Bmp.Width, 90 * RAD_MULTIPLIER, -(180 * RAD_MULTIPLIER));
-
-    Brush.Color := TRAY_OUTLINE_COLOUR;
-    Brush.Opacity := 50;
-    Pen.Color := TRAY_OUTLINE_COLOUR;
-    Pen.Opacity := 50;
-    Pie(0, 0, Bmp.Width, Bmp.Width, -(60 * RAD_MULTIPLIER), (120 * RAD_MULTIPLIER));
-  end;
-end;}
-
-{*
-procedure TMainForm.SetDeleteEnabled(AValue: boolean);
-begin
-  sbDelete.Enabled := AValue;
-end;
-
-procedure TMainForm.SetMoveDownEnabled(AValue: boolean);
-begin
-  sbMoveClockDown.Enabled := AValue;
-end;
-
-procedure TMainForm.SetMoveUpEnabled(AValue: boolean);
-begin
-  sbMoveClockUp.Enabled := Avalue;
-end;*}
-
-{8procedure TMainForm.FormShow(Sender: TObject);
-begin
-  //frmOptions.OnClose := @OptionsFormClosed;
-  UpdateAlertFormSettings;
-end;*}
-
-{procedure TMainForm.UpdateAlertFormSettings;
-begin
-  {with GlobalUserConfig do
-  begin
-    frmTimerAlert.Color := ModalBackgroundColour;
-    frmTimerAlert.stxMessage.Font.Color := ModalCaptionColour;
-    frmTimerAlert.stxAdditional.Font.Color := ModalSubtextColour;
-  end;}
-end;}
-
-{*procedure TMainForm.ExportToFile(Sender: TObject);
-var
-  FileName: string;
-  Conf: TJSONConfig;
-begin
-  SavetoFile;
-  FileName := '';
-  FileName := GetExportFileName;
-  if FileName <> '' then
-  begin
-    Conf := TJSONConfig.Create(nil);
-    FClocks.SaveClocks(Conf);
-    Conf.Filename := FileName;
-    Conf.Free;
-  end;
-end;*}
 
 procedure TMainForm.PostTimerCreation(AValue: TfraTimer);
 begin
   //AValue.AddSubscription(Self);
   AValue.OnSelect := @ClockSelected;
   ResetHeaderSections;
+end;
+
+procedure TMainForm.CreateBitmaps;
+var
+  FinalBmp: TBGRABitmap;
+  InSet: integer;
+  TrayIconSize: integer;
+  Stream: TResourceStream;
+  Count: integer;
+begin
+  TrayIconSize := GetSystemMetrics(SM_CXSMICON);
+
+  // Read
+  Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
+  FinalBmp := TBGRABitmap.Create(Stream);
+  BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize,
+    rmFineResample) as TBGRABitmap);
+  //FinalBmp := TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
+
+  //DrawBaseIconBackground(FinalBmp);
+  //DrawBaseIconForeground(FinalBmp);
+
+  FTrayStoppedBitmap := TIcon.Create;
+  FTrayStoppedBitmap.Assign(FinalBmp.Bitmap);
+
+  FinalBmp.Free;
+  //UnscaledBmp.Free;
+
+
+  //TempBmp.Free;
+
+
+  //FinalBmp := TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
+  Stream.Seek(0, soFromBeginning);
+  FinalBmp := TBGRABitmap.Create(Stream);
+  BGRAReplace(FinalBmp, FinalBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE,
+    rmFineResample) as TBGRABitmap);
+  //DrawBaseIconBackground(FinalBmp);
+  //DrawBaseIconForeground(FinalBmp);
+
+  FAppStoppedBitmap := TIcon.Create;
+  FAppStoppedBitmap.Assign(FinalBmp.Bitmap);
+
+  FinalBmp.Free;
+  //UnscaledBmp.Free;
+
+  ProgressUpdate(PROGRESS_COMPLETED);
+
+  Stream.Free;
+  Stream := TResourceStream.Create(hInstance, '256_PROGRESS_BASE', RT_RCDATA);
+
+  InSet := 3;
+
+  for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
+  begin
+
+    //FinalBmp :=
+    //TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
+    Stream.Seek(0, soFromBeginning);
+    FinalBmp := TBGRABitmap.Create(Stream);
+    BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize,
+      rmFineResample) as TBGRABitmap);
+    //DebugLn('Revised width is ' + FinalBmp.Width);
+
+    //DrawBaseIconBackground(FinalBmp);
+    with FinalBmp do
+    begin
+
+      CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
+      CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
+
+       {CanvasBGRA.Pie(InSet, InSet, (TrayIconSize - InSet),
+         (TrayIconSize - InSet), 90 * RAD_MULTIPLIER,
+         -(15 * RAD_MULTIPLIER * (Count - 1)));}
+      CanvasBGRA.Pie((Inset * TrayIconSize) div TRAY_BASE_WIDTH,
+        (Inset * TrayIconSize) div TRAY_BASE_WIDTH,
+        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
+        (TrayIconSize - ((Inset * TrayIconSize) div TRAY_BASE_WIDTH)),
+        90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
+    end;
+    //DrawBaseIconForeground(FinalBmp);
+    FTrayProgressIcons[Count] := TIcon.Create;
+
+    FTrayProgressIcons[Count].Assign(FinalBmp.Bitmap);
+
+    FinalBmp.Free;
+    //UnscaledBmp.Free;
+
+    //FinalBmp :=
+    //  TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE, BGRAPixelTransparent);
+    Stream.Seek(0, soFromBeginning);
+    FinalBmp := TBGRABitmap.Create(Stream);
+    BGRAReplace(FinalBmp, FinalBmp.Resample(APP_ICON_SIZE, APP_ICON_SIZE,
+      rmFineResample) as TBGRABitmap);
+    //DrawBaseIconBackground(FinalBmp);
+    with FinalBmp do
+    begin
+
+      CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
+      CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
+
+      CanvasBGRA.Pie((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
+        (Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH,
+        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
+        (APP_ICON_SIZE - ((Inset * APP_ICON_SIZE) div TRAY_BASE_WIDTH)),
+        90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
+    end;
+    //DrawBaseIconForeground(FinalBmp);
+    FAppProgressIcons[Count] := TIcon.Create;
+    FAppProgressIcons[Count].Assign(FinalBmp.Bitmap);
+
+    FinalBmp.Free;
+    //UnscaledBmp.Free;
+  end;
+  Stream.Free;
 end;
 
 procedure TMainForm.SetListButtonsStatus;
@@ -1026,77 +872,6 @@ begin
   Show;
 end;
 
-{*procedure TMainForm.NewTimerAdded(Sender: TObject);
-var
-  Added: TTimerClock;
-begin
-  {if OnNewTimer <> nil then
-    OnNewTimer(Sender);}
-  Added := FClocks.AddTimer;
-  PostTimerCreation(Added);
-end; *}
-
-{*
-procedure TMainForm.NewAlarmAdded(Sender: TObject);
-begin
-  if OnNewAlarm <> nil then
-    OnNewAlarm(Sender)
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnNewAlarm was found to be Nil');
-end; *}
-
-{procedure TMainForm.ClockDeleted(Sender: TObject);
-begin
-  //ShowMessage('Haha');
-  {*if OnClockDelete <> nil then
-  begin
-    OnClockDelete(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnClockDelete was found to be Nil');*}
-  DeleteSelected;
-  SetListButtonsStatus;
-end;}
-
-{procedure TMainForm.ClockMovedUp(Sender: TObject);
-begin
-  {*if OnClockMoveUp <> nil then
-  begin
-    OnClockMoveUp(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnClockMoveUp was found to be Nil');*}
-  MoveSelectedClocksUp;
-  SetListButtonsStatus;
-end;}
-
-{procedure TMainForm.ClockMovedDown(Sender: TObject);
-begin
-  {*if OnClockMoveDown <> nil then
-  begin
-    OnClockMoveDown(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnClockMoveDown was found to be Nil');*}
-  MoveSelectedClocksDown;
-  SetListButtonsStatus;
-end;                }
 
 procedure TMainForm.ClockSelected(Sender: TObject);
 begin
@@ -1111,15 +886,10 @@ var
   Widget: TfraTimer;
   Duration: TDateTime;
   Message: string;
-  Id: longword;
 begin
-  //DecodeTime(Duration, Hours, Minutes, Seconds, Millis);
-
-  //DebugLn('Entering TimerFinished');
-  //DebugLn('Timer ID - ' + InttoStr(Id));
 
   Widget := TfraTimer(Sender);
-  Id := Widget.Id;
+  //Id := Widget.Id;
   Duration := Widget.Duration;
 
   Hours := HourOf(Duration);
@@ -1167,7 +937,6 @@ end;
 procedure TMainForm.TimerPaused(Sender: TObject);
 var
   TimerFrame: TfraTimer;
-  Index: integer;
 begin
   TimerFrame := TfraTimer(Sender);
   try
@@ -1246,25 +1015,6 @@ begin
   TimerFrame := TfraTimer(Sender);
   ProgressUpdate(TimerFrame.Progress);
 end;
-
-{*procedure TMainForm.OptionsEdit(Sender: TObject);
-begin
-  frmOptions.ShowModal;
-end;*}
-
-{*procedure TMainForm.ExportClicked(Sender: TObject);
-begin
-  if OnExport <> nil then
-  begin
-    OnExport(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnExport was found to be Nil');
-end;*}
 
 procedure TMainForm.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
 var
@@ -1565,7 +1315,7 @@ begin
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
 
-    Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+    Conf.SetValue((TIMER_CONF_TIMERS) + ('/') + IntToStr(Count + 1) +
       '/' + TIMER_CONF_TITLE, TimerClock.Caption);
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_HOURS, HourOf(TimerClock.Duration));
@@ -1709,7 +1459,6 @@ end;
 procedure TMainForm.OnShortTimer(Sender: TObject);
 var
   TimerFrame: TfraTimer;
-  Count: integer;
 begin
   //for TimerFrame in FActiveTimerFrames.K;
   //DebugLn('Timer fired. ');
