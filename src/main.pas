@@ -911,8 +911,9 @@ begin
   Filled := 24;
   //FScrollBox.AutoScroll:=False;
   //FScrollBox.Visible:=False;
-  sbxClocks.Height := FOrder.Count * CLOCK_HEIGHT;
+  //sbxClocks.Height := FOrder.Count * CLOCK_HEIGHT;
   CountTabOrder := 0;
+  hdrTimers.Top:=0;
   for Id in FOrder do
   begin
     //Index := FClockWidgets.IndexOf(Id);
@@ -942,10 +943,10 @@ begin
   //FScrollBox.VertScrollBar.Range:=(FOrder.Count) * CLOCK_HEIGHT;
 
   //FScrollBox.VertScrollBar.Range:=Filled ;
-  //FScrollBox.Refresh;
+  //sbxClocks.Refresh;
   //FScrollBox.Visible:=True;
-  //FScrollBox.Repaint;
-  //FScrollBox.ReAlign;
+  //sbxClocks.Repaint;
+  //sbxClocks.ReAlign;
 
 end;
 
