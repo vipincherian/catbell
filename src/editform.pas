@@ -26,7 +26,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  DateTimePicker, settings, dateutils, sndfile, ctypes, LazLogger, Math;
+  ComCtrls, DateTimePicker, settings, dateutils, sndfile, ctypes, LazLogger,
+  Math;
 
 type
   { TTimerSpecs }
@@ -48,15 +49,16 @@ type
   { TfrmEditTimer }
 
   TfrmEditTimer = class(TForm)
-    bbSelectAudioFile: TBitBtn;
     bbCancel: TBitBtn;
-    bbSave: TBitBtn;
     bbClearAudioFile: TBitBtn;
+    bbSave: TBitBtn;
+    bbSelectAudioFile: TBitBtn;
     ckbModalAlert: TCheckBox;
     ckbTrayNotification: TCheckBox;
     dtpDuration: TDateTimePicker;
-    edtDescription: TEdit;
     edtAudioFile: TEdit;
+    edtDescription: TEdit;
+    imlEdit: TImageList;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
@@ -64,6 +66,9 @@ type
     lblLengthText: TLabel;
     lblLenthVal: TLabel;
     odgAudio: TOpenDialog;
+    tsAudio: TPageControl;
+    tsTimer: TTabSheet;
+    TabSheet2: TTabSheet;
     procedure bbCancelClick(Sender: TObject);
     procedure bbClearAudioFileClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
@@ -347,7 +352,8 @@ end;
 
 function TfrmEditTimer.ShowForAdd: boolean;
 begin
-  Self.Caption:='Add Timer';
+  Caption:='Add Timer';
+  tsTimer.Show;
   FId := longword(-1);
   Result:=ShowAndGetSpecs;
 end;
