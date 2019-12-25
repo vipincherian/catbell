@@ -228,7 +228,7 @@ object frmEditTimer: TfrmEditTimer
     end
   end
   object odgAudio: TOpenDialog
-    Filter = 'Supported audio files|*.wav;*.ogg|All files|*.*'
+    Filter = 'Supported audio files|*.wav;*.ogg;*.flac;*.aif;*.aiff;*.aifc;*.snd;*.raw;*.iff;*.8svx;*.sf;*.voc;*.w64;*.mat4;*mat5;*.pvf;*.xi;*.htk;*.caf;*.sd2|Waveform Audio|*.wav|Ogg Container Format|*.ogg|Free Lossless Audio Codec|*.flac|Audio Interchange File Format|*.aif;*aiff;*.aifc|SND File Format|*.snd|Raw Audio|*.raw|Commodore-Amiga Audio|*.iff;*.8svx|IRCAM soundfile|*.sf|Creative Voice file|*.voc|Sony Media Wave 64|*.w64|GNU Octave|*.mat4;*mat5|Portable Voice Format|*.pvf|Fasttracker 2|*.xi|HMM Took Kit|*.htk|Core Audio Format|*.caf|Sound Designer II|*.sd2|All Files|*'
     left = 472
   end
   object imlEdit: TImageList
