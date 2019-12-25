@@ -278,31 +278,9 @@ begin
     sf_close(AudioInfo^.SoundFile);
     Result := cint(paComplete);
   end;
-    {while (readCount > 0) do
-    begin
-      PaErrCode := Pa_WriteStream(Stream, AudBuffer, BUFFER_SIZE);
-      if (paErrCode <> Int32(paNoError)) then
-      begin
-        DebugLn('Pa_WriteStream failed ' + Pa_GetErrorText(paErrCode));
-        DebugLn('Error after Pa_WriteStream ' + IntToHex(PaErrCode, 8));
-      end;
-      FillChar(AudBuffer^, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
-      readCount := sf_read_float(SoundFile, AudBuffer, BUFFER_SIZE * Info.channels);
-      //WriteLn('readCount is ' + IntToHex(readCount, 8));
-    end;
-    //WriteLn(IntToStr(Info.channels));
 
-    PaErrCode := Pa_CloseStream(Stream);
-    if (paErrCode <> Int32(paNoError)) then
-    begin
-      DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
-    end;
-  Result := cint(paAbort);}
-  //Freemem(AudBuffer);
-  //output := AudBuffer;
-  //DebugLn('Exiting audio callback');
 end;
+
 {This function is called by PortAudio to signal that the stream has stopped.
 As this is a non-class function, it sends a message to frame using the frame's
 handle.}
@@ -972,7 +950,18 @@ begin
     frmEditTimer.dtpDuration.Enabled := True;
 
   //PostMessage(Handle, UM_PLAY_AUDIO, 0, 0);
-  PlayAudio;
+  if FAudioFile <> '' then
+  begin
+    PlayButtonEnabled := False;
+    PauseButtonEnabled := False;
+    StopButtonEnabled := False;
+    DurationEnabled := False;
+    //ImageGreyed := True;
+    //Counter := DEF_COUNTDOWN_CAPTION;
+    //bbAdjust.Enabled := False;
+    PlayAudio;
+  end;
+
 end;
 
 {procedure TfraTimer.NotifyChange(Sender: TObject);
@@ -1225,14 +1214,8 @@ var
   SoundFile: PSndFile;
   Info: SF_INFO;
   PaErrCode: PaError;
-
   StreamParams: PaStreamParameters;
-  //subFormat: cint;
-  //AudBuffer: array of double;
-  //AudBuffer: array[0..2047] of double;
-  //AudBuffer: pointer;
-  //readCount: cint;
-  //CallBack: PPaStreamCallback;
+
 begin
   DebugLn('Playing audio');
   Info.format := 0;
@@ -1250,17 +1233,9 @@ begin
   DebugLn(IntToStr(Info.samplerate));
   DebugLn(IntToStr(Info.sections));}
 
-  //SetLength(AudBuffer, 2048);
-  //FillChar(AudBuffer, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
-  //GetMem(AudBuffer, BUFFER_SIZE * Info.channels * sizeof(double));
-
-  //PaErrCode := Pa_Initialize();
-  //WriteLn('Error after pa_Initialize ' + IntToHex(PaErrCode, 8));
-  //FStream := nil;
   StreamParams.device := Pa_GetDefaultOutputDevice();
 
   StreamParams.channelCount := Info.channels;
-  // This has to be carefully set, not true will all files
   StreamParams.sampleFormat := paFloat32;
 
   Streamparams.suggestedLatency :=
@@ -1297,52 +1272,24 @@ begin
     DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
   end;
 
-
-  {subFormat := (Info.format) and SF_FORMAT_SUBMASK;
-  DebugLn('subFormat is ' + IntToHex(subFormat, 8));
-
-  //SetLength(AudBuffer, BUFFER_SIZE * Info.channels);
-
-  FillChar(AudBuffer^, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
-  readCount := 0;
-  readCount := sf_read_float(SoundFile, AudBuffer, BUFFER_SIZE * Info.channels);
-  //WriteLn('readCount is ' + IntToHex(readCount, 8));
-  while (readCount > 0) do
-  begin
-    PaErrCode := Pa_WriteStream(FStream, AudBuffer, BUFFER_SIZE);
-    if (paErrCode <> Int32(paNoError)) then
-    begin
-      DebugLn('Pa_WriteStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_WriteStream ' + IntToHex(PaErrCode, 8));
-    end;
-    FillChar(AudBuffer^, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
-    readCount := sf_read_float(SoundFile, AudBuffer, BUFFER_SIZE * Info.channels);
-    //WriteLn('readCount is ' + IntToHex(readCount, 8));
-  end;
-  //WriteLn(IntToStr(Info.channels));
-
-  PaErrCode := Pa_CloseStream(FStream);
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
-  end;
-  }
-
-  //sf_close(SoundFile);
-  //FreeMem(AudBuffer);
-  //SetLength(AudBuffer,0);
-  DebugLn('All went well');
-  DebugLn('Played audio');
+  //DebugLn('All went well');
+  //DebugLn('Played audio');
 end;
 
 procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
 var
   PaErrCode: PaError;
 begin
-  DebugLn('Inside finished audio ');
-  {if FStream <> nil then
-    DebugLn ('Fstream is not nil');}
+  //DebugLn('Inside finished audio ');
+
+  PlayButtonEnabled := True;
+  PauseButtonEnabled := False;
+  StopButtonEnabled := False;
+  DurationEnabled := True;
+  //ImageGreyed := True;
+  //Counter := DEF_COUNTDOWN_CAPTION;
+  bbAdjust.Enabled := False;
+
   paErrCode := Pa_CloseStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
   begin
