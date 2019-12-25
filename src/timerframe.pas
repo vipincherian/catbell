@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
-  editform, Graphics, Math, LazLogger, adjustform, sndfile, ctypes, LMessages, LCLIntf;
+  editform, Graphics, Math, LazLogger, adjustform, sndfile, portaudio, ctypes, LMessages, LCLIntf;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -52,6 +52,8 @@ const
   TIMER_CONF_ORDER = 'order';
 
   UM_PLAY_AUDIO = LM_USER + 1;
+
+  BUFFER_SIZE = 1024;
 
 type
 
@@ -503,7 +505,7 @@ var
   Elapsed: longword;
 begin
   Elapsed := Ceil(PendingMilliseconds / 1000);
-  //WriteLn('Elapsed in ms is ' + IntToStr(PendingMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
+  //DebugLn('Elapsed in ms is ' + IntToStr(PendingMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
 
   Seconds := Elapsed mod 60;
   Minutes := Elapsed div 60;
@@ -1126,9 +1128,103 @@ begin
 end;
 
 procedure TfraTimer.PlayAudio(var Msg: TLMessage);
+var
+  SoundFile: PSndFile;
+  Info: SF_INFO;
+  PaErrCode: PaError;
+
+  Stream: PPaStream;
+  StreamParams: PaStreamParameters;
+  subFormat: cint;
+  //AudBuffer: array of double;
+  //AudBuffer: array[0..2047] of double;
+  AudBuffer: pointer;
+  readCount: cint;
 begin
   DebugLn('Playing audio');
-  Sleep(5000);
+  Info.format := 0;
+  SoundFile := sf_open(PChar(FAudioFile), SFM_READ, @Info);
+  if (SoundFile = nil) then
+  begin
+    DebugLn('Error in sf_open');
+    sf_perror(nil);
+    //ReadKey;
+    exit;
+  end;
+  DebugLn(IntToHex(Info.format, 8));
+  DebugLn(IntToStr(Info.channels));
+  DebugLn(IntToStr(Info.frames));
+  DebugLn(IntToStr(Info.samplerate));
+  DebugLn(IntToStr(Info.sections));
+
+  //SetLength(AudBuffer, 2048);
+  //FillChar(AudBuffer, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
+  GetMem(AudBuffer, BUFFER_SIZE * Info.channels * sizeof(double));
+
+  //PaErrCode := Pa_Initialize();
+  //WriteLn('Error after pa_Initialize ' + IntToHex(PaErrCode, 8));
+  Stream := nil;
+  StreamParams.device := Pa_GetDefaultOutputDevice();
+
+  StreamParams.channelCount := Info.channels;
+  // This has to be carefully set, not true will all files
+  StreamParams.sampleFormat := paFloat32;
+
+  Streamparams.suggestedLatency :=
+    Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
+  StreamParams.hostApiSpecificStreamInfo := nil;
+  DebugLn('Default device is ' + IntToStr(StreamParams.device));
+
+  PaErrCode := Pa_OpenStream(@Stream, nil, @StreamParams, Info.samplerate,
+    paFramesPerBufferUnspecified, paClipOff, nil, nil);
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+  end;
+
+  PaErrCode := Pa_StartStream(Stream);
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
+  end;
+
+  subFormat := (Info.format) and SF_FORMAT_SUBMASK;
+  DebugLn('subFormat is ' + IntToHex(subFormat, 8));
+
+  //SetLength(AudBuffer, BUFFER_SIZE * Info.channels);
+
+  FillChar(AudBuffer^, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
+  readCount := 0;
+  readCount := sf_read_float(SoundFile, AudBuffer, BUFFER_SIZE * Info.channels);
+  //WriteLn('readCount is ' + IntToHex(readCount, 8));
+  while (readCount > 0) do
+  begin
+    PaErrCode := Pa_WriteStream(Stream, AudBuffer, BUFFER_SIZE);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_WriteStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_WriteStream ' + IntToHex(PaErrCode, 8));
+    end;
+    FillChar(AudBuffer^, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
+    readCount := sf_read_float(SoundFile, AudBuffer, BUFFER_SIZE * Info.channels);
+    //WriteLn('readCount is ' + IntToHex(readCount, 8));
+  end;
+  //WriteLn(IntToStr(Info.channels));
+
+  PaErrCode := Pa_CloseStream(Stream);
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
+  end;
+
+
+  sf_close(SoundFile);
+  FreeMem(AudBuffer);
+  //SetLength(AudBuffer,0);
+  DebugLn('All went well');
   DebugLn('Played audio');
 end;
 

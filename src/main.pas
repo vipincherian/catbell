@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages;
+  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages, portaudio, ctypes;
 
 const
   FORM_MIN_SIZE = 600;
@@ -251,8 +251,8 @@ implementation
 { TMainForm }
 
 procedure TMainForm.FormCreate(Sender: TObject);
-{var
-  png: TPortableNetworkGraphic;}
+var
+  PaErrCode: PaError;
 begin
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_SIZE;
@@ -312,6 +312,13 @@ begin
   FReference.Anchors := [];
 
   CreateBitmaps;
+
+  PaErrCode := Pa_Initialize() ;
+  if PaErrCode <> cint(paNoError) then
+  begin
+    DebugLn('Error in Pa_Initialize()');
+  end;
+
 
 end;
 
@@ -478,6 +485,8 @@ begin
   FOrder.Free;
 
   FShortTimer.Free;
+
+  Pa_Terminate();
   //FClockWidget.Free;
 end;
 
