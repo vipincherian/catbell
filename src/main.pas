@@ -994,24 +994,33 @@ begin
   end
   else
   begin
-    // TODO: Which is correct? Round ro Trunc?
-    //WriteLn('Progress is ' + FloatToStr(Progress));
     Index := Floor(Progress * 24.0);
     //WriteLn('Index is ' + IntToStr(Index));
     if Index >= 24 then
       Index := 23;
     Assert((Index >= 0) and (Index < TRAY_PROGRESS_ICON_COUNT));
-    if FLastTrayIconIndex <> Index then
+    if Widget = Nil then
+      Exit;
+    if Widget.IsProgressOnIcon then
     begin
-      tiMain.Icon.Assign(FTrayProgressIcons[Index + 1]);
-      //FForm.tiMain.Icon.Handle:=FTrayProgressIcons[Index + 1].Handle;
-      Icon.Assign(FAppProgressIcons[Index + 1]);
-      //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
-      Application.Icon.Assign(FAppProgressIcons[Index + 1]);
-      FLastTrayIconIndex := Index;
-      if Widget <> nil then
-        Widget.imgTimer.Picture.Assign(FWidgetProgressIcons[Index + 1]);
+      {Redraw icons only if there is a change}
+      if FLastTrayIconIndex <> Index then
+      begin
+        tiMain.Icon.Assign(FTrayProgressIcons[Index + 1]);
+        //FForm.tiMain.Icon.Handle:=FTrayProgressIcons[Index + 1].Handle;
+        Icon.Assign(FAppProgressIcons[Index + 1]);
+        //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
+        Application.Icon.Assign(FAppProgressIcons[Index + 1]);
+        FLastTrayIconIndex := Index;
+
+      end;
     end;
+    if Widget.LastProgressIconIndex <> Index then
+    begin
+      Widget.imgTimer.Picture.Assign(FWidgetProgressIcons[Index + 1]);
+      Widget.LastProgressIconIndex := Index;
+    end;
+
   end;
 
 end;
@@ -1200,6 +1209,7 @@ begin
   NewWidget.OnTimerPause := @TimerPaused;
   NewWidget.OnTimerStop := @TimerFinished;
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
+  NewWidget.LastProgressIconIndex:=LAST_TRAY_ICON_DEFAULT;
   //NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
   begin

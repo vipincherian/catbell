@@ -181,6 +181,8 @@ type
     OnTimerStart: TNotifyEvent;
     OnTimerPause: TNotifyEvent;
     OnTimerStop: TNotifyEvent;
+
+    LastProgressIconIndex: integer;
     //OnTimerProgressUpdate: TNotifyEvent;
 
     // Callback on progress-on-icon checkbox change only if
@@ -590,8 +592,8 @@ begin
     Counter := CounterText;
 
   // Calculate percentage ProgressPercentage
-  if IsProgressOnIcon then
-  begin
+  //if IsProgressOnIcon then
+  //begin
     ProgressPercentage := 1 - (PendingMilliseconds / FOrigTickDuration);
     // Elapsed time can exceed total pending tick duration, in certain cases.
     // The system could go on sleep mode while a timer is running
@@ -603,7 +605,7 @@ begin
       ProgressPercentage := 0;
     Assert(ProgressPercentage <= 1);
     PUblishProgress(1 - (PendingMilliseconds / FOrigTickDuration));
-  end;
+  //end;
 end;
 
 {procedure TfraTimer.SetNotifier(AValue: boolean);
@@ -948,8 +950,8 @@ begin
   bbAdjust.Enabled := False;
   //end;
 
-  if IsProgressOnIcon then
-    PublishProgress(TIMER_PROGRESS_FINISHED);
+  //if IsProgressOnIcon then
+  PublishProgress(TIMER_PROGRESS_FINISHED);
 
   FEndTickCount := 0;
   FOrigTickDuration := 0;
