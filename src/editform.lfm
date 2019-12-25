@@ -228,6 +228,7 @@ object frmEditTimer: TfrmEditTimer
     end
   end
   object odgAudio: TOpenDialog
+    Filter = 'Supported audio files|*.wav;*.ogg|All files|*.*'
     left = 472
   end
   object imlEdit: TImageList

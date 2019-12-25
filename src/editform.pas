@@ -192,7 +192,7 @@ var
 begin
   odgAudio.InitialDir:='.';
   odgAudio.Options := [ofFileMustExist];
-  odgAudio.Filter:='Supported audio files|*.wav;*.ogg|All files|*.*';
+  //odgAudio.Filter:='Supported audio files|*.wav;*.ogg|All files|*.*';
   if odgAudio.Execute then
   begin
      FileName:=odgAudio.FileName;
