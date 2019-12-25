@@ -117,6 +117,7 @@ type
 
     FPaused: boolean;
     FRunning: boolean;
+    FAudioPlaying: boolean;
 
     FProgress: single;
 
@@ -756,6 +757,7 @@ begin
 
   FRunning := False;
   FPaused := False;
+  FAudioPlaying:=False;
   //FNotifier := False;
 
   //FObservers := TListTimerObservers.Create;
@@ -931,48 +933,69 @@ begin
 end;
 
 procedure TfraTimer.Stop(Sender: TObject);
+var
+  PaErrCode: PaError;
 begin
-
-  FRunning := False;
-  FPaused := False;
-  //FShortTimer.Enabled := False;
-
-
-
-  //with FWidget do
-  //begin
-  PlayButtonEnabled := True;
-  PauseButtonEnabled := False;
-  StopButtonEnabled := False;
-  DurationEnabled := True;
-  //ImageGreyed := True;
-  Counter := DEF_COUNTDOWN_CAPTION;
-  bbAdjust.Enabled := False;
-  //end;
-
-  //if IsProgressOnIcon then
-  PublishProgress(TIMER_PROGRESS_FINISHED);
-
-  FEndTickCount := 0;
-  FOrigTickDuration := 0;
-  FStartTickCount := 0;
-
-  if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
-    frmEditTimer.dtpDuration.Enabled := True;
-
-  //PostMessage(Handle, UM_PLAY_AUDIO, 0, 0);
-  if FAudioFile <> '' then
+  { The audio is playing and the user request is to terminate the audio.}
+  if FAudioPlaying then
   begin
-    Assert(FSoundFile <> Nil);
-    PlayButtonEnabled := False;
+    FRunning := False;
+    FPaused := False;
+    PlayButtonEnabled := True;
     PauseButtonEnabled := False;
     StopButtonEnabled := False;
-    DurationEnabled := False;
-    //ImageGreyed := True;
+    DurationEnabled := True;
     //Counter := DEF_COUNTDOWN_CAPTION;
-    //bbAdjust.Enabled := False;
-    PlayAudio;
+    bbAdjust.Enabled := False;
+
+    PaErrCode := Pa_AbortStream(FStream);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      WriteLn('Pa_AbortStream failed ' + Pa_GetErrorText(paErrCode));
+      WriteLn('Error after Pa_AbortStream ' + IntToHex(PaErrCode, 8));
+    end;
+
+    {There is no need to close the stream. Stopping/aborting the stream
+    will trigger the callback for stream stoppage. The stream will be closed
+    in that callback function}
+
+    FAudioPlaying := False;
+    Exit;
+  end
+  else
+  {The timer run has completed. Stop the timer and play audio if required}
+  begin
+    FRunning := False;
+    FPaused := False;
+    Counter := DEF_COUNTDOWN_CAPTION;
+    bbAdjust.Enabled := False;
+
+    PublishProgress(TIMER_PROGRESS_FINISHED);
+
+    FEndTickCount := 0;
+    FOrigTickDuration := 0;
+    FStartTickCount := 0;
+
+    if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
+      frmEditTimer.dtpDuration.Enabled := True;
+
+    PauseButtonEnabled := False;
+    DurationEnabled := True;
+
+    if FAudioFile <> '' then
+    begin
+      Assert(FSoundFile <> Nil);
+      PlayButtonEnabled := False;
+      StopButtonEnabled := True;
+      PlayAudio;
+    end
+    else
+    begin
+      PlayButtonEnabled := True;
+      StopButtonEnabled := False;
+    end;
   end;
+
 
 end;
 
@@ -1293,6 +1316,8 @@ begin
     DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
   end;
 
+  FAudioPlaying:=True;
+
   //DebugLn('All went well');
   //DebugLn('Played audio');
 end;
@@ -1311,6 +1336,24 @@ begin
   //Counter := DEF_COUNTDOWN_CAPTION;
   bbAdjust.Enabled := False;
 
+  FAudioPlaying:=False;
+
+  {This check might be redundant. Just to be safe}
+  paErrCode := Pa_IsStreamStopped(FStream);
+  if paErrCode = 0 then
+  begin
+    paErrCode := Pa_StopStream(FStream);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
+    end;
+  end
+  else if PaErrCode <> 1 then
+  begin
+    DebugLn('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
+  end;
   paErrCode := Pa_CloseStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
   begin
