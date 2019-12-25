@@ -52,11 +52,20 @@ const
   TIMER_CONF_ORDER = 'order';
 
   UM_PLAY_AUDIO = LM_USER + 1;
+  UM_FINISHED_AUDIO = LM_USER + 2;
 
-  BUFFER_SIZE = 1024;
+  //BUFFER_SIZE = 1024;
 
 type
 
+  TAudioInfo = record
+    //name : string[30];
+    //age  : byte;
+    SoundFile: PSndFile;
+    Info: SF_INFO;
+    Handle: THandle;
+  end;
+  PAudioInfo =  ^TAudioInfo;
   { TfraTimer }
 
   TfraTimer = class(TFrame)
@@ -112,6 +121,11 @@ type
 
     FAudioFile: string;
     FAudioLength: double;
+
+    FAudioInfo: TAudioInfo;
+    FStream: PPaStream;
+
+    //FAudioCallback: PPaStreamCallback;
     //FObservers: TListTimerObservers;
     //function GetShowProgressOnIcon: boolean;
     procedure SetId(AValue: longword);
@@ -141,6 +155,7 @@ type
     procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: longword);
+
     //procedure SetNotifier(AValue: boolean);
     {function GetTop: integer;
     procedure SetTop(AValue: integer);
@@ -191,6 +206,7 @@ type
     procedure AdjustTimer(Sender: TObject);
     function SetAudioFile(AValue: string; out Error: string): boolean;
     procedure PlayAudio(var Msg: TLMessage); message UM_PLAY_AUDIO;
+    procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
@@ -219,13 +235,78 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     property AudioFile: string read FAudioFile;
+    //function AudioCallback(const input: pointer; output: pointer; frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
   end;
 
-
+  //function AudioCallback(input: pointer; output: pointer; frameCount: culong; timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
 implementation
 
 uses
   main;
+
+function AudioCallback( input: pointer; output: pointer;
+  frameCount: culong;  timeInfo: PPaStreamCallbackTimeInfo;
+  statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
+var
+  AudioInfo: PAudioInfo;
+  //AudBuffer: pointer;
+  subFormat, readCount: cint;
+begin
+  DebugLn('Inside audio callback');
+  AudioInfo := PAudioinfo(userData);
+  DebugLn('SoundFile is ' + IntTohex(QWord(AudioInfo^.SoundFile), 8));
+  DebugLn('Output is ' + IntTohex(QWord(output), 8));
+
+  //GetMem(AudBuffer, frameCount * AudioInfo^.Info.channels * sizeof(double));
+  //subFormat := (AudioInfo^.Info.format) and SF_FORMAT_SUBMASK;
+    //DebugLn('subFormat is ' + IntToHex(subFormat, 8));
+
+    //SetLength(AudBuffer, BUFFER_SIZE * Info.channels);
+    DebugLn('Framecount is ' + IntToStr(framecount));
+    //FillChar(output, frameCount * (AudioInfo^.Info.channels) * Sizeof(double), 0);
+    readCount := 0;
+    readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount * (AudioInfo^.Info.channels));
+    WriteLn('readCount is ' + IntToHex(readCount, 8));
+    if readCount > 0 then
+    begin
+      //output := AudBuffer;
+      //Move(AudBuffer,
+      Result := cint(paContinue);
+    end
+    else
+    begin
+      //FreeMem(AudBuffer);
+      PostMessage(AudioInfo^.Handle, UM_FINISHED_AUDIO,0,0);
+      sf_close(AudioInfo^.SoundFile);
+      Result := cint(paComplete);
+    end;
+    {while (readCount > 0) do
+    begin
+      PaErrCode := Pa_WriteStream(Stream, AudBuffer, BUFFER_SIZE);
+      if (paErrCode <> Int32(paNoError)) then
+      begin
+        DebugLn('Pa_WriteStream failed ' + Pa_GetErrorText(paErrCode));
+        DebugLn('Error after Pa_WriteStream ' + IntToHex(PaErrCode, 8));
+      end;
+      FillChar(AudBuffer^, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
+      readCount := sf_read_float(SoundFile, AudBuffer, BUFFER_SIZE * Info.channels);
+      //WriteLn('readCount is ' + IntToHex(readCount, 8));
+    end;
+    //WriteLn(IntToStr(Info.channels));
+
+    PaErrCode := Pa_CloseStream(Stream);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
+    end;
+  Result := cint(paAbort);}
+  //Freemem(AudBuffer);
+  //output := AudBuffer;
+  DebugLn('Exiting audio callback');
+end;
+
+
 {$R *.lfm}
 
 { TfraTimer }
@@ -705,8 +786,9 @@ begin
   bbEdit.DoubleBuffered:=True;
   DoubleBuffered:=True;
 
-
   CallbackOnProgressOnIconChange := True;
+
+  FStream := Nil;
 end;
 
 destructor TfraTimer.Destroy;
@@ -1133,13 +1215,14 @@ var
   Info: SF_INFO;
   PaErrCode: PaError;
 
-  Stream: PPaStream;
+
   StreamParams: PaStreamParameters;
   subFormat: cint;
   //AudBuffer: array of double;
   //AudBuffer: array[0..2047] of double;
-  AudBuffer: pointer;
+  //AudBuffer: pointer;
   readCount: cint;
+  CallBack: PPaStreamCallback;
 begin
   DebugLn('Playing audio');
   Info.format := 0;
@@ -1159,11 +1242,11 @@ begin
 
   //SetLength(AudBuffer, 2048);
   //FillChar(AudBuffer, BUFFER_SIZE * Info.channels * Sizeof(double), 0);
-  GetMem(AudBuffer, BUFFER_SIZE * Info.channels * sizeof(double));
+  //GetMem(AudBuffer, BUFFER_SIZE * Info.channels * sizeof(double));
 
   //PaErrCode := Pa_Initialize();
   //WriteLn('Error after pa_Initialize ' + IntToHex(PaErrCode, 8));
-  Stream := nil;
+  FStream := nil;
   StreamParams.device := Pa_GetDefaultOutputDevice();
 
   StreamParams.channelCount := Info.channels;
@@ -1175,22 +1258,37 @@ begin
   StreamParams.hostApiSpecificStreamInfo := nil;
   DebugLn('Default device is ' + IntToStr(StreamParams.device));
 
-  PaErrCode := Pa_OpenStream(@Stream, nil, @StreamParams, Info.samplerate,
-    paFramesPerBufferUnspecified, paClipOff, nil, nil);
+  //Callback := @AudioCallback;
+  FAudioInfo.SoundFile:=SoundFile;
+  FAudioInfo.Handle:=Handle;
+  Move(Info, FAudioInfo.Info, SizeOf(SF_INFO));
+
+  {If stream was open, close it}
+  if FStream <> Nil then
+  begin
+    DebugLn('Before openstream, FStream was not Nil');
+    Pa_CloseStream(FStream);
+  end;
+
+  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, Info.samplerate,
+    paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@AudioCallback), @FAudioInfo);
   if (paErrCode <> Int32(paNoError)) then
   begin
     DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
     DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
   end;
 
-  PaErrCode := Pa_StartStream(Stream);
+  //PaErrCode:=Pa_StreamFinishedCallBack;
+
+  PaErrCode := Pa_StartStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
   begin
     DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
     DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
   end;
 
-  subFormat := (Info.format) and SF_FORMAT_SUBMASK;
+
+  {subFormat := (Info.format) and SF_FORMAT_SUBMASK;
   DebugLn('subFormat is ' + IntToHex(subFormat, 8));
 
   //SetLength(AudBuffer, BUFFER_SIZE * Info.channels);
@@ -1201,7 +1299,7 @@ begin
   //WriteLn('readCount is ' + IntToHex(readCount, 8));
   while (readCount > 0) do
   begin
-    PaErrCode := Pa_WriteStream(Stream, AudBuffer, BUFFER_SIZE);
+    PaErrCode := Pa_WriteStream(FStream, AudBuffer, BUFFER_SIZE);
     if (paErrCode <> Int32(paNoError)) then
     begin
       DebugLn('Pa_WriteStream failed ' + Pa_GetErrorText(paErrCode));
@@ -1213,20 +1311,35 @@ begin
   end;
   //WriteLn(IntToStr(Info.channels));
 
-  PaErrCode := Pa_CloseStream(Stream);
+  PaErrCode := Pa_CloseStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
   begin
     DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
     DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
   end;
+  }
 
-
-  sf_close(SoundFile);
-  FreeMem(AudBuffer);
+  //sf_close(SoundFile);
+  //FreeMem(AudBuffer);
   //SetLength(AudBuffer,0);
   DebugLn('All went well');
   DebugLn('Played audio');
 end;
+
+procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
+begin
+  DebugLn('Inside finished audio ');
+  if FStream <> nil then
+    DebugLn ('Fstream is not nil');
+end;
+
+{function TfraTimer.AudioCallback(const input: pointer; output: pointer;
+  frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo;
+  statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
+begin
+  DebugLn('Inside callback');
+  Result := cint(paAbort);
+end;}
 
 {procedure TfraTimer.AddSubscription(aObserver: ITimerObserver);
 begin
