@@ -2,11 +2,11 @@ object frmEditTimer: TfrmEditTimer
   Left = 351
   Height = 245
   Top = 238
-  Width = 440
+  Width = 489
   BorderStyle = bsSingle
   Caption = 'Edit Timer'
   ClientHeight = 245
-  ClientWidth = 440
+  ClientWidth = 489
   Icon.Data = {
     7E04000000000100010010100000010020006804000016000000280000001000
     0000200000000100200000000000000400006400000064000000000000000000
@@ -54,7 +54,7 @@ object frmEditTimer: TfrmEditTimer
     Left = 112
     Height = 23
     Top = 8
-    Width = 320
+    Width = 369
     Anchors = [akTop, akLeft, akRight]
     OnChange = edtDescriptionChange
     TabOrder = 0
@@ -90,13 +90,13 @@ object frmEditTimer: TfrmEditTimer
     Left = 112
     Height = 23
     Top = 120
-    Width = 240
+    Width = 209
     Anchors = [akTop, akLeft, akRight]
     ReadOnly = True
     TabOrder = 4
   end
   object bbSelectAudioFile: TBitBtn
-    Left = 357
+    Left = 328
     Height = 30
     Top = 120
     Width = 75
@@ -144,7 +144,7 @@ object frmEditTimer: TfrmEditTimer
     TabOrder = 7
   end
   object bbSave: TBitBtn
-    Left = 357
+    Left = 406
     Height = 30
     Top = 210
     Width = 75
@@ -194,6 +194,16 @@ object frmEditTimer: TfrmEditTimer
     Width = 5
     Caption = '?'
     ParentColor = False
+  end
+  object bbClearAudioFile: TBitBtn
+    Left = 406
+    Height = 30
+    Top = 120
+    Width = 75
+    Anchors = [akTop, akRight]
+    Caption = 'Clear'
+    OnClick = bbClearAudioFileClick
+    TabOrder = 8
   end
   object odgAudio: TOpenDialog
     left = 243

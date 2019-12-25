@@ -51,6 +51,7 @@ type
     bbSelectAudioFile: TBitBtn;
     bbCancel: TBitBtn;
     bbSave: TBitBtn;
+    bbClearAudioFile: TBitBtn;
     ckbModalAlert: TCheckBox;
     ckbTrayNotification: TCheckBox;
     dtpDuration: TDateTimePicker;
@@ -64,6 +65,7 @@ type
     lblLenthVal: TLabel;
     odgAudio: TOpenDialog;
     procedure bbCancelClick(Sender: TObject);
+    procedure bbClearAudioFileClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
     procedure bbSelectAudioFileClick(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
@@ -211,6 +213,14 @@ end;
 procedure TfrmEditTimer.bbCancelClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmEditTimer.bbClearAudioFileClick(Sender: TObject);
+var
+  ErrorText: string;
+begin
+  SetAudioFile('', ErrorText);
+  edtAudioFile.Text:='';
 end;
 
 procedure TfrmEditTimer.FormDestroy(Sender: TObject);
