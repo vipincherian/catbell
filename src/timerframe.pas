@@ -274,7 +274,7 @@ begin
   readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
     (AudioInfo^.Info.channels));
 
-  if readCount = frameCount then
+  if readCount = (frameCount * AudioInfo^.Info.channels) then
   begin
     Result := cint(paContinue);
   end
