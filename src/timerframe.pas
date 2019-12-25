@@ -59,14 +59,14 @@ const
 
 type
 
-  TAudioInfo = record
+  TUserInfo = record
     //name : string[30];
     //age  : byte;
     SoundFile: PSndFile;
     Info: SF_INFO;
     Handle: THandle;
   end;
-  PAudioInfo = ^TAudioInfo;
+  PAudioInfo = ^TUserInfo;
   { TfraTimer }
 
   TfraTimer = class(TFrame)
@@ -122,9 +122,12 @@ type
 
     FAudioFile: string;
     FAudioLength: double;
+    FSoundFile: PSndFile;
 
-    FAudioInfo: TAudioInfo;
+    FUserInfo: TUserInfo;
     FStream: PPaStream;
+
+    FInfo: SF_INFO;
 
     //FAudioCallback: PPaStreamCallback;
     //FObservers: TListTimerObservers;
@@ -275,7 +278,7 @@ begin
   end
   else
   begin
-    sf_close(AudioInfo^.SoundFile);
+    //sf_close(AudioInfo^.SoundFile);
     Result := cint(paComplete);
   end;
 
@@ -362,7 +365,8 @@ begin
     dtpSet.Time := frmEditTimer.Duration;
     FTrayNotification := frmEditTimer.TrayNotification;
     FModalAlert := frmEditTimer.ModalAlert;
-    FAudioFile := frmEditTimer.AudioFile;
+    //FAudioFile := frmEditTimer.AudioFile;
+    SetAudioFile(frmEditTimer.AudioFile, ErrorText);
   end;
 end;
 
@@ -776,6 +780,7 @@ begin
   CallbackOnProgressOnIconChange := True;
 
   FStream := nil;
+  FSoundFile := nil;
 end;
 
 destructor TfraTimer.Destroy;
@@ -783,6 +788,10 @@ begin
   Parent := nil;
   //FShortTimer.Free;
   //FObservers.Free;
+  if FSoundFile <> nil then
+  begin
+    sf_close(FSoundFile);
+  end;
   inherited Destroy;
 end;
 
@@ -952,6 +961,7 @@ begin
   //PostMessage(Handle, UM_PLAY_AUDIO, 0, 0);
   if FAudioFile <> '' then
   begin
+    Assert(FSoundFile <> Nil);
     PlayButtonEnabled := False;
     PauseButtonEnabled := False;
     StopButtonEnabled := False;
@@ -1159,12 +1169,12 @@ begin
 end;
 
 function TfraTimer.SetAudioFile(AValue: string; out Error: string): boolean;
-var
-  Info: SF_INFO;
-  SoundFile: PSndFile;
+//var
+  //Info: SF_INFO;
+  //SoundFile: PSndFile;
 begin
   Result := False;
-  Info.format := 0;
+  FInfo.format := 0;
 
   if AValue = '' then
   begin
@@ -1178,8 +1188,10 @@ begin
     Result := True;
     Exit;
   end;
-  SoundFile := sf_open(PChar(AValue), SFM_READ, @Info);
-  if (SoundFile = nil) then
+  if FSoundFile <> nil then
+    sf_close(FSoundFile);
+  FSoundFile := sf_open(PChar(AValue), SFM_READ, @FInfo);
+  if (FSoundFile = nil) then
   begin
     DebugLn('Error in sf_open');
     //sf_perror(nil);
@@ -1188,17 +1200,17 @@ begin
     Error := 'SoundFile is nil';
     Exit;
   end;
-  DebugLn(IntToHex(Info.format, 8));
-  DebugLn(IntToStr(Info.channels));
-  DebugLn(IntToStr(Info.frames));
-  DebugLn(IntToStr(Info.samplerate));
-  DebugLn(IntToStr(Info.sections));
-  FAudioLength := (Info.frames) / (Info.samplerate);
+  DebugLn(IntToHex(FInfo.format, 8));
+  DebugLn(IntToStr(FInfo.channels));
+  DebugLn(IntToStr(FInfo.frames));
+  DebugLn(IntToStr(FInfo.samplerate));
+  DebugLn(IntToStr(FInfo.sections));
+  FAudioLength := (FInfo.frames) / (FInfo.samplerate);
   //ShowMessage('length is ' + FloatToStr(AudioLength));
 
   FAudioFile := AValue;
 
-  sf_close(SoundFile);
+  //sf_close(SoundFile);
 
 
   //lblLengthText.Visible:=True;
@@ -1211,31 +1223,38 @@ end;
 
 procedure TfraTimer.PlayAudio;
 var
-  SoundFile: PSndFile;
-  Info: SF_INFO;
+  //SoundFile: PSndFile;
+  //Info: SF_INFO;
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
 
 begin
   DebugLn('Playing audio');
-  Info.format := 0;
-  SoundFile := sf_open(PChar(FAudioFile), SFM_READ, @Info);
+  FInfo.format := 0;
+  {SoundFile := sf_open(PChar(FAudioFile), SFM_READ, @Info);
   if (SoundFile = nil) then
   begin
     DebugLn('Error in sf_open ');
     sf_perror(nil);
     //ReadKey;
     exit;
-  end;
+  end;}
   {DebugLn(IntToHex(Info.format, 8));
   DebugLn(IntToStr(Info.channels));
   DebugLn(IntToStr(Info.frames));
   DebugLn(IntToStr(Info.samplerate));
   DebugLn(IntToStr(Info.sections));}
 
+  Assert(FSoundFile <> nil);
+
+  if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
+  begin
+    DebugLn('Sf_seek returned error');
+  end;
+
   StreamParams.device := Pa_GetDefaultOutputDevice();
 
-  StreamParams.channelCount := Info.channels;
+  StreamParams.channelCount := FInfo.channels;
   StreamParams.sampleFormat := paFloat32;
 
   Streamparams.suggestedLatency :=
@@ -1244,13 +1263,13 @@ begin
   DebugLn('Default device is ' + IntToStr(StreamParams.device));
 
   //Callback := @FeedStream;
-  FAudioInfo.SoundFile := SoundFile;
-  FAudioInfo.Handle := Handle;
-  Move(Info, FAudioInfo.Info, SizeOf(SF_INFO));
+  FUserInfo.SoundFile := FSoundFile;
+  FUserInfo.Handle := Handle;
+  Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
-  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, Info.samplerate,
+  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
     paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedStream),
-    @FAudioInfo);
+    @FUserInfo);
   if (paErrCode <> Int32(paNoError)) then
   begin
     DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));

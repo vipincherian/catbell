@@ -191,10 +191,8 @@ begin
      FileName:=odgAudio.FileName;
      if not SetAudioFile(FileName, ErrorText) then
      begin
-
        ShowMessage(ErrorText);
        end;
-
 
   end;
   //ShowMessage(FileName);
