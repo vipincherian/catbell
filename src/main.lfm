@@ -1488,10 +1488,12 @@ object MainForm: TMainForm
     top = 150
   end
   object pmTray: TPopupMenu
+    Images = ilMainSmall
     left = 608
     top = 89
     object pmiShowWindow: TMenuItem
       Caption = 'Show window'
+      ImageIndex = 0
       OnClick = pmiShowWindowClick
     end
     object MenuItem8: TMenuItem
@@ -1500,6 +1502,7 @@ object MainForm: TMainForm
     object pmiQuit: TMenuItem
       Action = aiQuit
       Caption = 'Quit'
+      ImageIndex = 1
     end
   end
 end

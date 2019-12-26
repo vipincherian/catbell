@@ -53,6 +53,7 @@ type
     bbClearAudioFile: TBitBtn;
     bbSave: TBitBtn;
     bbSelectAudioFile: TBitBtn;
+    ckbLoop: TCheckBox;
     ckbModalAlert: TCheckBox;
     ckbTrayNotification: TCheckBox;
     dtpDuration: TDateTimePicker;
@@ -63,6 +64,7 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label5: TLabel;
     lblLengthText: TLabel;
     lblLenthVal: TLabel;
     odgAudio: TOpenDialog;
