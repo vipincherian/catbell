@@ -179,9 +179,9 @@ type
     //OnPause: TNotifyEvent;
     //OnNotify: TNotifyEvent;
     OnSelect: TNotifyEvent;
-    OnTimerStart: TNotifyEvent;
-    OnTimerPause: TNotifyEvent;
-    OnTimerStop: TNotifyEvent;
+    //OnTimerStart: TNotifyEvent;
+    //OnTimerPause: TNotifyEvent;
+    //OnTimerStop: TNotifyEvent;
 
     LastProgressIconIndex: integer;
     //OnTimerProgressUpdate: TNotifyEvent;
@@ -202,8 +202,8 @@ type
     procedure CheckForZeroTime;
 
     procedure HandleTimerTrigger();
-    procedure Start(Sender: TObject);
-    procedure Pause(Sender: TObject);
+    procedure Start;
+    procedure Pause;
     procedure Stop(UserInitiated: boolean);
     //procedure NotifyChange(Sender: TObject);
     procedure Finish;
@@ -313,7 +313,7 @@ end;
 procedure TfraTimer.aiPlayExecute(Sender: TObject);
 begin
   //PlayClicked(Sender);
-  Start(Sender);
+  Start;
 end;
 
 procedure TfraTimer.aiStopExecute(Sender: TObject);
@@ -349,7 +349,7 @@ end;
 procedure TfraTimer.aiPauseExecute(Sender: TObject);
 begin
   //PauseClicked(Sender);
-  Pause(Sender);
+  Pause;
 end;
 
 procedure TfraTimer.aiEditExecute(Sender: TObject);
@@ -850,7 +850,7 @@ begin
   end;
 end;
 
-procedure TfraTimer.Start(Sender: TObject);
+procedure TfraTimer.Start;
 var
   TempDuration: TDateTime;
   Hours: word;
@@ -902,15 +902,16 @@ begin
   bbAdjust.Enabled := True;
   //end;
 
-  if OnTimerStart <> nil then
-    OnTimerStart(Self);
+  {if OnTimerStart <> nil then
+    OnTimerStart(Self);}
+  MainForm.TimerStarted(Self);
 
   if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
     frmEditTimer.dtpDuration.Enabled := True;
 
 end;
 
-procedure TfraTimer.Pause(Sender: TObject);
+procedure TfraTimer.Pause;
 begin
   //ShowMessage('Pause');
   //FShortTimer.Enabled := False;
@@ -927,8 +928,9 @@ begin
   StopButtonEnabled := True;
   DurationEnabled := False;
   //end;
-  if OnTimerPause <> nil then
-    OnTimerPause(Self);
+  //if OnTimerPause <> nil then
+  //  OnTimerPause(Self);
+  MainForm.TimerPaused(Self);
 
 end;
 
@@ -1024,8 +1026,11 @@ begin
   //DebugLn('Entering TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
   Stop(False);
 
-  if OnTimerStop <> nil then
-    OnTimerStop(Self);
+  //if OnTimerStop <> nil then
+  //  OnTimerStop(Self);
+
+  MainForm.TimerFinished(Self);
+
   {for Observer in FObservers do
   begin
     Observer.TimerFinished(FId);
