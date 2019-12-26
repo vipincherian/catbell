@@ -61,7 +61,11 @@ uses
   ctypes;
 
 const
+  {$IF defined(windows) }
   LIB_PORTAUDIO = 'libportaudio-2.dll';
+  {$ELSEIF Defined(unix)}
+  LIB_PORTAUDIO = 'libportaudio.so.2';
+  {$ENDIF}
   PORTAUDIO_VERSION = '190600_20161030';
 
 {$IFDEF AUDIO_STATIC}

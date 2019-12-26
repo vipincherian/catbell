@@ -39,10 +39,17 @@ uses
 {$IFNDEF AUDIO_STATIC}
   dynlibs,
 {$ENDIF}
+{$IF defined(unix)}
+  unixtype,
+{$ENDIF}
   ctypes;
 
 const
-  LIB_SNDFILE = 'libsndfile-1.dll';
+  {$IF defined(windows) }
+    LIB_SNDFILE = 'libsndfile-1.dll';
+  {$ELSEIF Defined(unix)}
+    LIB_SNDFILE = 'libsndfile.so.1';
+  {$ENDIF}
   SNDFILE_VERSION = 'libsndfile-1.0.28-exp';
 
 {$IFDEF AUDIO_STATIC}
