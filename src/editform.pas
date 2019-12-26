@@ -118,7 +118,7 @@ var
 implementation
 
 uses
-  timerframe;
+  main, timerframe;
 
 {$R *.lfm}
 
@@ -167,6 +167,11 @@ begin
   lblLengthText.Visible:=False;
   lblLenthVal.Visible:=False;
   bbSave.Enabled:=Validate;
+
+  if not frmMain.AudioWorking then
+  begin
+    bbSelectAudioFile.Enabled:=False;
+  end;
 
 end;
 
@@ -290,6 +295,13 @@ begin
     Result := True;
     Exit;
   end;
+
+  if not frmMain.AudioWorking then
+  begin
+    DebugLn('TfrmEdit.SetAudioFile called when audio is not working');
+    Exit;
+  end;
+
   SoundFile := sf_open(PChar(AValue), SFM_READ, @Info);
   if (SoundFile = nil) then
   begin

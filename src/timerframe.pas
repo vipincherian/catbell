@@ -796,7 +796,7 @@ begin
   Parent := nil;
   //FShortTimer.Free;
   //FObservers.Free;
-  if FSoundFile <> nil then
+  if (FSoundFile <> nil) and frmMain.AudioWorking then
   begin
     sf_close(FSoundFile);
   end;
@@ -991,7 +991,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if (FAudioFile <> '') and (not UserInitiated) then
+    if (FAudioFile <> '') and (not UserInitiated) and frmMain.AudioWorking then
     begin
       Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
@@ -1224,6 +1224,13 @@ begin
     Result := True;
     Exit;
   end;
+
+  if not frmMain.AudioWorking then
+  begin
+    DebugLn('SetAudioFile called when audio is not working');
+    Exit;
+  end;
+
   if FSoundFile <> nil then
     sf_close(FSoundFile);
   FSoundFile := sf_open(PChar(AValue), SFM_READ, @FInfo);
@@ -1265,6 +1272,12 @@ var
   StreamParams: PaStreamParameters;
 
 begin
+
+  if not frmMain.AudioWorking then
+  begin
+    DebugLn('PlayAudio called when audio is not working');
+    Exit;
+  end;
   DebugLn('Playing audio');
   FInfo.format := 0;
   {SoundFile := sf_open(PChar(FAudioFile), SFM_READ, @Info);

@@ -196,6 +196,8 @@ type
     the same functionality.}
     FReference: TfraTimer;
 
+    FAudioWorking: boolean;
+
     procedure CreateBitmaps;
     function GetStatusMessage: string;
     procedure PostTimerCreation(AValue: TfraTimer);
@@ -247,6 +249,7 @@ type
     procedure OnShortTimer(Sender: TObject);
     procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
+    property AudioWorking: boolean read FAudioWorking;
   end;
 
 var
@@ -262,7 +265,7 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 var
   PaErrCode: PaError;
 {$IFNDEF AUDIO_STATIC}
-  Status: boolean;
+  //Status: boolean;
 {$ENDIF}
 begin
   FOrder := TIdList.Create;
@@ -307,12 +310,8 @@ begin
   bbMoveUp.DoubleBuffered := True;
   bbMoveDown.DoubleBuffered := True;
   DoubleBuffered := True;
+
   stbMain.DoubleBuffered := True;
-  //stbMain.Panels[PANEL_MESSAGE].;
-
-
-  //TrayIconSize := TRAY_BASE_WIDTH;
-
 
   FShortTimer := TTimer.Create(nil);
   FShortTimer.Interval := 200;
@@ -325,30 +324,61 @@ begin
   FReference.Anchors := [];
 
   CreateBitmaps;
+
+  FAudioWorking := True;
 {$IFNDEF AUDIO_STATIC}
-  Status := Pa_Load(LIB_PORTAUDIO);
-  if not Status then
+  FAudioWorking := Pa_Load(LIB_PORTAUDIO);
+  if not FAudioWorking then
   begin
     DebugLn('Could not load portaudio');
     //ReadKey;
     //exit;
   end;
 
-  Status := sf_load(LIB_SNDFILE);
-  if not Status then
+  //FAudioWorking:=Status;
+
+  { Load sndfile library only if portaudio was loaded successfully }
+
+  if FAudioWorking then
   begin
-    DebugLn('Could not load sndfile');
-    //ReadKey;
-    //exit;
+    FAudioWorking := sf_load(LIB_SNDFILE);
+    if not FAudioWorking then
+    begin
+      DebugLn('Could not load sndfile');
+      //ReadKey;
+      //exit;
+      Pa_Unload();
+    end;
   end;
+
+  //FAudioWorking:=Status;
+
 {$ENDIF}
 
-  PaErrCode := Pa_Initialize();
-  if PaErrCode <> cint(paNoError) then
+  if FAudioWorking then
   begin
-    DebugLn('Error in Pa_Initialize()');
+    PaErrCode := Pa_Initialize();
+    if PaErrCode <> cint(paNoError) then
+    begin
+      DebugLn('Error in Pa_Initialize()');
+
+      FAudioWorking:=False;
+
+      { If portaudio cannot be initialised, then audio will not work.
+      Unload libraries }
+      {$IFNDEF AUDIO_STATIC}
+      sf_Unload();
+      Pa_Unload();
+      {$ENDIF}
+    end;
   end;
 
+  stbMain.BeginUpdate;
+  if FAudioWorking then
+    stbMain.Panels[PANEL_AUDIO].Text:='Audio: Ok'
+  else
+    stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Not Ok';
+  stbMain.EndUpdate;
 end;
 
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
@@ -515,10 +545,11 @@ begin
 
   FShortTimer.Free;
 
-  Pa_Terminate();
+  if FAudioWorking then
+    Pa_Terminate;
 {$IFNDEF AUDIO_STATIC}
-  Sf_Unload();
-  Pa_Unload();
+  Sf_Unload;
+  Pa_Unload;
 {$ENDIF}
   //FClockWidget.Free;
 end;
@@ -910,8 +941,11 @@ end;
 
 procedure TfrmMain.SetStatusMessage(AValue: string);
 begin
-  if StatusMessage <> Avalue then
+  stbMain.BeginUpdate;
+  if stbMain.Panels[PANEL_MESSAGE].Text <> Avalue then
     stbMain.Panels[PANEL_MESSAGE].Text := Avalue;
+  stbMain.EndUpdate;
+
 end;
 
 procedure TfrmMain.ShowInForeground;
