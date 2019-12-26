@@ -388,8 +388,10 @@ begin
       frmTimerAdjust.cmbOptions.Items.Delete(ADJUST_STOPBY);
   end;
   frmTimerAdjust.cmbOptions.ItemIndex := 0;
+  frmTimerAdjust.bbApply.Enabled := True;
   frmTimerAdjust.dtpDiff.Show;
   frmTimerAdjust.dtpTill.Hide;
+  frmTimerAdjust.Id := FId;
   frmTimerAdjust.ShowModal;
 end;
 
@@ -596,17 +598,17 @@ begin
   // Calculate percentage ProgressPercentage
   //if IsProgressOnIcon then
   //begin
-    ProgressPercentage := 1 - (PendingMilliseconds / FOrigTickDuration);
-    // Elapsed time can exceed total pending tick duration, in certain cases.
-    // The system could go on sleep mode while a timer is running
-    // (and while the timer event is being processed) and on
-    // waking up, the pre-caculated tick duration could have already been
-    // overshot. If that is the case, mark ProgressPercentage as zero, and the next
-    // timer event will mark it as completed.
-    if ProgressPercentage < 0 then
-      ProgressPercentage := 0;
-    Assert(ProgressPercentage <= 1);
-    PUblishProgress(1 - (PendingMilliseconds / FOrigTickDuration));
+  ProgressPercentage := 1 - (PendingMilliseconds / FOrigTickDuration);
+  // Elapsed time can exceed total pending tick duration, in certain cases.
+  // The system could go on sleep mode while a timer is running
+  // (and while the timer event is being processed) and on
+  // waking up, the pre-caculated tick duration could have already been
+  // overshot. If that is the case, mark ProgressPercentage as zero, and the next
+  // timer event will mark it as completed.
+  if ProgressPercentage < 0 then
+    ProgressPercentage := 0;
+  Assert(ProgressPercentage <= 1);
+  PUblishProgress(1 - (PendingMilliseconds / FOrigTickDuration));
   //end;
 end;
 
@@ -759,7 +761,7 @@ begin
 
   FRunning := False;
   FPaused := False;
-  FAudioPlaying:=False;
+  FAudioPlaying := False;
   //FNotifier := False;
 
   //FObservers := TListTimerObservers.Create;
@@ -967,7 +969,7 @@ begin
     Exit;
   end
   else
-  {The timer run has completed. Stop the timer and play audio if required}
+    {The timer run has completed. Stop the timer and play audio if required}
   begin
     FRunning := False;
     FPaused := False;
@@ -983,12 +985,15 @@ begin
     if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
       frmEditTimer.dtpDuration.Enabled := True;
 
+    if frmTimerAdjust.Showing and (frmTimerAdjust.Id = Fid) then
+      frmTimerAdjust.bbApply.Enabled := False;
+
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
     if (FAudioFile <> '') and (not UserInitiated) then
     begin
-      Assert(FSoundFile <> Nil);
+      Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
       PlayAudio;
@@ -999,7 +1004,6 @@ begin
       StopButtonEnabled := False;
     end;
   end;
-
 
 end;
 
@@ -1201,7 +1205,7 @@ begin
 end;
 
 function TfraTimer.SetAudioFile(AValue: string; out Error: string): boolean;
-//var
+  //var
   //Info: SF_INFO;
   //SoundFile: PSndFile;
 begin
@@ -1323,7 +1327,7 @@ begin
     DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
   end;
 
-  FAudioPlaying:=True;
+  FAudioPlaying := True;
 
   //DebugLn('All went well');
   //DebugLn('Played audio');
@@ -1343,7 +1347,8 @@ begin
   //Counter := DEF_COUNTDOWN_CAPTION;
   bbAdjust.Enabled := False;
 
-  FAudioPlaying:=False;
+  FAudioPlaying := False;
+
 
   {This check might be redundant. Just to be safe}
   paErrCode := Pa_IsStreamStopped(FStream);

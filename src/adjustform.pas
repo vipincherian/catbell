@@ -46,6 +46,7 @@ type
   private
     procedure SetTillDateTime;
   public
+    Id: longword;
     { This usage of notify event is genuine, no need to clean up
     Some of the checks related to adjustment has to be executed at the
     parent timer frame. }
@@ -96,6 +97,8 @@ begin
   dtpTill.Left := dtpDiff.Left;
   dtpDiff.Time:=EncodeTime(0, 5, 0, 0);
   SetTillDateTime;
+
+  Id := -1;
 end;
 
 procedure TfrmTimerAdjust.FormShow(Sender: TObject);

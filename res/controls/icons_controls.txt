@@ -1,6 +1,6 @@
 arrow_down.svg|24
 arrow_up.svg|24
-delete.svg|24
+delete.svg|16,24
 hourglass.svg|16,24,32,48,256
 options.svg|16,24_g
 pause.svg|24
@@ -18,4 +18,5 @@ hourglass_flat.svg|16,24_g,256
 notify_progress_auto.svg|24
 pencil.svg|16,24
 wrench.svg|16,24
+sound.svg|16
 progress_base.svg|256
