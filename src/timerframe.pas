@@ -333,7 +333,7 @@ begin
   //  Exit;
   if CallbackOnProgressOnIconChange then
   begin
-    MainForm.HandleTimerFrameIconProgressChange(Self);
+    frmMain.HandleTimerFrameIconProgressChange(Self);
     {if OnProgressOnIconChanged <> nil then
     begin
       OnProgressOnIconChanged(Self);
@@ -690,7 +690,7 @@ begin
       +' ' +
 {$I %LINE%}
       +': OnSelect was found to be Nil');}
-  MainForm.ClockSelected(Self);
+  frmMain.ClockSelected(Self);
 end;
 
 procedure TfraTimer.Hide;
@@ -908,7 +908,7 @@ begin
 
   {if OnTimerStart <> nil then
     OnTimerStart(Self);}
-  MainForm.TimerStarted(Self);
+  frmMain.TimerStarted(Self);
 
   if frmEdit.Showing and (frmEdit.Id = FId) then
     frmEdit.dtpDuration.Enabled := True;
@@ -934,7 +934,7 @@ begin
   //end;
   //if OnTimerPause <> nil then
   //  OnTimerPause(Self);
-  MainForm.TimerPaused(Self);
+  frmMain.TimerPaused(Self);
 
 end;
 
@@ -1035,7 +1035,7 @@ begin
   //if OnTimerStop <> nil then
   //  OnTimerStop(Self);
 
-  MainForm.TimerFinished(Self);
+  frmMain.TimerFinished(Self);
 
   {for Observer in FObservers do
   begin
@@ -1057,7 +1057,7 @@ begin
   FProgress := Percent;
   //if OnTimerProgressUpdate <> nil then
   //  OnTimerProgressUpdate(Self);
-  MainForm.ProgressUpdate(Self, Percent);
+  frmMain.ProgressUpdate(Self, Percent);
 
 end;
 

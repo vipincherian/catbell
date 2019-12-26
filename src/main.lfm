@@ -237,7 +237,17 @@ object frmMain: TfrmMain
     Height = 23
     Top = 293
     Width = 654
-    Panels = <>
+    Panels = <    
+      item
+        Width = 100
+      end    
+      item
+        Width = 100
+      end    
+      item
+        Width = 50
+      end>
+    SimplePanel = False
   end
   object bbDelete: TBitBtn
     Left = 613

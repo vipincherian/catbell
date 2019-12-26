@@ -81,6 +81,10 @@ const
   //WM_USER = $400;
   UM_AFTERSHOW = LM_USER;
 
+  PANEL_TIMERCOUNT = 0;
+  PANEL_AUDIO = 1;
+  PANEL_MESSAGE = 2;
+
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
   TTimerFrameList = specialize TFPGList<TfraTimer>;
@@ -193,6 +197,7 @@ type
     FReference: TfraTimer;
 
     procedure CreateBitmaps;
+    function GetStatusMessage: string;
     procedure PostTimerCreation(AValue: TfraTimer);
     procedure SetListButtonsStatus;
     procedure ResetHeaderSections;
@@ -202,6 +207,7 @@ type
     function GetCanselectedMoveDown: boolean;
     function GetCanSelectedMoveUp: boolean;
     procedure Reorder;
+    procedure SetStatusMessage(AValue: string);
     procedure ShowInForeground;
 
   public
@@ -240,6 +246,7 @@ type
     procedure MoveSelectedClocksDown;
     procedure OnShortTimer(Sender: TObject);
     procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
+    property StatusMessage: string read GetStatusMessage write SetStatusMessage;
   end;
 
 var
@@ -667,6 +674,11 @@ begin
   Stream.Free;
 end;
 
+function TfrmMain.GetStatusMessage: string;
+begin
+  Result := stbMain.Panels[PANEL_MESSAGE].Text;
+end;
+
 procedure TfrmMain.SetListButtonsStatus;
 begin
   //sbDelete.Enabled := AnySelected;
@@ -869,6 +881,12 @@ begin
   //sbxClocks.Repaint;
   //sbxClocks.ReAlign;
 
+end;
+
+procedure TfrmMain.SetStatusMessage(AValue: string);
+begin
+  if StatusMessage <> Avalue then
+    stbMain.Panels[PANEL_MESSAGE].Text:=Avalue;
 end;
 
 procedure TfrmMain.ShowInForeground;
@@ -1185,6 +1203,7 @@ begin
     //OrderString.Free;
     //Order.Free;
     Reorder;
+    StatusMessage:='Saved timers loaded';
   end;
 end;
 
