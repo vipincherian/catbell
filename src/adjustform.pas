@@ -46,6 +46,9 @@ type
   private
     procedure SetTillDateTime;
   public
+    { This usage of notify event is genuine, no need to clean up
+    Some of the checks related to adjustment has to be executed at the
+    parent timer frame. }
     OnAdjust: TNotifyEvent;
   end;
 

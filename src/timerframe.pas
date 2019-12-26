@@ -173,12 +173,12 @@ type
     {TODO: Review these two events and remove dynamic bindings}
     //OnNotifyClick: TNotifyEvent;
     //OnNotifyChange: TNotifyEvent;
-    OnProgressOnIconChanged: TNotifyEvent;
+    //OnProgressOnIconChanged: TNotifyEvent;
     //OnPlay: TNotifyEvent;
     //OnStop: TNotifyEvent;
     //OnPause: TNotifyEvent;
     //OnNotify: TNotifyEvent;
-    OnSelect: TNotifyEvent;
+    //OnSelect: TNotifyEvent;
     //OnTimerStart: TNotifyEvent;
     //OnTimerPause: TNotifyEvent;
     //OnTimerStop: TNotifyEvent;
@@ -333,7 +333,8 @@ begin
   //  Exit;
   if CallbackOnProgressOnIconChange then
   begin
-    if OnProgressOnIconChanged <> nil then
+    MainForm.HandleTimerFrameIconProgressChange(Self);
+    {if OnProgressOnIconChanged <> nil then
     begin
       OnProgressOnIconChanged(Self);
     end
@@ -342,7 +343,7 @@ begin
 {$I %FILE%}
         +' ' +
 {$I %LINE%}
-        +': OnProgressOnIconChanged was found to be Nil');
+        +': OnProgressOnIconChanged was found to be Nil');}
   end;
 end;
 
@@ -677,7 +678,7 @@ end;}
 procedure TfraTimer.ClockSelected(Sender: TObject);
 begin
   //ShowMessage('TTimerClockWidget.Selected');
-  if OnSelect <> nil then
+  {if OnSelect <> nil then
   begin
     OnSelect(Self);
   end
@@ -686,7 +687,8 @@ begin
 {$I %FILE%}
       +' ' +
 {$I %LINE%}
-      +': OnSelect was found to be Nil');
+      +': OnSelect was found to be Nil');}
+  MainForm.ClockSelected(Self);
 end;
 
 procedure TfraTimer.Hide;
@@ -751,7 +753,7 @@ begin
   //sbPause.OnClick := @PauseClicked;
   //OnNotifyClick := @NotifyClicked;
   cbSelect.OnChange := @ClockSelected;
-  OnProgressOnIconChanged := nil;
+  //OnProgressOnIconChanged := nil;
 
   //ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap);
 

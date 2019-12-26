@@ -205,14 +205,14 @@ type
 
   public
     { public declarations }
-    OnNewTimer: TNotifyEvent;
-    OnNewAlarm: TNotifyEvent;
-    OnClockDelete: TNotifyEvent;
-    OnClockMoveUp: TNotifyEvent;
-    OnClockMoveDown: TNotifyEvent;
-    OnEXport: TNotifyEvent;
+    //OnNewTimer: TNotifyEvent;
+    //OnNewAlarm: TNotifyEvent;
+    //OnClockDelete: TNotifyEvent;
+    //OnClockMoveUp: TNotifyEvent;
+    //OnClockMoveDown: TNotifyEvent;
+    //OnEXport: TNotifyEvent;
 
-    procedure ClockSelected(Sender: TObject);
+    procedure ClockSelected(Sender: TfraTimer);
     procedure TimerFinished(Sender: TfraTimer);
     procedure TimerPaused(Sender: TfraTimer);
     procedure TimerStarted(Sender: TfraTimer);
@@ -229,7 +229,7 @@ type
 
     function AddTimer(): TfraTimer;
     //procedure NotifyChange(Sender: TObject);
-    procedure HandleTimerFrameIconProgressChange(Sender: TObject);
+    procedure HandleTimerFrameIconProgressChange(Sender: TfraTimer);
     procedure SaveClocks(Conf: TJsonConfig);
     procedure DeleteSelected;
     //property Widget: TClocksWidget read FClocksWidget write SetWidget;
@@ -264,8 +264,8 @@ begin
 
   FCounterClockID := TSequence.Create;
 
-  OnNewTimer := nil;
-  OnEXport := nil;
+  //OnNewTimer := nil;
+  //OnEXport := nil;
   FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
 
   //FClocks := TClocks.Create;
@@ -561,7 +561,7 @@ end;
 procedure TMainForm.PostTimerCreation(AValue: TfraTimer);
 begin
   //AValue.AddSubscription(Self);
-  AValue.OnSelect := @ClockSelected;
+  //AValue.OnSelect := @ClockSelected;
   ResetHeaderSections;
 end;
 
@@ -878,7 +878,7 @@ begin
 end;
 
 
-procedure TMainForm.ClockSelected(Sender: TObject);
+procedure TMainForm.ClockSelected(Sender: TfraTimer);
 begin
   SetListButtonsStatus;
 end;
@@ -941,7 +941,7 @@ end;
 
 procedure TMainForm.TimerPaused(Sender: TfraTimer);
 begin
-  Sender := TfraTimer(Sender);
+  //Sender := TfraTimer(Sender);
   try
     //Index := FActiveTimerFrames.IndexOf(Sender.Id);
     //if Index <> -1 then
@@ -1220,7 +1220,7 @@ begin
 
   //NewTimer.Widget := NewWidget;
   //NewWidget.OnNotifyChange := @NotifyChange;
-  NewWidget.OnProgressOnIconChanged := @HandleTimerFrameIconProgressChange;
+  //NewWidget.OnProgressOnIconChanged := @HandleTimerFrameIconProgressChange;
   //NewTimer.AddSubscription(NewWidget.);
 
   //FTimerFrames.Add(Id, NewWidget);
@@ -1275,17 +1275,16 @@ begin
 end;}
 
 // Procedure to handle if
-procedure TMainForm.HandleTimerFrameIconProgressChange(Sender: TObject);
+procedure TMainForm.HandleTimerFrameIconProgressChange(Sender: TfraTimer);
 var
-  SenderTimer: TfraTimer;
   Temp: TfraTimer;
   Count: integer;
 begin
-  SenderTimer := TfraTimer(Sender);
+  //Sender := TfraTimer(Sender);
 
-  if not SenderTimer.IsProgressOnIcon then
+  if not Sender.IsProgressOnIcon then
   begin
-    SenderTimer.PublishProgress(TIMER_PROGRESS_FINISHED);
+    Sender.PublishProgress(TIMER_PROGRESS_FINISHED);
     //Notifier.IsProgressOnIcon := False;
     Exit;
   end;
@@ -1294,7 +1293,7 @@ begin
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
     Temp := FTimerFrames.Data[Count];
-    if Temp <> SenderTimer then
+    if Temp <> Sender then
       if Temp.IsProgressOnIcon then
       begin
         Temp.CallbackOnProgressOnIconChange := False;
