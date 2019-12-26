@@ -1402,7 +1402,7 @@ begin
       ShowMessage('Clock is Nil');
 
     if TimerClock.Running then
-      TimerClock.Stop(Self);
+      TimerClock.Stop(False);
 
     if TimerClock.Selected then
     begin

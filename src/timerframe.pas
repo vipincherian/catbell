@@ -204,7 +204,7 @@ type
     procedure HandleTimerTrigger();
     procedure Start(Sender: TObject);
     procedure Pause(Sender: TObject);
-    procedure Stop(Sender: TObject);
+    procedure Stop(UserInitiated: boolean);
     //procedure NotifyChange(Sender: TObject);
     procedure Finish;
     procedure PublishProgress(Percent: single);
@@ -319,7 +319,7 @@ end;
 procedure TfraTimer.aiStopExecute(Sender: TObject);
 begin
   //Stopclicked(Sender);
-  Stop(Sender);
+  Stop(True);
 end;
 
 procedure TfraTimer.bbAdjustClick(Sender: TObject);
@@ -932,7 +932,7 @@ begin
 
 end;
 
-procedure TfraTimer.Stop(Sender: TObject);
+procedure TfraTimer.Stop(UserInitiated: boolean);
 var
   PaErrCode: PaError;
 begin
@@ -982,7 +982,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if FAudioFile <> '' then
+    if (FAudioFile <> '') and (not UserInitiated) then
     begin
       Assert(FSoundFile <> Nil);
       PlayButtonEnabled := False;
@@ -1022,7 +1022,7 @@ begin
   //WriteLn('At TfraTimer.Finish');
   //DebugLn('Entering TfraTimer.Finish');
   //DebugLn('Entering TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
-  Stop(Self);
+  Stop(False);
 
   if OnTimerStop <> nil then
     OnTimerStop(Self);
