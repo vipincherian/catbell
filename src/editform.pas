@@ -46,9 +46,9 @@ type
     destructor Destroy; override;
   end;}
 
-  { TfrmEditTimer }
+  { TfrmEdit }
 
-  TfrmEditTimer = class(TForm)
+  TfrmEdit = class(TForm)
     bbCancel: TBitBtn;
     bbClearAudioFile: TBitBtn;
     bbSave: TBitBtn;
@@ -111,7 +111,7 @@ type
 
 
 var
-  frmEditTimer: TfrmEditTimer;
+  frmEdit: TfrmEdit;
 
 implementation
 
@@ -143,9 +143,9 @@ begin
   inherited Destroy;
 end;}
 
-{ TfrmEditTimer }
+{ TfrmEdit }
 
-procedure TfrmEditTimer.FormCreate(Sender: TObject);
+procedure TfrmEdit.FormCreate(Sender: TObject);
 begin
   FProceed:=False;
 
@@ -168,7 +168,7 @@ begin
 
 end;
 
-procedure TfrmEditTimer.bbSaveClick(Sender: TObject);
+procedure TfrmEdit.bbSaveClick(Sender: TObject);
 {var
   Hour, Min, Sec, Milli : Word;}
 begin
@@ -184,7 +184,7 @@ begin
   Close;
 end;
 
-procedure TfrmEditTimer.bbSelectAudioFileClick(Sender: TObject);
+procedure TfrmEdit.bbSelectAudioFileClick(Sender: TObject);
 var
   FileName: string;
   ErrorText: string;
@@ -205,22 +205,22 @@ begin
   //ShowMessage(FileName);
 end;
 
-procedure TfrmEditTimer.dtpDurationChange(Sender: TObject);
+procedure TfrmEdit.dtpDurationChange(Sender: TObject);
 begin
   bbSave.Enabled:=Validate;
 end;
 
-procedure TfrmEditTimer.edtDescriptionChange(Sender: TObject);
+procedure TfrmEdit.edtDescriptionChange(Sender: TObject);
 begin
   bbSave.Enabled:=Validate;
 end;
 
-procedure TfrmEditTimer.bbCancelClick(Sender: TObject);
+procedure TfrmEdit.bbCancelClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TfrmEditTimer.bbClearAudioFileClick(Sender: TObject);
+procedure TfrmEdit.bbClearAudioFileClick(Sender: TObject);
 var
   ErrorText: string;
 begin
@@ -228,17 +228,17 @@ begin
   edtAudioFile.Text:='';
 end;
 
-procedure TfrmEditTimer.FormDestroy(Sender: TObject);
+procedure TfrmEdit.FormDestroy(Sender: TObject);
 begin
   //FSpecs.Free;
 end;
 
-procedure TfrmEditTimer.FormShow(Sender: TObject);
+procedure TfrmEdit.FormShow(Sender: TObject);
 begin
 
 end;
 
-function TfrmEditTimer.Validate: boolean;
+function TfrmEdit.Validate: boolean;
 var
   Hours, Minutes, Seconds: word;
 begin
@@ -263,13 +263,13 @@ begin
 end;
 
 
-procedure TfrmEditTimer.SetDescription(AValue: string);
+procedure TfrmEdit.SetDescription(AValue: string);
 begin
   FDescription:=AValue;
   edtDescription.Text:=AValue;
 end;
 
-function TfrmEditTimer.SetAudioFile(AValue: string; out Error: string): boolean;
+function TfrmEdit.SetAudioFile(AValue: string; out Error: string): boolean;
 var
   Info: SF_INFO;
   SoundFile: PSndFile;
@@ -319,27 +319,27 @@ begin
 
 end;
 
-procedure TfrmEditTimer.SetDuration(AValue: TTime);
+procedure TfrmEdit.SetDuration(AValue: TTime);
 begin
   FDuration:=AValue;
   dtpDuration.Time:=AValue;
 end;
 
-procedure TfrmEditTimer.SetFTrayNotification(AValue: boolean);
+procedure TfrmEdit.SetFTrayNotification(AValue: boolean);
 begin
   //if FTrayNotification=AValue then Exit;
   FTrayNotification:=AValue;
   ckbTrayNotification.Checked:=AValue;
 end;
 
-procedure TfrmEditTimer.SetModalAlert(AValue: boolean);
+procedure TfrmEdit.SetModalAlert(AValue: boolean);
 begin
   //if FModalAlert=AValue then Exit;
   FModalAlert:=AValue;
   ckbModalAlert.Checked:=AValue;
 end;
 
-function TfrmEditTimer.ShowAndGetSpecs: boolean;
+function TfrmEdit.ShowAndGetSpecs: boolean;
 begin
   FProceed:=False;
   {edtDescription.Text:=FSpecs.Description;
@@ -350,7 +350,7 @@ begin
   Result:=FProceed;
 end;
 
-function TfrmEditTimer.ShowForAdd: boolean;
+function TfrmEdit.ShowForAdd: boolean;
 begin
   Caption:='Add Timer';
   tsTimer.Show;
@@ -358,7 +358,7 @@ begin
   Result:=ShowAndGetSpecs;
 end;
 
-function TfrmEditTimer.ShowForEdit(Sender: TFrame): boolean;
+function TfrmEdit.ShowForEdit(Sender: TFrame): boolean;
 var
   Widget: TfraTimer;
 begin

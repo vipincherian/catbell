@@ -358,41 +358,41 @@ var
   //Hour, Min, Sec, Milli: word;
   ErrorText: string;
 begin
-  frmEditTimer.Description := edtTitle.Text;
-  frmEditTimer.Duration := dtpSet.Time;
-  frmEditTimer.TrayNotification := FTrayNotification;
-  frmEditTimer.ModalAlert := FModalAlert;
-  frmEditTimer.SetAudioFile(FAudioFile, ErrorText);
-  if frmEditTimer.ShowForEdit(Self) then
+  frmEdit.Description := edtTitle.Text;
+  frmEdit.Duration := dtpSet.Time;
+  frmEdit.TrayNotification := FTrayNotification;
+  frmEdit.ModalAlert := FModalAlert;
+  frmEdit.SetAudioFile(FAudioFile, ErrorText);
+  if frmEdit.ShowForEdit(Self) then
   begin
-    Caption := frmEditTimer.Description;
-    dtpSet.Time := frmEditTimer.Duration;
-    FTrayNotification := frmEditTimer.TrayNotification;
-    FModalAlert := frmEditTimer.ModalAlert;
+    Caption := frmEdit.Description;
+    dtpSet.Time := frmEdit.Duration;
+    FTrayNotification := frmEdit.TrayNotification;
+    FModalAlert := frmEdit.ModalAlert;
     //FAudioFile := frmEditTimer.AudioFile;
-    SetAudioFile(frmEditTimer.AudioFile, ErrorText);
+    SetAudioFile(frmEdit.AudioFile, ErrorText);
   end;
 end;
 
 procedure TfraTimer.aiAdjustExecute(Sender: TObject);
 begin
-  frmTimerAdjust.OnAdjust := @AdjustTimer;
+  frmAdjust.OnAdjust := @AdjustTimer;
   if not FPaused then
   begin
-    if frmTimerAdjust.cmbOptions.Items.Count <= 2 then
-      frmTimerAdjust.cmbOptions.Items.Add(ADJUST_STOPBY_TEXT);
+    if frmAdjust.cmbOptions.Items.Count <= 2 then
+      frmAdjust.cmbOptions.Items.Add(ADJUST_STOPBY_TEXT);
   end
   else
   begin
-    if frmTimerAdjust.cmbOptions.Items.Count = 3 then
-      frmTimerAdjust.cmbOptions.Items.Delete(ADJUST_STOPBY);
+    if frmAdjust.cmbOptions.Items.Count = 3 then
+      frmAdjust.cmbOptions.Items.Delete(ADJUST_STOPBY);
   end;
-  frmTimerAdjust.cmbOptions.ItemIndex := 0;
-  frmTimerAdjust.bbApply.Enabled := True;
-  frmTimerAdjust.dtpDiff.Show;
-  frmTimerAdjust.dtpTill.Hide;
-  frmTimerAdjust.Id := FId;
-  frmTimerAdjust.ShowModal;
+  frmAdjust.cmbOptions.ItemIndex := 0;
+  frmAdjust.bbApply.Enabled := True;
+  frmAdjust.dtpDiff.Show;
+  frmAdjust.dtpTill.Hide;
+  frmAdjust.Id := FId;
+  frmAdjust.ShowModal;
 end;
 
 
@@ -910,8 +910,8 @@ begin
     OnTimerStart(Self);}
   MainForm.TimerStarted(Self);
 
-  if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
-    frmEditTimer.dtpDuration.Enabled := True;
+  if frmEdit.Showing and (frmEdit.Id = FId) then
+    frmEdit.dtpDuration.Enabled := True;
 
 end;
 
@@ -982,11 +982,11 @@ begin
     FOrigTickDuration := 0;
     FStartTickCount := 0;
 
-    if frmEditTimer.Showing and (frmEditTimer.Id = FId) then
-      frmEditTimer.dtpDuration.Enabled := True;
+    if frmEdit.Showing and (frmEdit.Id = FId) then
+      frmEdit.dtpDuration.Enabled := True;
 
-    if frmTimerAdjust.Showing and (frmTimerAdjust.Id = Fid) then
-      frmTimerAdjust.bbApply.Enabled := False;
+    if frmAdjust.Showing and (frmAdjust.Id = Fid) then
+      frmAdjust.bbApply.Enabled := False;
 
     PauseButtonEnabled := False;
     DurationEnabled := True;
@@ -1073,21 +1073,21 @@ begin
   // We should not even be in such a situation, but that is a different
   if not FRunning then
   begin
-    frmTimerAdjust.Close;
+    frmAdjust.Close;
     Exit;
   end;
 
-  case frmTimerAdjust.cmbOptions.ItemIndex of
+  case frmAdjust.cmbOptions.ItemIndex of
     ADJUST_SHORTEN:
       //frmTimerAdjust.dtpAdjust.Time:=;
     begin
-      Hours := HourOf(frmTimerAdjust.dtpDiff.Time);
-      Mins := MinuteOf(frmTimerAdjust.dtpDiff.Time);
-      Secs := SecondOf(frmTimerAdjust.dtpDiff.Time);
+      Hours := HourOf(frmAdjust.dtpDiff.Time);
+      Mins := MinuteOf(frmAdjust.dtpDiff.Time);
+      Secs := SecondOf(frmAdjust.dtpDiff.Time);
 
       if (Hours = 0) and (Mins = 0) and (Secs = 0) then
       begin
-        frmTimerAdjust.Close;
+        frmAdjust.Close;
         Exit;
       end;
 
@@ -1136,17 +1136,17 @@ begin
         FPendingTickCount := NewPendingTickCount;
         UpdateProgress(FPendingTickCount);
       end;
-      frmTimerAdjust.Close;
+      frmAdjust.Close;
     end;
     ADJUST_EXTEND:
     begin
-      Hours := HourOf(frmTimerAdjust.dtpDiff.Time);
-      Mins := MinuteOf(frmTimerAdjust.dtpDiff.Time);
-      Secs := SecondOf(frmTimerAdjust.dtpDiff.Time);
+      Hours := HourOf(frmAdjust.dtpDiff.Time);
+      Mins := MinuteOf(frmAdjust.dtpDiff.Time);
+      Secs := SecondOf(frmAdjust.dtpDiff.Time);
 
       if (Hours = 0) and (Mins = 0) and (Secs = 0) then
       begin
-        frmTimerAdjust.Close;
+        frmAdjust.Close;
         Exit;
       end;
 
@@ -1167,7 +1167,7 @@ begin
         //FOrigTickDuration := FOrigTickDuration + Adjustment;
         UpdateProgress(FPendingTickCount);
       end;
-      frmTimerAdjust.Close;
+      frmAdjust.Close;
     end;
     ADJUST_STOPBY:
     begin
@@ -1178,15 +1178,15 @@ begin
       EndTime := IncMilliSecond(Now, (FEndTickCount - CurrTickCount));
 
       // If extension
-      if EndTime < frmTimerAdjust.dtpTill.DateTime then
+      if EndTime < frmAdjust.dtpTill.DateTime then
       begin
-        Diff := MilliSecondsBetween(EndTime, frmTimerAdjust.dtpTill.DateTime);
+        Diff := MilliSecondsBetween(EndTime, frmAdjust.dtpTill.DateTime);
         Inc(FEndTickCount, Diff);
         Inc(FOrigTickDuration, Diff);
       end
       else // If shortening
       begin
-        Diff := MilliSecondsBetween(frmTimerAdjust.dtpTill.DateTime, EndTime);
+        Diff := MilliSecondsBetween(frmAdjust.dtpTill.DateTime, EndTime);
         NewEndTickCount := FEndTickCount - Diff;
         if NewEndTickCount <= CurrTickCount then
         begin
@@ -1199,7 +1199,7 @@ begin
         FEndTickCount := NewEndTickCount;
       end;
       HandleTimerTrigger();
-      frmTimerAdjust.Close;
+      frmAdjust.Close;
     end;
   end;
 end;

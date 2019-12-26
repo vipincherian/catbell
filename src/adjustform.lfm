@@ -1,4 +1,4 @@
-object frmTimerAdjust: TfrmTimerAdjust
+object frmAdjust: TfrmAdjust
   Left = 254
   Height = 112
   Top = 177

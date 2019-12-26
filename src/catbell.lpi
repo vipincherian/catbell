@@ -77,7 +77,7 @@
       <Unit6>
         <Filename Value="timeralertform.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmTimerAlert"/>
+        <ComponentName Value="frmAlert"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit6>
@@ -91,14 +91,14 @@
       <Unit8>
         <Filename Value="editform.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmEditTimer"/>
+        <ComponentName Value="frmEdit"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit8>
       <Unit9>
         <Filename Value="adjustform.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmTimerAdjust"/>
+        <ComponentName Value="frmAdjust"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit9>

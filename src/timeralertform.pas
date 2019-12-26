@@ -30,9 +30,9 @@ uses
 
 type
 
-  { TfrmTimerAlert }
+  { TfrmAlert }
 
-  TfrmTimerAlert = class(TForm)
+  TfrmAlert = class(TForm)
     bbClose: TBitBtn;
     Label1: TLabel;
     lbMessages: TListBox;
@@ -50,15 +50,15 @@ type
   end;
 
 var
-  frmTimerAlert: TfrmTimerAlert;
+  frmAlert: TfrmAlert;
 
 implementation
 
 {$R *.lfm}
 
-{ TfrmTimerAlert }
+{ TfrmAlert }
 
-procedure TfrmTimerAlert.FormCreate(Sender: TObject);
+procedure TfrmAlert.FormCreate(Sender: TObject);
 begin
   //BorderStyle := bsNone;
   //OnShow := @FormShow;
@@ -66,25 +66,25 @@ begin
   AlphaBlendValue:=50;
 end;
 
-procedure TfrmTimerAlert.FormShow(Sender: TObject);
+procedure TfrmAlert.FormShow(Sender: TObject);
 begin
   Left := (Screen.Width - Width) div 2;
   Top := (Screen.Height - Height) div 2;
   //FTimer.Interval:=2000;
 end;
 
-procedure TfrmTimerAlert.CreateParams(var Params: TCreateParams);
+procedure TfrmAlert.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
   Params.Style := Params.Style or WS_THICKFRAME;
 end;
 
-procedure TfrmTimerAlert.bbCloseClick(Sender: TObject);
+procedure TfrmAlert.bbCloseClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TfrmTimerAlert.FormClose(Sender: TObject;
+procedure TfrmAlert.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
   //DebugLn('Entering FormClose');

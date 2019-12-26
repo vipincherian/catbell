@@ -335,21 +335,21 @@ begin
   begin
     //dtpSet.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
     //  DefaultTimerSecs, 0);
-    frmEditTimer.Duration := EncodeTime(DefaultTimerHours, DefaultTimerMins,
+    frmEdit.Duration := EncodeTime(DefaultTimerHours, DefaultTimerMins,
       DefaultTimerSecs, 0);
-    frmEditTimer.Description := DefaultTimerTitle;
+    frmEdit.Description := DefaultTimerTitle;
     {TODO: This should be read from config}
-    frmEditTimer.TrayNotification := ShowTrayAlert;
-    frmEditTimer.ModalAlert := ShowModalAlert;
+    frmEdit.TrayNotification := ShowTrayAlert;
+    frmEdit.ModalAlert := ShowModalAlert;
   end;
 
-  if frmEditTimer.ShowForAdd then
+  if frmEdit.ShowForAdd then
   begin
     Added := AddTimer;
-    Added.Caption := frmEditTimer.Description;
-    Added.dtpSet.Time := frmEditTimer.Duration;
-    Added.ModalAlert := frmEditTimer.ModalAlert;
-    Added.TrayNotification := frmEditTimer.TrayNotification;
+    Added.Caption := frmEdit.Description;
+    Added.dtpSet.Time := frmEdit.Duration;
+    Added.ModalAlert := frmEdit.ModalAlert;
+    Added.TrayNotification := frmEdit.TrayNotification;
     PostTimerCreation(Added);
   end;
 end;
@@ -929,12 +929,12 @@ begin
       Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
       Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
     //frmTimerAlert.stxAdditional.Caption := Message;
-    frmTimerAlert.lbMessages.Items.Add(Message);
+    frmAlert.lbMessages.Items.Add(Message);
 
     //if not frmTimerAlert.Showing then
-    if frmTimerAlert.WindowState = wsMinimized then
-      frmTimerAlert.WindowState := wsNormal;
-    frmTimerAlert.ShowOnTop;
+    if frmAlert.WindowState = wsMinimized then
+      frmAlert.WindowState := wsNormal;
+    frmAlert.ShowOnTop;
   end;
   //DebugLn('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
 

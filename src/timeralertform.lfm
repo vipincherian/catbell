@@ -1,4 +1,4 @@
-object frmTimerAlert: TfrmTimerAlert
+object frmAlert: TfrmAlert
   Cursor = crHandPoint
   Left = 431
   Height = 146

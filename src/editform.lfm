@@ -1,4 +1,4 @@
-object frmEditTimer: TfrmEditTimer
+object frmEdit: TfrmEdit
   Left = 351
   Height = 247
   Top = 238

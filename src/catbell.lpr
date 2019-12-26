@@ -57,11 +57,11 @@ begin
   //AppController.FormWidget := MainForm;
 
   Application.CreateForm(TfrmOptions, frmOptions);
-  Application.CreateForm(TfrmTimerAlert, frmTimerAlert);
+  Application.CreateForm(TfrmAlert, frmAlert);
   Application.CreateForm(TfrmAbout, frmAbout);
   MainForm.LoadfromFile;
-  Application.CreateForm(TfrmEditTimer, frmEditTimer);
-  Application.CreateForm(TfrmTimerAdjust, frmTimerAdjust);
+  Application.CreateForm(TfrmEdit, frmEdit);
+  Application.CreateForm(TfrmAdjust, frmAdjust);
   Application.Run;
 
 //  AppController.Destroy;

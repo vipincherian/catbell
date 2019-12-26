@@ -30,9 +30,9 @@ uses
 
 type
 
-  { TfrmTimerAdjust }
+  { TfrmAdjust }
 
-  TfrmTimerAdjust = class(TForm)
+  TfrmAdjust = class(TForm)
     bbApply: TBitBtn;
     bbCancel: TBitBtn;
     cmbOptions: TComboBox;
@@ -54,7 +54,7 @@ type
   end;
 
 var
-  frmTimerAdjust: TfrmTimerAdjust;
+  frmAdjust: TfrmAdjust;
 
 const
   ADJUST_SHORTEN = 0;
@@ -66,9 +66,9 @@ implementation
 
 {$R *.lfm}
 
-{ TfrmTimerAdjust }
+{ TfrmAdjust }
 
-procedure TfrmTimerAdjust.cmbOptionsChange(Sender: TObject);
+procedure TfrmAdjust.cmbOptionsChange(Sender: TObject);
 begin
   case cmbOptions.ItemIndex of
     ADJUST_SHORTEN:
@@ -90,7 +90,7 @@ begin
   end;
 end;
 
-procedure TfrmTimerAdjust.FormCreate(Sender: TObject);
+procedure TfrmAdjust.FormCreate(Sender: TObject);
 begin
   dtpDiff.Show;
   dtpTill.Hide;
@@ -101,23 +101,23 @@ begin
   Id := -1;
 end;
 
-procedure TfrmTimerAdjust.FormShow(Sender: TObject);
+procedure TfrmAdjust.FormShow(Sender: TObject);
 begin
   SetTillDateTime;
 end;
 
-procedure TfrmTimerAdjust.SetTillDateTime;
+procedure TfrmAdjust.SetTillDateTime;
 begin
   dtpTill.DateTime := IncMinute(Now, 5);
 end;
 
-procedure TfrmTimerAdjust.bbApplyClick(Sender: TObject);
+procedure TfrmAdjust.bbApplyClick(Sender: TObject);
 begin
   if OnAdjust <> nil then
     OnAdjust(Self);
 end;
 
-procedure TfrmTimerAdjust.bbCancelClick(Sender: TObject);
+procedure TfrmAdjust.bbCancelClick(Sender: TObject);
 begin
   Close;
 end;
