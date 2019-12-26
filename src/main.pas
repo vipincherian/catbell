@@ -86,9 +86,9 @@ type
   TTimerFrameList = specialize TFPGList<TfraTimer>;
   TIdList = specialize TFPGList<longword>;
 
-  { TMainForm }
+  { TfrmMain }
 
-  TMainForm = class(TForm)
+  TfrmMain = class(TForm)
     aiMoveDown: TAction;
     aiMoveUp: TAction;
     aiDeleteTimer: TAction;
@@ -243,15 +243,15 @@ type
   end;
 
 var
-  MainForm: TMainForm;
+  frmMain: TfrmMain;
 
 implementation
 
 {$R *.lfm}
 
-{ TMainForm }
+{ TfrmMain }
 
-procedure TMainForm.FormCreate(Sender: TObject);
+procedure TfrmMain.FormCreate(Sender: TObject);
 var
   PaErrCode: PaError;
 begin
@@ -323,7 +323,7 @@ begin
 
 end;
 
-procedure TMainForm.aiNewTimerExecute(Sender: TObject);
+procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
 var
   Added: TfraTimer;
   //Proceed: boolean;
@@ -354,19 +354,19 @@ begin
   end;
 end;
 
-procedure TMainForm.aiOptionsExecute(Sender: TObject);
+procedure TfrmMain.aiOptionsExecute(Sender: TObject);
 begin
   //ShowMessage('Hehe');
   frmOptions.ShowModal;
   OptionsFormClosed;
 end;
 
-procedure TMainForm.aiQuitExecute(Sender: TObject);
+procedure TfrmMain.aiQuitExecute(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   CurrPosNormal, CurrPosRestored: TRect;
 begin
@@ -394,7 +394,7 @@ begin
   end;
 end;
 
-procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 {var
   CurrPosNormal, CurrPosRestored: TRect;}
 begin
@@ -404,7 +404,7 @@ begin
 
 end;
 
-procedure TMainForm.aiAboutExecute(Sender: TObject);
+procedure TfrmMain.aiAboutExecute(Sender: TObject);
 begin
   //ShowMessage(IntToStr(tiMain.Canvas.Width));
   //ShowMessage('Catbell by Vipin Cherian (c) 2017');
@@ -412,12 +412,12 @@ begin
   //tiMain.
 end;
 
-procedure TMainForm.aiNewAlarmExecute(Sender: TObject);
+procedure TfrmMain.aiNewAlarmExecute(Sender: TObject);
 begin
 
 end;
 
-procedure TMainForm.aiExportExecute(Sender: TObject);
+procedure TfrmMain.aiExportExecute(Sender: TObject);
 var
   FileName: string;
   Conf: TJSONConfig;
@@ -434,25 +434,25 @@ begin
   end;
 end;
 
-procedure TMainForm.aiMoveDownExecute(Sender: TObject);
+procedure TfrmMain.aiMoveDownExecute(Sender: TObject);
 begin
   MoveSelectedClocksDown;
   SetListButtonsStatus;
 end;
 
-procedure TMainForm.aiMoveUpExecute(Sender: TObject);
+procedure TfrmMain.aiMoveUpExecute(Sender: TObject);
 begin
   MoveSelectedClocksUp;
   SetListButtonsStatus;
 end;
 
-procedure TMainForm.aiDeleteTimerExecute(Sender: TObject);
+procedure TfrmMain.aiDeleteTimerExecute(Sender: TObject);
 begin
   DeleteSelected;
   SetListButtonsStatus;
 end;
 
-procedure TMainForm.FormDestroy(Sender: TObject);
+procedure TfrmMain.FormDestroy(Sender: TObject);
 var
   Count: integer;
   I: integer;
@@ -491,12 +491,12 @@ begin
   //FClockWidget.Free;
 end;
 
-procedure TMainForm.FormResize(Sender: TObject);
+procedure TfrmMain.FormResize(Sender: TObject);
 begin
   ResetHeaderSections;
 end;
 
-procedure TMainForm.FormShow(Sender: TObject);
+procedure TfrmMain.FormShow(Sender: TObject);
 begin
   with GlobalUserConfig do
   begin
@@ -531,27 +531,27 @@ begin
   //UpdateAlertFormSettings;
 end;
 
-procedure TMainForm.pmiShowWindowClick(Sender: TObject);
+procedure TfrmMain.pmiShowWindowClick(Sender: TObject);
 begin
   ShowInForeground;
 end;
 
-procedure TMainForm.tbProgressAutoClick(Sender: TObject);
+procedure TfrmMain.tbProgressAutoClick(Sender: TObject);
 begin
   GlobalUserConfig.AutoProgress := tbProgressAuto.Down;
 end;
 
-procedure TMainForm.tiMainClick(Sender: TObject);
+procedure TfrmMain.tiMainClick(Sender: TObject);
 begin
   ShowInForeground;
 end;
 
-procedure TMainForm.tiMainDblClick(Sender: TObject);
+procedure TfrmMain.tiMainDblClick(Sender: TObject);
 begin
   ShowInForeground;
 end;
 
-procedure TMainForm.tiMainMouseUp(Sender: TObject; Button: TMouseButton;
+procedure TfrmMain.tiMainMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 begin
   if Button = mbRight then
@@ -559,14 +559,14 @@ begin
 end;
 
 
-procedure TMainForm.PostTimerCreation(AValue: TfraTimer);
+procedure TfrmMain.PostTimerCreation(AValue: TfraTimer);
 begin
   //AValue.AddSubscription(Self);
   //AValue.OnSelect := @ClockSelected;
   ResetHeaderSections;
 end;
 
-procedure TMainForm.CreateBitmaps;
+procedure TfrmMain.CreateBitmaps;
 var
   FinalBmp, HiresBmp: TBGRABitmap;
   InSet: integer;
@@ -667,7 +667,7 @@ begin
   Stream.Free;
 end;
 
-procedure TMainForm.SetListButtonsStatus;
+procedure TfrmMain.SetListButtonsStatus;
 begin
   //sbDelete.Enabled := AnySelected;
   bbDelete.Enabled := AnySelected;
@@ -680,7 +680,7 @@ begin
   tbMoveDown.Enabled := GetCanselectedMoveDown;
 end;
 
-procedure TMainForm.ResetHeaderSections;
+procedure TfrmMain.ResetHeaderSections;
 var
   //Ids: TIdList;
   Id: longword;
@@ -744,7 +744,7 @@ begin
   //Ids.Free;
 end;
 
-function TMainForm.GetAnySelected: boolean;
+function TfrmMain.GetAnySelected: boolean;
 var
   Count: integer;
   Clock: TfraTimer;
@@ -764,7 +764,7 @@ begin
   Result := False;
 end;
 
-function TMainForm.GetCanselectedMoveDown: boolean;
+function TfrmMain.GetCanselectedMoveDown: boolean;
 var
   Id: longword;
   //Count: integer;
@@ -791,7 +791,7 @@ begin
   Result := False;
 end;
 
-function TMainForm.GetCanSelectedMoveUp: boolean;
+function TfrmMain.GetCanSelectedMoveUp: boolean;
 var
   Id: longword;
   //Count: integer;
@@ -819,7 +819,7 @@ begin
 end;
 
 
-procedure TMainForm.Reorder;
+procedure TfrmMain.Reorder;
 var
   Id: longword;
   //Index: integer;
@@ -871,7 +871,7 @@ begin
 
 end;
 
-procedure TMainForm.ShowInForeground;
+procedure TfrmMain.ShowInForeground;
 begin
   if WindowState = wsMinimized then
     WindowState := wsNormal;
@@ -879,12 +879,12 @@ begin
 end;
 
 
-procedure TMainForm.ClockSelected(Sender: TfraTimer);
+procedure TfrmMain.ClockSelected(Sender: TfraTimer);
 begin
   SetListButtonsStatus;
 end;
 
-procedure TMainForm.TimerFinished(Sender: TfraTimer);
+procedure TfrmMain.TimerFinished(Sender: TfraTimer);
 var
   Hours: word;
   Minutes: word;
@@ -940,7 +940,7 @@ begin
 
 end;
 
-procedure TMainForm.TimerPaused(Sender: TfraTimer);
+procedure TfrmMain.TimerPaused(Sender: TfraTimer);
 begin
   //Sender := TfraTimer(Sender);
   try
@@ -957,7 +957,7 @@ begin
 
 end;
 
-procedure TMainForm.TimerStarted(Sender: TfraTimer);
+procedure TfrmMain.TimerStarted(Sender: TfraTimer);
 var
   Index: integer;
 begin
@@ -976,7 +976,7 @@ begin
 
 end;
 
-procedure TMainForm.ProgressUpdate(Widget: TfraTimer; Progress: single);
+procedure TfrmMain.ProgressUpdate(Widget: TfraTimer; Progress: single);
 var
   //Bmp: TBitmap;
   Index: integer;
@@ -1023,7 +1023,7 @@ begin
 
 end;
 
-{procedure TMainForm.TimerProgressUpdated(Sender: TObject);
+{procedure TfrmMain.TimerProgressUpdated(Sender: TObject);
 var
   TimerFrame: TfraTimer;
 begin
@@ -1031,7 +1031,7 @@ begin
   ProgressUpdate(TimerFrame.Progress);
 end;}
 
-procedure TMainForm.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
+procedure TfrmMain.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
 var
   Temp: TfraTimer;
   Count: integer;
@@ -1068,7 +1068,7 @@ begin
   //UpdateAlertFormSettings;
 end;
 
-function TMainForm.GetExportFileName: string;
+function TfrmMain.GetExportFileName: string;
 begin
   if sdgExport.Execute then
     Result := sdgExport.FileName
@@ -1076,7 +1076,7 @@ begin
     Result := '';
 end;
 
-procedure TMainForm.ProcessCommandline;
+procedure TfrmMain.ProcessCommandline;
 var
   DefaultDbFile: string;
   PassedDbFile: string;
@@ -1094,7 +1094,7 @@ begin
 
 end;
 
-procedure TMainForm.SavetoFile;
+procedure TfrmMain.SavetoFile;
 var
   Conf: TJSONConfig;
   //Count: integer;
@@ -1108,7 +1108,7 @@ begin
   Conf.Free;
 end;
 
-procedure TMainForm.LoadfromFile;
+procedure TfrmMain.LoadfromFile;
 var
   Conf: TJSONConfig;
   TotalCount, Count: integer;
@@ -1188,7 +1188,7 @@ begin
   end;
 end;
 
-function TMainForm.AddTimer(): TfraTimer;
+function TfrmMain.AddTimer(): TfraTimer;
 var
   //NewTimer: TTimerClock;
   Id: longword;
@@ -1236,7 +1236,7 @@ begin
   Result := NewWidget;
 end;
 
-{procedure TMainForm.NotifyChange(Sender: TObject);
+{procedure TfrmMain.NotifyChange(Sender: TObject);
 var
   TimerClock: TfraTimer;
   Notifier: TfraTimer;
@@ -1276,7 +1276,7 @@ begin
 end;}
 
 // Procedure to handle if
-procedure TMainForm.HandleTimerFrameIconProgressChange(Sender: TfraTimer);
+procedure TfrmMain.HandleTimerFrameIconProgressChange(Sender: TfraTimer);
 var
   Temp: TfraTimer;
   Count: integer;
@@ -1306,7 +1306,7 @@ begin
 
 end;
 
-procedure TMainForm.SaveClocks(Conf: TJsonConfig);
+procedure TfrmMain.SaveClocks(Conf: TJsonConfig);
 var
   TimerClock: TfraTimer;
   Count: integer;
@@ -1378,7 +1378,7 @@ begin
   //Order.Free;
 end;
 
-procedure TMainForm.DeleteSelected;
+procedure TfrmMain.DeleteSelected;
 var
   Id: longword;
   TimerClock: TfraTimer;
@@ -1420,7 +1420,7 @@ begin
 
 end;
 
-procedure TMainForm.RemoveTimer(IdNew: longword);
+procedure TfrmMain.RemoveTimer(IdNew: longword);
 var
   RemovedTimer: TfraTimer;
   Index: integer;
@@ -1433,7 +1433,7 @@ begin
   Reorder;
 end;
 
-procedure TMainForm.MoveSelectedClocksUp;
+procedure TfrmMain.MoveSelectedClocksUp;
 var
   Id: longword;
   Count: integer;
@@ -1459,7 +1459,7 @@ begin
   Reorder;
 end;
 
-procedure TMainForm.MoveSelectedClocksDown;
+procedure TfrmMain.MoveSelectedClocksDown;
 var
   Id: longword;
   Count: integer;
@@ -1486,7 +1486,7 @@ begin
   Reorder;
 end;
 
-procedure TMainForm.OnShortTimer(Sender: TObject);
+procedure TfrmMain.OnShortTimer(Sender: TObject);
 var
   TimerFrame: TfraTimer;
 begin
@@ -1506,7 +1506,7 @@ begin
   end;
 end;
 
-procedure TMainForm.AfterShow(var Msg: TLMessage);
+procedure TfrmMain.AfterShow(var Msg: TLMessage);
 begin
   if FTimerFrames.Count = 0 then
     aiNewTimer.Execute;

@@ -48,9 +48,8 @@ begin
   //FormWidget := TMainFormWidget.Create();
   //AppController := TController.Create();
 
-
-  Application.CreateForm(TMainForm, MainForm);
-  MainForm.ProcessCommandline;
+  Application.CreateForm(TfrmMain, frmMain);
+  frmMain.ProcessCommandline;
 
   //MainFormWidget.FormView.Form := TMainWindow(Application.MainForm);
   //FormWidget.Form := TMainForm(Application.MainForm);
@@ -59,7 +58,7 @@ begin
   Application.CreateForm(TfrmOptions, frmOptions);
   Application.CreateForm(TfrmAlert, frmAlert);
   Application.CreateForm(TfrmAbout, frmAbout);
-  MainForm.LoadfromFile;
+  frmMain.LoadfromFile;
   Application.CreateForm(TfrmEdit, frmEdit);
   Application.CreateForm(TfrmAdjust, frmAdjust);
   Application.Run;
