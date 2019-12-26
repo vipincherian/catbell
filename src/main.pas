@@ -187,8 +187,9 @@ type
 
     { This is an invisible timer frame, the purpose of which
     is to aid in resizing header sections when there are no timers
-    added. It is a waste of space, but I could not find a better
-    and reliable way to achieve the same functionality.}
+    added. It is a waste of space, and altogether inelegant,
+    but I could not find a better and reliable way to achieve
+    the same functionality.}
     FReference: TfraTimer;
 
     procedure CreateBitmaps;
