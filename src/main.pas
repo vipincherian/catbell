@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages, portaudio, ctypes;
+  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages, portaudio, sndfile, ctypes;
 
 const
   FORM_MIN_SIZE = 600;
@@ -261,6 +261,9 @@ implementation
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
   PaErrCode: PaError;
+{$IFNDEF AUDIO_STATIC}
+  Status: boolean;
+{$ENDIF}
 begin
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_SIZE;
@@ -304,6 +307,8 @@ begin
   bbMoveUp.DoubleBuffered := True;
   bbMoveDown.DoubleBuffered := True;
   DoubleBuffered := True;
+  stbMain.DoubleBuffered := True;
+  //stbMain.Panels[PANEL_MESSAGE].;
 
 
   //TrayIconSize := TRAY_BASE_WIDTH;
@@ -320,13 +325,29 @@ begin
   FReference.Anchors := [];
 
   CreateBitmaps;
+{$IFNDEF AUDIO_STATIC}
+  Status := Pa_Load(LIB_PORTAUDIO);
+  if not Status then
+  begin
+    DebugLn('Could not load portaudio');
+    //ReadKey;
+    //exit;
+  end;
 
-  PaErrCode := Pa_Initialize() ;
+  Status := sf_load(LIB_SNDFILE);
+  if not Status then
+  begin
+    DebugLn('Could not load sndfile');
+    //ReadKey;
+    //exit;
+  end;
+{$ENDIF}
+
+  PaErrCode := Pa_Initialize();
   if PaErrCode <> cint(paNoError) then
   begin
     DebugLn('Error in Pa_Initialize()');
   end;
-
 
 end;
 
@@ -495,6 +516,10 @@ begin
   FShortTimer.Free;
 
   Pa_Terminate();
+{$IFNDEF AUDIO_STATIC}
+  Sf_Unload();
+  Pa_Unload();
+{$ENDIF}
   //FClockWidget.Free;
 end;
 
@@ -886,7 +911,7 @@ end;
 procedure TfrmMain.SetStatusMessage(AValue: string);
 begin
   if StatusMessage <> Avalue then
-    stbMain.Panels[PANEL_MESSAGE].Text:=Avalue;
+    stbMain.Panels[PANEL_MESSAGE].Text := Avalue;
 end;
 
 procedure TfrmMain.ShowInForeground;
@@ -1015,7 +1040,7 @@ begin
     if Index >= 24 then
       Index := 23;
     Assert((Index >= 0) and (Index < TRAY_PROGRESS_ICON_COUNT));
-    if Widget = Nil then
+    if Widget = nil then
       Exit;
     if Widget.IsProgressOnIcon then
     begin
@@ -1203,7 +1228,7 @@ begin
     //OrderString.Free;
     //Order.Free;
     Reorder;
-    StatusMessage:='Saved timers loaded';
+    StatusMessage := 'Saved timers loaded.';
   end;
 end;
 
@@ -1226,7 +1251,8 @@ begin
   //NewWidget.OnTimerPause := @TimerPaused;
   //NewWidget.OnTimerStop := @TimerFinished;
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
-  NewWidget.LastProgressIconIndex:=LAST_TRAY_ICON_DEFAULT;
+  NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
+
   //NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
   begin
