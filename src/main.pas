@@ -29,7 +29,8 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages, portaudio, sndfile, ctypes;
+  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages,
+  portaudio, sndfile, ctypes;
 
 const
   FORM_MIN_SIZE = 600;
@@ -211,6 +212,7 @@ type
     procedure Reorder;
     procedure SetStatusMessage(AValue: string);
     procedure ShowInForeground;
+    procedure UpdateStatusTimerCount;
 
   public
     { public declarations }
@@ -362,7 +364,7 @@ begin
     begin
       DebugLn('Error in Pa_Initialize()');
 
-      FAudioWorking:=False;
+      FAudioWorking := False;
 
       { If portaudio cannot be initialised, then audio will not work.
       Unload libraries }
@@ -375,9 +377,9 @@ begin
 
   stbMain.BeginUpdate;
   if FAudioWorking then
-    stbMain.Panels[PANEL_AUDIO].Text:='Audio: Ok'
+    stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Ok'
   else
-    stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Not Ok';
+    stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Error';
   stbMain.EndUpdate;
 end;
 
@@ -955,6 +957,19 @@ begin
   Show;
 end;
 
+procedure TfrmMain.UpdateStatusTimerCount;
+var
+  TextMessage: string;
+begin
+  TextMessage := 'Running: ' + IntToStr(FActiveTimerFrames.Count) +
+    '/' + IntToStr(FTimerFrames.Count);
+  if FShortTimer.Enabled then
+    TextMessage := TextMessage + ' +'
+  else
+    TextMessage := TextMessage + ' -';
+  stbMain.Panels[PANEL_TIMERCOUNT].Text := TextMessage;
+end;
+
 
 procedure TfrmMain.ClockSelected(Sender: TfraTimer);
 begin
@@ -983,7 +998,9 @@ begin
     //Index := FActiveTimerFrames.IndexOf(Id);
     //if Index <> -1 then
     //begin
-    FActiveTimerFrames.Remove(Sender);
+    if FActiveTimerFrames.Remove(Sender) = -1 then
+      DebugLn('Unable to remove from active timerframes.');
+    ;
     //end;
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
 
@@ -1013,6 +1030,7 @@ begin
       frmAlert.WindowState := wsNormal;
     frmAlert.ShowOnTop;
   end;
+  UpdateStatusTimerCount;
   //DebugLn('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
 
 end;
@@ -1046,6 +1064,7 @@ begin
     begin
       FActiveTimerFrames.Add(Sender);
     end;
+    UpdateStatusTimerCount;
   except
     on E: Exception do
       ShowMessage('Error (3): ' + E.ClassName + #13#10 + E.Message);
@@ -1262,7 +1281,9 @@ begin
     //OrderString.Free;
     //Order.Free;
     Reorder;
+
     StatusMessage := 'Saved timers loaded.';
+    UpdateStatusTimerCount;
   end;
 end;
 

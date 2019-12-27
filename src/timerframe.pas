@@ -1004,7 +1004,7 @@ begin
       StopButtonEnabled := False;
     end;
   end;
-
+  frmMain.TimerFinished(Self);
 end;
 
 {procedure TfraTimer.NotifyChange(Sender: TObject);
@@ -1035,7 +1035,6 @@ begin
   //if OnTimerStop <> nil then
   //  OnTimerStop(Self);
 
-  frmMain.TimerFinished(Self);
 
   {for Observer in FObservers do
   begin
