@@ -106,6 +106,7 @@ type
     property Description: string read FDescription write SetDescription;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
     property AudioFile: string read FAudioFile;
+    property AudioLength: double read FAudioLength;
     property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
     property Id: longword read FId;
     function SetAudioFile(AValue: string; out Error: string): boolean;
@@ -287,7 +288,7 @@ begin
   if AValue = '' then
   begin
     FAudioFile:='';
-    FAudioLength:=-1;;
+    FAudioLength:=0;;
     lblLengthText.Visible:=False;
     edtAudioFile.Text:='';
     //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
@@ -298,7 +299,10 @@ begin
 
   if not frmMain.AudioWorking then
   begin
-    DebugLn('TfrmEdit.SetAudioFile called when audio is not working');
+    FAudioFile:=AValue;
+    FAudioLength:=Duration;
+    edtAudioFile.Text:=FAudioFile;
+    Result := True;
     Exit;
   end;
 

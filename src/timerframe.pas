@@ -211,7 +211,7 @@ type
     //procedure AddSubscription(aObserver: ITimerObserver);
     //procedure RemoveSubscription(aObserver: ITimerObserver);
     procedure AdjustTimer(Sender: TObject);
-    function SetAudioFile(AValue: string; out Error: string): boolean;
+    function SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
     procedure PlayAudio;
     procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
 
@@ -242,6 +242,7 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     property AudioFile: string read FAudioFile;
+    property AudioLength: double read FAudioLength;
     //function AudioCallback(const input: pointer; output: pointer; frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
   end;
 
@@ -370,7 +371,7 @@ begin
     FTrayNotification := frmEdit.TrayNotification;
     FModalAlert := frmEdit.ModalAlert;
     //FAudioFile := frmEditTimer.AudioFile;
-    SetAudioFile(frmEdit.AudioFile, ErrorText);
+    SetAudioFile(frmEdit.AudioFile, frmEdit.AudioLength, ErrorText);
   end;
 end;
 
@@ -1203,7 +1204,7 @@ begin
   end;
 end;
 
-function TfraTimer.SetAudioFile(AValue: string; out Error: string): boolean;
+function TfraTimer.SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
   //var
   //Info: SF_INFO;
   //SoundFile: PSndFile;
@@ -1214,7 +1215,7 @@ begin
   if AValue = '' then
   begin
     FAudioFile := '';
-    FAudioLength := -1.0;
+    FAudioLength := 0;
     ;
     //lblLengthText.Visible:=False;
     //edtAudioFile.Text:='';
@@ -1224,9 +1225,16 @@ begin
     Exit;
   end;
 
+  { If audio is not working, then set the filepath and duration without
+  additional checks. This is done so that the default config does not lose this
+  information when saved later.}
   if not frmMain.AudioWorking then
   begin
-    DebugLn('SetAudioFile called when audio is not working');
+    //DebugLn('SetAudioFile called when audio is not working');
+    FAudioFile:=AValue;
+    FAudioLength:=Duration;
+    FSoundFile:=Nil;
+    Result := True;
     Exit;
   end;
 

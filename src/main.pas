@@ -71,6 +71,7 @@ const
   TIMER_CONF_NOTIFIER = 'notifier';
 
   TIMER_CONF_AUDIOFILE = 'audio_file';
+  TIMER_CONF_AUDIOLENGTH = 'audio_duration';
 
   TIMER_CONF_MODALALERT = 'modal_alert';
   TIMER_CONF_TRAYNOTIFiCATION = 'tray_notification';
@@ -1249,10 +1250,12 @@ begin
         '/' + TIMER_CONF_NOTIFIER, False);
 
       Success := NewTimerClock.SetAudioFile(Conf.GetValue(TIMER_CONF_TIMERS +
-        '/' + IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOFILE, ''), ErrorText);
+        '/' + IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOFILE, ''),
+        StrToFloat(Conf.GetValue(TIMER_CONF_TIMERS +         '/' + IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOLENGTH, '0')),
+        ErrorText);
       if not Success then
       begin
-        NewTimerClock.SetAudioFile('', ErrorText);
+        NewTimerClock.SetAudioFile('', 0, ErrorText);
       end;
 
       NewTimerClock.ModalAlert :=
@@ -1454,6 +1457,8 @@ begin
 
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_AUDIOFILE, TimerClock.AudioFile);
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + FloatToStr(Count + 1) +
+      '/' + TIMER_CONF_AUDIOLENGTH, TimerClock.AudioLength);
 
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_MODALALERT, TimerClock.ModalAlert);
