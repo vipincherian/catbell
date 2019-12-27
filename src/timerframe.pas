@@ -1009,7 +1009,7 @@ begin
       StopButtonEnabled := False;
     end;
   end;
-  frmMain.TimerFinished(Self);
+  frmMain.TimerFinished(Self, UserInitiated);
 end;
 
 {procedure TfraTimer.NotifyChange(Sender: TObject);

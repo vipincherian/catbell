@@ -225,7 +225,7 @@ type
     //OnEXport: TNotifyEvent;
 
     procedure ClockSelected(Sender: TfraTimer);
-    procedure TimerFinished(Sender: TfraTimer);
+    procedure TimerFinished(Sender: TfraTimer; UserInitiated: boolean);
     procedure TimerPaused(Sender: TfraTimer);
     procedure TimerStarted(Sender: TfraTimer);
     procedure ProgressUpdate(Widget: TfraTimer; Progress: single);
@@ -977,7 +977,7 @@ begin
   SetListButtonsStatus;
 end;
 
-procedure TfrmMain.TimerFinished(Sender: TfraTimer);
+procedure TfrmMain.TimerFinished(Sender: TfraTimer; UserInitiated: boolean);
 var
   Hours: word;
   Minutes: word;
@@ -1010,7 +1010,7 @@ begin
       ShowMessage('Error(1): ' + E.ClassName + #13#10 + E.Message);
   end;
 
-  if Sender.TrayNotification then
+  if (Sender.TrayNotification and (not UserInitiated)) then
   begin
     tiMain.BalloonHint :=
       Sender.Caption + ' completed. (' + Format('%.2d', [Hours]) +
@@ -1018,7 +1018,7 @@ begin
     tiMain.ShowBalloonHint;
   end;
 
-  if Sender.ModalAlert then
+  if (Sender.ModalAlert = true and (not UserInitiated)) then
   begin
     Message :=
       Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
