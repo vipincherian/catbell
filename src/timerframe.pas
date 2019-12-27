@@ -65,6 +65,7 @@ type
     SoundFile: PSndFile;
     Info: SF_INFO;
     Handle: THandle;
+    Widget: Pointer;
   end;
   PAudioInfo = ^TUserInfo;
   { TfraTimer }
@@ -214,6 +215,7 @@ type
     function SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
     procedure PlayAudio;
     procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
+    procedure FinishedAud(Data: PtrInt);
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
@@ -294,11 +296,13 @@ handle.}
 procedure StreamFinished(UserData: pointer); cdecl;
 var
   AudioInfo: PAudioInfo;
+  Widget: TfraTimer;
 begin
   //DebugLn('Inside streamFinished');
   AudioInfo := PAudioinfo(userData);
-
-  PostMessage(AudioInfo^.Handle, UM_FINISHED_AUDIO, 0, 0);
+  Widget := TfraTimer(AudioInfo^.Widget);
+  //PostMessage(AudioInfo^.Handle, UM_FINISHED_AUDIO, 0, 0);
+  Application.QueueAsyncCall(@(Widget.FinishedAud), 0);
 end;
 
 {$R *.lfm}
@@ -1321,6 +1325,7 @@ begin
   //Callback := @FeedStream;
   FUserInfo.SoundFile := FSoundFile;
   FUserInfo.Handle := Handle;
+  FUserInfo.Widget := Self;
   Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
   PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
@@ -1357,7 +1362,49 @@ procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
 var
   PaErrCode: PaError;
 begin
-  //DebugLn('Inside finished audio ');
+  DebugLn('Inside finished audio ');
+
+  PlayButtonEnabled := True;
+  PauseButtonEnabled := False;
+  StopButtonEnabled := False;
+  DurationEnabled := True;
+  //ImageGreyed := True;
+  //Counter := DEF_COUNTDOWN_CAPTION;
+  bbAdjust.Enabled := False;
+
+  FAudioPlaying := False;
+
+
+  {This check might be redundant. Just to be safe}
+  paErrCode := Pa_IsStreamStopped(FStream);
+  if paErrCode = 0 then
+  begin
+    paErrCode := Pa_StopStream(FStream);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
+    end;
+  end
+  else if PaErrCode <> 1 then
+  begin
+    DebugLn('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
+  end;
+  paErrCode := Pa_CloseStream(FStream);
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
+  end;
+  FStream := nil;
+end;
+
+procedure TfraTimer.FinishedAud(Data: PtrInt);
+var
+  PaErrCode: PaError;
+begin
+  DebugLn('Inside finished audio ');
 
   PlayButtonEnabled := True;
   PauseButtonEnabled := False;
