@@ -72,6 +72,7 @@ const
 
   TIMER_CONF_AUDIOFILE = 'audio_file';
   TIMER_CONF_AUDIOLENGTH = 'audio_duration';
+  TIMER_CONF_AUDIOLOOP = 'audio_loop';
 
   TIMER_CONF_MODALALERT = 'modal_alert';
   TIMER_CONF_TRAYNOTIFiCATION = 'tray_notification';
@@ -403,7 +404,7 @@ begin
     frmEdit.TrayNotification := ShowTrayAlert;
     frmEdit.ModalAlert := ShowModalAlert;
     {TODO: Remove hard-coding}
-    frmEdit.ckbLoop.Checked:=False;
+    frmEdit.ckbLoop.Checked := False;
   end;
 
   if frmEdit.ShowForAdd then
@@ -413,7 +414,7 @@ begin
     Added.dtpSet.Time := frmEdit.Duration;
     Added.ModalAlert := frmEdit.ModalAlert;
     Added.TrayNotification := frmEdit.TrayNotification;
-    Added.AudioLooped:=frmEdit.ckbLoop.Checked;
+    Added.AudioLooped := frmEdit.ckbLoop.Checked;
     PostTimerCreation(Added);
   end;
 end;
@@ -1021,7 +1022,7 @@ begin
     tiMain.ShowBalloonHint;
   end;
 
-  if (Sender.ModalAlert = true and (not UserInitiated)) then
+  if (Sender.ModalAlert = True and (not UserInitiated)) then
   begin
     Message :=
       Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
@@ -1254,12 +1255,14 @@ begin
 
       Success := NewTimerClock.SetAudioFile(Conf.GetValue(TIMER_CONF_TIMERS +
         '/' + IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOFILE, ''),
-        StrToFloat(Conf.GetValue(TIMER_CONF_TIMERS +         '/' + IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOLENGTH, '0')),
-        ErrorText);
+        StrToFloat(Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_AUDIOLENGTH, '0')), ErrorText);
       if not Success then
       begin
         NewTimerClock.SetAudioFile('', 0, ErrorText);
       end;
+      newTimerClock.AudioLooped:=Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        '/' + TIMER_CONF_AUDIOLOOP, false);
 
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
@@ -1456,12 +1459,14 @@ begin
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_SECONDS, SecondOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
-      '/' + TIMER_CONF_NOTIFIER, TimerClock.IsProgressOnIcon);
+      '/' + TIMER_CONF_NOTIFIER, TimerClock.AudioLooped);
 
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_AUDIOFILE, TimerClock.AudioFile);
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + FloatToStr(Count + 1) +
       '/' + TIMER_CONF_AUDIOLENGTH, TimerClock.AudioLength);
+    Conf.SetValue(TIMER_CONF_TIMERS + '/' + FloatToStr(Count + 1) +
+      '/' + TIMER_CONF_AUDIOLOOP, TimerClock.AudioLooped);
 
     Conf.SetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/' + TIMER_CONF_MODALALERT, TimerClock.ModalAlert);
