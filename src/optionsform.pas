@@ -114,6 +114,7 @@ end;
 procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
 var
   Index: integer;
+  DefaultDevice: integer;
 begin
   with Config do
   begin
@@ -139,7 +140,20 @@ begin
 
     if GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME then
     begin
-      cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
+      Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
+      if index >= 0 then
+        cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
+      else
+      begin
+        DefaultDevice:=Pa_GetDefaultOutputDevice();
+        if DefaultDevice = paNoDevice then
+        begin
+          DebugLn('No default device');
+          tsAudio.Enabled:=False;
+        end
+        else
+          cmbAudioDevice.ItemIndex := DefaultDevice;
+      end;
     end;
   end;
 end;
