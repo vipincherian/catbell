@@ -44,9 +44,10 @@ const
   TIMER_CONF_TIMERS = 'timers';
   TIMER_CONF_TITLE = 'timer_title';
   TIMER_CONF_TIME = 'time';
-  TIMER_CONF_HOURS = 'hours';
-  TIMER_CONF_MINUTES = 'minutes';
-  TIMER_CONF_SECONDS = 'seconds';
+  //TIMER_CONF_HOURS = 'hours';
+  //TIMER_CONF_MINUTES = 'minutes';
+  //TIMER_CONF_SECONDS = 'seconds';
+  TIMER_CONF_DURATION = 'duration';
   TIMER_CONF_NOTIFIER = 'notifier';
   //TIMER_CONF_ID = 'id';
   TIMER_CONF_COUNT = 'count';

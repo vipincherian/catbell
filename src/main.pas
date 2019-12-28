@@ -65,9 +65,10 @@ const
   TIMER_CONF_TIMERS = 'timers';
   TIMER_CONF_TITLE = 'timer_title';
   TIMER_CONF_TIME = 'time';
-  TIMER_CONF_HOURS = 'hours';
-  TIMER_CONF_MINUTES = 'minutes';
-  TIMER_CONF_SECONDS = 'seconds';
+  //TIMER_CONF_HOURS = 'hours';
+  //TIMER_CONF_MINUTES = 'minutes';
+  //TIMER_CONF_SECONDS = 'seconds';
+  TIMER_CONF_DURATION = 'duration';
   TIMER_CONF_NOTIFIER = 'notifier';
 
   TIMER_CONF_AUDIOFILE = 'audio_file';
@@ -1247,12 +1248,14 @@ begin
       NewTimerClock := AddTimer;
       NewTimerClock.Caption :=
         string(Conf.GetValue(UTF8Decode(TIMER_CONF_TITLE), DEF_TIMER_TITLE));
-      Hours := Conf.GetValue(UTF8Decode(TIMER_CONF_HOURS), 0);
+      {Hours := Conf.GetValue(UTF8Decode(TIMER_CONF_HOURS), 0);
       Mins := Conf.GetValue(UTF8Decode(TIMER_CONF_MINUTES), 0);
       Secs := Conf.GetValue(UTF8Decode(TIMER_CONF_SECONDS), 0);
 
       NewTimerClock.Duration :=
-        EncodeTime(Hours, Mins, Secs, 0);
+        EncodeTime(Hours, Mins, Secs, 0);}
+
+      NewTimerClock.Duration := StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')));
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
@@ -1443,9 +1446,10 @@ begin
   if FOrder.Count <> FTimerFrames.Count then
     ShowMessage('FOrder.Count does not match FTimerFrames.Count');
 
-  Conf.OpenKey(TIMER_CONF_TIMERS + '/', True);
+
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
+    Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) + '/') , True);
     // FOrder has the order of IDs, but in reverse order.
     Id := FOrder[FTimerFrames.Count - Count - 1];
     TimerClock := FTimerFrames.KeyData[Id];
@@ -1453,26 +1457,26 @@ begin
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
 
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_TITLE, TimerClock.Caption);
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_HOURS,
-      HourOf(TimerClock.Duration));
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_MINUTES,
+    Conf.SetValue(UTF8Decode(TIMER_CONF_TITLE), UTF8Decode(TimerClock.Caption));
+    {Conf.SetValue(TIMER_CONF_HOURS, HourOf(TimerClock.Duration));
+    Conf.SetValue(TIMER_CONF_MINUTES,
       MinuteOf(TimerClock.Duration));
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_SECONDS,
-      SecondOf(TimerClock.Duration));
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_NOTIFIER,
+    Conf.SetValue(TIMER_CONF_SECONDS,
+      SecondOf(TimerClock.Duration));}
+    Conf.SetValue(TIMER_CONF_DURATION, TimerClock.Duration);
+    Conf.SetValue(TIMER_CONF_NOTIFIER,
       TimerClock.AudioLooped);
 
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOFILE,
-      TimerClock.AudioFile);
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOLENGTH,
+    Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
+      UTF8Decode(TimerClock.AudioFile));
+    Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
       TimerClock.AudioLength);
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOLOOP,
+    Conf.SetValue(TIMER_CONF_AUDIOLOOP,
       TimerClock.AudioLooped);
 
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_MODALALERT,
+    Conf.SetValue(TIMER_CONF_MODALALERT,
       TimerClock.ModalAlert);
-    Conf.SetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_TRAYNOTIFiCATION,
+    Conf.SetValue(TIMER_CONF_TRAYNOTIFiCATION,
       TimerClock.TrayNotification);
 
     // Add the new ID at the beginning of the list
@@ -1481,9 +1485,9 @@ begin
     //Index := FOrder.IndexOf(TimerClock.Id);
     //Assert(Index >= 0);
     //Order.Items[Index] := Count + 1;
-
+    Conf.CloseKey;
   end;
-  Conf.CloseKey;
+
 
   {for Id in FOrder do
     OrderStrings.Add(IntToStr(Id));}
