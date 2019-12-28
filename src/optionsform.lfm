@@ -53,10 +53,10 @@ object frmOptions: TfrmOptions
     Height = 272
     Top = 8
     Width = 424
-    ActivePage = tsTimers
+    ActivePage = tsAdjust
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
@@ -303,7 +303,7 @@ object frmOptions: TfrmOptions
         end
       end
     end
-    object TabSheet1: TTabSheet
+    object tsAdjust: TTabSheet
       Caption = 'Adjust'
       ClientHeight = 246
       ClientWidth = 422
@@ -387,9 +387,39 @@ object frmOptions: TfrmOptions
         end
       end
     end
-    object TabSheet2: TTabSheet
+    object tsAudio: TTabSheet
       Caption = 'Audio'
+      ClientHeight = 246
+      ClientWidth = 422
       ImageIndex = 3
+      object GroupBox5: TGroupBox
+        Left = 16
+        Height = 105
+        Top = 8
+        Width = 393
+        Caption = 'Output'
+        ClientHeight = 91
+        ClientWidth = 391
+        TabOrder = 0
+        object Label7: TLabel
+          Left = 19
+          Height = 13
+          Top = 16
+          Width = 49
+          Caption = 'Device : '
+          ParentColor = False
+        end
+        object cmbAudioDevice: TComboBox
+          Left = 80
+          Height = 23
+          Top = 16
+          Width = 296
+          Anchors = [akTop, akLeft, akRight]
+          ItemHeight = 0
+          Style = csDropDownList
+          TabOrder = 0
+        end
+      end
     end
   end
   object bbtnDefault: TBitBtn

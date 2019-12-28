@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
-  Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils;
+  Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils, portaudio, LazLogger;
 
 type
 
@@ -45,6 +45,7 @@ type
     cbAutoProgress: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
+    cmbAudioDevice: TComboBox;
     dtpShorten: TDateTimePicker;
     dtpCompleteBy: TDateTimePicker;
     dtpDefaultTime: TDateTimePicker;
@@ -54,6 +55,7 @@ type
     Defaults: TGroupBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
+    GroupBox5: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
     Label11: TLabel;
@@ -63,13 +65,14 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
+    Label7: TLabel;
     Label9: TLabel;
     pgcOptions: TPageControl;
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
+    tsAdjust: TTabSheet;
+    tsAudio: TTabSheet;
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;
 
@@ -96,6 +99,9 @@ var
 
 implementation
 
+uses
+  main;
+
 {$R *.lfm}
 
 { TfrmOptions }
@@ -110,12 +116,12 @@ begin
   with Config do
   begin
     ckbQueryExit.Checked := QueryExit;
-    ckbTimerTitleEditable.Checked:=AllowTimerTitleEdit;
+    ckbTimerTitleEditable.Checked := AllowTimerTitleEdit;
 
     edtDefaultTitle.Text := DefaultTimerTitle;
     dtpDefaultTime.Time := DefaultTimerDuration;
     //EncodeTime(DefaultTimerHours, DefaultTimerMins,
-//      DefaultTimerSecs, 0);
+    //      DefaultTimerSecs, 0);
 
     cbTrayAlert.Checked := ShowTrayAlert;
     cbModalAlert.Checked := ShowModalAlert;
@@ -123,11 +129,11 @@ begin
 
     { Time formats tf12 & ts24 translate to 0 and 1, which are the same as
     the indices. Playing with fire, where it can be afforded. }
-    cmbTimeFormat.ItemIndex:=DefaultTimeFormat;
+    cmbTimeFormat.ItemIndex := DefaultTimeFormat;
 
-    dtpShorten.Time:=AdjustDiffDefault;
+    dtpShorten.Time := AdjustDiffDefault;
     //dtpExtend.Time:=AdjustExtendDefault;
-    dtpCompleteBy.Time:=AdjustCompletebyDefault;
+    dtpCompleteBy.Time := AdjustCompletebyDefault;
   end;
 end;
 
@@ -136,25 +142,30 @@ begin
   with Config do
   begin
     QueryExit := ckbQueryExit.Checked;
-    AllowTimerTitleEdit:=ckbTimerTitleEditable.Checked;
+    AllowTimerTitleEdit := ckbTimerTitleEditable.Checked;
     DefaultTimerTitle := edtDefaultTitle.Text;
     //DefaultTimerHours := HourOf(dtpDefaultTime.Time);
     //DefaultTimerMins := MinuteOf(dtpDefaultTime.Time);
     //DefaultTimerSecs := SecondOf(dtpDefaultTime.Time);
-    DefaultTimerDuration:=dtpDefaultTime.Time;
+    DefaultTimerDuration := dtpDefaultTime.Time;
     ShowTrayAlert := cbTrayAlert.Checked;
     ShowModalAlert := cbModalAlert.Checked;
     AutoProgress := cbAutoProgress.Checked;
     DefaultTimeFormat := cmbTimeFormat.ItemIndex;
 
-    AdjustDiffDefault:=dtpShorten.Time;
+    AdjustDiffDefault := dtpShorten.Time;
     //AdjustExtendDefault:=dtpExtend.Time;
-    AdjustCompletebyDefault:=dtpCompleteBy.Time;
+    AdjustCompletebyDefault := dtpCompleteBy.Time;
 
   end;
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
+var
+  PaErrCode: PaError;
+  NumDevices, DefaultDevice, Count: integer;
+  DeviceInfo: PPaDeviceInfo;
+  DeviceName: string;
 begin
   OnShow := @FormShow;
   FLastConfig := TUserConfig.Create;
@@ -162,6 +173,44 @@ begin
   FDefaultConfig := TUserConfig.Create;
   SetControlsAs(GlobalUserConfig);
   pgcOptions.ActivePage := tsTimers;
+
+  { Load audio devices }
+  tsAudio.Enabled:=frmMain.AudioWorking;
+  if frmMain.AudioWorking then
+  begin
+    NumDevices := Pa_GetDeviceCount();
+    if NumDevices < 0 then
+    begin
+      DebugLn('Pa_GetDeviceCount failed ');
+      DebugLn('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
+    end;
+
+    DefaultDevice:=Pa_GetDefaultOutputDevice();
+    if DefaultDevice = paNoDevice then
+    begin
+      DebugLn('No default device');
+    end;
+    DebugLn('Default device is ' + IntToStr(DefaultDevice));
+
+    for Count := 0 to NumDevices - 1 do
+    begin
+      DeviceInfo := Pa_GetDeviceInfo(Count);
+      if DeviceInfo = Nil then
+        DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count))
+      else
+      begin
+        DeviceName:=StrPas(DeviceInfo^.Name);
+
+        if Count = DefaultDevice then
+          DeviceName := DeviceName + ' (Default)';
+        cmbAudioDevice.Items.Add(DeviceName);
+      end;
+    end;
+  end;
+  if cmbAudioDevice.Items.Count > 0 then
+  begin
+    cmbAudioDevice.ItemIndex:=0;
+  end;
 end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
@@ -176,11 +225,12 @@ begin
   GetConfigFromControls(FChangedConfig);
   if not FChangedConfig.CompareWith(FLastConfig) then
   begin
-    if MessageDlg('Confirmation', 'You have unsaved changes. Press Ok to proceed and lose changes.', mtInformation,
-      mbOKCancel, 0) = mrCancel then
-      begin
-        Exit;
-      end;
+    if MessageDlg('Confirmation',
+      'You have unsaved changes. Press Ok to proceed and lose changes.',
+      mtInformation, mbOKCancel, 0) = mrCancel then
+    begin
+      Exit;
+    end;
   end;
   SetControlsAs(FLastConfig);
   Close;
@@ -192,12 +242,12 @@ begin
   GetConfigFromControls(FChangedConfig);
   if not FChangedConfig.CompareWith(FDefaultConfig) then
   begin
-    if MessageDlg('Confirmation', 'Reset options to default?', mtInformation,
-      mbOKCancel, 0) = mrOk then
-      begin
-        SetControlsAs(FDefaultConfig);
-        //Close;
-      end;
+    if MessageDlg('Confirmation', 'Reset options to default?',
+      mtInformation, mbOKCancel, 0) = mrOk then
+    begin
+      SetControlsAs(FDefaultConfig);
+      //Close;
+    end;
   end;
 
 
@@ -234,7 +284,7 @@ begin
     ModalSubtextColour:=crbSubtextModal.ButtonColor;
   end;}
   GetConfigFromControls(GlobalUserConfig);
-//  GlobalUserConfig.CopyFrom(FChangedConfig);
+  //  GlobalUserConfig.CopyFrom(FChangedConfig);
   GlobalUserConfig.Flush;
   Close;
 end;
