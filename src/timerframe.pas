@@ -1316,7 +1316,9 @@ var
   //Info: SF_INFO;
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
-
+  NumDevices, DefaultDevice, DeviceId, Count: integer;
+  DeviceInfo: PPaDeviceInfo;
+  DeviceName: string;
 begin
 
   if not frmMain.AudioWorking then
@@ -1346,12 +1348,45 @@ begin
   begin
     DebugLn('Sf_seek returned error');
   end;
+
+  DefaultDevice:=Pa_GetDefaultOutputDevice();
+  if DefaultDevice = paNoDevice then
+  begin
+    DebugLn('No default device');
+  end;
+
+  DebugLn('Default device is ' + IntToStr(DefaultDevice));
+
+  StreamParams.device := -1;
+
   if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-    StreamParams.device := Pa_GetDefaultOutputDevice()
+    StreamParams.device := DefaultDevice
   else
   begin
-    StreamParams.device := Pa_GetDefaultOutputDevice();
-    ;//StreamParams.device := GlobalUserConfig.AudioDeviceName;
+    NumDevices := Pa_GetDeviceCount();
+    if NumDevices < 0 then
+    begin
+      DebugLn('Pa_GetDeviceCount failed ');
+      DebugLn('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
+    end;
+
+    for Count := 0 to NumDevices - 1 do
+    begin
+      DeviceInfo := Pa_GetDeviceInfo(Count);
+      if DeviceInfo = Nil then
+        DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count))
+      else
+      begin
+        DeviceName:=StrPas(DeviceInfo^.Name);
+        if DeviceName = GlobalUserConfig.AudioDeviceName then
+        begin
+          StreamParams.device:=Count;
+          break;
+        end;
+      end;
+    end;
+    if StreamParams.device = -1 then
+      StreamParams.device := DefaultDevice;
   end;
   //StreamParams.device := 8;
   DebugLn('Audio device is ' + IntToStr(StreamParams.device));
