@@ -253,6 +253,7 @@ type
     procedure MoveSelectedClocksDown;
     procedure OnShortTimer(Sender: TObject);
     procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
+    procedure AfterShow2(Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
     property AudioWorking: boolean read FAudioWorking;
   end;
@@ -631,7 +632,8 @@ begin
 
     {if FTimerFrames.Count = 0 then
       aiNewTimer.Execute;}
-    PostMessage(Handle, UM_AFTERSHOW, 0, 0);
+    //PostMessage(Handle, UM_AFTERSHOW, 0, 0);
+    Application.QueueAsyncCall(@AfterShow2, 0);
     {Top := LastPosNormal.Top;
     Left := LastPosNormal.Left;
     Width := LastPosNormal.Width;
@@ -1670,6 +1672,12 @@ begin
 end;
 
 procedure TfrmMain.AfterShow(var Msg: TLMessage);
+begin
+  if FTimerFrames.Count = 0 then
+    aiNewTimer.Execute;
+end;
+
+procedure TfrmMain.AfterShow2(Data: PtrInt);
 begin
   if FTimerFrames.Count = 0 then
     aiNewTimer.Execute;
