@@ -100,7 +100,7 @@ begin
   dtpDiff.Time:=GlobalUserConfig.AdjustDiffDefault;
   SetTillDateTime;
 
-  Id := -1;
+  Id := longword(-1);
 end;
 
 procedure TfrmAdjust.FormShow(Sender: TObject);

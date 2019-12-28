@@ -1215,9 +1215,7 @@ var
   Conf: TJSONConfig;
   TotalCount, Count: integer;
   NewTimerClock: TfraTimer;
-  Hours, Mins, Secs: word;
   ErrorText: string;
-  ErrorSummary: string;
   Success: boolean;
   //Order: TIdList;
   //OrderString: TStringList;

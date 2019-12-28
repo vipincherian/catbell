@@ -287,7 +287,7 @@ begin
   FConf.SetValue(AUTO_PROGRESS, AutoProgress);
   FConf.SetValue(QUERY_EXIT, QueryExit);
   FConf.SetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
-  Fconf.SetValue(TIMER_TITLE, DefaultTimerTitle);
+  Fconf.SetValue(TIMER_TITLE, UTF8Decode(DefaultTimerTitle));
   //FConf.SetValue(TIMER_HOURS, DefaultTimerHours);
   //FConf.SetValue(TIMER_MINS, DefaultTimerMins);
   //FConf.SetValue(TIMER_SECS, DefaultTimerSecs);

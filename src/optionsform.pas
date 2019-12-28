@@ -162,7 +162,7 @@ end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
 var
-  PaErrCode: PaError;
+  //PaErrCode: PaError;
   NumDevices, DefaultDevice, Count: integer;
   DeviceInfo: PPaDeviceInfo;
   DeviceName: string;
