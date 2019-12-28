@@ -112,6 +112,8 @@ begin
 end;
 
 procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
+var
+  Index: integer;
 begin
   with Config do
   begin
@@ -135,8 +137,10 @@ begin
     //dtpExtend.Time:=AdjustExtendDefault;
     dtpCompleteBy.Time := AdjustCompletebyDefault;
 
-    if GlobalUserConfig.AudioDevice <> DEF_AUDIO_DEVICE then
-      cmbAudioDevice.ItemIndex:=GlobalUserConfig.AudioDevice;
+    if GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME then
+    begin
+      cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
+    end;
   end;
 end;
 
@@ -160,7 +164,8 @@ begin
     //AdjustExtendDefault:=dtpExtend.Time;
     AdjustCompletebyDefault := dtpCompleteBy.Time;
 
-    GlobalUserConfig.AudioDevice := cmbAudioDevice.ItemIndex;
+    //AudioDevice := cmbAudioDevice.ItemIndex;
+    AudioDeviceName:=cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
 
   end;
 end;
@@ -215,10 +220,10 @@ begin
   end;
   if cmbAudioDevice.Items.Count > 0 then
   begin
-    if GlobalUserConfig.AudioDevice = DEF_AUDIO_DEVICE then
+    if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
       cmbAudioDevice.ItemIndex:=DefaultDevice
     else
-      cmbAudioDevice.ItemIndex:=GlobalUserConfig.AudioDevice;
+      cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
   end;
 end;
 

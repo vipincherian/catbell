@@ -1346,10 +1346,13 @@ begin
   begin
     DebugLn('Sf_seek returned error');
   end;
-  if GlobalUserConfig.AudioDevice = DEF_AUDIO_DEVICE then
+  if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
     StreamParams.device := Pa_GetDefaultOutputDevice()
   else
-    StreamParams.device := GlobalUserConfig.AudioDevice;
+  begin
+    StreamParams.device := Pa_GetDefaultOutputDevice();
+    ;//StreamParams.device := GlobalUserConfig.AudioDeviceName;
+  end;
   //StreamParams.device := 8;
   DebugLn('Audio device is ' + IntToStr(StreamParams.device));
 

@@ -79,7 +79,8 @@ type
     AdjustDiffDefault: double;
     //AdjustExtendDefault: double;
     AdjustCompletebyDefault: double;
-    AudioDevice: integer;
+    //AudioDevice: integer;
+    AudioDeviceName: string;
     constructor Create();
     destructor Destroy; override;
     //procedure Load;
@@ -167,8 +168,11 @@ const
   ADJ_DIFF = 'adjust_diff';
   ADJ_COMPLETEBY = 'adust_completeby';
 
-  AUDIO_DEVICE = 'audio_device';
-  DEF_AUDIO_DEVICE = -1; // Default audio device
+  //AUDIO_DEVICE = 'audio_device';
+  //DEF_AUDIO_DEVICE = -1; // Default audio device
+
+  AUDIO_DEVICE_NAME = 'audio_device_name';
+  DEF_AUDIO_DEVICE_NAME = '';
 
 procedure InitSettings;
 procedure CleanupSettings;
@@ -261,7 +265,8 @@ begin
     AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, AdjustDiffDefault);
     AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
 
-    AudioDevice:= FConf.GetValue(AUDIO_DEVICE, AudioDevice);
+    //AudioDevice:= FConf.GetValue(AUDIO_DEVICE, AudioDevice);
+    AudioDeviceName:= string(FConf.GetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName)));
 
   except
     CreateAnew;
@@ -305,7 +310,8 @@ begin
   FConf.SetValue(ADJ_DIFF, AdjustDiffDefault);
   FConf.SetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
 
-  FConf.SetValue(AUDIO_DEVICE, AudioDevice);
+  //FConf.SetValue(AUDIO_DEVICE, AudioDevice);
+  FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName));
 
 end;
 
@@ -342,7 +348,8 @@ begin
   FConf.SetValue(ADJ_DIFF, DEF_TIMER_DURATION);
   FConf.SetValue(ADJ_COMPLETEBY, DEF_TIMER_DURATION);
 
-  FConf.SetValue(AUDIO_DEVICE, DEF_AUDIO_DEVICE);
+  //FConf.SetValue(AUDIO_DEVICE, DEF_AUDIO_DEVICE);
+  FConf.SetValue(AUDIO_DEVICE_NAME, DEF_AUDIO_DEVICE_NAME);
 
   FConf.Flush;
 end;
@@ -394,7 +401,7 @@ begin
 
   DefaultTimeFormat := integer(DEF_TIME_FORMAT);
 
-  AudioDevice:=DEF_AUDIO_DEVICE;
+  AudioDeviceName:=DEF_AUDIO_DEVICE_NAME;
 
 end;
 
@@ -424,7 +431,7 @@ begin
   AdjustDiffDefault := From.AdjustDiffDefault;
   AdjustCompletebyDefault := From.AdjustCompletebyDefault;
 
-  AudioDevice:=From.AudioDevice;
+  AudioDeviceName:=From.AudioDeviceName;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -496,7 +503,7 @@ begin
     Result := False;
     Exit;
   end;
-  if AudioDevice <> From.AudioDevice then
+  if AudioDeviceName <> From.AudioDeviceName then
   begin
     Result := False;
     Exit;

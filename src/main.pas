@@ -272,6 +272,8 @@ var
 {$IFNDEF AUDIO_STATIC}
   //Status: boolean;
 {$ENDIF}
+  DefaultDevice: integer;
+  DeviceInfo: PPaDeviceInfo;
 begin
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_SIZE;
@@ -377,6 +379,48 @@ begin
       {$ENDIF}
     end;
   end;
+
+  // Check if default audio device has changed
+  {if FAudioWorking then
+  begin
+    //DefaultDevice:=Pa_GetDefaultOutputDevice();
+    if GlobalUserConfig.AudioDevice >= 0 then
+    begin
+      DeviceInfo := Pa_GetDeviceInfo(GlobalUserConfig.AudioDevice);
+      if DeviceInfo = nil then
+      begin
+        DebugLn('Audio device stored in confi file does not exists. Device #' +
+          IntToStr(GlobalUserConfig.AudioDevice));
+        ShowMessage('Configured audio device not found. Resetting to default');
+        GlobalUserConfig.AudioDevice := DEF_AUDIO_DEVICE;
+      end
+      else
+      begin
+        if StrPas(DeviceInfo^.Name) <> GlobalUserConfig.AudioDeviceName then
+        begin
+          DebugLn('Stored audio device name does not match ' +
+            'with the current ID. ID - ' + IntToStr(
+            GlobalUserConfig.AudioDevice) + ', Stored Device Name - ' +
+            GlobalUserConfig.AudioDeviceName + ', Current Device Name - ' +
+            StrPas(DeviceInfo^.Name));
+          GlobalUserConfig.AudioDevice := DEF_AUDIO_DEVICE;
+          ShowMessage('Configured audio device name does not match. ' +
+            'Resetting to default');
+        end;
+      end;
+    end;
+
+    if GlobalUserConfig.AudioDevice = DEF_AUDIO_DEVICE then
+    begin
+      DefaultDevice := Pa_GetDefaultOutputDevice();
+      if DefaultDevice = paNoDevice then
+      begin
+        DebugLn('No default device found. So no audio.');
+        FAudioWorking := False;
+      end;
+    end;
+
+  end;}
 
   stbMain.BeginUpdate;
   if FAudioWorking then
@@ -1253,7 +1297,8 @@ begin
       NewTimerClock.Duration :=
         EncodeTime(Hours, Mins, Secs, 0);}
 
-      NewTimerClock.Duration := StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')));
+      NewTimerClock.Duration :=
+        StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')));
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
@@ -1447,7 +1492,7 @@ begin
 
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
-    Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) + '/') , True);
+    Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) + '/'), True);
     // FOrder has the order of IDs, but in reverse order.
     Id := FOrder[FTimerFrames.Count - Count - 1];
     TimerClock := FTimerFrames.KeyData[Id];
