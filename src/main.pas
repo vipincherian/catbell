@@ -165,6 +165,7 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
+    procedure sbxClocksResize(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
     //procedure tbShowModalAlertClick(Sender: TObject);
     //procedure tbShowTrayAlertClick(Sender: TObject);
@@ -206,7 +207,7 @@ type
     function GetStatusMessage: string;
     procedure PostTimerCreation(AValue: TfraTimer);
     procedure SetListButtonsStatus;
-    procedure ResetHeaderSections;
+    procedure ResizeHeaderSections;
 
     function GetAnySelected: boolean;
     //procedure SetWidget(AValue: TClocksWidget);
@@ -610,7 +611,7 @@ end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
-  ResetHeaderSections;
+  ;//ResizeHeaderSections;
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -654,6 +655,11 @@ begin
   ShowInForeground;
 end;
 
+procedure TfrmMain.sbxClocksResize(Sender: TObject);
+begin
+  ResizeHeaderSections;
+end;
+
 procedure TfrmMain.tbProgressAutoClick(Sender: TObject);
 begin
   GlobalUserConfig.AutoProgress := tbProgressAuto.Down;
@@ -681,7 +687,7 @@ procedure TfrmMain.PostTimerCreation(AValue: TfraTimer);
 begin
   //AValue.AddSubscription(Self);
   //AValue.OnSelect := @ClockSelected;
-  ResetHeaderSections;
+  ResizeHeaderSections;
 end;
 
 procedure TfrmMain.CreateBitmaps;
@@ -803,13 +809,14 @@ begin
   tbMoveDown.Enabled := GetCanselectedMoveDown;
 end;
 
-procedure TfrmMain.ResetHeaderSections;
+procedure TfrmMain.ResizeHeaderSections;
 var
   //Ids: TIdList;
   Id: longword;
   Timer: TfraTimer;
   Filled: integer = 0;
   Temp: integer;
+  ScrollbarWidth: integer = 0;
 begin
   //Ids:=TIdList.Create;
   //GetAllIdS(Ids);

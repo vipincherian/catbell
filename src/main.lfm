@@ -185,6 +185,7 @@ object frmMain: TfrmMain
       ClientHeight = 245
       ClientWidth = 590
       TabOrder = 1
+      OnResize = sbxClocksResize
       object hdrTimers: THeaderControl
         Left = 0
         Height = 24
