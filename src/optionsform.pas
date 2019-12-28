@@ -134,6 +134,9 @@ begin
     dtpShorten.Time := AdjustDiffDefault;
     //dtpExtend.Time:=AdjustExtendDefault;
     dtpCompleteBy.Time := AdjustCompletebyDefault;
+
+    if GlobalUserConfig.AudioDevice <> DEF_AUDIO_DEVICE then
+      cmbAudioDevice.ItemIndex:=GlobalUserConfig.AudioDevice;
   end;
 end;
 
@@ -156,6 +159,8 @@ begin
     AdjustDiffDefault := dtpShorten.Time;
     //AdjustExtendDefault:=dtpExtend.Time;
     AdjustCompletebyDefault := dtpCompleteBy.Time;
+
+    GlobalUserConfig.AudioDevice := cmbAudioDevice.ItemIndex;
 
   end;
 end;
@@ -210,7 +215,10 @@ begin
   end;
   if cmbAudioDevice.Items.Count > 0 then
   begin
-    cmbAudioDevice.ItemIndex:=0;
+    if GlobalUserConfig.AudioDevice = DEF_AUDIO_DEVICE then
+      cmbAudioDevice.ItemIndex:=DefaultDevice
+    else
+      cmbAudioDevice.ItemIndex:=GlobalUserConfig.AudioDevice;
   end;
 end;
 
