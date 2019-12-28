@@ -1222,6 +1222,7 @@ var
   //OrderString: TStringList;
   //Pos: string;
   //Id: longword;
+  Keys: TStringList;
 begin
   //Order := nil;
   //OrderString := nil;
@@ -1234,41 +1235,45 @@ begin
     //FClocks.LoadClocks(Conf);
     TotalCount := Conf.GetValue(TIMER_CONF_COUNT, 0);
 
+    //Keys := TStringList.Create;
+
+
+    //Keys.Free;
+    Conf.OpenKey(TIMER_CONF_TIMERS + '/', false);
     for Count := 0 to TotalCount - 1 do
     begin
       NewTimerClock := AddTimer;
       NewTimerClock.Caption :=
-        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_TITLE, 'Countdown timer');
-      Hours := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      Hours := Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_HOURS, 0);
-      Mins := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      Mins := Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_MINUTES, 0);
-      Secs := Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      Secs := Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_SECONDS, 0);
       //TODO: Remove hardcoding
       NewTimerClock.Duration :=
         EncodeDateTime(2000, 1, 1, Hours, Mins, Secs, 0);
       NewTimerClock.IsProgressOnIcon :=
-        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_NOTIFIER, False);
 
-      Success := NewTimerClock.SetAudioFile(Conf.GetValue(TIMER_CONF_TIMERS +
-        '/' + IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOFILE, ''),
-        StrToFloat(Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      Success := NewTimerClock.SetAudioFile(Conf.GetValue(IntToStr(Count + 1) + '/' + TIMER_CONF_AUDIOFILE, ''),
+        StrToFloat(Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_AUDIOLENGTH, '0')), ErrorText);
       if not Success then
       begin
         NewTimerClock.SetAudioFile('', 0, ErrorText);
       end;
-      newTimerClock.AudioLooped:=Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      newTimerClock.AudioLooped:=Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_AUDIOLOOP, false);
 
       NewTimerClock.ModalAlert :=
-        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
-        Conf.GetValue(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+        Conf.GetValue(IntToStr(Count + 1) +
         '/' + TIMER_CONF_TRAYNOTIFiCATION, False);
 
       //NewTimerClock.AddSubscription(FFormWidget);
@@ -1286,6 +1291,7 @@ begin
         Order.Add(StrToInt(Pos));
       end;  }
     end;
+    Conf.CloseKey;
     Conf.Free;
     //OrderString.Free;
     //Order.Free;

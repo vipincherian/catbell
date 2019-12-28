@@ -200,6 +200,7 @@ begin
       else
       begin
         DeviceName:=StrPas(DeviceInfo^.Name);
+        //DeviceInfo^.
 
         if Count = DefaultDevice then
           DeviceName := DeviceName + ' (Default)';

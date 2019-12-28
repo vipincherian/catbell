@@ -1347,6 +1347,7 @@ begin
   end;
 
   StreamParams.device := Pa_GetDefaultOutputDevice();
+  //StreamParams.device := 8;
 
   StreamParams.channelCount := FInfo.channels;
   StreamParams.sampleFormat := paFloat32;

@@ -53,10 +53,10 @@ object frmOptions: TfrmOptions
     Height = 272
     Top = 8
     Width = 424
-    ActivePage = tsAdjust
+    ActivePage = tsTimers
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
@@ -402,17 +402,17 @@ object frmOptions: TfrmOptions
         ClientWidth = 391
         TabOrder = 0
         object Label7: TLabel
-          Left = 19
+          Left = 16
           Height = 13
-          Top = 16
+          Top = 40
           Width = 49
           Caption = 'Device : '
           ParentColor = False
         end
         object cmbAudioDevice: TComboBox
-          Left = 80
+          Left = 77
           Height = 23
-          Top = 16
+          Top = 40
           Width = 296
           Anchors = [akTop, akLeft, akRight]
           ItemHeight = 0
