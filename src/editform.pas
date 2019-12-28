@@ -56,7 +56,9 @@ type
     ckbLoop: TCheckBox;
     ckbModalAlert: TCheckBox;
     ckbTrayNotification: TCheckBox;
+    cmbType: TComboBox;
     dtpDuration: TDateTimePicker;
+    dtpBy: TDateTimePicker;
     edtAudioFile: TEdit;
     edtDescription: TEdit;
     imlEdit: TImageList;
@@ -75,6 +77,8 @@ type
     procedure bbClearAudioFileClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
     procedure bbSelectAudioFileClick(Sender: TObject);
+    procedure cmbTypeChange(Sender: TObject);
+    procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
     procedure edtDescriptionChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -115,6 +119,10 @@ type
 
 var
   frmEdit: TfrmEdit;
+
+const
+  TYPE_DURATION = 0;
+  TYPE_BY = 1;
 
 implementation
 
@@ -169,6 +177,8 @@ begin
   lblLenthVal.Visible:=False;
   bbSave.Enabled:=Validate;
 
+  dtpBy.Left:=dtpDuration.Left;
+
   if not frmMain.AudioWorking then
   begin
     bbSelectAudioFile.Enabled:=False;
@@ -211,6 +221,29 @@ begin
 
   end;
   //ShowMessage(FileName);
+end;
+
+procedure TfrmEdit.cmbTypeChange(Sender: TObject);
+begin
+  case cmbType.ItemIndex of
+  TYPE_DURATION:
+    begin
+      dtpDuration.Visible:=True;
+      dtpBy.Visible:=False;
+    end;
+  TYPE_BY:
+    begin
+      dtpDuration.Visible:=False;
+      dtpBy.Visible:=True;
+    end;
+  else
+    DebugLn('');
+  end;
+end;
+
+procedure TfrmEdit.dtpByChange(Sender: TObject);
+begin
+  bbSave.Enabled:=Validate;
 end;
 
 procedure TfrmEdit.dtpDurationChange(Sender: TObject);
@@ -300,7 +333,7 @@ begin
   if not frmMain.AudioWorking then
   begin
     FAudioFile:=AValue;
-    FAudioLength:=Duration;
+    FAudioLength:=AudioLength;
     edtAudioFile.Text:=FAudioFile;
     Result := True;
     Exit;

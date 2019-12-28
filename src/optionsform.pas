@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
-  Dialogs, ComCtrls, StdCtrls, Buttons, settings, DateUtils;
+  Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils;
 
 type
 
@@ -36,27 +36,47 @@ type
     bbtnDefault: TBitBtn;
     bbtnCancel: TBitBtn;
     bbtnSave: TBitBtn;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
+    CheckBox3: TCheckBox;
     ckbQueryExit: TCheckBox;
     cbTrayAlert: TCheckBox;
     cbModalAlert: TCheckBox;
     cbAutoProgress: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
-    crbBackgroundModal: TColorButton;
-    crbCaptionModal: TColorButton;
-    crbSubtextModal: TColorButton;
     dtpDefaultTime: TDateTimePicker;
     edtDefaultTitle: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Defaults: TGroupBox;
     GroupBox3: TGroupBox;
+    GroupBox4: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
     PageControl1: TPageControl;
-    StaticText1: TStaticText;
-    StaticText2: TStaticText;
+    SpinEdit1: TSpinEdit;
+    SpinEdit10: TSpinEdit;
+    SpinEdit11: TSpinEdit;
+    SpinEdit12: TSpinEdit;
+    SpinEdit2: TSpinEdit;
+    SpinEdit3: TSpinEdit;
+    SpinEdit4: TSpinEdit;
+    SpinEdit5: TSpinEdit;
+    SpinEdit6: TSpinEdit;
+    SpinEdit7: TSpinEdit;
+    SpinEdit8: TSpinEdit;
+    SpinEdit9: TSpinEdit;
+    TabSheet1: TTabSheet;
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;
 
@@ -107,10 +127,6 @@ begin
     cbModalAlert.Checked := ShowModalAlert;
     cbAutoProgress.Checked := AutoProgress;
 
-    crbBackgroundModal.ButtonColor:=ModalBackgroundColour;
-    crbCaptionModal.ButtonColor:=ModalCaptionColour;
-    crbSubtextModal.ButtonColor:=ModalSubtextColour;
-
   end;
 end;
 
@@ -127,9 +143,7 @@ begin
     ShowTrayAlert := cbTrayAlert.Checked;
     ShowModalAlert := cbModalAlert.Checked;
     AutoProgress := cbAutoProgress.Checked;
-    ModalBackgroundColour:=crbBackgroundModal.ButtonColor;
-    ModalCaptionColour:=crbCaptionModal.ButtonColor;
-    ModalSubtextColour:=crbSubtextModal.ButtonColor;
+
   end;
 end;
 

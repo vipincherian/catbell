@@ -53,141 +53,40 @@ object frmOptions: TfrmOptions
     Height = 272
     Top = 8
     Width = 424
-    ActivePage = tsInterface
+    ActivePage = tsTimers
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
     TabIndex = 0
     TabOrder = 0
     OnChange = PageControl1Change
-    object tsInterface: TTabSheet
-      Caption = 'Interface'
-      ClientHeight = 246
-      ClientWidth = 422
-      ImageIndex = 1
-      object GroupBox1: TGroupBox
-        Left = 8
-        Height = 88
-        Top = 8
-        Width = 398
-        Anchors = [akTop, akLeft, akRight]
-        Caption = 'Application'
-        ClientHeight = 74
-        ClientWidth = 396
-        TabOrder = 0
-        object ckbQueryExit: TCheckBox
-          Left = 16
-          Height = 18
-          Top = 8
-          Width = 202
-          Caption = 'Prompt before exiting appliation'
-          TabOrder = 0
-        end
-        object ckbTimerTitleEditable: TCheckBox
-          Left = 16
-          Height = 18
-          Top = 32
-          Width = 217
-          Caption = 'Allow in-place editing of timer title.'
-          TabOrder = 1
-        end
-      end
-      object GroupBox2: TGroupBox
-        Left = 8
-        Height = 121
-        Top = 104
-        Width = 398
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        Caption = 'Modal timer completion alert'
-        ClientHeight = 107
-        ClientWidth = 396
-        TabOrder = 1
-        object Label3: TLabel
-          Left = 13
-          Height = 13
-          Top = 10
-          Width = 118
-          Caption = 'Background colour : '
-          ParentColor = False
-        end
-        object crbBackgroundModal: TColorButton
-          Cursor = crHandPoint
-          Left = 128
-          Height = 25
-          Top = 3
-          Width = 75
-          BorderWidth = 2
-          ButtonColorSize = 16
-          ButtonColor = clBlack
-          Flat = True
-        end
-        object StaticText1: TStaticText
-          Left = 13
-          Height = 17
-          Top = 43
-          Width = 98
-          Caption = 'Caption colour :'
-          TabOrder = 0
-        end
-        object StaticText2: TStaticText
-          Left = 13
-          Height = 17
-          Top = 75
-          Width = 91
-          Caption = 'Sub text colour :'
-          TabOrder = 1
-        end
-        object crbCaptionModal: TColorButton
-          Cursor = crHandPoint
-          Left = 128
-          Height = 25
-          Top = 35
-          Width = 75
-          BorderWidth = 2
-          ButtonColorSize = 16
-          ButtonColor = clBlack
-          Flat = True
-        end
-        object crbSubtextModal: TColorButton
-          Cursor = crHandPoint
-          Left = 128
-          Height = 25
-          Top = 67
-          Width = 75
-          BorderWidth = 2
-          ButtonColorSize = 16
-          ButtonColor = clBlack
-          Flat = True
-        end
-      end
-    end
     object tsTimers: TTabSheet
       Caption = 'Timers'
       ClientHeight = 246
       ClientWidth = 422
       ImageIndex = 0
       object Defaults: TGroupBox
-        Left = 8
+        Left = 16
         Height = 88
         Top = 8
-        Width = 392
+        Width = 391
         Anchors = [akTop, akLeft, akRight]
         Caption = 'For new timers'
         ClientHeight = 74
-        ClientWidth = 390
+        ClientWidth = 389
         TabOrder = 0
         object Label1: TLabel
           Left = 13
           Height = 13
           Top = 8
-          Width = 63
+          Width = 73
           Caption = 'Default title :'
           ParentColor = False
         end
         object dtpDefaultTime: TDateTimePicker
-          Left = 88
-          Height = 21
+          Left = 96
+          Height = 19
           Top = 40
-          Width = 67
+          Width = 71
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = -53780
@@ -209,53 +108,302 @@ object frmOptions: TfrmOptions
           Left = 14
           Height = 13
           Top = 40
-          Width = 62
+          Width = 73
           Caption = 'Default time:'
           ParentColor = False
         end
       end
       object edtDefaultTitle: TEdit
-        Left = 96
-        Height = 21
+        Left = 112
+        Height = 19
         Top = 32
-        Width = 288
+        Width = 280
         Anchors = [akTop, akLeft, akRight]
         MaxLength = 255
         TabOrder = 1
       end
       object GroupBox3: TGroupBox
-        Left = 8
+        Left = 16
         Height = 128
         Top = 104
-        Width = 393
+        Width = 391
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Alerts'
         ClientHeight = 114
-        ClientWidth = 391
+        ClientWidth = 389
         TabOrder = 2
         object cbTrayAlert: TCheckBox
           Left = 13
-          Height = 17
+          Height = 18
           Top = 12
-          Width = 244
+          Width = 288
           Caption = 'Enable system tray notification for new timers.'
           TabOrder = 0
         end
         object cbModalAlert: TCheckBox
           Left = 13
-          Height = 17
+          Height = 18
           Top = 42
-          Width = 217
+          Width = 258
           Caption = 'Enable modal popup alert for new timers.'
           TabOrder = 1
         end
         object cbAutoProgress: TCheckBox
           Left = 13
-          Height = 17
+          Height = 18
           Top = 70
-          Width = 293
+          Width = 348
           Caption = 'Automatically show the progress of the last timer started'
           TabOrder = 2
+        end
+      end
+    end
+    object tsInterface: TTabSheet
+      Caption = 'Interface'
+      ClientHeight = 246
+      ClientWidth = 422
+      ImageIndex = 1
+      object GroupBox1: TGroupBox
+        Left = 16
+        Height = 88
+        Top = 8
+        Width = 390
+        Anchors = [akTop, akLeft, akRight]
+        Caption = 'Application'
+        ClientHeight = 74
+        ClientWidth = 388
+        TabOrder = 0
+        object ckbQueryExit: TCheckBox
+          Left = 16
+          Height = 18
+          Top = 8
+          Width = 202
+          Caption = 'Prompt before exiting appliation'
+          TabOrder = 0
+        end
+        object ckbTimerTitleEditable: TCheckBox
+          Left = 16
+          Height = 18
+          Top = 32
+          Width = 217
+          Caption = 'Allow in-place editing of timer title.'
+          TabOrder = 1
+        end
+      end
+      object GroupBox2: TGroupBox
+        Left = 16
+        Height = 121
+        Top = 104
+        Width = 390
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        Caption = 'Override icon sizes'
+        ClientHeight = 107
+        ClientWidth = 388
+        TabOrder = 1
+        object CheckBox1: TCheckBox
+          Left = 16
+          Height = 18
+          Top = 8
+          Width = 43
+          Caption = 'Tray'
+          TabOrder = 0
+        end
+        object CheckBox2: TCheckBox
+          Left = 16
+          Height = 18
+          Top = 36
+          Width = 62
+          Caption = 'Window'
+          TabOrder = 1
+        end
+        object CheckBox3: TCheckBox
+          Left = 16
+          Height = 18
+          Top = 64
+          Width = 81
+          Caption = 'Application'
+          TabOrder = 2
+        end
+        object SpinEdit1: TSpinEdit
+          Left = 112
+          Height = 19
+          Top = 8
+          Width = 50
+          MaxValue = 256
+          MinValue = 16
+          TabOrder = 3
+          Value = 16
+        end
+        object Label3: TLabel
+          Left = 168
+          Height = 13
+          Top = 11
+          Width = 37
+          Caption = 'Label3'
+          ParentColor = False
+        end
+        object SpinEdit2: TSpinEdit
+          Left = 112
+          Height = 19
+          Top = 35
+          Width = 50
+          MaxValue = 256
+          MinValue = 16
+          TabOrder = 4
+          Value = 16
+        end
+        object SpinEdit3: TSpinEdit
+          Left = 112
+          Height = 19
+          Top = 64
+          Width = 50
+          MaxValue = 256
+          MinValue = 16
+          TabOrder = 5
+          Value = 16
+        end
+        object Label4: TLabel
+          Left = 168
+          Height = 13
+          Top = 38
+          Width = 37
+          Caption = 'Label4'
+          ParentColor = False
+        end
+        object Label5: TLabel
+          Left = 168
+          Height = 13
+          Top = 67
+          Width = 37
+          Caption = 'Label5'
+          ParentColor = False
+        end
+      end
+    end
+    object TabSheet1: TTabSheet
+      Caption = 'Adjust'
+      ClientHeight = 246
+      ClientWidth = 422
+      ImageIndex = 2
+      object GroupBox4: TGroupBox
+        Left = 16
+        Height = 136
+        Top = 8
+        Width = 392
+        Caption = 'Default'
+        ClientHeight = 122
+        ClientWidth = 390
+        TabOrder = 0
+        object Label6: TLabel
+          Left = 24
+          Height = 13
+          Top = 32
+          Width = 42
+          Caption = 'Hours :'
+          ParentColor = False
+        end
+        object Label7: TLabel
+          Left = 16
+          Height = 13
+          Top = 56
+          Width = 52
+          Caption = 'Minutes :'
+          ParentColor = False
+        end
+        object Label8: TLabel
+          Left = 14
+          Height = 13
+          Top = 80
+          Width = 57
+          Caption = 'Seconds :'
+          ParentColor = False
+        end
+        object SpinEdit4: TSpinEdit
+          Left = 112
+          Height = 19
+          Top = 32
+          Width = 50
+          TabOrder = 0
+        end
+        object SpinEdit5: TSpinEdit
+          Left = 112
+          Height = 19
+          Top = 60
+          Width = 50
+          TabOrder = 1
+        end
+        object SpinEdit6: TSpinEdit
+          Left = 112
+          Height = 19
+          Top = 88
+          Width = 50
+          TabOrder = 2
+        end
+        object Label9: TLabel
+          Left = 112
+          Height = 13
+          Top = 8
+          Width = 45
+          Caption = 'Shorten'
+          ParentColor = False
+        end
+        object Label10: TLabel
+          Left = 200
+          Height = 13
+          Top = 8
+          Width = 38
+          Caption = 'Extend'
+          ParentColor = False
+        end
+        object Label11: TLabel
+          Left = 288
+          Height = 13
+          Top = 8
+          Width = 71
+          Caption = 'Complete by'
+          ParentColor = False
+        end
+        object SpinEdit7: TSpinEdit
+          Left = 200
+          Height = 19
+          Top = 32
+          Width = 50
+          TabOrder = 3
+        end
+        object SpinEdit8: TSpinEdit
+          Left = 200
+          Height = 19
+          Top = 60
+          Width = 50
+          TabOrder = 4
+        end
+        object SpinEdit9: TSpinEdit
+          Left = 200
+          Height = 19
+          Top = 88
+          Width = 50
+          TabOrder = 5
+        end
+        object SpinEdit10: TSpinEdit
+          Left = 288
+          Height = 19
+          Top = 32
+          Width = 50
+          TabOrder = 6
+        end
+        object SpinEdit11: TSpinEdit
+          Left = 288
+          Height = 19
+          Top = 60
+          Width = 50
+          TabOrder = 7
+        end
+        object SpinEdit12: TSpinEdit
+          Left = 288
+          Height = 19
+          Top = 88
+          Width = 50
+          TabOrder = 8
         end
       end
     end
@@ -339,7 +487,7 @@ object frmOptions: TfrmOptions
     left = 192
     top = 294
     Bitmap = {
-      4C690200000010000000100000008C95ED008D96EDFF8D96EDFF8D96EDFF8D96
+      4C690300000010000000100000008C95ED008D96EDFF8D96EDFF8D96EDFF8D96
       EDFF8D96EDFF8D96EDFF8D96EDFF4352E2FF4352E2FF4352E2FF4352E2FF4352
       E2FF4352E2FF4352E2FF4352E2FC8C95ED008D96EDFF8D96EDFF8D96EDFF8D96
       EDFF8D96EDFF8D96EDFF8D96EDFF4352E2FF4352E2FF4352E2FF4352E2FF4352
@@ -403,6 +551,38 @@ object frmOptions: TfrmOptions
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000003F3F3F45796E5ADD6E6555C84040
+      4028000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000046464058AA9678FCD7BF99FFD7BE98FF8C7C
+      66F84141412F0000000000000000000000000000000000000000000000000000
+      000000000000000000004848425993C9C3FDCCC9ACFFD7BF99FFD7BF99FFD7BE
+      98FF827158F74343432E00000000000000000000000000000000000000000000
+      000000000000434340579E9DC2FDB1D5E4FFA0F2F8FFCBCAAEFFD7BF99FFCAA9
+      77FFBE9557FF75644AF643434326000000000000000000000000000000000000
+      0000444441568C90BDFCB3B9F8FFA9B0F5FFA1CAEDFFA0F2F8FFBAB893FFBE95
+      57FFBE9557FFBD9557FF5F5546BE000000000000000000000000000000004545
+      42558C90BDFCB3B9F8FFAAB1F5FF8F98EDFF8D96EDFF7BB3E8FF63E9F4FFAAA7
+      79FFBE9557FFBE9557FF655847D0000000000000000000000000464643548C90
+      BCFCB3B9F8FFA9B1F5FF8F97EDFF8D96EDFF6874E8FF4352E2FF569CE1FF63E9
+      F4FFAAA779FF8B734DFB404040400000000000000000464643548C90BCFCB3B9
+      F8FFAAB1F5FF8F98EDFF8D96EDFF6874E8FF4352E2FF4251E0FF3542BFFF5EA2
+      D4FF74B6ACFD464640540000000000000000464643548B8FBBFCB3B9F8FFAAB1
+      F5FF8F98EDFF8D96EDFF6A76E8FF4352E2FF4251E0FF3542BFFF303CB3FF4F56
+      B3FE4747445600000000000000004D4D4D0A758B9DFDB3B9F8FFAAB1F5FF8F98
+      EDFF8D96EDFF6975E8FF4352E2FF4251E0FF3541BFFF303CB3FF4750B0FD4444
+      44560000000000000000000000004040403088D0D7FEA3CEDEFF8F98EDFF8D96
+      EDFF6B77E8FF4352E2FF4251E0FF3542BFFF303CB3FF4851B2FD4343485C0000
+      00000000000000000000000000004141415691E3ECFF9CF5FFFF9BB9E4FF6B77
+      E8FF4352E2FF4251E0FF3541BFFF303CB3FF4851B2FD45454A5D000000000000
+      00000000000000000000000000004444447F9BE2EAFF9CF5FFFF7DF2FFFF4B6C
+      CDFF4251E0FF3542BFFF303CB3FF4650B2FE4545485900000000000000000000
+      0000000000000000000000000000585655BAA1A7A8FF81E0EAFF5CEFFFFF5CEF
+      FFFF507CC2FF303CB3FF4750B2FE4444495E0000000000000000000000000000
+      000000000000000000000000000063625FE2848484FF646F70FF5DD4E1FF5DDA
+      E8FF5DC4CFFE4D6497FE4343465B000000000000000000000000000000000000
+      00000000000000000000000000004845455952504EE24E4C48C3434141894141
+      415E414141374040401000000000000000000000000000000000000000000000
       0000000000000000000000000000
     }
   end

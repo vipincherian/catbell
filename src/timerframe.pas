@@ -185,6 +185,7 @@ type
     //OnTimerStop: TNotifyEvent;
 
     LastProgressIconIndex: integer;
+    AudioLooped: boolean;
     //OnTimerProgressUpdate: TNotifyEvent;
 
     // Callback on progress-on-icon checkbox change only if
@@ -794,6 +795,7 @@ begin
 
   FStream := nil;
   FSoundFile := nil;
+  AudioLooped := false;
 end;
 
 destructor TfraTimer.Destroy;
