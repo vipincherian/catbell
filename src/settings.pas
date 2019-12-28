@@ -92,16 +92,16 @@ type
   { TUserFileConfig }
 
   TUserFileConfig = class(TUserConfig)
-    private
-      FFileName: string;
-      FConf: TJSONConfig;
-      procedure Save;
-      procedure CreateAnew;
-    public
-      constructor Create(FileName: string);
-      destructor Destroy; override;
-      procedure Load;
-      procedure Flush;
+  private
+    FFileName: string;
+    FConf: TJSONConfig;
+    procedure Save;
+    procedure CreateAnew;
+  public
+    constructor Create(FileName: string);
+    destructor Destroy; override;
+    procedure Load;
+    procedure Flush;
   end;
 
 var
@@ -157,7 +157,7 @@ const
   DEF_TIMER_DURATION = 3.4722222189884633E-003;
 
   WINDOW_STATE = 'window_state';
-  DEF_WINDOW_STATE = Integer(wsNormal);
+  DEF_WINDOW_STATE = integer(wsNormal);
 
   TIME_FORMAT = 'time_format';
   DEF_TIME_FORMAT = tf12;
@@ -201,9 +201,9 @@ constructor TUserFileConfig.Create(FileName: string);
 begin
   inherited Create;
   FFileName := FileName;
-  FConf := TJSONConfig.Create(Nil);
-  FConf.Filename:=FFileName;
-  FConf.Formatted:=true;
+  FConf := TJSONConfig.Create(nil);
+  FConf.Filename := FFileName;
+  FConf.Formatted := True;
 end;
 
 destructor TUserFileConfig.Destroy;
@@ -222,17 +222,21 @@ begin
     CreateAnew;
   end;
   try
-    LastPosNormal.Top := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_TOP, FDefaultPos.Top);
-    LastPosNormal.Left := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_LEFT, FDefaultPos.Left);
-    LastPosNormal.Right := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_RIGHT, FDefaultPos.Right);
-    LastPosNormal.Bottom := FConf.GetValue(LAST_POS_NORMAL + LAST_POS_BOTTOM, FDefaultPos.Bottom);
+    FConf.OpenKey(LAST_POS_NORMAL, False);
+    LastPosNormal.Top := FConf.GetValue(LAST_POS_TOP, FDefaultPos.Top);
+    LastPosNormal.Left := FConf.GetValue(LAST_POS_LEFT, FDefaultPos.Left);
+    LastPosNormal.Right := FConf.GetValue(LAST_POS_RIGHT, FDefaultPos.Right);
+    LastPosNormal.Bottom := FConf.GetValue(LAST_POS_BOTTOM, FDefaultPos.Bottom);
+    FConf.CloseKey;
 
-    LastPosRestored.Top := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_TOP, FDefaultPos.Top);
-    LastPosRestored.Left := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_LEFT, FDefaultPos.Left);
-    LastPosRestored.Right := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_RIGHT, FDefaultPos.Right);
-    LastPosRestored.Bottom := FConf.GetValue(LAST_POS_RESTORED + LAST_POS_BOTTOM, FDefaultPos.Bottom);
+    FConf.OpenKey(LAST_POS_RESTORED, False);
+    LastPosRestored.Top := FConf.GetValue(LAST_POS_TOP, FDefaultPos.Top);
+    LastPosRestored.Left := FConf.GetValue(LAST_POS_LEFT, FDefaultPos.Left);
+    LastPosRestored.Right := FConf.GetValue(LAST_POS_RIGHT, FDefaultPos.Right);
+    LastPosRestored.Bottom := FConf.GetValue(LAST_POS_BOTTOM, FDefaultPos.Bottom);
+    FConf.CloseKey;
 
-    LastWindowState:=TWindowState(FConf.GetValue(WINDOW_STATE, DEF_WINDOW_STATE));
+    LastWindowState := TWindowState(FConf.GetValue(WINDOW_STATE, DEF_WINDOW_STATE));
 
     {TODO: Is the defaulting correct here?}
     ShowModalAlert := FConf.GetValue(SHOW_MODAL_ALERT, ShowModalAlert);
@@ -240,18 +244,18 @@ begin
     //ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
     AutoProgress := FConf.GetValue(AUTO_PROGRESS, AutoProgress);
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
-    AllowTimerTitleEdit:=FConf.GetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
+    AllowTimerTitleEdit := FConf.GetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
     DefaultTimerTitle := FConf.GetValue(TIMER_TITLE, DefaultTimerTitle);
     //DefaultTimerHours := FConf.GetValue(TIMER_HOURS, DefaultTimerHours);
     //DefaultTimerMins := FConf.GetValue(TIMER_MINS, DefaultTimerMins);
     //DefaultTimerSecs := FConf.GetValue(TIMER_SECS, DefaultTimerSecs);
-    DefaultTimerDuration:=FConf.GetValue(TIMER_DURATION, DefaultTimerDuration);
+    DefaultTimerDuration := FConf.GetValue(TIMER_DURATION, DefaultTimerDuration);
 
-    DefaultTimeFormat:=FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
+    DefaultTimeFormat := FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
 
     //AdjustExtendDefault:=FConf.GetValue(ADJ_EXTEND, AdjustExtendDefault);
-    AdjustDiffDefault:=FConf.GetValue(ADJ_DIFF, AdjustDiffDefault);
-    AdjustCompletebyDefault:=FConf.GetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
+    AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, AdjustDiffDefault);
+    AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
 
   except
     CreateAnew;
@@ -261,17 +265,22 @@ end;
 
 procedure TUserFileConfig.Save;
 begin
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_TOP, LastPosNormal.Top);
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_LEFT, LastPosNormal.Left);
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_RIGHT, LastPosNormal.Right);
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_BOTTOM, LastPosNormal.Bottom);
 
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_TOP, LastPosRestored.Top);
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_LEFT, LastPosRestored.Left);
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_RIGHT, LastPosRestored.Right);
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_BOTTOM, LastPosRestored.Bottom);
+  FConf.OpenKey(LAST_POS_NORMAL, True);
+  FConf.SetValue(LAST_POS_TOP, LastPosNormal.Top);
+  FConf.SetValue(LAST_POS_LEFT, LastPosNormal.Left);
+  FConf.SetValue(LAST_POS_RIGHT, LastPosNormal.Right);
+  FConf.SetValue(LAST_POS_BOTTOM, LastPosNormal.Bottom);
+  FConf.CloseKey;
 
-  FConf.SetValue(WINDOW_STATE, Integer(LastWindowState));
+  FConf.OpenKey(LAST_POS_RESTORED, True);
+  FConf.SetValue(LAST_POS_TOP, LastPosRestored.Top);
+  FConf.SetValue(LAST_POS_LEFT, LastPosRestored.Left);
+  FConf.SetValue(LAST_POS_RIGHT, LastPosRestored.Right);
+  FConf.SetValue(LAST_POS_BOTTOM, LastPosRestored.Bottom);
+  Fconf.CloseKey;
+
+  FConf.SetValue(WINDOW_STATE, integer(LastWindowState));
 
   FConf.SetValue(SHOW_MODAL_ALERT, ShowModalAlert);
   FConf.SetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
@@ -294,15 +303,19 @@ end;
 
 procedure TUserFileConfig.CreateAnew;
 begin
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_TOP, FDefaultPos.Top);
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_LEFT, FDefaultPos.Left);
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_RIGHT, FDefaultPos.Right);
-  FConf.SetValue(LAST_POS_NORMAL+LAST_POS_BOTTOM, FDefaultPos.Bottom);
+  FConf.OpenKey(LAST_POS_NORMAL, True);
+  FConf.SetValue(LAST_POS_TOP, FDefaultPos.Top);
+  FConf.SetValue(LAST_POS_LEFT, FDefaultPos.Left);
+  FConf.SetValue(LAST_POS_RIGHT, FDefaultPos.Right);
+  FConf.SetValue(LAST_POS_BOTTOM, FDefaultPos.Bottom);
+  FConf.CloseKey;
 
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_TOP, FDefaultPos.Top);
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_LEFT, FDefaultPos.Left);
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_RIGHT, FDefaultPos.Right);
-  FConf.SetValue(LAST_POS_RESTORED+LAST_POS_BOTTOM, FDefaultPos.Bottom);
+  FConf.OpenKey(LAST_POS_RESTORED, True);
+  FConf.SetValue(LAST_POS_TOP, FDefaultPos.Top);
+  FConf.SetValue(LAST_POS_LEFT, FDefaultPos.Left);
+  FConf.SetValue(LAST_POS_RIGHT, FDefaultPos.Right);
+  FConf.SetValue(LAST_POS_BOTTOM, FDefaultPos.Bottom);
+  Fconf.CloseKey;
 
   FConf.SetValue(WINDOW_STATE, DEF_WINDOW_STATE);
 
@@ -315,7 +328,7 @@ begin
   FConf.SetValue(TIMER_MINS, DEF_TIMER_MINS);
   FConf.SetValue(TIMER_SECS, DEF_TIMER_SECS);
 
-  FConf.SetValue(TIME_FORMAT, Integer(DEF_TIME_FORMAT));
+  FConf.SetValue(TIME_FORMAT, integer(DEF_TIME_FORMAT));
 
   //FConf.SetValue(ADJ_EXTEND, DEF_TIMER_DURATION);
   FConf.SetValue(ADJ_DIFF, DEF_TIMER_DURATION);
@@ -362,14 +375,14 @@ begin
   AutoProgress := DEF_AUTO_PROGRESS;
   QueryExit := DEF_QUERY_EXIT;
 
-  LastWindowState:=wsNormal;
+  LastWindowState := wsNormal;
   DefaultTimerTitle := DEF_TIMER_TITLE;
   //DefaultTimerHours := DEF_TIMER_HOURS;
   //DefaultTimerMins := DEF_TIMER_MINS;
   //DefaultTimerSecs := DEF_TIMER_SECS;
   DefaultTimerDuration := DEF_TIMER_DURATION;
 
-  DefaultTimeFormat := Integer(DEF_TIME_FORMAT);
+  DefaultTimeFormat := integer(DEF_TIME_FORMAT);
 
 end;
 
@@ -392,12 +405,12 @@ begin
   //DefaultTimerMins := From.DefaultTimerMins;
   //DefaultTimerSecs := From.DefaultTimerSecs;
   DefaultTimerDuration := From.DefaultTimerDuration;
-  AllowTimerTitleEdit:=From.AllowTimerTitleEdit;
-  DefaultTimeFormat:=From.DefaultTimeFormat;
+  AllowTimerTitleEdit := From.AllowTimerTitleEdit;
+  DefaultTimeFormat := From.DefaultTimeFormat;
 
   //AdjustExtendDefault:=From.AdjustCompletebyDefault;
-  AdjustDiffDefault:=From.AdjustDiffDefault;
-  AdjustCompletebyDefault:=From.AdjustCompletebyDefault;
+  AdjustDiffDefault := From.AdjustDiffDefault;
+  AdjustCompletebyDefault := From.AdjustCompletebyDefault;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
