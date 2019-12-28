@@ -402,6 +402,8 @@ begin
     {TODO: This should be read from config}
     frmEdit.TrayNotification := ShowTrayAlert;
     frmEdit.ModalAlert := ShowModalAlert;
+    {TODO: Remove hard-coding}
+    frmEdit.ckbLoop.Checked:=False;
   end;
 
   if frmEdit.ShowForAdd then
@@ -411,6 +413,7 @@ begin
     Added.dtpSet.Time := frmEdit.Duration;
     Added.ModalAlert := frmEdit.ModalAlert;
     Added.TrayNotification := frmEdit.TrayNotification;
+    Added.AudioLooped:=frmEdit.ckbLoop.Checked;
     PostTimerCreation(Added);
   end;
 end;

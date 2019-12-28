@@ -77,6 +77,7 @@ type
     SpinEdit8: TSpinEdit;
     SpinEdit9: TSpinEdit;
     TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;
 

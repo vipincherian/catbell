@@ -64,7 +64,7 @@ type
     //age  : byte;
     SoundFile: PSndFile;
     Info: SF_INFO;
-    Handle: THandle;
+    //Handle: THandle;
     Widget: Pointer;
   end;
   PAudioInfo = ^TUserInfo;
@@ -271,23 +271,52 @@ var
   AudioInfo: PAudioInfo;
   //AudBuffer: pointer;
   readCount: cint;
+  Widget: TfraTimer;
 begin
   //DebugLn('Inside audio callback');
   AudioInfo := PAudioinfo(userData);
+  Widget := TfraTimer(AudioInfo^.Widget);
 
   readCount := 0;
   readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
     (AudioInfo^.Info.channels));
 
-  if readCount = (frameCount * AudioInfo^.Info.channels) then
+  if Widget.AudioLooped then
   begin
+    { If audio is lopped and if no audio data could be read,
+    seek to the beginning and then read again }
+    if readCount = 0 then
+    begin
+      if sf_seek(AudioInfo^.SoundFile, 0, SEEK_SET) = -1 then
+      begin
+        DebugLn('Sf_seek returned error');
+      end;
+      readCount := 0;
+      readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
+        (AudioInfo^.Info.channels));
+      if readCount = 0 then
+      begin
+        DebugLn('readCount zero immediately after seek to beginning');
+        Result := cint(paAbort);
+        Exit;
+      end;
+    end;
+    { If audio is looped, always continue }
     Result := cint(paContinue);
-  end
+  end { when audio is not looped }
   else
   begin
-    //sf_close(AudioInfo^.SoundFile);
-    Result := cint(paComplete);
+    if readCount = (frameCount * AudioInfo^.Info.channels) then
+    begin
+      Result := cint(paContinue);
+    end
+    else
+    begin
+      //sf_close(AudioInfo^.SoundFile);
+      Result := cint(paComplete);
+    end;
   end;
+
 
 end;
 
@@ -369,6 +398,7 @@ begin
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
   frmEdit.SetAudioFile(FAudioFile, ErrorText);
+  frmEdit.ckbLoop.Checked:=AudioLooped;
   if frmEdit.ShowForEdit(Self) then
   begin
     Caption := frmEdit.Description;
@@ -377,6 +407,7 @@ begin
     FModalAlert := frmEdit.ModalAlert;
     //FAudioFile := frmEditTimer.AudioFile;
     SetAudioFile(frmEdit.AudioFile, frmEdit.AudioLength, ErrorText);
+    AudioLooped:=frmEdit.ckbLoop.Checked;
   end;
 end;
 
@@ -1326,7 +1357,7 @@ begin
 
   //Callback := @FeedStream;
   FUserInfo.SoundFile := FSoundFile;
-  FUserInfo.Handle := Handle;
+  //FUserInfo.Handle := Handle;
   FUserInfo.Widget := Self;
   Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
