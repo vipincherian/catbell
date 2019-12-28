@@ -33,7 +33,8 @@ uses
   portaudio, sndfile, ctypes;
 
 const
-  FORM_MIN_SIZE = 600;
+  FORM_MIN_WIDTH = 600;
+  FORM_MIN_HEIGHT = 300;
   TICON_RED_INDEX: integer = 1;
   TICON_GREEN_INDEX: integer = 2;
   TRAY_PROGRESS_ICON_COUNT = 24;
@@ -279,7 +280,8 @@ var
   DeviceInfo: PPaDeviceInfo;
 begin
   FOrder := TIdList.Create;
-  Constraints.MinWidth := FORM_MIN_SIZE;
+  Constraints.MinWidth := FORM_MIN_WIDTH;
+  Constraints.MinHeight := FORM_MIN_HEIGHT;
   ;
 
   FTimerFrames := TTimerFrameMap.Create;
