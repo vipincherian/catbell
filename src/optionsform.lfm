@@ -53,10 +53,10 @@ object frmOptions: TfrmOptions
     Height = 272
     Top = 8
     Width = 424
-    ActivePage = tsInterface
+    ActivePage = tsTimers
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
