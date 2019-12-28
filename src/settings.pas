@@ -69,12 +69,16 @@ type
     QueryExit: boolean;
     AllowTimerTitleEdit: boolean;
     DefaultTimerTitle: string;
-    DefaultTimerHours: integer;
-    DefaultTimerMins: integer;
-    DefaultTimerSecs: integer;
+    //DefaultTimerHours: integer;
+    //DefaultTimerMins: integer;
+    //DefaultTimerSecs: integer;
+    DefaultTimerDuration: double;
 
     LastWindowState: TWindowState;
     DefaultTimeFormat: integer;
+    AdjustDiffDefault: double;
+    //AdjustExtendDefault: double;
+    AdjustCompletebyDefault: double;
     constructor Create();
     destructor Destroy; override;
     //procedure Load;
@@ -149,11 +153,18 @@ const
   TIMER_SECS = 'timer_secs';
   DEF_TIMER_SECS = 0;
 
+  TIMER_DURATION = 'timer_duration';
+  DEF_TIMER_DURATION = 3.4722222189884633E-003;
+
   WINDOW_STATE = 'window_state';
   DEF_WINDOW_STATE = Integer(wsNormal);
 
   TIME_FORMAT = 'time_format';
   DEF_TIME_FORMAT = tf12;
+
+  //ADJ_EXTEND = 'adjust_extend';
+  ADJ_DIFF = 'adjust_diff';
+  ADJ_COMPLETEBY = 'adust_completeby';
 
 procedure InitSettings;
 procedure CleanupSettings;
@@ -165,6 +176,8 @@ begin
   { Combo-box indices are set blindly. An assert to check this during development. }
   Assert(integer(tf12) = 0);
   Assert(integer(tf24) = 1);
+
+  //DEF_TIMER_DURATION := EncodeTime(0, 5, 0, 0);
 
   if not DirectoryExists(GetAppConfigDir(False)) then
     CreateDir(GetAppConfigDir(False));
@@ -229,11 +242,16 @@ begin
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
     AllowTimerTitleEdit:=FConf.GetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
     DefaultTimerTitle := FConf.GetValue(TIMER_TITLE, DefaultTimerTitle);
-    DefaultTimerHours := FConf.GetValue(TIMER_HOURS, DefaultTimerHours);
-    DefaultTimerMins := FConf.GetValue(TIMER_MINS, DefaultTimerMins);
-    DefaultTimerSecs := FConf.GetValue(TIMER_SECS, DefaultTimerSecs);
+    //DefaultTimerHours := FConf.GetValue(TIMER_HOURS, DefaultTimerHours);
+    //DefaultTimerMins := FConf.GetValue(TIMER_MINS, DefaultTimerMins);
+    //DefaultTimerSecs := FConf.GetValue(TIMER_SECS, DefaultTimerSecs);
+    DefaultTimerDuration:=FConf.GetValue(TIMER_DURATION, DefaultTimerDuration);
 
     DefaultTimeFormat:=FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
+
+    //AdjustExtendDefault:=FConf.GetValue(ADJ_EXTEND, AdjustExtendDefault);
+    AdjustDiffDefault:=FConf.GetValue(ADJ_DIFF, AdjustDiffDefault);
+    AdjustCompletebyDefault:=FConf.GetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
 
   except
     CreateAnew;
@@ -261,11 +279,16 @@ begin
   FConf.SetValue(QUERY_EXIT, QueryExit);
   FConf.SetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
   Fconf.SetValue(TIMER_TITLE, DefaultTimerTitle);
-  FConf.SetValue(TIMER_HOURS, DefaultTimerHours);
-  FConf.SetValue(TIMER_MINS, DefaultTimerMins);
-  FConf.SetValue(TIMER_SECS, DefaultTimerSecs);
+  //FConf.SetValue(TIMER_HOURS, DefaultTimerHours);
+  //FConf.SetValue(TIMER_MINS, DefaultTimerMins);
+  //FConf.SetValue(TIMER_SECS, DefaultTimerSecs);
+  FConf.SetValue(TIMER_DURATION, DefaultTimerDuration);
 
   FConf.SetValue(TIME_FORMAT, DefaultTimeFormat);
+
+  //FConf.SetValue(ADJ_EXTEND, AdjustExtendDefault);
+  FConf.SetValue(ADJ_DIFF, AdjustDiffDefault);
+  FConf.SetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
 
 end;
 
@@ -294,6 +317,9 @@ begin
 
   FConf.SetValue(TIME_FORMAT, Integer(DEF_TIME_FORMAT));
 
+  //FConf.SetValue(ADJ_EXTEND, DEF_TIMER_DURATION);
+  FConf.SetValue(ADJ_DIFF, DEF_TIMER_DURATION);
+  FConf.SetValue(ADJ_COMPLETEBY, DEF_TIMER_DURATION);
 
   FConf.Flush;
 end;
@@ -338,9 +364,10 @@ begin
 
   LastWindowState:=wsNormal;
   DefaultTimerTitle := DEF_TIMER_TITLE;
-  DefaultTimerHours := DEF_TIMER_HOURS;
-  DefaultTimerMins := DEF_TIMER_MINS;
-  DefaultTimerSecs := DEF_TIMER_SECS;
+  //DefaultTimerHours := DEF_TIMER_HOURS;
+  //DefaultTimerMins := DEF_TIMER_MINS;
+  //DefaultTimerSecs := DEF_TIMER_SECS;
+  DefaultTimerDuration := DEF_TIMER_DURATION;
 
   DefaultTimeFormat := Integer(DEF_TIME_FORMAT);
 
@@ -361,11 +388,16 @@ begin
   QueryExit := From.QueryExit;
 
   DefaultTimerTitle := From.DefaultTimerTitle;
-  DefaultTimerHours := From.DefaultTimerHours;
-  DefaultTimerMins := From.DefaultTimerMins;
-  DefaultTimerSecs := From.DefaultTimerSecs;
+  //DefaultTimerHours := From.DefaultTimerHours;
+  //DefaultTimerMins := From.DefaultTimerMins;
+  //DefaultTimerSecs := From.DefaultTimerSecs;
+  DefaultTimerDuration := From.DefaultTimerDuration;
   AllowTimerTitleEdit:=From.AllowTimerTitleEdit;
   DefaultTimeFormat:=From.DefaultTimeFormat;
+
+  //AdjustExtendDefault:=From.AdjustCompletebyDefault;
+  AdjustDiffDefault:=From.AdjustDiffDefault;
+  AdjustCompletebyDefault:=From.AdjustCompletebyDefault;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -395,7 +427,7 @@ begin
     Result := False;
     Exit;
   end;
-  if DefaultTimerHours <> From.DefaultTimerHours then
+  {if DefaultTimerHours <> From.DefaultTimerHours then
   begin
     Result := False;
     Exit;
@@ -409,12 +441,35 @@ begin
   begin
     Result := False;
     Exit;
+  end;}
+
+  if DefaultTimerDuration <> From.DefaultTimerDuration then
+  begin
+    Result := False;
+    Exit;
   end;
   if DefaultTimeFormat <> From.DefaultTimeFormat then
   begin
     Result := False;
     Exit;
   end;
+
+  {if AdjustExtendDefault <> From.AdjustExtendDefault then
+  begin
+    Result := False;
+    Exit;
+  end;}
+  if AdjustDiffDefault <> From.AdjustDiffDefault then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if AdjustCompletebyDefault <> From.AdjustCompletebyDefault then
+  begin
+    Result := False;
+    Exit;
+  end;
+
   Result := True;
 end;
 

@@ -45,9 +45,8 @@ type
     cbAutoProgress: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
-    DateTimePicker1: TDateTimePicker;
-    DateTimePicker2: TDateTimePicker;
-    DateTimePicker3: TDateTimePicker;
+    dtpShorten: TDateTimePicker;
+    dtpCompleteBy: TDateTimePicker;
     dtpDefaultTime: TDateTimePicker;
     edtDefaultTitle: TEdit;
     GroupBox1: TGroupBox;
@@ -57,7 +56,6 @@ type
     GroupBox4: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
-    Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
@@ -115,8 +113,9 @@ begin
     ckbTimerTitleEditable.Checked:=AllowTimerTitleEdit;
 
     edtDefaultTitle.Text := DefaultTimerTitle;
-    dtpDefaultTime.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
-      DefaultTimerSecs, 0);
+    dtpDefaultTime.Time := DefaultTimerDuration;
+    //EncodeTime(DefaultTimerHours, DefaultTimerMins,
+//      DefaultTimerSecs, 0);
 
     cbTrayAlert.Checked := ShowTrayAlert;
     cbModalAlert.Checked := ShowModalAlert;
@@ -126,6 +125,9 @@ begin
     the indices. Playing with fire, where it can be afforded. }
     cmbTimeFormat.ItemIndex:=DefaultTimeFormat;
 
+    dtpShorten.Time:=AdjustDiffDefault;
+    //dtpExtend.Time:=AdjustExtendDefault;
+    dtpCompleteBy.Time:=AdjustCompletebyDefault;
   end;
 end;
 
@@ -136,13 +138,18 @@ begin
     QueryExit := ckbQueryExit.Checked;
     AllowTimerTitleEdit:=ckbTimerTitleEditable.Checked;
     DefaultTimerTitle := edtDefaultTitle.Text;
-    DefaultTimerHours := HourOf(dtpDefaultTime.Time);
-    DefaultTimerMins := MinuteOf(dtpDefaultTime.Time);
-    DefaultTimerSecs := SecondOf(dtpDefaultTime.Time);
+    //DefaultTimerHours := HourOf(dtpDefaultTime.Time);
+    //DefaultTimerMins := MinuteOf(dtpDefaultTime.Time);
+    //DefaultTimerSecs := SecondOf(dtpDefaultTime.Time);
+    DefaultTimerDuration:=dtpDefaultTime.Time;
     ShowTrayAlert := cbTrayAlert.Checked;
     ShowModalAlert := cbModalAlert.Checked;
     AutoProgress := cbAutoProgress.Checked;
     DefaultTimeFormat := cmbTimeFormat.ItemIndex;
+
+    AdjustDiffDefault:=dtpShorten.Time;
+    //AdjustExtendDefault:=dtpExtend.Time;
+    AdjustCompletebyDefault:=dtpCompleteBy.Time;
 
   end;
 end;

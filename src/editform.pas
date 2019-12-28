@@ -167,7 +167,7 @@ begin
   FSpecs.Description:='Countdown Timer';}
   with GlobalUserConfig do
   begin
-    FDuration:=EncodeTime(DefaultTimerHours, DefaultTimerMins, DefaultTimerSecs,0);
+    FDuration:=DefaultTimerDuration;//EncodeTime(DefaultTimerHours, DefaultTimerMins, DefaultTimerSecs,0);
     FDescription:=DefaultTimerTitle;
     FModalAlert:=ShowModalAlert;
     FTrayNotification:=ShowTrayAlert;

@@ -773,8 +773,9 @@ begin
   //teSet.Time := EncodeTime(0, GlobalDefault.TimerInitMins, 0, 0);
   with GlobalUserConfig do
   begin
-    dtpSet.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
-      DefaultTimerSecs, 0);
+    dtpSet.Time := DefaultTimerDuration;
+    //EncodeTime(DefaultTimerHours, DefaultTimerMins,
+    //  DefaultTimerSecs, 0);
     edtTitle.Text := DefaultTimerTitle;
   end;
 

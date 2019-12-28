@@ -96,8 +96,9 @@ begin
   dtpTill.Hide;
   dtpTill.TimeFormat:=TTimeFormat(GlobalUserConfig.DefaultTimeFormat);
   dtpTill.Left := dtpDiff.Left;
-  dtpDiff.Time:=EncodeTime(0, 5, 0, 0);
-    SetTillDateTime;
+  //dtpDiff.Time:=EncodeTime(0, 5, 0, 0);
+  dtpDiff.Time:=GlobalUserConfig.AdjustDiffDefault;
+  SetTillDateTime;
 
   Id := -1;
 end;
@@ -109,7 +110,7 @@ end;
 
 procedure TfrmAdjust.SetTillDateTime;
 begin
-  dtpTill.DateTime := IncMinute(Now, 5);
+  dtpTill.DateTime := IncMinute(Now, MinuteOf(GlobalUserConfig.AdjustDiffDefault));
 end;
 
 procedure TfrmAdjust.bbApplyClick(Sender: TObject);

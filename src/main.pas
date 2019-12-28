@@ -397,8 +397,9 @@ begin
   begin
     //dtpSet.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
     //  DefaultTimerSecs, 0);
-    frmEdit.Duration := EncodeTime(DefaultTimerHours, DefaultTimerMins,
-      DefaultTimerSecs, 0);
+    frmEdit.Duration := DefaultTimerDuration;
+    //EncodeTime(DefaultTimerHours, DefaultTimerMins,
+    //  DefaultTimerSecs, 0);
     frmEdit.Description := DefaultTimerTitle;
     frmEdit.TrayNotification := ShowTrayAlert;
     frmEdit.ModalAlert := ShowModalAlert;
