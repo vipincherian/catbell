@@ -36,6 +36,7 @@ type
     bbtnDefault: TBitBtn;
     bbtnCancel: TBitBtn;
     bbtnSave: TBitBtn;
+    BitBtn1: TBitBtn;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
@@ -44,11 +45,11 @@ type
     cbModalAlert: TCheckBox;
     cbAutoProgress: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
-    cmbTimeFormat: TComboBox;
     cmbAudioDevice: TComboBox;
-    dtpShorten: TDateTimePicker;
+    cmbTimeFormat: TComboBox;
     dtpCompleteBy: TDateTimePicker;
     dtpDefaultTime: TDateTimePicker;
+    dtpShorten: TDateTimePicker;
     edtDefaultTitle: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
@@ -71,8 +72,6 @@ type
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
-    tsAdjust: TTabSheet;
-    tsAudio: TTabSheet;
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;
 
@@ -149,7 +148,8 @@ begin
         if DefaultDevice = paNoDevice then
         begin
           DebugLn('No default device');
-          tsAudio.Enabled:=False;
+          //tsAudio.Enabled:=False;
+          cmbAudioDevice.Enabled := False;
         end
         else
           cmbAudioDevice.ItemIndex := DefaultDevice;
@@ -199,7 +199,8 @@ begin
   pgcOptions.ActivePage := tsTimers;
 
   { Load audio devices }
-  tsAudio.Enabled:=frmMain.AudioWorking;
+  //tsAudio.Enabled:=frmMain.AudioWorking;
+  cmbAudioDevice.Enabled:=frmMain.AudioWorking;
   if frmMain.AudioWorking then
   begin
     NumDevices := Pa_GetDeviceCount();
