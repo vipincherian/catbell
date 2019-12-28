@@ -838,11 +838,11 @@ begin
     the scrollbar's may not be the same. This needs to be taken into account,
     and an adjustment of (sbxClocks.Width - Timer.Width) needs to be made.}
 
-  Inc(Temp, sbxClocks.Width - Timer.Width - Filled);
+  Inc(Temp, sbxClocks.ClientWidth - Timer.Width - Filled);
   //Temp := Temp - Filled;
   hdrTimers.Sections.Items[1].Width := Temp;
 
-  Inc(Filled, hdrTimers.Sections.Items[1].Width - (sbxClocks.Width - Timer.Width));
+  Inc(Filled, hdrTimers.Sections.Items[1].Width - (sbxClocks.ClientWidth - Timer.Width));
   //Filled := Filled - (sbxClocks.Width - Timer.Width);
 
   Temp := Timer.bbAdjust.Left + Timer.bbAdjust.Width;
@@ -967,10 +967,10 @@ begin
     TimerWidget.Top := Filled;
     TimerWidget.TabOrder := CountTabOrder;
     // + FScrollBox.VertScrollBar.Size - FScrollBox.VertScrollBar.Position;
-    if sbxClocks.VertScrollBar.IsScrollBarVisible then
+    {if sbxClocks.VertScrollBar.IsScrollBarVisible then
       TimerWidget.Width := sbxClocks.Width - GetSystemMetrics(SM_CYVSCROLL)
     else
-      TimerWidget.Width := sbxClocks.Width;
+      TimerWidget.Width := sbxClocks.Width;}
     //Clock.He;
     Inc(Filled, TimerWidget.Height);
     Inc(CountTabOrder);
