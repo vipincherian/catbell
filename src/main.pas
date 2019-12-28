@@ -254,6 +254,7 @@ type
     procedure OnShortTimer(Sender: TObject);
     procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
     procedure AfterShow2(Data: PtrInt);
+    procedure ShowModalAlert(Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
     property AudioWorking: boolean read FAudioWorking;
   end;
@@ -1077,10 +1078,7 @@ begin
     //frmTimerAlert.stxAdditional.Caption := Message;
     frmAlert.lbMessages.Items.Add(Message);
 
-    //if not frmTimerAlert.Showing then
-    if frmAlert.WindowState = wsMinimized then
-      frmAlert.WindowState := wsNormal;
-    frmAlert.ShowOnTop;
+    Application.QueueAsyncCall(@ShowModalAlert, 0);
   end;
   UpdateStatusTimerCount;
   //DebugLn('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
@@ -1681,6 +1679,13 @@ procedure TfrmMain.AfterShow2(Data: PtrInt);
 begin
   if FTimerFrames.Count = 0 then
     aiNewTimer.Execute;
+end;
+
+procedure TfrmMain.ShowModalAlert(Data: PtrInt);
+begin
+  if frmAlert.WindowState = wsMinimized then
+    frmAlert.WindowState := wsNormal;
+  frmAlert.ShowModal;
 end;
 
 end.
