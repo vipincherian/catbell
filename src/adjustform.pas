@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  DateTimePicker, dateutils;
+  DateTimePicker, dateutils, settings;
 
 type
 
@@ -94,9 +94,10 @@ procedure TfrmAdjust.FormCreate(Sender: TObject);
 begin
   dtpDiff.Show;
   dtpTill.Hide;
+  dtpTill.TimeFormat:=TTimeFormat(GlobalUserConfig.DefaultTimeFormat);
   dtpTill.Left := dtpDiff.Left;
   dtpDiff.Time:=EncodeTime(0, 5, 0, 0);
-  SetTillDateTime;
+    SetTillDateTime;
 
   Id := -1;
 end;

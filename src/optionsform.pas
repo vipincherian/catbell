@@ -44,6 +44,7 @@ type
     cbModalAlert: TCheckBox;
     cbAutoProgress: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
+    cmbTimeFormat: TComboBox;
     dtpDefaultTime: TDateTimePicker;
     edtDefaultTitle: TEdit;
     GroupBox1: TGroupBox;
@@ -55,6 +56,7 @@ type
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
+    Label12: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -128,6 +130,10 @@ begin
     cbModalAlert.Checked := ShowModalAlert;
     cbAutoProgress.Checked := AutoProgress;
 
+    { Time formats tf12 & ts24 translate to 0 and 1, which are the same as
+    the indices. Playing with fire, where it can be afforded. }
+    cmbTimeFormat.ItemIndex:=DefaultTimeFormat;
+
   end;
 end;
 
@@ -144,6 +150,7 @@ begin
     ShowTrayAlert := cbTrayAlert.Checked;
     ShowModalAlert := cbModalAlert.Checked;
     AutoProgress := cbAutoProgress.Checked;
+    DefaultTimeFormat := cmbTimeFormat.ItemIndex;
 
   end;
 end;

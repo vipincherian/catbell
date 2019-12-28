@@ -25,7 +25,7 @@ unit settings;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, Graphics, jsonConf;
+  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf;
 
 type
 
@@ -72,10 +72,9 @@ type
     DefaultTimerHours: integer;
     DefaultTimerMins: integer;
     DefaultTimerSecs: integer;
-    ModalBackgroundColour: integer;
-    ModalCaptionColour: integer;
-    ModalSubtextColour: integer;
+
     LastWindowState: TWindowState;
+    DefaultTimeFormat: integer;
     constructor Create();
     destructor Destroy; override;
     //procedure Load;
@@ -150,18 +149,11 @@ const
   TIMER_SECS = 'timer_secs';
   DEF_TIMER_SECS = 0;
 
-  MODAL_BKG_COLOUR = 'modal_bkg_colour';
-  DEF_MODAL_BKG_COLOUR = clBlack;
-
-  MODAL_CAPTION_COLOUR = 'modal_caption_colour';
-  DEF_MODAL_CAPTION_COLOUR = clLime;
-
-  MODAL_SUB_COLOUR = 'modal_sub_colour';
-  DEF_MODAL_SUB_COLOUR = clSilver;
-
   WINDOW_STATE = 'window_state';
   DEF_WINDOW_STATE = Integer(wsNormal);
 
+  TIME_FORMAT = 'time_format';
+  DEF_TIME_FORMAT = tf12;
 
 procedure InitSettings;
 procedure CleanupSettings;
@@ -170,6 +162,10 @@ implementation
 
 procedure InitSettings;
 begin
+  { Combo-box indices are set blindly. An assert to check this during development. }
+  Assert(integer(tf12) = 0);
+  Assert(integer(tf24) = 1);
+
   if not DirectoryExists(GetAppConfigDir(False)) then
     CreateDir(GetAppConfigDir(False));
   //GlobalDefault := TDefaultConfig.Create;
@@ -237,9 +233,8 @@ begin
     DefaultTimerMins := FConf.GetValue(TIMER_MINS, DefaultTimerMins);
     DefaultTimerSecs := FConf.GetValue(TIMER_SECS, DefaultTimerSecs);
 
-    ModalBackgroundColour := FConf.GetValue(MODAL_BKG_COLOUR, ModalBackgroundColour);
-    ModalCaptionColour := FConf.GetValue(MODAL_CAPTION_COLOUR, ModalCaptionColour);
-    ModalSubtextColour := FConf.GetValue(MODAL_SUB_COLOUR, ModalSubtextColour);
+    DefaultTimeFormat:=FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
+
   except
     CreateAnew;
   end;
@@ -269,9 +264,9 @@ begin
   FConf.SetValue(TIMER_HOURS, DefaultTimerHours);
   FConf.SetValue(TIMER_MINS, DefaultTimerMins);
   FConf.SetValue(TIMER_SECS, DefaultTimerSecs);
-  FConf.SetValue(MODAL_BKG_COLOUR, ModalBackgroundColour);
-  FConf.setValue(MODAL_CAPTION_COLOUR, ModalCaptionColour);
-  FConf.setValue(MODAL_SUB_COLOUR, ModalSubtextColour);
+
+  FConf.SetValue(TIME_FORMAT, DefaultTimeFormat);
+
 end;
 
 procedure TUserFileConfig.CreateAnew;
@@ -296,9 +291,9 @@ begin
   FConf.SetValue(TIMER_HOURS, DEF_TIMER_HOURS);
   FConf.SetValue(TIMER_MINS, DEF_TIMER_MINS);
   FConf.SetValue(TIMER_SECS, DEF_TIMER_SECS);
-  FConf.SetValue(MODAL_BKG_COLOUR, DEF_MODAL_BKG_COLOUR);
-  FConf.setValue(MODAL_CAPTION_COLOUR, DEF_MODAL_CAPTION_COLOUR);
-  FConf.setValue(MODAL_SUB_COLOUR, DEF_MODAL_SUB_COLOUR);
+
+  FConf.SetValue(TIME_FORMAT, Integer(DEF_TIME_FORMAT));
+
 
   FConf.Flush;
 end;
@@ -340,13 +335,15 @@ begin
   ShowTrayAlert := DEF_SHOW_TRAY_ALERT;
   AutoProgress := DEF_AUTO_PROGRESS;
   QueryExit := DEF_QUERY_EXIT;
+
+  LastWindowState:=wsNormal;
   DefaultTimerTitle := DEF_TIMER_TITLE;
   DefaultTimerHours := DEF_TIMER_HOURS;
   DefaultTimerMins := DEF_TIMER_MINS;
   DefaultTimerSecs := DEF_TIMER_SECS;
-  ModalBackgroundColour := DEF_MODAL_BKG_COLOUR;
-  ModalCaptionColour := DEF_MODAL_CAPTION_COLOUR;
-  ModalSubtextColour := DEF_MODAL_SUB_COLOUR;
+
+  DefaultTimeFormat := Integer(DEF_TIME_FORMAT);
+
 end;
 
 destructor TUserConfig.Destroy;
@@ -362,13 +359,13 @@ begin
   ShowTrayAlert := From.ShowTrayAlert;
   AutoProgress := From.AutoProgress;
   QueryExit := From.QueryExit;
+
   DefaultTimerTitle := From.DefaultTimerTitle;
   DefaultTimerHours := From.DefaultTimerHours;
   DefaultTimerMins := From.DefaultTimerMins;
   DefaultTimerSecs := From.DefaultTimerSecs;
-  ModalBackgroundColour := From.ModalBackgroundColour;
-  ModalCaptionColour := From.ModalCaptionColour;
-  ModalSubtextColour := From.ModalSubtextColour;
+  AllowTimerTitleEdit:=From.AllowTimerTitleEdit;
+  DefaultTimeFormat:=From.DefaultTimeFormat;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -413,17 +410,7 @@ begin
     Result := False;
     Exit;
   end;
-  if ModalBackgroundColour <> From.ModalBackgroundColour then
-  begin
-    Result := False;
-    Exit;
-  end;
-  if ModalCaptionColour <> From.ModalCaptionColour then
-  begin
-    Result := False;
-    Exit;
-  end;
-  if ModalSubtextColour <> From.ModalSubtextColour then
+  if DefaultTimeFormat <> From.DefaultTimeFormat then
   begin
     Result := False;
     Exit;

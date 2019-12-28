@@ -400,10 +400,9 @@ begin
     frmEdit.Duration := EncodeTime(DefaultTimerHours, DefaultTimerMins,
       DefaultTimerSecs, 0);
     frmEdit.Description := DefaultTimerTitle;
-    {TODO: This should be read from config}
     frmEdit.TrayNotification := ShowTrayAlert;
     frmEdit.ModalAlert := ShowModalAlert;
-    {TODO: Remove hard-coding}
+    { We are not providing an option to keep audio looped by default }
     frmEdit.ckbLoop.Checked := False;
   end;
 
