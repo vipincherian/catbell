@@ -48,17 +48,17 @@ object frmOptions: TfrmOptions
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.0.6.0'
-  object PageControl1: TPageControl
+  object pgcOptions: TPageControl
     Left = 8
     Height = 272
     Top = 8
     Width = 424
-    ActivePage = TabSheet1
+    ActivePage = tsInterface
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 2
+    TabIndex = 1
     TabOrder = 0
-    OnChange = PageControl1Change
+    OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
       Caption = 'Timers'
       ClientHeight = 246
@@ -90,7 +90,7 @@ object frmOptions: TfrmOptions
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = -53780
-          TabOrder = 0
+          TabOrder = 1
           TrailingSeparator = False
           TextForNullDate = 'NULL'
           LeadingZeros = True
@@ -112,15 +112,15 @@ object frmOptions: TfrmOptions
           Caption = 'Default time:'
           ParentColor = False
         end
-      end
-      object edtDefaultTitle: TEdit
-        Left = 112
-        Height = 19
-        Top = 32
-        Width = 280
-        Anchors = [akTop, akLeft, akRight]
-        MaxLength = 255
-        TabOrder = 1
+        object edtDefaultTitle: TEdit
+          Left = 96
+          Height = 19
+          Top = 8
+          Width = 280
+          Anchors = [akTop, akLeft, akRight]
+          MaxLength = 255
+          TabOrder = 0
+        end
       end
       object GroupBox3: TGroupBox
         Left = 16
@@ -131,7 +131,7 @@ object frmOptions: TfrmOptions
         Caption = 'Alerts'
         ClientHeight = 114
         ClientWidth = 389
-        TabOrder = 2
+        TabOrder = 1
         object cbTrayAlert: TCheckBox
           Left = 13
           Height = 18
@@ -237,7 +237,7 @@ object frmOptions: TfrmOptions
           Top = 36
           Width = 62
           Caption = 'Window'
-          TabOrder = 1
+          TabOrder = 2
         end
         object CheckBox3: TCheckBox
           Left = 16
@@ -245,7 +245,7 @@ object frmOptions: TfrmOptions
           Top = 64
           Width = 81
           Caption = 'Application'
-          TabOrder = 2
+          TabOrder = 4
         end
         object SpinEdit1: TSpinEdit
           Left = 112
@@ -254,7 +254,7 @@ object frmOptions: TfrmOptions
           Width = 50
           MaxValue = 256
           MinValue = 16
-          TabOrder = 3
+          TabOrder = 1
           Value = 16
         end
         object Label3: TLabel
@@ -272,7 +272,7 @@ object frmOptions: TfrmOptions
           Width = 50
           MaxValue = 256
           MinValue = 16
-          TabOrder = 4
+          TabOrder = 3
           Value = 16
         end
         object SpinEdit3: TSpinEdit
@@ -437,7 +437,7 @@ object frmOptions: TfrmOptions
       E60A000000000000000000000000000000000000000000000000
     }
     OnClick = bbtnDefaultClick
-    TabOrder = 1
+    TabOrder = 3
   end
   object bbtnCancel: TBitBtn
     Cursor = crHandPoint
@@ -465,7 +465,7 @@ object frmOptions: TfrmOptions
     Kind = bkOK
     ModalResult = 1
     OnClick = bbtnSaveClick
-    TabOrder = 3
+    TabOrder = 1
   end
   object ilOptions: TImageList
     left = 192

@@ -64,7 +64,7 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label9: TLabel;
-    PageControl1: TPageControl;
+    pgcOptions: TPageControl;
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
@@ -79,7 +79,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure PageControl1Change(Sender: TObject);
+    procedure pgcOptionsChange(Sender: TObject);
   private
     { private declarations }
     FLastConfig: TUserConfig;
@@ -100,7 +100,7 @@ implementation
 
 { TfrmOptions }
 
-procedure TfrmOptions.PageControl1Change(Sender: TObject);
+procedure TfrmOptions.pgcOptionsChange(Sender: TObject);
 begin
 
 end;
@@ -161,6 +161,7 @@ begin
   FChangedConfig := TUserConfig.Create;
   FDefaultConfig := TUserConfig.Create;
   SetControlsAs(GlobalUserConfig);
+  pgcOptions.ActivePage := tsTimers;
 end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
