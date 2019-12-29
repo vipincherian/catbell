@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
-  Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils, portaudio, LazLogger;
+  Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils, {portaudio, }LazLogger, audio;
 
 type
 
@@ -113,7 +113,7 @@ end;
 procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
 var
   Index: integer;
-  DefaultDevice: integer;
+  DefaultDeviceId: integer;
 begin
   with Config do
   begin
@@ -144,14 +144,14 @@ begin
         cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
       else
       begin
-        DefaultDevice:=Pa_GetDefaultOutputDevice();
-        if DefaultDevice = paNoDevice then
+        DefaultDeviceId:= TAudio.GetDefaultDevice; //Pa_GetDefaultOutputDevice();
+        {if DefaultDevice = paNoDevice then
         begin
           DebugLn('No default device');
           //tsAudio.Enabled:=False;
           cmbAudioDevice.Enabled := False;
         end
-        else
+        else}
           cmbAudioDevice.ItemIndex := DefaultDevice;
       end;
     end;
@@ -187,9 +187,11 @@ end;
 procedure TfrmOptions.FormCreate(Sender: TObject);
 var
   //PaErrCode: PaError;
-  NumDevices, DefaultDevice, Count: integer;
-  DeviceInfo: PPaDeviceInfo;
+  Count: integer;
+  //DeviceInfo: PPaDeviceInfo;
   DeviceName: string;
+  DeviceNames: TSTringList;
+  DefaultDeviceId: AudioDeviceIndex;
 begin
   OnShow := @FormShow;
   FLastConfig := TUserConfig.Create;
@@ -201,7 +203,16 @@ begin
   { Load audio devices }
   //tsAudio.Enabled:=frmMain.AudioWorking;
   cmbAudioDevice.Enabled:=frmMain.AudioWorking;
-  if frmMain.AudioWorking then
+  DefaultDeviceId:= TAudio.DefaultDevice;
+  DeviceNames := TAudio.Devices;
+  for Count := 0 to  Devicenames.Count - 1 do
+  begin
+    DeviceName:=DeviceNames.Strings[Count];
+    if Count = DefaultDeviceId then
+      DeviceName := DeviceName + ' (Default)';
+    cmbAudioDevice.Items.Add(DeviceName);
+  end;
+  {if frmMain.AudioWorking then
   begin
     NumDevices := Pa_GetDeviceCount();
     if NumDevices < 0 then
@@ -232,11 +243,11 @@ begin
         cmbAudioDevice.Items.Add(DeviceName);
       end;
     end;
-  end;
+  end;}
   if cmbAudioDevice.Items.Count > 0 then
   begin
     if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-      cmbAudioDevice.ItemIndex:=DefaultDevice
+      cmbAudioDevice.ItemIndex:=0//DefaultDevice
     else
       cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
   end;

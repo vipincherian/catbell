@@ -30,7 +30,7 @@ uses
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
   timerframe, fgl, sequence, editform, Math, LazLogger, LMessages,
-  portaudio, sndfile, ctypes, audio;
+  {portaudio, sndfile,} ctypes, audio;
 
 const
   FORM_MIN_WIDTH = 600;
@@ -272,12 +272,12 @@ implementation
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
-  PaErrCode: PaError;
+  //PaErrCode: PaError;
 {$IFNDEF AUDIO_STATIC}
   //Status: boolean;
 {$ENDIF}
   DefaultDevice: integer;
-  DeviceInfo: PPaDeviceInfo;
+  //DeviceInfo: PPaDeviceInfo;
 begin
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;

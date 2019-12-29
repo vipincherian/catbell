@@ -9,7 +9,7 @@ object frmMain: TfrmMain
   VertScrollBar.Range = 152
   ActiveControl = pnlBorder
   Caption = 'Catbell'
-  ClientHeight = 316
+  ClientHeight = 315
   ClientWidth = 654
   Menu = mmMain
   OnClose = FormClose
@@ -152,19 +152,19 @@ object frmMain: TfrmMain
   end
   object pnlBorder: TPanel
     Left = 8
-    Height = 248
+    Height = 247
     Top = 40
     Width = 592
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlBorder'
-    ClientHeight = 248
+    ClientHeight = 247
     ClientWidth = 592
     TabOrder = 1
     object pnlClocks: TPanel
       Left = 1
-      Height = 246
+      Height = 245
       Top = 1
       Width = 590
       Align = alClient
@@ -175,14 +175,14 @@ object frmMain: TfrmMain
     end
     object sbxClocks: TScrollBox
       Left = 1
-      Height = 246
+      Height = 245
       Top = 1
       Width = 590
       HorzScrollBar.Page = 170
       VertScrollBar.Page = 24
       Align = alClient
       BorderStyle = bsNone
-      ClientHeight = 246
+      ClientHeight = 245
       ClientWidth = 590
       TabOrder = 1
       OnResize = sbxClocksResize
@@ -235,8 +235,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 23
-    Top = 293
+    Height = 15
+    Top = 300
     Width = 654
     Panels = <    
       item
@@ -254,7 +254,7 @@ object frmMain: TfrmMain
     Left = 613
     Height = 32
     Hint = 'Delete the sected timer(s)'
-    Top = 178
+    Top = 177
     Width = 32
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
@@ -268,7 +268,7 @@ object frmMain: TfrmMain
     Left = 613
     Height = 32
     Hint = 'Move the selected timer(s) up'
-    Top = 218
+    Top = 217
     Width = 32
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
@@ -282,7 +282,7 @@ object frmMain: TfrmMain
     Left = 613
     Height = 32
     Hint = 'Move the selected timer(s) down'
-    Top = 258
+    Top = 257
     Width = 32
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
