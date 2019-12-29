@@ -30,7 +30,7 @@ uses
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
   timerframe, fgl, sequence, editform, Math, LazLogger, LMessages,
-  portaudio, sndfile, ctypes;
+  portaudio, sndfile, ctypes, audio;
 
 const
   FORM_MIN_WIDTH = 600;
@@ -337,8 +337,10 @@ begin
 
   CreateBitmaps;
 
-  FAudioWorking := True;
-{$IFNDEF AUDIO_STATIC}
+
+  FAudioWorking := TAudio.AudioLoaded;
+  {
+  {$IFNDEF AUDIO_STATIC}
   FAudioWorking := Pa_Load(LIB_PORTAUDIO);
   if not FAudioWorking then
   begin
@@ -384,7 +386,7 @@ begin
       {$ENDIF}
     end;
   end;
-
+  }
   // Check if default audio device has changed
   {if FAudioWorking then
   begin
@@ -601,13 +603,14 @@ begin
   FOrder.Free;
 
   FShortTimer.Free;
-
+  {
   if FAudioWorking then
     Pa_Terminate;
 {$IFNDEF AUDIO_STATIC}
   Sf_Unload;
   Pa_Unload;
 {$ENDIF}
+}
   //FClockWidget.Free;
 end;
 

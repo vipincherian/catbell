@@ -30,7 +30,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, SysUtils, datetimectrls, main,
   sequence, timerframe, settings, optionsform, 
-timeralertform, aboutform, editform, adjustform
+timeralertform, aboutform, editform, adjustform, audio
   { you can add units after this };
 
 {$R *.res}
