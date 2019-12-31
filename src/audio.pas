@@ -14,7 +14,7 @@ const
 
 type
   EAudioNotLoaded = class(Exception);
-  ENoDevice = class(Exception);
+  EInvalidDevice = class(Exception);
   EInvalidAudio = class(Exception);
   AudioDeviceIndex = PaDeviceIndex;
 
@@ -45,12 +45,15 @@ type
 
     FAudioPlaying: boolean;
 
+    FOutputDevice: string;
+
     //PlayCriticalSection: TRTLCriticalSection;
 
     //FOwner: TForm;
 
     class function GetDevices: TStringList; static;
     procedure SetFileName(AValue: string);
+    procedure SetOutputDevice(AValue: string);
   public
     AudioLoaded: boolean; static;
     FDeviceNames: TStringList; static;
@@ -63,13 +66,15 @@ type
     class function GetDefaultDevice: AudioDeviceIndex; static;
     class function GetDeviceIndex(DeviceName: string): AudioDeviceIndex; static;
     //class procedure GetAllDevices
-    //class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
+    class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
     class property Devices: TStringList read GetDevices;
     procedure Play;
     procedure Abort;
     procedure FinishedAud(Data: PtrInt);
     property FileName: string read FFileName write SetFileName;
     property Playing: boolean read FAudioPlaying;
+    property OutputDevice: string read FOutputDevice write SetOutputDevice;
+
   end;
 
 
@@ -264,6 +269,17 @@ begin
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
+procedure TAudio.SetOutputDevice(AValue: string);
+var
+  Id: AudioDeviceIndex;
+begin
+  try
+    Id := GetDeviceIndex(Avalue);
+    FOutputDevice:=AValue;
+  finally
+  end;
+end;
+
 
 
 constructor TAudio.Create();
@@ -309,7 +325,7 @@ begin
   begin
     DebugLn('No default device');
     LeaveCriticalSection(AudioCriticalSection);
-    raise ENoDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
+    raise EInvalidDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
   end;
   Result := DeviceId;
   LeaveCriticalSection(AudioCriticalSection);
@@ -357,7 +373,7 @@ begin
     end;
   end;
   LeaveCriticalSection(AudioCriticalSection);
-  raise ENoDevice.Create('No matching device for ' + DeviceName);
+  raise EInvalidDevice.Create('No matching device for ' + DeviceName);
 
 end;
 
@@ -372,68 +388,78 @@ var
   DeviceName: string;
 begin
   EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.AudioLoaded then
-    raise EAudioNotLoaded.Create('Audio not loaded.');
 
+  try
+    if not TAudio.AudioLoaded then
+      raise EAudioNotLoaded.Create('Audio not loaded.');
 
-  if FAudioPlaying then
-  begin
-    ShowMessage('Again?');
-    LeaveCriticalsection(AudioCriticalSection);
-    Exit;
+    if FAudioPlaying then
+    begin
+      ShowMessage('Again?');
+      //LeaveCriticalsection(AudioCriticalSection);
+      Exit;
+    end;
+
+    if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
+    begin
+      DebugLn('Sf_seek returned error');
+    end;
+
+    if FOutputDevice = '' then
+      DeviceId := DefaultDevice
+    else
+      DeviceId := GetDeviceIndex(FOutputDevice);
+    StreamParams.device := DeviceId;
+
+    DebugLn('Audio device is ' + IntToStr(StreamParams.device));
+
+    StreamParams.channelCount := FInfo.channels;
+    StreamParams.sampleFormat := paFloat32;
+
+    Streamparams.suggestedLatency :=
+      Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
+    StreamParams.hostApiSpecificStreamInfo := nil;
+    DebugLn('Default device is ' + IntToStr(StreamParams.device));
+
+    //Callback := @FeedAudioStream;
+    FUserInfo.SoundFile := FSoundFile;
+    //FUserInfo.Handle := Handle;
+    //FUserInfo.Widget := Self;
+    FUserInfo.Looped := Looped;
+    FUserInfo.Player := Self;
+    //FUserInfo.CriticalSection:=AudioCriticalSection;
+    Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
+
+    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
+      paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedAudioStream),
+      @FUserInfo);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+    end;
+
+    PaErrCode := Pa_SetStreamFinishedCallback(FStream,
+      PPaStreamFinishedCallback(@AudioStreamFinished));
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
+    end;
+
+    PaErrCode := Pa_StartStream(FStream);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
+    end;
+
+    FAudioPlaying := True;
+
+  finally
+    LeaveCriticalSection(AudioCriticalSection);
   end;
 
-  if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
-  begin
-    DebugLn('Sf_seek returned error');
-  end;
-  StreamParams.device := TAudio.FDefaultDevice;
-
-  DebugLn('Audio device is ' + IntToStr(StreamParams.device));
-
-  StreamParams.channelCount := FInfo.channels;
-  StreamParams.sampleFormat := paFloat32;
-
-  Streamparams.suggestedLatency :=
-    Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
-  StreamParams.hostApiSpecificStreamInfo := nil;
-  DebugLn('Default device is ' + IntToStr(StreamParams.device));
-
-  //Callback := @FeedAudioStream;
-  FUserInfo.SoundFile := FSoundFile;
-  //FUserInfo.Handle := Handle;
-  //FUserInfo.Widget := Self;
-  FUserInfo.Looped := Looped;
-  FUserInfo.Player := Self;
-  //FUserInfo.CriticalSection:=AudioCriticalSection;
-  Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
-
-  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
-    paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedAudioStream),
-    @FUserInfo);
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
-  end;
-
-  PaErrCode := Pa_SetStreamFinishedCallback(FStream,
-    PPaStreamFinishedCallback(@AudioStreamFinished));
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
-  end;
-
-  PaErrCode := Pa_StartStream(FStream);
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
-  end;
-
-  FAudioPlaying := True;
-  LeaveCriticalSection(AudioCriticalSection);
 
 end;
 
@@ -458,6 +484,7 @@ begin
     in that callback function}
 
   finally
+    FAudioPlaying := False;
     LeaveCriticalSection(AudioCriticalSection);
   end;
 

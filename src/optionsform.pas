@@ -208,8 +208,8 @@ begin
   for Count := 0 to  Devicenames.Count - 1 do
   begin
     DeviceName:=DeviceNames.Strings[Count];
-    if Count = DefaultDeviceId then
-      DeviceName := DeviceName + ' (Default)';
+    {if Count = DefaultDeviceId then
+      DeviceName := DeviceName + ' (Default)';}
     cmbAudioDevice.Items.Add(DeviceName);
   end;
   {if frmMain.AudioWorking then

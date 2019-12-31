@@ -218,10 +218,10 @@ type
     //procedure RemoveSubscription(aObserver: ITimerObserver);
     procedure AdjustTimer(Sender: TObject);
     function SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
-    procedure PlayAudio;
+    //procedure PlayAudio;
     procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
     procedure FinishedAud(Data: PtrInt);
-    procedure TriggerAudio(Data: PtrInt);
+    //procedure TriggerAudio(Data: PtrInt);
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
@@ -1064,8 +1064,9 @@ begin
       //Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
-      PlayAudio;
+      //PlayAudio;
 
+      FAudio.OutputDevice:= GlobalUserConfig.AudioDeviceName;
       FAudio.Play;
       DebugLn('FAudio.Play');
       FAudioPlaying:=True;
@@ -1345,7 +1346,7 @@ begin
 
 end;
 
-procedure TfraTimer.PlayAudio;
+{procedure TfraTimer.PlayAudio;
 {var
   //SoundFile: PSndFile;
   //Info: SF_INFO;
@@ -1469,7 +1470,7 @@ begin
 
   //DebugLn('All went well');
   //DebugLn('Played audio');
-end;
+end;}
 
 procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
 {var
@@ -1555,13 +1556,13 @@ begin
   FStream := nil; }
 end;
 
-procedure TfraTimer.TriggerAudio(Data: PtrInt);
+{procedure TfraTimer.TriggerAudio(Data: PtrInt);
 begin
   FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
   FAudio.Play;
   FAudioPlaying:=True;
   //Sleep(3000);
-end;
+end;}
 
 {function TfraTimer.AudioCallback(const input: pointer; output: pointer;
   frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo;
