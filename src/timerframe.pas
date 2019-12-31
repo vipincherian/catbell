@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
-  editform, Graphics, Math, LazLogger, adjustform, sndfile, portaudio,
+  editform, Graphics, Math, LazLogger, adjustform, {sndfile, portaudio,} audio,
   ctypes, LMessages, LCLIntf;
 
 const
@@ -60,7 +60,7 @@ const
 
 type
 
-  TUserInfo = record
+  {TUserInfo = record
     //name : string[30];
     //age  : byte;
     SoundFile: PSndFile;
@@ -68,7 +68,7 @@ type
     //Handle: THandle;
     Widget: Pointer;
   end;
-  PAudioInfo = ^TUserInfo;
+  PAudioInfo = ^TUserInfo; }
   { TfraTimer }
 
   TfraTimer = class(TFrame)
@@ -104,6 +104,7 @@ type
   private
     { private declarations }
     FId: longword;
+    AudioCriticalSection: TRTLCriticalSection;
 
     FModalAlert: boolean;
     FTrayNotification: boolean;
@@ -125,12 +126,13 @@ type
 
     FAudioFile: string;
     FAudioLength: double;
-    FSoundFile: PSndFile;
+    //FSoundFile: PSndFile;
 
-    FUserInfo: TUserInfo;
-    FStream: PPaStream;
+    //FUserInfo: TUserInfo;
+    //FStream: PPaStream;
 
-    FInfo: SF_INFO;
+    //FInfo: SF_INFO;
+    FAudio: TAudio;
 
     //FAudioCallback: PPaStreamCallback;
     //FObservers: TListTimerObservers;
@@ -218,6 +220,7 @@ type
     procedure PlayAudio;
     procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
     procedure FinishedAud(Data: PtrInt);
+    procedure TriggerAudio(Data: PtrInt);
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
@@ -265,7 +268,7 @@ it closes the sound file and returns paComplete.
 This will stop the stream and the associated callback - which
 triggers on stoppage of the steam - gets called.}
 
-function FeedStream(input: pointer; output: pointer; frameCount: culong;
+{function FeedStream(input: pointer; output: pointer; frameCount: culong;
   timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags;
   userData: pointer): cint; cdecl;
 var
@@ -319,12 +322,12 @@ begin
   end;
 
 
-end;
+end;}
 
 {This function is called by PortAudio to signal that the stream has stopped.
 As this is a non-class function, it sends a message to frame using the frame's
 handle.}
-procedure StreamFinished(UserData: pointer); cdecl;
+{procedure StreamFinished(UserData: pointer); cdecl;
 var
   AudioInfo: PAudioInfo;
   Widget: TfraTimer;
@@ -334,7 +337,7 @@ begin
   Widget := TfraTimer(AudioInfo^.Widget);
   //PostMessage(AudioInfo^.Handle, UM_FINISHED_AUDIO, 0, 0);
   Application.QueueAsyncCall(@(Widget.FinishedAud), 0);
-end;
+end;}
 
 {$R *.lfm}
 
@@ -769,6 +772,7 @@ end; }
 constructor TfraTimer.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  InitCriticalSection(AudioCriticalSection);
   FId := 0;
   FProgress := 0.0;
   //teSet.Time := EncodeTime(0, GlobalDefault.TimerInitMins, 0, 0);
@@ -826,20 +830,25 @@ begin
 
   CallbackOnProgressOnIconChange := True;
 
-  FStream := nil;
-  FSoundFile := nil;
+  //FStream := nil;
+  //FSoundFile := nil;
   AudioLooped := false;
+
+  FAudio := TAudio.Create;
+  FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
 end;
 
 destructor TfraTimer.Destroy;
 begin
+  FAudio.Free;
   Parent := nil;
   //FShortTimer.Free;
   //FObservers.Free;
-  if (FSoundFile <> nil) and frmMain.AudioWorking then
+  {if (FSoundFile <> nil) and frmMain.AudioWorking then
   begin
     sf_close(FSoundFile);
-  end;
+  end;}
+  DoneCriticalsection(AudioCriticalSection);
   inherited Destroy;
 end;
 
@@ -868,6 +877,7 @@ var
   PendingMilliseconds: longword;
   CurrTickCount: longword;
 begin
+  EnterCriticalSection(AudioCriticalSection);
   { If the countdown timer is not running, then default to 00:00:00}
   //if FRunning = False then
   //Counter := DEF_COUNTDOWN_CAPTION
@@ -886,12 +896,14 @@ begin
         Observer.Finished(0, 'Countdown timer!', FWidget.Duration);}
       Counter := DEF_COUNTDOWN_CAPTION;
       Finish;
+      LeaveCriticalSection(AudioCriticalSection);
       Exit;
     end;
     PendingMilliseconds := FEndTickCount - CurrTickCount;
     UpdateProgress(PendingMilliseconds);
 
   end;
+  LeaveCriticalSection(AudioCriticalSection);
 end;
 
 procedure TfraTimer.Start;
@@ -979,8 +991,8 @@ begin
 end;
 
 procedure TfraTimer.Stop(UserInitiated: boolean);
-var
-  PaErrCode: PaError;
+{var
+  PaErrCode: PaError;}
 begin
   { The audio is playing and the user request is to terminate the audio.}
   if FAudioPlaying then
@@ -994,12 +1006,12 @@ begin
     //Counter := DEF_COUNTDOWN_CAPTION;
     bbAdjust.Enabled := False;
 
-    PaErrCode := Pa_AbortStream(FStream);
+    {PaErrCode := Pa_AbortStream(FStream);
     if (paErrCode <> Int32(paNoError)) then
     begin
       WriteLn('Pa_AbortStream failed ' + Pa_GetErrorText(paErrCode));
       WriteLn('Error after Pa_AbortStream ' + IntToHex(PaErrCode, 8));
-    end;
+    end;}
 
     {There is no need to close the stream. Stopping/aborting the stream
     will trigger the callback for stream stoppage. The stream will be closed
@@ -1033,10 +1045,15 @@ begin
 
     if (FAudioFile <> '') and (not UserInitiated) and frmMain.AudioWorking then
     begin
-      Assert(FSoundFile <> nil);
+      //Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
       PlayAudio;
+
+      FAudio.Play;
+      DebugLn('FAudio.Play');
+      FAudioPlaying:=True;
+      //Application.QueueAsyncCall(@TriggerAudio, 0);
     end
     else
     begin
@@ -1249,7 +1266,7 @@ function TfraTimer.SetAudioFile(AValue: string; Duration: double; out Error: str
   //SoundFile: PSndFile;
 begin
   Result := False;
-  FInfo.format := 0;
+  //FInfo.format := 0;
 
   if AValue = '' then
   begin
@@ -1260,6 +1277,7 @@ begin
     //edtAudioFile.Text:='';
     //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
     //lblLenthVal.Visible:=False;
+    FAudio.FileName:='';
     Result := True;
     Exit;
   end;
@@ -1272,12 +1290,12 @@ begin
     //DebugLn('SetAudioFile called when audio is not working');
     FAudioFile:=AValue;
     FAudioLength:=Duration;
-    FSoundFile:=Nil;
+    //FSoundFile:=Nil;
     Result := True;
     Exit;
   end;
 
-  if FSoundFile <> nil then
+  {if FSoundFile <> nil then
     sf_close(FSoundFile);
   FSoundFile := sf_open(PChar(AValue), SFM_READ, @FInfo);
   if (FSoundFile = nil) then
@@ -1295,8 +1313,9 @@ begin
   DebugLn(IntToStr(FInfo.samplerate));
   DebugLn(IntToStr(FInfo.sections));
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
-  //ShowMessage('length is ' + FloatToStr(AudioLength));
+  //ShowMessage('length is ' + FloatToStr(AudioLength)); }
 
+  FAudio.FileName:=Avalue;
   FAudioFile := AValue;
 
   //sf_close(SoundFile);
@@ -1311,16 +1330,16 @@ begin
 end;
 
 procedure TfraTimer.PlayAudio;
-var
+{var
   //SoundFile: PSndFile;
   //Info: SF_INFO;
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
   NumDevices, DefaultDevice, DeviceId, Count: integer;
   DeviceInfo: PPaDeviceInfo;
-  DeviceName: string;
+  DeviceName: string;}
 begin
-
+  {
   if not frmMain.AudioWorking then
   begin
     DebugLn('PlayAudio called when audio is not working');
@@ -1328,6 +1347,7 @@ begin
   end;
   DebugLn('Playing audio');
   FInfo.format := 0;
+
   {SoundFile := sf_open(PChar(FAudioFile), SFM_READ, @Info);
   if (SoundFile = nil) then
   begin
@@ -1405,7 +1425,7 @@ begin
   FUserInfo.Widget := Self;
   Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
-  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
+  {PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
     paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedStream),
     @FUserInfo);
   if (paErrCode <> Int32(paNoError)) then
@@ -1427,17 +1447,17 @@ begin
   begin
     DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
     DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
-  end;
+  end; }
 
-  FAudioPlaying := True;
+  FAudioPlaying := True;}
 
   //DebugLn('All went well');
   //DebugLn('Played audio');
 end;
 
 procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
-var
-  PaErrCode: PaError;
+{var
+  PaErrCode: PaError;}
 begin
   DebugLn('Inside finished audio ');
 
@@ -1453,7 +1473,7 @@ begin
 
 
   {This check might be redundant. Just to be safe}
-  paErrCode := Pa_IsStreamStopped(FStream);
+  {paErrCode := Pa_IsStreamStopped(FStream);
   if paErrCode = 0 then
   begin
     paErrCode := Pa_StopStream(FStream);
@@ -1474,12 +1494,12 @@ begin
     DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
     DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
   end;
-  FStream := nil;
+  FStream := nil; }
 end;
 
 procedure TfraTimer.FinishedAud(Data: PtrInt);
-var
-  PaErrCode: PaError;
+{var
+  PaErrCode: PaError;}
 begin
   DebugLn('Inside finished audio ');
 
@@ -1495,7 +1515,7 @@ begin
 
 
   {This check might be redundant. Just to be safe}
-  paErrCode := Pa_IsStreamStopped(FStream);
+  {paErrCode := Pa_IsStreamStopped(FStream);
   if paErrCode = 0 then
   begin
     paErrCode := Pa_StopStream(FStream);
@@ -1516,7 +1536,15 @@ begin
     DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
     DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
   end;
-  FStream := nil;
+  FStream := nil; }
+end;
+
+procedure TfraTimer.TriggerAudio(Data: PtrInt);
+begin
+  FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
+  FAudio.Play;
+  FAudioPlaying:=True;
+  //Sleep(3000);
 end;
 
 {function TfraTimer.AudioCallback(const input: pointer; output: pointer;

@@ -152,7 +152,7 @@ begin
           cmbAudioDevice.Enabled := False;
         end
         else}
-          cmbAudioDevice.ItemIndex := TAudio.DefaultDevice;
+          cmbAudioDevice.ItemIndex := TAudio.GetDefaultDevice;
       end;
     end;
   end;
@@ -203,7 +203,7 @@ begin
   { Load audio devices }
   //tsAudio.Enabled:=frmMain.AudioWorking;
   cmbAudioDevice.Enabled:=frmMain.AudioWorking;
-  DefaultDeviceId:= TAudio.DefaultDevice;
+  DefaultDeviceId:= TAudio.GetDefaultDevice;
   DeviceNames := TAudio.Devices;
   for Count := 0 to  Devicenames.Count - 1 do
   begin
