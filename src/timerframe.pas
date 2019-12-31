@@ -199,6 +199,7 @@ type
     //procedure PauseClicked(Sender: TObject);
     //procedure NotifyClicked(Sender: TObject);
     procedure ClockSelected(Sender: TObject);
+    procedure AudioPlayed(Sender: TObject);
     procedure Hide;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -734,6 +735,19 @@ begin
   frmMain.ClockSelected(Self);
 end;
 
+procedure TfraTimer.AudioPlayed(Sender: TObject);
+begin
+  PlayButtonEnabled := True;
+  PauseButtonEnabled := False;
+  StopButtonEnabled := False;
+  DurationEnabled := True;
+  //ImageGreyed := True;
+  //Counter := DEF_COUNTDOWN_CAPTION;
+  bbAdjust.Enabled := False;
+
+  FAudioPlaying := False;
+end;
+
 procedure TfraTimer.Hide;
 begin
   Top := Top + Height;
@@ -835,7 +849,8 @@ begin
   AudioLooped := false;
 
   FAudio := TAudio.Create;
-  FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
+  FAudio.OnPlayCompletion:=@AudioPlayed;
+  //FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
 end;
 
 destructor TfraTimer.Destroy;

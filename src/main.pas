@@ -1708,7 +1708,8 @@ procedure TfrmMain.ShowModalAlert(Data: PtrInt);
 begin
   if frmAlert.WindowState = wsMinimized then
     frmAlert.WindowState := wsNormal;
-  frmAlert.ShowModal;
+  if not frmAlert.Showing then
+    frmAlert.ShowModal;
 end;
 
 end.

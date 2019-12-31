@@ -55,6 +55,7 @@ type
     FDeviceNames: TStringList; static;
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
+    OnPlayCompletion: TNotifyEvent;
     Looped: boolean;
     constructor Create();
     destructor Destroy; override;
@@ -274,6 +275,8 @@ begin
   Looped:=False;
   FAudioPlaying := False;
 
+  OnPlayCompletion := Nil;
+
   //InitCriticalSection(CallbackCriticalSection);
   //InitializeCriticalSection(AudioCriticalSection);
   //FOwner := Nil;
@@ -462,6 +465,8 @@ begin
   end;
   FStream := nil;
   FAudioPlaying := False;
+  if OnPlayCompletion <> nil then
+    OnPlayCompletion(Self);
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
