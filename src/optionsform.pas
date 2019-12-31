@@ -308,6 +308,8 @@ begin
 end;
 
 procedure TfrmOptions.bbtnSaveClick(Sender: TObject);
+{var
+  Audio: TAudio;}
 begin
   {with GlobalUserConfig do
   begin
@@ -326,6 +328,13 @@ begin
   GetConfigFromControls(GlobalUserConfig);
   //  GlobalUserConfig.CopyFrom(FChangedConfig);
   GlobalUserConfig.Flush;
+
+  {Audio := TAudio.Create;
+  Audio.FileName := '/media/data/down/www/just-like-magic.ogg';
+  DebugLn('File is ' + Audio.FileName);
+  Audio.Play;
+  Sleep(3000);
+  Audio.Free;}
   Close;
 end;
 

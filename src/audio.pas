@@ -23,7 +23,8 @@ type
     SoundFile: PSndFile;
     Info: SF_INFO;
     //Handle: THandle;
-    Widget: Pointer;
+    //Widget: Pointer;
+    Looped: boolean;
   end;
   PAudioInfo = ^TUserInfo;
 
@@ -50,6 +51,7 @@ type
     AudioLoaded: boolean; static;
     FDeviceNames: TStringList; static;
     FDefaultDevice: integer; static;
+    Looped: boolean;
     constructor Create();
     destructor Destroy; override;
     class function GetDefaultDevice: AudioDeviceIndex; static;
@@ -81,7 +83,7 @@ var
   readCount: cint;
   //Widget: TfraTimer;
 begin
-  //DebugLn('Inside audio callback');
+  DebugLn('Inside audio callback1');
   AudioInfo := PAudioinfo(userData);
   //Widget := TfraTimer(AudioInfo^.Widget);
 
@@ -89,7 +91,7 @@ begin
   readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
     (AudioInfo^.Info.channels));
 
-  {if Widget.AudioLooped then
+  if AudioInfo^.Looped then
   begin
     { If audio is lopped and if no audio data could be read,
     seek to the beginning and then read again }
@@ -112,7 +114,7 @@ begin
     { If audio is looped, always continue }
     Result := cint(paContinue);
   end { when audio is not looped }
-  else}
+  else
   begin
     if readCount = (frameCount * AudioInfo^.Info.channels) then
     begin
@@ -242,6 +244,7 @@ begin
   FFileType := READ_NOTLOADED;
 
   FFileName := '';
+  Looped:=False;
   //FOwner := Nil;
 
   //FOwner.Application;
@@ -342,7 +345,8 @@ begin
   //Callback := @FeedStream;
   FUserInfo.SoundFile := FSoundFile;
   //FUserInfo.Handle := Handle;
-  FUserInfo.Widget := Self;
+  //FUserInfo.Widget := Self;
+  FUserInfo.Looped:=Looped;
   Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
   PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
