@@ -120,7 +120,7 @@ type
 
     FPaused: boolean;
     FRunning: boolean;
-    FAudioPlaying: boolean;
+    //FAudioPlaying: boolean;
 
     FProgress: single;
 
@@ -219,8 +219,8 @@ type
     procedure AdjustTimer(Sender: TObject);
     function SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
     //procedure PlayAudio;
-    procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
-    procedure FinishedAud(Data: PtrInt);
+    //procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
+    //procedure FinishedAud(Data: PtrInt);
     //procedure TriggerAudio(Data: PtrInt);
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
@@ -745,7 +745,7 @@ begin
   //Counter := DEF_COUNTDOWN_CAPTION;
   bbAdjust.Enabled := False;
 
-  FAudioPlaying := False;
+  //FAudioPlaying := False;
 end;
 
 procedure TfraTimer.Hide;
@@ -818,7 +818,7 @@ begin
 
   FRunning := False;
   FPaused := False;
-  FAudioPlaying := False;
+  //FAudioPlaying := False;
   //FNotifier := False;
 
   //FObservers := TListTimerObservers.Create;
@@ -1010,7 +1010,7 @@ procedure TfraTimer.Stop(UserInitiated: boolean);
   PaErrCode: PaError;}
 begin
   { The audio is playing and the user request is to terminate the audio.}
-  if FAudioPlaying then
+  if FAudio.Playing then
   begin
     FRunning := False;
     FPaused := False;
@@ -1033,7 +1033,7 @@ begin
     in that callback function}
     FAudio.Abort;
 
-    FAudioPlaying := False;
+    //FAudioPlaying := False;
     Exit;
   end
   else
@@ -1069,7 +1069,7 @@ begin
       FAudio.OutputDevice:= GlobalUserConfig.AudioDeviceName;
       FAudio.Play;
       DebugLn('FAudio.Play');
-      FAudioPlaying:=True;
+      //FAudioPlaying:=True;
       //Application.QueueAsyncCall(@TriggerAudio, 0);
     end
     else
@@ -1472,7 +1472,7 @@ begin
   //DebugLn('Played audio');
 end;}
 
-procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
+{procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
 {var
   PaErrCode: PaError;}
 begin
@@ -1486,7 +1486,7 @@ begin
   //Counter := DEF_COUNTDOWN_CAPTION;
   bbAdjust.Enabled := False;
 
-  FAudioPlaying := False;
+  //FAudioPlaying := False;
 
 
   {This check might be redundant. Just to be safe}
@@ -1512,9 +1512,9 @@ begin
     DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
   end;
   FStream := nil; }
-end;
+end;}
 
-procedure TfraTimer.FinishedAud(Data: PtrInt);
+{procedure TfraTimer.FinishedAud(Data: PtrInt);
 {var
   PaErrCode: PaError;}
 begin
@@ -1528,7 +1528,7 @@ begin
   //Counter := DEF_COUNTDOWN_CAPTION;
   bbAdjust.Enabled := False;
 
-  FAudioPlaying := False;
+  //FAudioPlaying := False;
 
 
   {This check might be redundant. Just to be safe}
@@ -1554,7 +1554,7 @@ begin
     DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
   end;
   FStream := nil; }
-end;
+end;}
 
 {procedure TfraTimer.TriggerAudio(Data: PtrInt);
 begin
