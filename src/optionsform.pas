@@ -152,7 +152,7 @@ begin
           cmbAudioDevice.Enabled := False;
         end
         else}
-          cmbAudioDevice.ItemIndex := DefaultDevice;
+          cmbAudioDevice.ItemIndex := TAudio.DefaultDevice;
       end;
     end;
   end;

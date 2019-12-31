@@ -5,39 +5,143 @@ unit audio;
 interface
 
 uses
-  Classes, SysUtils, sndfile, portaudio, LazLogger, ctypes;
+  Classes, SysUtils, sndfile, portaudio, LazLogger, ctypes, Forms;
 
 const
   READ_NOTLOADED = -1;
   READ_SND = 0;
 
 type
-  EAudioNotLoaded = Class(Exception);
-  ENoDefaultDevice = Class(Exception);
+  EAudioNotLoaded = class(Exception);
+  ENoDevice = class(Exception);
+  EInvalidAudio = class(Exception);
   AudioDeviceIndex = PaDeviceIndex;
+
+  TUserInfo = record
+    //name : string[30];
+    //age  : byte;
+    SoundFile: PSndFile;
+    Info: SF_INFO;
+    //Handle: THandle;
+    Widget: Pointer;
+  end;
+  PAudioInfo = ^TUserInfo;
+
   { TAudio }
   TAudio = class(TObject)
   private
-    FSndFile: PSNDFILE;
+    FSoundFile: PSNDFILE;
     FFileType: integer;
+
+    FFileName: string;
+    FAudioLength: double;
+
+    FInfo: SF_INFO;
+    FUserInfo: TUserInfo;
+    FStream: PPaStream;
+
+    FAudioPlaying: boolean;
+
+    //FOwner: TForm;
+
     class function GetDevices: TStringList; static;
+    procedure SetFileName(AValue: string);
   public
     AudioLoaded: boolean; static;
     FDeviceNames: TStringList; static;
+    FDefaultDevice: integer; static;
     constructor Create();
     destructor Destroy; override;
     class function GetDefaultDevice: AudioDeviceIndex; static;
-    class function GetDevice(DeviceName: string): AudioDeviceIndex; static;
+    class function GetDeviceIndex(DeviceName: string): AudioDeviceIndex; static;
     //class procedure GetAllDevices
     class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
     class property Devices: TStringList read GetDevices;
+    procedure Play;
+    property FileName: string read FFileName write SetFileName;
   end;
 
-var
-  PaErrCode: PaError;
-  DefaultDevice: integer;
 
 implementation
+{This function is called by PortAudio to request for audio data, and is passed
+as a parameter while opening the stream.
+It tries to read from the sound file and supply the data.
+If read does not return any data, or if it is less than the number of frames
+requested, it assumes tha the entire data has been exhausted and
+it closes the sound file and returns paComplete.
+This will stop the stream and the associated callback - which
+triggers on stoppage of the steam - gets called.}
+
+function FeedStream(input: pointer; output: pointer; frameCount: culong;
+  timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags;
+  userData: pointer): cint; cdecl;
+var
+  AudioInfo: PAudioInfo;
+  //AudBuffer: pointer;
+  readCount: cint;
+  //Widget: TfraTimer;
+begin
+  //DebugLn('Inside audio callback');
+  AudioInfo := PAudioinfo(userData);
+  //Widget := TfraTimer(AudioInfo^.Widget);
+
+  readCount := 0;
+  readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
+    (AudioInfo^.Info.channels));
+
+  {if Widget.AudioLooped then
+  begin
+    { If audio is lopped and if no audio data could be read,
+    seek to the beginning and then read again }
+    if readCount = 0 then
+    begin
+      if sf_seek(AudioInfo^.SoundFile, 0, SEEK_SET) = -1 then
+      begin
+        DebugLn('Sf_seek returned error');
+      end;
+      readCount := 0;
+      readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
+        (AudioInfo^.Info.channels));
+      if readCount = 0 then
+      begin
+        DebugLn('readCount zero immediately after seek to beginning');
+        Result := cint(paAbort);
+        Exit;
+      end;
+    end;
+    { If audio is looped, always continue }
+    Result := cint(paContinue);
+  end { when audio is not looped }
+  else}
+  begin
+    if readCount = (frameCount * AudioInfo^.Info.channels) then
+    begin
+      Result := cint(paContinue);
+    end
+    else
+    begin
+      //sf_close(AudioInfo^.SoundFile);
+      Result := cint(paComplete);
+    end;
+  end;
+
+
+end;
+
+{This function is called by PortAudio to signal that the stream has stopped.
+As this is a non-class function, it sends a message to frame using the frame's
+handle.}
+procedure StreamFinished(UserData: pointer); cdecl;
+var
+  AudioInfo: PAudioInfo;
+  //Widget: TfraTimer;
+begin
+  DebugLn('Inside streamFinished');
+  AudioInfo := PAudioinfo(userData);
+  //Widget := TfraTimer(AudioInfo^.Widget);
+  //PostMessage(AudioInfo^.Handle, UM_FINISHED_AUDIO, 0, 0);
+  //Application.QueueAsyncCall(@(Widget.FinishedAud), 0);
+end;
 
 { TAudio }
 
@@ -48,9 +152,8 @@ var
   DeviceName: string;
 begin
   if not TAudio.AudioLoaded then
-  begin
-    ;
-  end;
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
   TAudio.FDeviceNames.Clear;
   NumDevices := Pa_GetDeviceCount();
   if NumDevices < 0 then
@@ -72,7 +175,8 @@ begin
     if DeviceInfo = nil then
     begin
       DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
-      FDeviceNames.Clear;
+      //FDeviceNames.Clear;
+      FDeviceNames.Add('Unknown');
     end
     else
     begin
@@ -84,13 +188,64 @@ begin
   Result := FDeviceNames;
 end;
 
+procedure TAudio.SetFileName(AValue: string);
+var
+  TempSoundFile: PSNDFILE;
+begin
+  if not TAudio.AudioLoaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  if AValue = '' then
+  begin
+    FFileName:='';
+    FAudioLength:=0;
+    if FSoundFile <> nil then
+      sf_close(FSoundFile);
+    Exit;
+  end;
+
+
+  TempSoundFile := sf_open(PChar(AValue), SFM_READ, @FInfo);
+  if (TempSoundFile = nil) then
+  begin
+    DebugLn('Error in sf_open');
+    //sf_perror(nil);
+    //ReadKey;
+    //exit;
+    //Error := 'SoundFile is nil';
+    raise EInvalidAudio.Create('sf_open returned nil for ' + AValue);
+    Exit;
+  end;
+
+  if FSoundFile <> nil then
+    sf_close(FSoundFile);
+
+  FSoundFile := TempSoundFile;
+
+  DebugLn(IntToHex(FInfo.format, 8));
+  DebugLn(IntToStr(FInfo.channels));
+  DebugLn(IntToStr(FInfo.frames));
+  DebugLn(IntToStr(FInfo.samplerate));
+  DebugLn(IntToStr(FInfo.sections));
+
+  FFileName:=AValue;
+  FAudioLength := (FInfo.frames) / (FInfo.samplerate);
+end;
+
 
 
 constructor TAudio.Create();
 begin
-  FSndFile := nil;
+  if not TAudio.AudioLoaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+  FSoundFile := nil;
   FFileType := READ_NOTLOADED;
 
+  FFileName := '';
+  //FOwner := Nil;
+
+  //FOwner.Application;
+  //Application.QueueAsyncCall();
 end;
 
 destructor TAudio.Destroy;
@@ -103,19 +258,124 @@ class function TAudio.GetDefaultDevice: AudioDeviceIndex;
 var
   DeviceId: AudioDeviceIndex;
 begin
+  if not TAudio.AudioLoaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
   DeviceId := Pa_GetDefaultOutputDevice();
   if DeviceId = paNoDevice then
   begin
     DebugLn('No default device');
-    Raise ENoDefaultDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
+    raise ENoDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
   end;
   Result := DeviceId;
 end;
 
-class function TAudio.GetDevice(DeviceName: string): AudioDeviceIndex;
+class function TAudio.GetDeviceIndex(DeviceName: string): AudioDeviceIndex;
+var
+  NumDevices, Count: integer;
+  DeviceInfo: PPaDeviceInfo;
+  //DeviceName: string;
 begin
+  if not TAudio.AudioLoaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  NumDevices := Pa_GetDeviceCount();
+  if NumDevices < 0 then
+  begin
+    DebugLn('Pa_GetDeviceCount failed ');
+    DebugLn('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
+  end;
+
+  {DefaultDeviceId := Pa_GetDefaultOutputDevice();
+  if DefaultDeviceId = paNoDevice then
+  begin
+    DebugLn('No default device');
+  end;
+  DebugLn('Default device is ' + IntToStr(DefaultDeviceId)); }
+
+  for Count := 0 to NumDevices - 1 do
+  begin
+    DeviceInfo := Pa_GetDeviceInfo(Count);
+    if DeviceInfo = nil then
+    begin
+      DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
+      //FDeviceNames.Clear;
+      //FDeviceNames.Add('Unknown');
+    end
+    else
+    if DeviceName = StrPas(DeviceInfo^.Name) then
+    begin
+      Result := Count;
+      Exit;
+    end;
+  end;
+  raise ENoDevice.Create('No matching device for ' + DeviceName);
 
 end;
+
+procedure TAudio.Play;
+var
+  //SoundFile: PSndFile;
+  //Info: SF_INFO;
+  PaErrCode: PaError;
+  StreamParams: PaStreamParameters;
+  NumDevices, DeviceId, Count: integer;
+  DeviceInfo: PPaDeviceInfo;
+  DeviceName: string;
+begin
+  if not TAudio.AudioLoaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
+
+  StreamParams.device:=DefaultDevice;
+
+  DebugLn('Audio device is ' + IntToStr(StreamParams.device));
+
+  StreamParams.channelCount := FInfo.channels;
+  StreamParams.sampleFormat := paFloat32;
+
+  Streamparams.suggestedLatency :=
+    Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
+  StreamParams.hostApiSpecificStreamInfo := nil;
+  DebugLn('Default device is ' + IntToStr(StreamParams.device));
+
+  //Callback := @FeedStream;
+  FUserInfo.SoundFile := FSoundFile;
+  //FUserInfo.Handle := Handle;
+  FUserInfo.Widget := Self;
+  Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
+
+  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
+    paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedStream),
+    @FUserInfo);
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+  end;
+
+  PaErrCode := Pa_SetStreamFinishedCallback(FStream,
+    PPaStreamFinishedCallback(@StreamFinished));
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
+  end;
+
+  PaErrCode := Pa_StartStream(FStream);
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
+    DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
+  end;
+
+  FAudioPlaying := True;
+
+end;
+
+var
+  PaErrCode: PaError;
+
 
 initialization
   TAudio.AudioLoaded := False;
@@ -173,8 +433,8 @@ initialization
 
   if TAudio.AudioLoaded then
   begin
-    DefaultDevice := Pa_GetDefaultOutputDevice();
-    if DefaultDevice = paNoDevice then
+    TAudio.FDefaultDevice := Pa_GetDefaultOutputDevice();
+    if TAudio.FDefaultDevice = paNoDevice then
     begin
       DebugLn('No default device');
       TAudio.AudioLoaded := False;
