@@ -1067,6 +1067,7 @@ begin
       //PlayAudio;
 
       FAudio.OutputDevice:= GlobalUserConfig.AudioDeviceName;
+      FAudio.Looped := AudioLooped;
       FAudio.Play;
       DebugLn('FAudio.Play');
       //FAudioPlaying:=True;
