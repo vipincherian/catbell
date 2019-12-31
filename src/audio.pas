@@ -5,7 +5,8 @@ unit audio;
 interface
 
 uses
-  Classes, SysUtils, sndfile, portaudio, LazLogger, ctypes, Forms, Dialogs, LCLIntf, lcltype;
+  Classes, SysUtils, sndfile, portaudio, LazLogger, ctypes, Forms,
+  Dialogs, LCLIntf, lcltype;
 
 const
   READ_NOTLOADED = -1;
@@ -44,7 +45,7 @@ type
 
     FAudioPlaying: boolean;
 
-     //PlayCriticalSection: TRTLCriticalSection;
+    //PlayCriticalSection: TRTLCriticalSection;
 
     //FOwner: TForm;
 
@@ -65,6 +66,7 @@ type
     //class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
     class property Devices: TStringList read GetDevices;
     procedure Play;
+    procedure Abort;
     procedure FinishedAud(Data: PtrInt);
     property FileName: string read FFileName write SetFileName;
     property Playing: boolean read FAudioPlaying;
@@ -72,6 +74,7 @@ type
 
 
 implementation
+
 {This function is called by PortAudio to request for audio data, and is passed
 as a parameter while opening the stream.
 It tries to read from the sound file and supply the data.
@@ -224,8 +227,8 @@ begin
   end;
   if AValue = '' then
   begin
-    FFileName:='';
-    FAudioLength:=0;
+    FFileName := '';
+    FAudioLength := 0;
     if FSoundFile <> nil then
       sf_close(FSoundFile);
     Exit;
@@ -256,7 +259,7 @@ begin
   DebugLn(IntToStr(FInfo.samplerate));
   DebugLn(IntToStr(FInfo.sections));
 
-  FFileName:=AValue;
+  FFileName := AValue;
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
   LeaveCriticalSection(AudioCriticalSection);
 end;
@@ -272,10 +275,10 @@ begin
   FFileType := READ_NOTLOADED;
 
   FFileName := '';
-  Looped:=False;
+  Looped := False;
   FAudioPlaying := False;
 
-  OnPlayCompletion := Nil;
+  OnPlayCompletion := nil;
 
   //InitCriticalSection(CallbackCriticalSection);
   //InitializeCriticalSection(AudioCriticalSection);
@@ -368,8 +371,7 @@ var
   DeviceInfo: PPaDeviceInfo;
   DeviceName: string;
 begin
-
-    EnterCriticalSection(AudioCriticalSection);
+  EnterCriticalSection(AudioCriticalSection);
   if not TAudio.AudioLoaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
@@ -385,7 +387,7 @@ begin
   begin
     DebugLn('Sf_seek returned error');
   end;
-  StreamParams.device:=TAudio.FDefaultDevice;
+  StreamParams.device := TAudio.FDefaultDevice;
 
   DebugLn('Audio device is ' + IntToStr(StreamParams.device));
 
@@ -401,8 +403,8 @@ begin
   FUserInfo.SoundFile := FSoundFile;
   //FUserInfo.Handle := Handle;
   //FUserInfo.Widget := Self;
-  FUserInfo.Looped:=Looped;
-  FUserInfo.Player:=Self;
+  FUserInfo.Looped := Looped;
+  FUserInfo.Player := Self;
   //FUserInfo.CriticalSection:=AudioCriticalSection;
   Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
@@ -432,6 +434,32 @@ begin
 
   FAudioPlaying := True;
   LeaveCriticalSection(AudioCriticalSection);
+
+end;
+
+procedure TAudio.Abort;
+var
+  PaErrCode: PaError;
+begin
+  EnterCriticalSection(AudioCriticalSection);
+  try
+    if not TAudio.AudioLoaded then
+      raise EAudioNotLoaded.Create('Audio not loaded.');
+
+    PaErrCode := Pa_AbortStream(FStream);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      WriteLn('Pa_AbortStream failed ' + Pa_GetErrorText(paErrCode));
+      WriteLn('Error after Pa_AbortStream ' + IntToHex(PaErrCode, 8));
+    end;
+
+    {There is no need to close the stream. Stopping/aborting the stream
+    will trigger the callback for stream stoppage. The stream will be closed
+    in that callback function}
+
+  finally
+    LeaveCriticalSection(AudioCriticalSection);
+  end;
 
 end;
 

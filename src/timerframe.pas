@@ -1031,6 +1031,7 @@ begin
     {There is no need to close the stream. Stopping/aborting the stream
     will trigger the callback for stream stoppage. The stream will be closed
     in that callback function}
+    FAudio.Abort;
 
     FAudioPlaying := False;
     Exit;
