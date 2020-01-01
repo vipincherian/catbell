@@ -444,6 +444,7 @@ procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
 var
   Added: TfraTimer;
   //Proceed: boolean;
+  TempAudio: TAudio;
 begin
   {*if OnNewTimer <> nil then
     OnNewTimer(Sender);*}
@@ -462,6 +463,8 @@ begin
     frmEdit.ckbLoop.Checked := False;
   end;
 
+  TempAudio :=TAudio.Create;
+  frmEdit.Audio := TempAudio;
   if frmEdit.ShowForAdd then
   begin
     Added := AddTimer;
@@ -469,9 +472,12 @@ begin
     Added.dtpSet.Time := frmEdit.Duration;
     Added.ModalAlert := frmEdit.ModalAlert;
     Added.TrayNotification := frmEdit.TrayNotification;
-    Added.Audio.Looped := frmEdit.ckbLoop.Checked;
+    //Added.Audio.Looped := frmEdit.ckbLoop.Checked;
+    Added.Audio := TempAudio;
     PostTimerCreation(Added);
-  end;
+  end
+  else
+    TempAudio.Free;
 end;
 
 procedure TfrmMain.aiOptionsExecute(Sender: TObject);

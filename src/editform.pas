@@ -96,10 +96,12 @@ type
     FId: longword;
     //FAudioFile: string;
     //FAudioLength: double;
+    FAudio: TAudio;
     FAudioInfo: TTimerAudioInfo;
     function GetAudioDuration: double;
     function GetAudioFileName: string;
     function GetAudioLooped: boolean;
+    procedure SetAudio(AValue: TAudio);
     procedure SetAudioDuration(AValue: double);
     procedure SetAudioFileName(AValue: string);
     procedure SetAudioLooped(AValue: boolean);
@@ -110,7 +112,7 @@ type
     function Validate: boolean;
     //function VerifyAudioFile(const FileName: string): boolean;
   public
-    Audio: TAudio;
+
     function ShowAndGetSpecs: boolean;
     function ShowForAdd :boolean;
     function ShowForEdit (Sender: TFrame):boolean;
@@ -123,7 +125,7 @@ type
     property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
     property Id: longword read FId;
     //function SetAudioFile(AValue: string; out Error: string): boolean;
-    //property Audio:TAudio read FAudio;
+    property Audio:TAudio read FAudio write SetAudio;
     property AudioFileName:string read GetAudioFileName write SetAudioFileName;
     property AudioDuration:double read GetAudioDuration write SetAudioDuration;
     property AudioLooped:boolean read GetAudioLooped write SetAudioLooped;
@@ -371,6 +373,28 @@ begin
     Result := Audio.Looped
   else
     Result := FAudioInfo.Looped;
+end;
+
+procedure TfrmEdit.SetAudio(AValue: TAudio);
+begin
+  FAudio:=AValue;
+   if FAudio.FileName = '' then
+   begin
+     //FAudioFile:='';
+     //FAudioLength:=0;;
+     lblLengthText.Visible:=False;
+     edtAudioFile.Text:='';
+     //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudio.Duration, -2));
+     lblLenthVal.Visible:=False;
+     Exit;
+   end
+   else
+   begin
+     lblLengthText.Visible:=True;
+     edtAudioFile.Text:=AudioFileName;
+     lblLenthVal.Caption:=FloatToStr(RoundTo(FAudio.Duration, -2));
+     lblLenthVal.Visible:=True;
+   end;
 end;
 
 procedure TfrmEdit.SetAudioDuration(AValue: double);
