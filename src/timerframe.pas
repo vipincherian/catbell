@@ -131,10 +131,12 @@ type
 
     //FInfo: SF_INFO;
     FAudio: TAudio;
+    FAudioInfo: TTimerAudioInfo;
 
     //FAudioCallback: PPaStreamCallback;
     //FObservers: TListTimerObservers;
     //function GetShowProgressOnIcon: boolean;
+    procedure SetAudio(AValue: TAudio);
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
@@ -188,8 +190,8 @@ type
     LastProgressIconIndex: integer;
     //AudioLooped: boolean;
 
-    AudioFileName: string;
-    AudioLength: double;
+    //AudioFileName: string;
+    //AudioLength: double;
     //OnTimerProgressUpdate: TNotifyEvent;
 
     // Callback on progress-on-icon checkbox change only if
@@ -250,7 +252,8 @@ type
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
-    property Audio: TAudio read FAudio;
+    property Audio: TAudio read FAudio write SetAudio;
+    property AudioInfo: TTimerAudioInfo read FAudioInfo;
     //property AudioFile: string read AudioFileName;
     //property AudioLength: double read AudioLength;
     //function AudioCallback(const input: pointer; output: pointer; frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
@@ -406,7 +409,7 @@ begin
   frmEdit.ModalAlert := FModalAlert;
   //frmEdit.SetAudioFile(AudioFileName, ErrorText);
   frmEdit.Audio := FAudio;
-  frmEdit.AudioFileName:=Self.AudioFileName;
+  frmEdit.AudioFileName:=Audio.FileName;
   frmEdit.ckbLoop.Checked:=Audio.Looped;
   if frmEdit.ShowForEdit(Self) then
   begin
@@ -479,6 +482,12 @@ begin
   FId := AValue;
   Name := Name + IntToStr(AValue);
   //Id := IdNew;
+end;
+
+procedure TfraTimer.SetAudio(AValue: TAudio);
+begin
+  FAudio.Free;
+  FAudio := AValue
 end;
 
 {function TfraTimer.GetShowProgressOnIcon: boolean;
@@ -1064,7 +1073,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if (AudioFileName <> '') and (not UserInitiated) and TAudio.Loaded then
+    if (Audio.FileName <> '') and (not UserInitiated) and TAudio.Loaded then
     begin
       //Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
@@ -1293,8 +1302,8 @@ begin
 
   if AValue = '' then
   begin
-    AudioFileName := '';
-    AudioLength := 0;
+    //AudioFileName := '';
+    //AudioLength := 0;
     ;
     //lblLengthText.Visible:=False;
     //edtAudioFile.Text:='';
@@ -1311,8 +1320,10 @@ begin
   if not TAudio.Loaded then
   begin
     //DebugLn('SetAudioFile called when audio is not working');
-    AudioFileName:=AValue;
-    AudioLength:=Duration;
+    //AudioFileName:=AValue;
+    //AudioLength:=Duration;
+    FAudioInfo.FileName:=AValue;
+    FAudioInfo.Duration:=Duration;
     //FSoundFile:=Nil;
     Result := True;
     Exit;
@@ -1339,7 +1350,7 @@ begin
   //ShowMessage('length is ' + FloatToStr(AudioLength)); }
 
   FAudio.FileName:=Avalue;
-  AudioFileName := AValue;
+  //AudioFileName := AValue;
 
   //sf_close(SoundFile);
 

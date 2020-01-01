@@ -1527,9 +1527,9 @@ begin
       TimerClock.Audio.Looped);
 
     Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
-      UTF8Decode(TimerClock.AudioFileName));
+      UTF8Decode(TimerClock.Audio.FileName));
     Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
-      TimerClock.AudioLength);
+      TimerClock.Audio.Duration);
     Conf.SetValue(TIMER_CONF_AUDIOLOOP,
       TimerClock.Audio.Looped);
 
