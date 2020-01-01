@@ -220,14 +220,14 @@ procedure TAudio.SetFileName(AValue: string);
 var
   TempSoundFile: PSNDFILE;
 begin
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   if FAudioPlaying then
   begin
     DebugLn('Cannot call SetFileName when audio is playing');
-    LeaveCriticalSection(AudioCriticalSection);
+    //LeaveCriticalSection(AudioCriticalSection);
     Exit;
   end;
   if AValue = '' then
@@ -248,7 +248,7 @@ begin
     //ReadKey;
     //exit;
     //Error := 'SoundFile is nil';
-    LeaveCriticalSection(AudioCriticalSection);
+    //LeaveCriticalSection(AudioCriticalSection);
     raise EInvalidAudio.Create('sf_open returned nil for ' + AValue);
     Exit;
   end;
@@ -266,7 +266,7 @@ begin
 
   FFileName := AValue;
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
-  LeaveCriticalSection(AudioCriticalSection);
+  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 procedure TAudio.SetOutputDevice(AValue: string);
@@ -387,7 +387,7 @@ var
   DeviceInfo: PPaDeviceInfo;
   DeviceName: string;
 begin
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
 
   try
     if not TAudio.Loaded then
@@ -457,7 +457,7 @@ begin
     FAudioPlaying := True;
 
   finally
-    LeaveCriticalSection(AudioCriticalSection);
+    //LeaveCriticalSection(AudioCriticalSection);
   end;
 
 
@@ -467,7 +467,7 @@ procedure TAudio.Abort;
 var
   PaErrCode: PaError;
 begin
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
   try
     if not TAudio.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
@@ -485,7 +485,7 @@ begin
 
   finally
     FAudioPlaying := False;
-    LeaveCriticalSection(AudioCriticalSection);
+    //LeaveCriticalSection(AudioCriticalSection);
   end;
 
 end;
@@ -494,9 +494,12 @@ procedure TAudio.FinishedAud(Data: PtrInt);
 var
   PaErrCode: PaError;
 begin
+  if not TAudio.Loaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  //EnterCriticalSection(AudioCriticalSection);
 
   {This check might be redundant. Just to be safe}
-  EnterCriticalSection(AudioCriticalSection);
   paErrCode := Pa_IsStreamStopped(FStream);
   if paErrCode = 0 then
   begin
@@ -522,7 +525,7 @@ begin
   FAudioPlaying := False;
   if OnPlayCompletion <> nil then
     OnPlayCompletion(Self);
-  LeaveCriticalSection(AudioCriticalSection);
+  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 var

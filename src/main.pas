@@ -177,7 +177,7 @@ type
 
   private
     { private declarations }
-    TimerCriticalSection: TRTLCriticalSection;
+    //TimerCriticalSection: TRTLCriticalSection;
     FTrayProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FAppProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FWidgetProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
@@ -281,7 +281,7 @@ var
   DefaultDevice: integer;
   //DeviceInfo: PPaDeviceInfo;
 begin
-  InitCriticalSection(TimerCriticalSection);
+  //InitCriticalSection(TimerCriticalSection);
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
   Constraints.MinHeight := FORM_MIN_HEIGHT;
@@ -615,7 +615,7 @@ begin
 {$ENDIF}
 }
   //FClockWidget.Free;
-  DoneCriticalsection(TimerCriticalSection);
+  //DoneCriticalsection(TimerCriticalSection);
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
@@ -1669,7 +1669,7 @@ procedure TfrmMain.OnShortTimer(Sender: TObject);
 var
   TimerFrame: TfraTimer;
 begin
-  EnterCriticalSection(TimerCriticalSection);
+  //EnterCriticalSection(TimerCriticalSection);
   //for TimerFrame in FActiveTimerFrames.K;
   //DebugLn('Timer fired. ');
   //DebugLn('' + IntToStr(FActiveTimerFrames.Count) + ' active timers');
@@ -1687,7 +1687,7 @@ begin
         ShowMessage('Error (4): ' + E.ClassName + #13#10 + E.Message);
     end;
   finally
-    LeaveCriticalSection(TimerCriticalSection);
+    //LeaveCriticalSection(TimerCriticalSection);
   end;
 
 
