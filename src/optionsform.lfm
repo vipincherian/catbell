@@ -47,6 +47,7 @@ object frmOptions: TfrmOptions
   }
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnHide = FormHide
   OnShow = FormShow
   LCLVersion = '2.0.6.0'
   object pgcOptions: TPageControl
@@ -423,6 +424,7 @@ object frmOptions: TfrmOptions
           Top = 104
           Width = 75
           Caption = 'bbPlay'
+          OnClick = bbPlayClick
           TabOrder = 1
         end
         object Label8: TLabel
@@ -449,6 +451,7 @@ object frmOptions: TfrmOptions
           Top = 104
           Width = 75
           Caption = 'bbStop'
+          OnClick = bbStopClick
           TabOrder = 2
         end
       end

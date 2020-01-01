@@ -12,6 +12,15 @@ const
   READ_NOTLOADED = -1;
   READ_SND = 0;
 
+  SampleRate = 44100;
+  FramesPerBuffer = 64;
+
+  // How long you want to play the test sine:
+  NumSecs = 2;
+
+  // Wavetable size. Influences your pitch:
+  TableSize = 200;
+
 type
   EAudioNotLoaded = class(Exception);
   EInvalidDevice = class(Exception);
@@ -29,6 +38,17 @@ type
     //CriticalSection: TRTLCriticalSection;
   end;
   PAudioInfo = ^TUserInfo;
+
+  { A type which holds a wavetable, two integers keeping track of
+    at which offset in the wavetable each channel is currently
+    playing (= phase), and a message: }
+  PaTestData = record
+    Sine : array[0..TableSize] of CFloat;
+    LeftPhase : CInt32;
+    RightPhase : CInt32;
+    AMessage : PChar;
+  end;
+  PPaTestData = ^PaTestData;
 
   { TAudio }
   TAudio = class(TObject)
@@ -50,6 +70,10 @@ type
     //PlayCriticalSection: TRTLCriticalSection;
 
     //FOwner: TForm;
+    Stream : PPaStream;
+    //Err : PaError;
+    Data : PaTestData;
+    DataPointer : PPaTestData;
 
     class function GetDevices: TStringList; static;
     procedure SetFileName(AValue: string);
@@ -69,8 +93,9 @@ type
     class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
     class property Devices: TStringList read GetDevices;
     procedure Play;
+    procedure PlaySine;
     procedure Abort;
-    procedure FinishedAud(Data: PtrInt);
+    procedure FinishedAud(Datax: PtrInt);
     property FileName: string read FFileName write SetFileName;
     property Duration: double read FAudioLength;
     property Playing: boolean read FAudioPlaying;
@@ -165,6 +190,58 @@ begin
   //PostMessage(AudioInfo^.Handle, UM_FINISHED_AUDIO, 0, 0);
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
   LeaveCriticalSection(TAudio.AudioCriticalSection);
+end;
+
+{ The callback function which is called by PA everytime new Data is needed.
+  Remember: ALWAYS USE CDECL or your pointers will be messed up!
+  Pointers to this function must be castable to PPaStreamCallback: }
+function PaTestCallback( inputBuffer : pointer; OutputBuffer : pointer;
+      framesPerBuffer : culong; timeInfo : PPaStreamCallbackTimeInfo;
+      statusFlags : PaStreamCallbackFlags; UserData : pointer ) : CInt32;
+      cdecl;
+var
+  OutBuffer : PCFloat;
+  i : culong;
+  LocalDataPointer : PPaTestData;
+begin
+  OutBuffer := PCFloat(OutputBuffer);
+  LocalDataPointer := PPaTestData(UserData);
+
+  // Fill the buffer...
+  for i := 0 to (FramesPerBuffer-1) do begin
+
+    OutBuffer^ := LocalDataPointer^.Sine[LocalDataPointer^.LeftPhase];
+    Inc(OutBuffer);
+
+    OutBuffer^ := LocalDataPointer^.Sine[LocalDataPointer^.RightPhase];
+    Inc(OutBuffer);
+
+    Inc(LocalDataPointer^.LeftPhase);
+    if (LocalDataPointer^.LeftPhase >= TableSize ) then
+        LocalDataPointer^.LeftPhase :=
+          (LocalDataPointer^.LeftPhase - TableSize);
+
+    Inc(LocalDataPointer^.RightPhase);
+    Inc(LocalDataPointer^.RightPhase);
+    if ( LocalDataPointer^.RightPhase >= TableSize ) then
+        LocalDataPointer^.RightPhase :=
+          (LocalDataPointer^.RightPhase - TableSize);
+  end;
+
+  PaTestCallback:= CInt32( 0);
+end;
+
+
+{ This is called when playback is finished.
+  Remember: ALWAYS USE CDECL or your pointers will be messed up!
+  Pointers to this function must be castable to PPaStreamFinishedCallback: }
+procedure StreamFinished( UserData : pointer ); cdecl;
+//procedure TForm1.StreamFinished( UserData : pointer ); cdecl;
+var
+  LocalDataPointer : PPaTestData;
+begin
+  LocalDataPointer := PPaTestData( UserData);
+//  Edit1.Caption:= 'Stream Completed: ' +LocalDataPointer^.AMessage^;
 end;
 
 { TAudio }
@@ -284,6 +361,8 @@ end;
 
 
 constructor TAudio.Create();
+var
+  i: integer;
 begin
 
   if not TAudio.Loaded then
@@ -303,6 +382,15 @@ begin
 
   //FOwner.Application;
   //Application.QueueAsyncCall();
+  { Fill a Sine wavetable (Float Data -1 .. +1) }
+  for i := 0 to TableSize - 1
+    do Data.Sine[i]:= CFloat((Sin( ( CFloat(i)/CFloat(TableSize) ) * Pi * 2 )));
+
+  Data.LeftPhase:= 0;
+  Data.RightPhase:= 0;
+  Data.AMessage:= 'No Message'#0;
+
+  DataPointer:= @Data;
 end;
 
 destructor TAudio.Destroy;
@@ -464,6 +552,42 @@ begin
 
 end;
 
+procedure TAudio.PlaySine;
+var
+  //SoundFile: PSndFile;
+  //Info: SF_INFO;
+  PaErrCode: PaError;
+  OutputParameters: PaStreamParameters;
+  NumDevices, DeviceId, Count: integer;
+  DeviceInfo: PPaDeviceInfo;
+  DeviceName: string;
+begin
+    //OutDevice:= StrToInt(  trim( LeftStr( ComboBox1.Caption, 2)));
+  if not TAudio.Loaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+  OutputParameters.Device := GetDeviceIndex(OutputDevice);
+  //Label7.Caption:= 'Output Device = ' +IntToStr( OutDevice); //Pa_GetDefaultOutputDevice);
+  OutputParameters.ChannelCount := CInt32(2);
+  OutputParameters.SampleFormat := paFloat32;
+  OutputParameters.SuggestedLatency :=
+    (Pa_GetDeviceInfo( OutputParameters.device)^.defaultHighOutputLatency) * 1;
+  OutputParameters.HostApiSpecificStreamInfo := nil;
+
+
+  PaErrCode := Pa_OpenStream( @FStream, nil, @OutputParameters, SampleRate,
+    FramesPerBuffer, paClipOff, PPaStreamCallback(@PaTestCallback),
+    DataPointer);
+
+
+
+  PaErrCode := Pa_SetStreamFinishedCallback( FStream,
+     PPaStreamFinishedCallback( @StreamFinished));
+
+  FAudioPlaying:=True;
+  PaErrCode := Pa_StartStream( FStream );
+
+end;
+
 procedure TAudio.Abort;
 var
   PaErrCode: PaError;
@@ -496,7 +620,7 @@ begin
 
 end;
 
-procedure TAudio.FinishedAud(Data: PtrInt);
+procedure TAudio.FinishedAud(Datax: PtrInt);
 var
   PaErrCode: PaError;
 begin

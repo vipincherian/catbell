@@ -79,11 +79,14 @@ type
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;
 
+    procedure bbPlayClick(Sender: TObject);
+    procedure bbStopClick(Sender: TObject);
     procedure bbtnCancelClick(Sender: TObject);
     procedure bbtnDefaultClick(Sender: TObject);
     procedure bbtnSaveClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormHide(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Label8Click(Sender: TObject);
     procedure pgcOptionsChange(Sender: TObject);
@@ -274,6 +277,16 @@ begin
   FDefaultConfig.Free;
 end;
 
+procedure TfrmOptions.FormHide(Sender: TObject);
+begin
+  if TAudio.Loaded and Audio.Playing then
+  begin
+    Audio.Abort;
+    {while Audio.Playing do
+      Application.ProcessMessages;}
+  end;
+end;
+
 procedure TfrmOptions.bbtnCancelClick(Sender: TObject);
 begin
   GetConfigFromControls(FChangedConfig);
@@ -289,6 +302,27 @@ begin
   SetControlsAs(FLastConfig);
   Close;
 
+end;
+
+procedure TfrmOptions.bbPlayClick(Sender: TObject);
+begin
+  if TAudio.Loaded then
+  begin
+    if cmbAudioDevice.ItemIndex >= 0 then
+    begin
+
+      Audio.OutputDevice:=cmbAudioDevice.Items[cmbAudioDevice.ItemIndex];
+      ShowMessage(Audio.OutputDevice);
+      Audio.PlaySine;
+    end;
+
+  end;
+end;
+
+procedure TfrmOptions.bbStopClick(Sender: TObject);
+begin
+  if TAudio.Loaded then;
+    Audio.Abort;
 end;
 
 procedure TfrmOptions.bbtnDefaultClick(Sender: TObject);
@@ -351,6 +385,7 @@ begin
   Audio.Free;}
   Close;
 end;
+
 
 procedure TfrmOptions.FormShow(Sender: TObject);
 begin
