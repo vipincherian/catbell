@@ -59,6 +59,7 @@ type
     GroupBox5: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
+    lblDefaultDeviceName: TLabel;
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
@@ -67,11 +68,13 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
+    Label8: TLabel;
     Label9: TLabel;
     pgcOptions: TPageControl;
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
+    tsAudio: TTabSheet;
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;
 
@@ -81,12 +84,15 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Label8Click(Sender: TObject);
     procedure pgcOptionsChange(Sender: TObject);
+    procedure tsAudioShow(Sender: TObject);
   private
     { private declarations }
     FLastConfig: TUserConfig;
     FChangedConfig: TUserConfig;
     FDefaultConfig: TUserConfig;
+    procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
   public
@@ -108,6 +114,11 @@ uses
 procedure TfrmOptions.pgcOptionsChange(Sender: TObject);
 begin
 
+end;
+
+procedure TfrmOptions.tsAudioShow(Sender: TObject);
+begin
+  RefreshAudioDevices;
 end;
 
 procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
@@ -162,6 +173,41 @@ begin
   end;
 end;
 
+procedure TfrmOptions.RefreshAudioDevices;
+var
+  DefaultDeviceId: AudioDeviceIndex;
+  DeviceNames: TSTringList;
+  DeviceName: string;
+  Count: integer;
+begin
+  { Load audio devices }
+  //tsAudio.Enabled:=frmMain.AudioWorking;
+  tsAudio.Enabled:=TAudio.Loaded;
+
+  if TAudio.Loaded then
+  begin
+    cmbAudioDevice.Items.Clear;
+    DefaultDeviceId:= TAudio.GetDefaultDevice;
+    DeviceNames := TAudio.Devices;
+    for Count := 0 to  Devicenames.Count - 1 do
+    begin
+      DeviceName:=DeviceNames.Strings[Count];
+      {if Count = DefaultDeviceId then
+        DeviceName := DeviceName + ' (Default)';}
+      cmbAudioDevice.Items.Add(DeviceName);
+    end;
+
+    if cmbAudioDevice.Items.Count > 0 then
+    begin
+      if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
+        cmbAudioDevice.ItemIndex:=0//DefaultDevice
+      else
+        cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(
+          GlobalUserConfig.AudioDeviceName);
+    end;
+  end;
+end;
+
 procedure TfrmOptions.GetConfigFromControls(Config: TUserConfig);
 begin
   with Config do
@@ -189,13 +235,6 @@ begin
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
-var
-  //PaErrCode: PaError;
-  Count: integer;
-  //DeviceInfo: PPaDeviceInfo;
-  DeviceName: string;
-  DeviceNames: TSTringList;
-  DefaultDeviceId: AudioDeviceIndex;
 begin
   OnShow := @FormShow;
   FLastConfig := TUserConfig.Create;
@@ -204,29 +243,8 @@ begin
   SetControlsAs(GlobalUserConfig);
   pgcOptions.ActivePage := tsTimers;
 
-  { Load audio devices }
-  //tsAudio.Enabled:=frmMain.AudioWorking;
-  cmbAudioDevice.Enabled:=TAudio.Loaded;
-  if TAudio.Loaded then
-  begin
-    DefaultDeviceId:= TAudio.GetDefaultDevice;
-    DeviceNames := TAudio.Devices;
-    for Count := 0 to  Devicenames.Count - 1 do
-    begin
-      DeviceName:=DeviceNames.Strings[Count];
-      {if Count = DefaultDeviceId then
-        DeviceName := DeviceName + ' (Default)';}
-      cmbAudioDevice.Items.Add(DeviceName);
-    end;
-
-    if cmbAudioDevice.Items.Count > 0 then
-    begin
-      if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-        cmbAudioDevice.ItemIndex:=0//DefaultDevice
-      else
-        cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
-    end;
-  end;
+  RefreshAudioDevices;
+  lblDefaultDeviceName.Caption:=TAudio.Devices.Strings[TAudio.DefaultDevice];
 
 end;
 
@@ -319,6 +337,11 @@ procedure TfrmOptions.FormShow(Sender: TObject);
 begin
   SetControlsAs(GlobalUserConfig);
   FLastConfig.CopyFrom(GlobalUserConfig);
+end;
+
+procedure TfrmOptions.Label8Click(Sender: TObject);
+begin
+
 end;
 
 end.

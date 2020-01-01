@@ -47,21 +47,22 @@ object frmOptions: TfrmOptions
   }
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnShow = FormShow
   LCLVersion = '2.0.6.0'
   object pgcOptions: TPageControl
     Left = 8
-    Height = 353
+    Height = 344
     Top = 8
     Width = 523
-    ActivePage = tsInterface
+    ActivePage = tsAudio
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
       Caption = 'Timers'
-      ClientHeight = 327
+      ClientHeight = 318
       ClientWidth = 521
       ImageIndex = 0
       object Defaults: TGroupBox
@@ -159,12 +160,12 @@ object frmOptions: TfrmOptions
       end
       object GroupBox4: TGroupBox
         Left = 15
-        Height = 88
+        Height = 79
         Top = 216
         Width = 491
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Default'
-        ClientHeight = 74
+        ClientHeight = 65
         ClientWidth = 489
         TabOrder = 2
         object Label9: TLabel
@@ -239,7 +240,7 @@ object frmOptions: TfrmOptions
     end
     object tsInterface: TTabSheet
       Caption = 'Interface'
-      ClientHeight = 327
+      ClientHeight = 318
       ClientWidth = 521
       ImageIndex = 1
       object GroupBox1: TGroupBox
@@ -381,28 +382,34 @@ object frmOptions: TfrmOptions
           ParentColor = False
         end
       end
+    end
+    object tsAudio: TTabSheet
+      Caption = 'Audio'
+      ClientHeight = 318
+      ClientWidth = 521
+      OnShow = tsAudioShow
       object GroupBox5: TGroupBox
         Left = 16
-        Height = 104
-        Top = 208
+        Height = 248
+        Top = 8
         Width = 489
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Output'
-        ClientHeight = 90
+        ClientHeight = 234
         ClientWidth = 487
-        TabOrder = 2
+        TabOrder = 0
         object Label7: TLabel
           Left = 16
           Height = 13
-          Top = 8
-          Width = 49
-          Caption = 'Device : '
+          Top = 50
+          Width = 89
+          Caption = 'Device to use : '
           ParentColor = False
         end
         object cmbAudioDevice: TComboBox
-          Left = 77
+          Left = 136
           Height = 23
-          Top = 8
+          Top = 42
           Width = 312
           Anchors = [akTop, akLeft, akRight]
           ItemHeight = 0
@@ -410,12 +417,30 @@ object frmOptions: TfrmOptions
           TabOrder = 0
         end
         object BitBtn1: TBitBtn
-          Left = 304
+          Left = 352
           Height = 30
-          Top = 40
+          Top = 160
           Width = 75
           Caption = 'BitBtn1'
           TabOrder = 1
+        end
+        object Label8: TLabel
+          Left = 16
+          Height = 13
+          Top = 16
+          Width = 92
+          Caption = 'Default device : '
+          ParentColor = False
+          OnClick = Label8Click
+        end
+        object lblDefaultDeviceName: TLabel
+          Left = 136
+          Height = 13
+          Top = 16
+          Width = 123
+          Caption = 'lblDefaultDeviceName'
+          ParentColor = False
+          OnClick = Label8Click
         end
       end
     end
