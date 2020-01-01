@@ -485,7 +485,7 @@ begin
     Added.ModalAlert := frmEdit.ModalAlert;
     Added.TrayNotification := frmEdit.TrayNotification;
     //Added.Audio.Looped := frmEdit.ckbLoop.Checked;
-    Added.Audio := TempAudio;
+    //Added.Audio := TempAudio;
     if TAudio.Loaded then
     begin
       Added.Audio := TempAudio ;
@@ -1314,6 +1314,7 @@ var
 begin
   //Order := nil;
   //OrderString := nil;
+  ErrorText := '';
 
   if FileExists(FDbFileName) then
   begin
@@ -1359,8 +1360,21 @@ begin
 
       if TAudio.Loaded then
       begin
-        NewTimerClock.Audio.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-        NewTimerClock.Audio.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+        try
+          NewTimerClock.Audio.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          NewTimerClock.Audio.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+        except
+          on E : EInvalidAudio do
+          begin
+             ErrorText := ErrorText + 'Could not load audio file ' +
+               Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '') +
+               ' - unsupported format or invalide file. File name will be reset to blank.'#13#10;
+          end
+          else
+          ErrorText := ErrorText + 'Could not load audio file ' +
+            Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '') +
+            ' - unknown error. File name will be reset to blank.'#13#10;
+        end;
       end
       else
       begin
@@ -1395,7 +1409,13 @@ begin
     //Order.Free;
     Reorder;
 
-    StatusMessage := 'Saved timers loaded.';
+    if ErrorText = '' then
+      StatusMessage := 'Saved timers loaded.'
+    else
+    begin
+      StatusMessage := 'Saved timers loaded (with errors).';
+      ShowMessage(ErrorText);
+    end;
     UpdateStatusTimerCount;
   end;
 end;
