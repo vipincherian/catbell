@@ -131,7 +131,7 @@ type
 
     //FInfo: SF_INFO;
     FAudio: TAudio;
-    FAudioInfo: TTimerAudioInfo;
+
 
     //FAudioCallback: PPaStreamCallback;
     //FObservers: TListTimerObservers;
@@ -188,6 +188,7 @@ type
     //OnTimerStop: TNotifyEvent;
 
     LastProgressIconIndex: integer;
+    AudioInfo: TTimerAudioInfo;
     //AudioLooped: boolean;
 
     //AudioFileName: string;
@@ -253,7 +254,7 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     property Audio: TAudio read FAudio write SetAudio;
-    property AudioInfo: TTimerAudioInfo read FAudioInfo;
+    //property AudioInfo: TTimerAudioInfo read FAudioInfo write FAudioInfo;
     //property AudioFile: string read AudioFileName;
     //property AudioLength: double read AudioLength;
     //function AudioCallback(const input: pointer; output: pointer; frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
@@ -408,9 +409,17 @@ begin
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
   //frmEdit.SetAudioFile(AudioFileName, ErrorText);
-  frmEdit.Audio := FAudio;
-  frmEdit.AudioFileName:=Audio.FileName;
-  frmEdit.ckbLoop.Checked:=Audio.Looped;
+  if TAudio.Loaded then
+    frmEdit.Audio := FAudio
+  else
+  begin
+    frmEdit.Audio := Nil;
+    frmEdit.AudioFileName:= AudioInfo.FileName;
+    frmEdit.AudioDuration:= AudioInfo.Duration;
+    frmEdit.AudioLooped:=AudioInfo.Looped;
+  end;
+  //frmEdit.AudioFileName:=FAudio.FileName;
+  frmEdit.ckbLoop.Checked:=FAudio.Looped;
   if frmEdit.ShowForEdit(Self) then
   begin
     Caption := frmEdit.Description;
@@ -418,8 +427,16 @@ begin
     FTrayNotification := frmEdit.TrayNotification;
     FModalAlert := frmEdit.ModalAlert;
     //AudioFileName := frmEditTimer.AudioFile;
-    SetAudioFile(frmEdit.AudioFileName, frmEdit.AudioDuration, ErrorText);
-    Audio.Looped:=frmEdit.ckbLoop.Checked;
+    //SetAudioFile(frmEdit.AudioFileName, frmEdit.AudioDuration, ErrorText);
+    if TAudio.Loaded then
+      frmEdit.Audio.Looped:=  frmEdit.ckbLoop.Checked
+    else
+    begin
+      AudioInfo.FileName := frmEdit.AudioFileName;
+      AudioInfo.Duration := frmEdit.AudioDuration;
+      AudioInfo.Looped := frmEdit.ckbLoop.Checked;
+    end;
+    //Audio.Looped:=frmEdit.ckbLoop.Checked;
   end;
 end;
 
@@ -860,9 +877,13 @@ begin
   //FStream := nil;
   //FSoundFile := nil;
   //AudioLooped := false;
+  FAudio := Nil;
+  if TAudio.Loaded then
+  begin
+    FAudio := TAudio.Create;
+    FAudio.OnPlayCompletion:=@AudioPlayed;
+  end;
 
-  FAudio := TAudio.Create;
-  FAudio.OnPlayCompletion:=@AudioPlayed;
 
   //FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
 end;
@@ -1322,8 +1343,8 @@ begin
     //DebugLn('SetAudioFile called when audio is not working');
     //AudioFileName:=AValue;
     //AudioLength:=Duration;
-    FAudioInfo.FileName:=AValue;
-    FAudioInfo.Duration:=Duration;
+    AudioInfo.FileName:=AValue;
+    AudioInfo.Duration:=Duration;
     //FSoundFile:=Nil;
     Result := True;
     Exit;

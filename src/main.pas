@@ -462,9 +462,21 @@ begin
     { We are not providing an option to keep audio looped by default }
     frmEdit.ckbLoop.Checked := False;
   end;
+  TempAudio := Nil;
 
-  TempAudio :=TAudio.Create;
-  frmEdit.Audio := TempAudio;
+  if TAudio.Loaded then
+  begin
+    TempAudio :=TAudio.Create;
+    frmEdit.Audio := TempAudio;
+  end
+  else
+  begin
+    frmEdit.Audio := Nil;
+    frmEdit.AudioFileName:= '';
+    frmEdit.AudioDuration:= 0;
+    frmEdit.AudioLooped:=False;
+  end;
+
   if frmEdit.ShowForAdd then
   begin
     Added := AddTimer;
@@ -474,6 +486,17 @@ begin
     Added.TrayNotification := frmEdit.TrayNotification;
     //Added.Audio.Looped := frmEdit.ckbLoop.Checked;
     Added.Audio := TempAudio;
+    if TAudio.Loaded then
+    begin
+      Added.Audio := TempAudio ;
+      Added.Audio.Looped := frmEdit.ckbLoop.Checked;
+    end
+    else
+    begin
+      Added.AudioInfo.FileName := frmEdit.AudioFileName;
+      Added.AudioInfo.Duration := frmEdit.AudioDuration;
+      Added.AudioInfo.Looped := frmEdit.ckbLoop.Checked;
+    end;
     PostTimerCreation(Added);
   end
   else

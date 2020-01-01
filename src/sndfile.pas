@@ -45,7 +45,9 @@ uses
   ctypes;
 
 const
-  {$IF defined(windows) }
+  {$IF defined(FORCE_AUDIO_NOTLOADED) }
+    LIB_SNDFILE = 'xxx';
+  {$ELSEIF defined(windows) }
     LIB_SNDFILE = 'libsndfile-1.dll';
   {$ELSEIF Defined(unix)}
     LIB_SNDFILE = 'libsndfile.so.1';

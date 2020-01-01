@@ -203,54 +203,27 @@ begin
   { Load audio devices }
   //tsAudio.Enabled:=frmMain.AudioWorking;
   cmbAudioDevice.Enabled:=TAudio.Loaded;
-  DefaultDeviceId:= TAudio.GetDefaultDevice;
-  DeviceNames := TAudio.Devices;
-  for Count := 0 to  Devicenames.Count - 1 do
+  if TAudio.Loaded then
   begin
-    DeviceName:=DeviceNames.Strings[Count];
-    {if Count = DefaultDeviceId then
-      DeviceName := DeviceName + ' (Default)';}
-    cmbAudioDevice.Items.Add(DeviceName);
-  end;
-  {if frmMain.AudioWorking then
-  begin
-    NumDevices := Pa_GetDeviceCount();
-    if NumDevices < 0 then
+    DefaultDeviceId:= TAudio.GetDefaultDevice;
+    DeviceNames := TAudio.Devices;
+    for Count := 0 to  Devicenames.Count - 1 do
     begin
-      DebugLn('Pa_GetDeviceCount failed ');
-      DebugLn('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
+      DeviceName:=DeviceNames.Strings[Count];
+      {if Count = DefaultDeviceId then
+        DeviceName := DeviceName + ' (Default)';}
+      cmbAudioDevice.Items.Add(DeviceName);
     end;
 
-    DefaultDevice:=Pa_GetDefaultOutputDevice();
-    if DefaultDevice = paNoDevice then
+    if cmbAudioDevice.Items.Count > 0 then
     begin
-      DebugLn('No default device');
-    end;
-    DebugLn('Default device is ' + IntToStr(DefaultDevice));
-
-    for Count := 0 to NumDevices - 1 do
-    begin
-      DeviceInfo := Pa_GetDeviceInfo(Count);
-      if DeviceInfo = Nil then
-        DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count))
+      if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
+        cmbAudioDevice.ItemIndex:=0//DefaultDevice
       else
-      begin
-        DeviceName:=StrPas(DeviceInfo^.Name);
-        //DeviceInfo^.
-
-        if Count = DefaultDevice then
-          DeviceName := DeviceName + ' (Default)';
-        cmbAudioDevice.Items.Add(DeviceName);
-      end;
+        cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
     end;
-  end;}
-  if cmbAudioDevice.Items.Count > 0 then
-  begin
-    if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-      cmbAudioDevice.ItemIndex:=0//DefaultDevice
-    else
-      cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
   end;
+
 end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
