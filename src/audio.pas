@@ -47,6 +47,7 @@ type
     LeftPhase : CInt32;
     RightPhase : CInt32;
     AMessage : PChar;
+    Player: Pointer;
   end;
   PPaTestData = ^PaTestData;
 
@@ -204,6 +205,7 @@ var
   i : culong;
   LocalDataPointer : PPaTestData;
 begin
+  EnterCriticalSection(TAudio.AudioCriticalSection);
   OutBuffer := PCFloat(OutputBuffer);
   LocalDataPointer := PPaTestData(UserData);
 
@@ -229,6 +231,7 @@ begin
   end;
 
   PaTestCallback:= CInt32( 0);
+  LeaveCriticalSection(TAudio.AudioCriticalSection);
 end;
 
 
@@ -239,8 +242,13 @@ procedure StreamFinished( UserData : pointer ); cdecl;
 //procedure TForm1.StreamFinished( UserData : pointer ); cdecl;
 var
   LocalDataPointer : PPaTestData;
+  AudioTemp: TAudio;
 begin
+  EnterCriticalSection(TAudio.AudioCriticalSection);
   LocalDataPointer := PPaTestData( UserData);
+  AudioTemp := TAudio(LocalDataPointer^.Player);
+    Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
+    LeaveCriticalSection(TAudio.AudioCriticalSection);
 //  Edit1.Caption:= 'Stream Completed: ' +LocalDataPointer^.AMessage^;
 end;
 
@@ -565,13 +573,19 @@ begin
     //OutDevice:= StrToInt(  trim( LeftStr( ComboBox1.Caption, 2)));
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
-  OutputParameters.Device := GetDeviceIndex(OutputDevice);
+  if FOutputDevice = '' then
+    DeviceId := DefaultDevice
+  else
+    DeviceId := GetDeviceIndex(FOutputDevice);
+  OutputParameters.Device := DeviceId;
   //Label7.Caption:= 'Output Device = ' +IntToStr( OutDevice); //Pa_GetDefaultOutputDevice);
   OutputParameters.ChannelCount := CInt32(2);
   OutputParameters.SampleFormat := paFloat32;
   OutputParameters.SuggestedLatency :=
     (Pa_GetDeviceInfo( OutputParameters.device)^.defaultHighOutputLatency) * 1;
   OutputParameters.HostApiSpecificStreamInfo := nil;
+
+  DataPointer^.Player:=Self;
 
 
   PaErrCode := Pa_OpenStream( @FStream, nil, @OutputParameters, SampleRate,
@@ -583,8 +597,9 @@ begin
   PaErrCode := Pa_SetStreamFinishedCallback( FStream,
      PPaStreamFinishedCallback( @StreamFinished));
 
-  FAudioPlaying:=True;
+
   PaErrCode := Pa_StartStream( FStream );
+   FAudioPlaying:=True;
 
 end;
 
@@ -627,10 +642,10 @@ begin
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
-  //EnterCriticalSection(AudioCriticalSection);
+  EnterCriticalSection(AudioCriticalSection);
 
   {This check might be redundant. Just to be safe}
-
+  Assert(FStream <> Nil);
   paErrCode := Pa_IsStreamStopped(FStream);
   if paErrCode = 0 then
   begin
@@ -656,7 +671,7 @@ begin
   FAudioPlaying := False;
   if OnPlayCompletion <> nil then
     OnPlayCompletion(Self);
-  //LeaveCriticalSection(AudioCriticalSection);
+  LeaveCriticalSection(AudioCriticalSection);
 end;
 
 var

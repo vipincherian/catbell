@@ -312,7 +312,7 @@ begin
     begin
 
       Audio.OutputDevice:=cmbAudioDevice.Items[cmbAudioDevice.ItemIndex];
-      ShowMessage(Audio.OutputDevice);
+      //ShowMessage(Audio.OutputDevice);
       Audio.PlaySine;
     end;
 
