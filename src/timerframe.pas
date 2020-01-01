@@ -404,7 +404,9 @@ begin
   frmEdit.Duration := dtpSet.Time;
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
-  frmEdit.SetAudioFile(AudioFileName, ErrorText);
+  //frmEdit.SetAudioFile(AudioFileName, ErrorText);
+  frmEdit.Audio := FAudio;
+  frmEdit.AudioFileName:=Self.AudioFileName;
   frmEdit.ckbLoop.Checked:=Audio.Looped;
   if frmEdit.ShowForEdit(Self) then
   begin
@@ -413,7 +415,7 @@ begin
     FTrayNotification := frmEdit.TrayNotification;
     FModalAlert := frmEdit.ModalAlert;
     //AudioFileName := frmEditTimer.AudioFile;
-    SetAudioFile(frmEdit.AudioFile, frmEdit.AudioLength, ErrorText);
+    SetAudioFile(frmEdit.AudioFileName, frmEdit.AudioDuration, ErrorText);
     Audio.Looped:=frmEdit.ckbLoop.Checked;
   end;
 end;
@@ -852,6 +854,7 @@ begin
 
   FAudio := TAudio.Create;
   FAudio.OnPlayCompletion:=@AudioPlayed;
+
   //FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
 end;
 

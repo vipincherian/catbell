@@ -45,6 +45,11 @@ type
     constructor Create();
     destructor Destroy; override;
   end;}
+  TTimerAudioInfo = record
+    FileName: string;
+    Duration: double;
+    Looped: boolean;
+  end;
 
   { TfrmEdit }
 
@@ -89,9 +94,15 @@ type
     FModalAlert: boolean;
     FTrayNotification: boolean;
     FId: longword;
-    FAudioFile: string;
-    FAudioLength: double;
-
+    //FAudioFile: string;
+    //FAudioLength: double;
+    FAudioInfo: TTimerAudioInfo;
+    function GetAudioDuration: double;
+    function GetAudioFileName: string;
+    function GetAudioLooped: boolean;
+    procedure SetAudioDuration(AValue: double);
+    procedure SetAudioFileName(AValue: string);
+    procedure SetAudioLooped(AValue: boolean);
     procedure SetDescription(AValue: string);
     procedure SetDuration(AValue: TTime);
     procedure SetFTrayNotification(AValue: boolean);
@@ -99,6 +110,7 @@ type
     function Validate: boolean;
     //function VerifyAudioFile(const FileName: string): boolean;
   public
+    Audio: TAudio;
     function ShowAndGetSpecs: boolean;
     function ShowForAdd :boolean;
     function ShowForEdit (Sender: TFrame):boolean;
@@ -106,11 +118,15 @@ type
     property Duration: TTime read FDuration write SetDuration;
     property Description: string read FDescription write SetDescription;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
-    property AudioFile: string read FAudioFile;
-    property AudioLength: double read FAudioLength;
+    //property AudioFile: string read FAudioInfo.FileName;
+    //property AudioLength: double read FAudioLength.Dur;
     property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
     property Id: longword read FId;
-    function SetAudioFile(AValue: string; out Error: string): boolean;
+    //function SetAudioFile(AValue: string; out Error: string): boolean;
+    //property Audio:TAudio read FAudio;
+    property AudioFileName:string read GetAudioFileName write SetAudioFileName;
+    property AudioDuration:double read GetAudioDuration write SetAudioDuration;
+    property AudioLooped:boolean read GetAudioLooped write SetAudioLooped;
   end;
 
 
@@ -179,6 +195,10 @@ begin
     bbSelectAudioFile.Enabled:=False;
   end;
 
+  FAudioInfo.FileName:='';
+  FAudioInfo.Duration:=0;
+  FAudioInfo.Looped:=False;
+
 end;
 
 procedure TfrmEdit.bbSaveClick(Sender: TObject);
@@ -209,10 +229,11 @@ begin
   if odgAudio.Execute then
   begin
      FileName:=odgAudio.FileName;
-     if not SetAudioFile(FileName, ErrorText) then
+     AudioFileName:=FileName;
+     {if not SetAudioFile(FileName, ErrorText) then
      begin
        ShowMessage(ErrorText);
-       end;
+       end;}
 
   end;
   //ShowMessage(FileName);
@@ -242,7 +263,8 @@ procedure TfrmEdit.bbClearAudioFileClick(Sender: TObject);
 var
   ErrorText: string;
 begin
-  SetAudioFile('', ErrorText);
+  //SetAudioFile('', ErrorText);
+  AudioFileName:='';
   edtAudioFile.Text:='';
 end;
 
@@ -287,7 +309,80 @@ begin
   edtDescription.Text:=AValue;
 end;
 
-function TfrmEdit.SetAudioFile(AValue: string; out Error: string): boolean;
+procedure TfrmEdit.SetAudioFileName(AValue: string);
+begin
+  if TAudio.Loaded then
+  begin
+    Audio.FileName:=AValue;
+    edtAudioFile.Text:=Audio.FileName;
+    lblLenthVal.Caption:=FloatToStr(RoundTo(AudioDuration, -2));
+  end
+  else
+  begin
+    FAudioInfo.FileName:=AValue;
+  end;
+  if AValue = '' then
+  begin
+    //FAudioFile:='';
+    //FAudioLength:=0;;
+    lblLengthText.Visible:=False;
+    edtAudioFile.Text:='';
+    //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
+    lblLenthVal.Visible:=False;
+    Exit;
+  end
+  else
+  begin
+    lblLengthText.Visible:=True;
+    edtAudioFile.Text:=AudioFileName;
+    lblLenthVal.Visible:=True;
+  end;
+end;
+
+procedure TfrmEdit.SetAudioLooped(AValue: boolean);
+begin
+  if TAudio.Loaded then
+   Audio.Looped := AValue
+ else
+   FAudioInfo.Looped := AValue;
+
+ ckbLoop.Checked:=AudioLooped;
+end;
+
+function TfrmEdit.GetAudioFileName: string;
+begin
+  if TAudio.Loaded then
+    Result := Audio.FileName
+  else
+    Result := FAudioInfo.FileName;
+end;
+
+function TfrmEdit.GetAudioDuration: double;
+begin
+  if TAudio.Loaded then
+    Result := Audio.Duration
+  else
+    Result := FAudioInfo.Duration;
+end;
+
+function TfrmEdit.GetAudioLooped: boolean;
+begin
+   if TAudio.Loaded then
+    Result := Audio.Looped
+  else
+    Result := FAudioInfo.Looped;
+end;
+
+procedure TfrmEdit.SetAudioDuration(AValue: double);
+begin
+   if not TAudio.Loaded then
+   begin
+    FAudioInfo.Duration := AValue;
+    lblLenthVal.Caption:=FloatToStr(RoundTo(AudioDuration, -2));
+   end;
+end;
+
+{function TfrmEdit.SetAudioFile(AValue: string; out Error: string): boolean;
 var
   Info: SF_INFO;
   SoundFile: PSndFile;
@@ -297,8 +392,8 @@ begin
 
   if AValue = '' then
   begin
-    FAudioFile:='';
-    FAudioLength:=0;;
+    //FAudioFile:='';
+    //FAudioLength:=0;;
     lblLengthText.Visible:=False;
     edtAudioFile.Text:='';
     //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
@@ -309,9 +404,9 @@ begin
 
   if not TAudio.Loaded then
   begin
-    FAudioFile:=AValue;
-    FAudioLength:=AudioLength;
-    edtAudioFile.Text:=FAudioFile;
+    AudioInfo.FileName:=AValue;
+    //AudioInfo.Duration:=AudioLength;
+    edtAudioFile.Text:=AudioInfo.FileName;
     Result := True;
     Exit;
   end;
@@ -345,7 +440,7 @@ begin
     lblLenthVal.Visible:=True;
     Result := True;
 
-end;
+end;}
 
 procedure TfrmEdit.SetDuration(AValue: TTime);
 begin

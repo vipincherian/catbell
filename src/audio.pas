@@ -72,6 +72,7 @@ type
     procedure Abort;
     procedure FinishedAud(Data: PtrInt);
     property FileName: string read FFileName write SetFileName;
+    property Duration: double read FAudioLength;
     property Playing: boolean read FAudioPlaying;
     property OutputDevice: string read FOutputDevice write SetOutputDevice;
 
