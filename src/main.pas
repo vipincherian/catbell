@@ -1708,8 +1708,12 @@ procedure TfrmMain.ShowModalAlert(Data: PtrInt);
 begin
   if frmAlert.WindowState = wsMinimized then
     frmAlert.WindowState := wsNormal;
+  { If the modal window is already showing, an exception is thrown when you
+  attempt to ShowModal. So in that case, ShowOnTop }
   if not frmAlert.Showing then
-    frmAlert.ShowModal;
+    frmAlert.ShowModal
+  else
+    frmAlert.ShowOnTop;
 end;
 
 end.
