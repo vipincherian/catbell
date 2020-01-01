@@ -203,7 +203,7 @@ type
     the same functionality.}
     FReference: TfraTimer;
 
-    FAudioWorking: boolean;
+    //FAudioWorking: boolean;
 
     procedure CreateBitmaps;
     function GetStatusMessage: string;
@@ -259,7 +259,7 @@ type
     procedure AfterShow2(Data: PtrInt);
     procedure ShowModalAlert(Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
-    property AudioWorking: boolean read FAudioWorking;
+    //property AudioWorking: boolean read FAudioWorking;
 
   end;
 
@@ -341,7 +341,7 @@ begin
   CreateBitmaps;
 
 
-  FAudioWorking := TAudio.AudioLoaded;
+  //FAudioWorking := TAudio.Loaded;
   {
   {$IFNDEF AUDIO_STATIC}
   FAudioWorking := Pa_Load(LIB_PORTAUDIO);
@@ -433,7 +433,7 @@ begin
   end;}
 
   stbMain.BeginUpdate;
-  if FAudioWorking then
+  if TAudio.Loaded then
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Ok'
   else
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Error';

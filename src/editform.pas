@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
   ComCtrls, DateTimePicker, settings, dateutils, sndfile, ctypes, LazLogger,
-  Math;
+  Math, audio;
 
 type
   { TTimerSpecs }
@@ -174,7 +174,7 @@ begin
   lblLenthVal.Visible:=False;
   bbSave.Enabled:=Validate;
 
-  if not frmMain.AudioWorking then
+  if not TAudio.Loaded then
   begin
     bbSelectAudioFile.Enabled:=False;
   end;
@@ -307,7 +307,7 @@ begin
     Exit;
   end;
 
-  if not frmMain.AudioWorking then
+  if not TAudio.Loaded then
   begin
     FAudioFile:=AValue;
     FAudioLength:=AudioLength;

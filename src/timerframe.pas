@@ -1061,7 +1061,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if (AudioFileName <> '') and (not UserInitiated) and frmMain.AudioWorking then
+    if (AudioFileName <> '') and (not UserInitiated) and TAudio.Loaded then
     begin
       //Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
@@ -1305,7 +1305,7 @@ begin
   { If audio is not working, then set the filepath and duration without
   additional checks. This is done so that the default config does not lose this
   information when saved later.}
-  if not frmMain.AudioWorking then
+  if not TAudio.Loaded then
   begin
     //DebugLn('SetAudioFile called when audio is not working');
     AudioFileName:=AValue;

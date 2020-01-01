@@ -55,7 +55,7 @@ type
     procedure SetFileName(AValue: string);
     procedure SetOutputDevice(AValue: string);
   public
-    AudioLoaded: boolean; static;
+    Loaded: boolean; static;
     FDeviceNames: TStringList; static;
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
@@ -175,7 +175,7 @@ var
   DeviceName: string;
 begin
   EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.AudioLoaded then
+  if not TAudio.Loaded then
   begin
     LeaveCriticalSection(AudioCriticalSection);
     raise EAudioNotLoaded.Create('Audio not loaded.');
@@ -221,7 +221,7 @@ var
   TempSoundFile: PSNDFILE;
 begin
   EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.AudioLoaded then
+  if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   if FAudioPlaying then
@@ -285,7 +285,7 @@ end;
 constructor TAudio.Create();
 begin
 
-  if not TAudio.AudioLoaded then
+  if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
   FSoundFile := nil;
   FFileType := READ_NOTLOADED;
@@ -317,7 +317,7 @@ var
   DeviceId: AudioDeviceIndex;
 begin
   EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.AudioLoaded then
+  if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   DeviceId := Pa_GetDefaultOutputDevice();
@@ -338,7 +338,7 @@ var
   //DeviceName: string;
 begin
   EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.AudioLoaded then
+  if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   NumDevices := Pa_GetDeviceCount();
@@ -390,7 +390,7 @@ begin
   EnterCriticalSection(AudioCriticalSection);
 
   try
-    if not TAudio.AudioLoaded then
+    if not TAudio.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
 
     if FAudioPlaying then
@@ -469,7 +469,7 @@ var
 begin
   EnterCriticalSection(AudioCriticalSection);
   try
-    if not TAudio.AudioLoaded then
+    if not TAudio.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
 
     PaErrCode := Pa_AbortStream(FStream);
@@ -530,11 +530,11 @@ var
 
 
 initialization
-  TAudio.AudioLoaded := False;
+  TAudio.Loaded := False;
   TAudio.FDeviceNames := TStringList.Create;
   {$IFNDEF AUDIO_STATIC}
-  TAudio.AudioLoaded := Pa_Load(LIB_PORTAUDIO);
-  if not TAudio.AudioLoaded then
+  TAudio.Loaded := Pa_Load(LIB_PORTAUDIO);
+  if not TAudio.Loaded then
   begin
     DebugLn('Could not load portaudio');
     //ReadKey;
@@ -545,10 +545,10 @@ initialization
 
   { Load sndfile library only if portaudio was loaded successfully }
 
-  if TAudio.AudioLoaded then
+  if TAudio.Loaded then
   begin
-    TAudio.AudioLoaded := sf_load(LIB_SNDFILE);
-    if not TAudio.AudioLoaded then
+    TAudio.Loaded := sf_load(LIB_SNDFILE);
+    if not TAudio.Loaded then
     begin
       DebugLn('Could not load sndfile');
       //ReadKey;
@@ -565,14 +565,14 @@ initialization
   { If everything has gone alright so far, attempt to initialise
   PortAudio }
 
-  if TAudio.AudioLoaded then
+  if TAudio.Loaded then
   begin
     PaErrCode := Pa_Initialize();
     if PaErrCode <> cint(paNoError) then
     begin
       DebugLn('Error in Pa_Initialize()');
 
-      TAudio.AudioLoaded := False;
+      TAudio.Loaded := False;
 
       { If portaudio cannot be initialised, then audio will not work.
       Unload libraries }
@@ -583,13 +583,13 @@ initialization
     end;
   end;
 
-  if TAudio.AudioLoaded then
+  if TAudio.Loaded then
   begin
     TAudio.FDefaultDevice := Pa_GetDefaultOutputDevice();
     if TAudio.FDefaultDevice = paNoDevice then
     begin
       DebugLn('No default device');
-      TAudio.AudioLoaded := False;
+      TAudio.Loaded := False;
       Pa_Terminate;
       {$IFNDEF AUDIO_STATIC}
       sf_Unload;
@@ -602,7 +602,7 @@ initialization
 
 finalization
   DoneCriticalsection(TAudio.AudioCriticalSection);
-  if TAudio.AudioLoaded then
+  if TAudio.Loaded then
   begin
     Pa_Terminate;
     {$IFNDEF AUDIO_STATIC}
