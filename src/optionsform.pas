@@ -137,24 +137,28 @@ begin
     //dtpExtend.Time:=AdjustExtendDefault;
     dtpCompleteBy.Time := AdjustCompletebyDefault;
 
-    if GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME then
+    if TAudio.Loaded then
     begin
-      Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
-      if index >= 0 then
-        cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
-      else
+      if GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME then
       begin
-        DefaultDeviceId:= TAudio.GetDefaultDevice; //Pa_GetDefaultOutputDevice();
-        {if DefaultDevice = paNoDevice then
+        Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
+        if index >= 0 then
+          cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
+        else
         begin
-          DebugLn('No default device');
-          //tsAudio.Enabled:=False;
-          cmbAudioDevice.Enabled := False;
-        end
-        else}
-          cmbAudioDevice.ItemIndex := TAudio.GetDefaultDevice;
+          DefaultDeviceId:= TAudio.GetDefaultDevice; //Pa_GetDefaultOutputDevice();
+          {if DefaultDevice = paNoDevice then
+          begin
+            DebugLn('No default device');
+            //tsAudio.Enabled:=False;
+            cmbAudioDevice.Enabled := False;
+          end
+          else}
+            cmbAudioDevice.ItemIndex := TAudio.GetDefaultDevice;
+        end;
       end;
     end;
+
   end;
 end;
 

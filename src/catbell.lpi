@@ -126,6 +126,7 @@
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Other>
+      <CustomOptions Value="-dFORCE_AUDIO_NOTLOADED"/>
       <OtherDefines Count="1">
         <Define0 Value="FORCE_AUDIO_NOTLOADED"/>
       </OtherDefines>

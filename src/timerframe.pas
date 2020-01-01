@@ -221,7 +221,7 @@ type
     //procedure AddSubscription(aObserver: ITimerObserver);
     //procedure RemoveSubscription(aObserver: ITimerObserver);
     procedure AdjustTimer(Sender: TObject);
-    function SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
+    //function SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
     //procedure PlayAudio;
     //procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
     //procedure FinishedAud(Data: PtrInt);
@@ -410,7 +410,10 @@ begin
   frmEdit.ModalAlert := FModalAlert;
   //frmEdit.SetAudioFile(AudioFileName, ErrorText);
   if TAudio.Loaded then
-    frmEdit.Audio := FAudio
+  begin
+    frmEdit.Audio := FAudio;
+    frmEdit.ckbLoop.Checked:=FAudio.Looped;
+  end
   else
   begin
     frmEdit.Audio := Nil;
@@ -419,7 +422,7 @@ begin
     frmEdit.AudioLooped:=AudioInfo.Looped;
   end;
   //frmEdit.AudioFileName:=FAudio.FileName;
-  frmEdit.ckbLoop.Checked:=FAudio.Looped;
+
   if frmEdit.ShowForEdit(Self) then
   begin
     Caption := frmEdit.Description;
@@ -1045,7 +1048,7 @@ procedure TfraTimer.Stop(UserInitiated: boolean);
   PaErrCode: PaError;}
 begin
   { The audio is playing and the user request is to terminate the audio.}
-  if FAudio.Playing then
+  if TAudio.Loaded and FAudio.Playing then
   begin
     FRunning := False;
     FPaused := False;
@@ -1094,7 +1097,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if (Audio.FileName <> '') and (not UserInitiated) and TAudio.Loaded then
+    if TAudio.Loaded and (Audio.FileName <> '') and (not UserInitiated) then
     begin
       //Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
@@ -1313,7 +1316,7 @@ begin
   end;
 end;
 
-function TfraTimer.SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
+{function TfraTimer.SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
   //var
   //Info: SF_INFO;
   //SoundFile: PSndFile;
@@ -1382,7 +1385,7 @@ begin
   //lblLenthVal.Visible:=True;
   Result := True;
 
-end;
+end; }
 
 {procedure TfraTimer.PlayAudio;
 {var

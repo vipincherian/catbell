@@ -1347,7 +1347,7 @@ begin
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
-      Success := NewTimerClock.SetAudioFile(
+      {Success := NewTimerClock.SetAudioFile(
         string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')),
         StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0'))),
         ErrorText);
@@ -1355,8 +1355,19 @@ begin
       begin
         NewTimerClock.SetAudioFile('', 0, ErrorText);
       end;
-      newTimerClock.Audio.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+      newTimerClock.Audio.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);}
 
+      if TAudio.Loaded then
+      begin
+        NewTimerClock.Audio.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+        NewTimerClock.Audio.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+      end
+      else
+      begin
+        NewTimerclock.AudioInfo.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+        NewTimerClock.AudioInfo.Duration:=StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0')));
+        NewTimerClock.AudioInfo.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+      end;
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
@@ -1551,16 +1562,31 @@ begin
       MinuteOf(TimerClock.Duration));
     Conf.SetValue(TIMER_CONF_SECONDS,
       SecondOf(TimerClock.Duration));}
-    Conf.SetValue(TIMER_CONF_DURATION, TimerClock.Duration);
-    Conf.SetValue(TIMER_CONF_NOTIFIER,
-      TimerClock.Audio.Looped);
+    //Conf.SetValue(TIMER_CONF_DURATION, TimerClock.Duration);
+    //Conf.SetValue(TIMER_CONF_NOTIFIER,
+    //  TimerClock.Audio.Looped);
 
-    Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
-      UTF8Decode(TimerClock.Audio.FileName));
-    Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
-      TimerClock.Audio.Duration);
-    Conf.SetValue(TIMER_CONF_AUDIOLOOP,
-      TimerClock.Audio.Looped);
+    Conf.SetValue(TIMER_CONF_DURATION, TimerClock.Duration);
+    Conf.SetValue(TIMER_CONF_NOTIFIER, TimerClock.TrayNotification);
+    if TAudio.Loaded then
+    begin
+      Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
+        UTF8Decode(TimerClock.Audio.FileName));
+      Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
+        TimerClock.Audio.Duration);
+      Conf.SetValue(TIMER_CONF_AUDIOLOOP,
+        TimerClock.Audio.Looped);
+    end
+    else
+    begin
+      Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
+        UTF8Decode(TimerClock.AudioInfo.FileName));
+      Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
+        TimerClock.AudioInfo.Duration);
+      Conf.SetValue(TIMER_CONF_AUDIOLOOP,
+        TimerClock.AudioInfo.Looped);
+    end;
+
 
     Conf.SetValue(TIMER_CONF_MODALALERT,
       TimerClock.ModalAlert);

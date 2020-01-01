@@ -378,6 +378,8 @@ end;
 procedure TfrmEdit.SetAudio(AValue: TAudio);
 begin
   FAudio:=AValue;
+  if FAudio = Nil then
+    Exit;
    if FAudio.FileName = '' then
    begin
      //FAudioFile:='';
