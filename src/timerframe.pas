@@ -124,8 +124,6 @@ type
 
     FProgress: single;
 
-    FAudioFile: string;
-    FAudioLength: double;
     //FSoundFile: PSndFile;
 
     //FUserInfo: TUserInfo;
@@ -188,7 +186,10 @@ type
     //OnTimerStop: TNotifyEvent;
 
     LastProgressIconIndex: integer;
-    AudioLooped: boolean;
+    //AudioLooped: boolean;
+
+    AudioFileName: string;
+    AudioLength: double;
     //OnTimerProgressUpdate: TNotifyEvent;
 
     // Callback on progress-on-icon checkbox change only if
@@ -249,8 +250,9 @@ type
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
-    property AudioFile: string read FAudioFile;
-    property AudioLength: double read FAudioLength;
+    property Audio: TAudio read FAudio;
+    //property AudioFile: string read AudioFileName;
+    //property AudioLength: double read AudioLength;
     //function AudioCallback(const input: pointer; output: pointer; frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
   end;
 
@@ -402,17 +404,17 @@ begin
   frmEdit.Duration := dtpSet.Time;
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
-  frmEdit.SetAudioFile(FAudioFile, ErrorText);
-  frmEdit.ckbLoop.Checked:=AudioLooped;
+  frmEdit.SetAudioFile(AudioFileName, ErrorText);
+  frmEdit.ckbLoop.Checked:=Audio.Looped;
   if frmEdit.ShowForEdit(Self) then
   begin
     Caption := frmEdit.Description;
     dtpSet.Time := frmEdit.Duration;
     FTrayNotification := frmEdit.TrayNotification;
     FModalAlert := frmEdit.ModalAlert;
-    //FAudioFile := frmEditTimer.AudioFile;
+    //AudioFileName := frmEditTimer.AudioFile;
     SetAudioFile(frmEdit.AudioFile, frmEdit.AudioLength, ErrorText);
-    AudioLooped:=frmEdit.ckbLoop.Checked;
+    Audio.Looped:=frmEdit.ckbLoop.Checked;
   end;
 end;
 
@@ -846,7 +848,7 @@ begin
 
   //FStream := nil;
   //FSoundFile := nil;
-  AudioLooped := false;
+  //AudioLooped := false;
 
   FAudio := TAudio.Create;
   FAudio.OnPlayCompletion:=@AudioPlayed;
@@ -1059,7 +1061,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if (FAudioFile <> '') and (not UserInitiated) and frmMain.AudioWorking then
+    if (AudioFileName <> '') and (not UserInitiated) and frmMain.AudioWorking then
     begin
       //Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
@@ -1067,7 +1069,7 @@ begin
       //PlayAudio;
 
       FAudio.OutputDevice:= GlobalUserConfig.AudioDeviceName;
-      FAudio.Looped := AudioLooped;
+      //FAudio.Looped := AudioLooped;
       FAudio.Play;
       DebugLn('FAudio.Play');
       //FAudioPlaying:=True;
@@ -1288,12 +1290,12 @@ begin
 
   if AValue = '' then
   begin
-    FAudioFile := '';
-    FAudioLength := 0;
+    AudioFileName := '';
+    AudioLength := 0;
     ;
     //lblLengthText.Visible:=False;
     //edtAudioFile.Text:='';
-    //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
+    //lblLenthVal.Caption:=FloatToStr(RoundTo(AudioLength, -2));
     //lblLenthVal.Visible:=False;
     FAudio.FileName:='';
     Result := True;
@@ -1306,8 +1308,8 @@ begin
   if not frmMain.AudioWorking then
   begin
     //DebugLn('SetAudioFile called when audio is not working');
-    FAudioFile:=AValue;
-    FAudioLength:=Duration;
+    AudioFileName:=AValue;
+    AudioLength:=Duration;
     //FSoundFile:=Nil;
     Result := True;
     Exit;
@@ -1330,18 +1332,18 @@ begin
   DebugLn(IntToStr(FInfo.frames));
   DebugLn(IntToStr(FInfo.samplerate));
   DebugLn(IntToStr(FInfo.sections));
-  FAudioLength := (FInfo.frames) / (FInfo.samplerate);
+  AudioLength := (FInfo.frames) / (FInfo.samplerate);
   //ShowMessage('length is ' + FloatToStr(AudioLength)); }
 
   FAudio.FileName:=Avalue;
-  FAudioFile := AValue;
+  AudioFileName := AValue;
 
   //sf_close(SoundFile);
 
 
   //lblLengthText.Visible:=True;
-  //edtAudioFile.Text:=FAudioFile;
-  //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
+  //edtAudioFile.Text:=AudioFileName;
+  //lblLenthVal.Caption:=FloatToStr(RoundTo(AudioLength, -2));
   //lblLenthVal.Visible:=True;
   Result := True;
 

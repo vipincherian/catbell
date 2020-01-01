@@ -260,6 +260,7 @@ type
     procedure ShowModalAlert(Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
     property AudioWorking: boolean read FAudioWorking;
+
   end;
 
 var
@@ -468,7 +469,7 @@ begin
     Added.dtpSet.Time := frmEdit.Duration;
     Added.ModalAlert := frmEdit.ModalAlert;
     Added.TrayNotification := frmEdit.TrayNotification;
-    Added.AudioLooped := frmEdit.ckbLoop.Checked;
+    Added.Audio.Looped := frmEdit.ckbLoop.Checked;
     PostTimerCreation(Added);
   end;
 end;
@@ -1325,7 +1326,7 @@ begin
       begin
         NewTimerClock.SetAudioFile('', 0, ErrorText);
       end;
-      newTimerClock.AudioLooped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+      newTimerClock.Audio.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
 
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
@@ -1523,14 +1524,14 @@ begin
       SecondOf(TimerClock.Duration));}
     Conf.SetValue(TIMER_CONF_DURATION, TimerClock.Duration);
     Conf.SetValue(TIMER_CONF_NOTIFIER,
-      TimerClock.AudioLooped);
+      TimerClock.Audio.Looped);
 
     Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
-      UTF8Decode(TimerClock.AudioFile));
+      UTF8Decode(TimerClock.AudioFileName));
     Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
       TimerClock.AudioLength);
     Conf.SetValue(TIMER_CONF_AUDIOLOOP,
-      TimerClock.AudioLooped);
+      TimerClock.Audio.Looped);
 
     Conf.SetValue(TIMER_CONF_MODALALERT,
       TimerClock.ModalAlert);
