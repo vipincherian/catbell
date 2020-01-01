@@ -33,10 +33,11 @@ type
   { TfrmOptions }
 
   TfrmOptions = class(TForm)
+    bbStop: TBitBtn;
     bbtnDefault: TBitBtn;
     bbtnCancel: TBitBtn;
     bbtnSave: TBitBtn;
-    BitBtn1: TBitBtn;
+    bbPlay: TBitBtn;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
@@ -92,6 +93,7 @@ type
     FLastConfig: TUserConfig;
     FChangedConfig: TUserConfig;
     FDefaultConfig: TUserConfig;
+    Audio: TAudio;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
@@ -118,7 +120,11 @@ end;
 
 procedure TfrmOptions.tsAudioShow(Sender: TObject);
 begin
-  RefreshAudioDevices;
+  if TAudio.Loaded then
+  begin
+    RefreshAudioDevices;
+    lblDefaultDeviceName.Caption:=TAudio.Devices.Strings[TAudio.DefaultDevice];
+  end;
 end;
 
 procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
@@ -242,14 +248,27 @@ begin
   FDefaultConfig := TUserConfig.Create;
   SetControlsAs(GlobalUserConfig);
   pgcOptions.ActivePage := tsTimers;
+  Audio := Nil;
+  if TAudio.Loaded then
+  begin
+    RefreshAudioDevices;
+    lblDefaultDeviceName.Caption:=TAudio.Devices.Strings[TAudio.DefaultDevice];
+    Audio := TAudio.Create;
+  end
+  else
+  begin
+    cmbAudioDevice.Enabled:=False;
+    lblDefaultDeviceName.Caption := 'Audio libraries not loaded. Audio will not work';
+    bbPlay.Enabled := False;
+    bbStop.Enabled := False;
+  end
 
-  RefreshAudioDevices;
-  lblDefaultDeviceName.Caption:=TAudio.Devices.Strings[TAudio.DefaultDevice];
 
 end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
 begin
+  Audio.Free;
   FLastConfig.Free;
   FChangedConfig.Free;
   FDefaultConfig.Free;

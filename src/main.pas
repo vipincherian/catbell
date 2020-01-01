@@ -518,7 +518,21 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   CurrPosNormal, CurrPosRestored: TRect;
+  Count: integer;
 begin
+  { if any audio is playing, stop }
+  if TAudio.Loaded then
+  begin
+    StatusMessage:='Stopping sounds being played if any...';
+    Cursor := crHourglass;
+    for Count := 0 to FTimerFrames.Count - 1 do
+    begin
+      FTimerFrames.Data[Count].Audio.Abort;
+      { Abort is asynchronous, wait till each timer aborts }
+      while FTimerFrames.Data[Count].Audio.Playing do
+        Application.ProcessMessages;
+    end;
+  end;
 
   CurrPosNormal.Top := Top;
   CurrPosNormal.Left := Left;

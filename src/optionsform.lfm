@@ -387,6 +387,7 @@ object frmOptions: TfrmOptions
       Caption = 'Audio'
       ClientHeight = 318
       ClientWidth = 521
+      ImageIndex = 3
       OnShow = tsAudioShow
       object GroupBox5: TGroupBox
         Left = 16
@@ -416,12 +417,12 @@ object frmOptions: TfrmOptions
           Style = csDropDownList
           TabOrder = 0
         end
-        object BitBtn1: TBitBtn
-          Left = 352
+        object bbPlay: TBitBtn
+          Left = 288
           Height = 30
-          Top = 160
+          Top = 104
           Width = 75
-          Caption = 'BitBtn1'
+          Caption = 'bbPlay'
           TabOrder = 1
         end
         object Label8: TLabel
@@ -441,6 +442,14 @@ object frmOptions: TfrmOptions
           Caption = 'lblDefaultDeviceName'
           ParentColor = False
           OnClick = Label8Click
+        end
+        object bbStop: TBitBtn
+          Left = 373
+          Height = 30
+          Top = 104
+          Width = 75
+          Caption = 'bbStop'
+          TabOrder = 2
         end
       end
     end

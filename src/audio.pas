@@ -473,6 +473,11 @@ begin
     if not TAudio.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
 
+    if not FAudioPlaying then
+    begin
+      DebugLn('Audio not playing. There is nothing to be done in abort');
+      Exit;
+    end;
     PaErrCode := Pa_AbortStream(FStream);
     if (paErrCode <> Int32(paNoError)) then
     begin
@@ -485,7 +490,7 @@ begin
     in that callback function}
 
   finally
-    FAudioPlaying := False;
+    //FAudioPlaying := False;
     //LeaveCriticalSection(AudioCriticalSection);
   end;
 
@@ -501,6 +506,7 @@ begin
   //EnterCriticalSection(AudioCriticalSection);
 
   {This check might be redundant. Just to be safe}
+
   paErrCode := Pa_IsStreamStopped(FStream);
   if paErrCode = 0 then
   begin
