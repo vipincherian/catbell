@@ -1191,9 +1191,14 @@ begin
     tiMain.Icon.Assign(FTrayStoppedBitmap);
     Icon.Assign(FTrayStoppedBitmap);
     Application.Icon.Assign(FAppStoppedBitmap);
+
     FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+
     if Widget <> nil then
+    begin
       Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
+      Widget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
+    end;
   end
   else
   begin
