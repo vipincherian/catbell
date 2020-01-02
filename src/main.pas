@@ -531,7 +531,9 @@ begin
       FTimerFrames.Data[Count].Audio.Abort;
 
       StartTickCount:=GetTickCount64;
-      { Abort is asynchronous, wait till each timer aborts }
+      { Abort is asynchronous, wait till each timer aborts.
+      Also, we do not wait for more than two seconds per timer.
+      After that, it is past caring. Tardiness can be tolerated only as much. }
       while FTimerFrames.Data[Count].Audio.Playing do
       begin
         DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
