@@ -28,19 +28,38 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, SysUtils, datetimectrls, main,
+  Forms, SysUtils, Dialogs, datetimectrls, main,
   sequence, timerframe, settings, optionsform, 
 timeralertform, aboutform, editform, adjustform, audio
-  { you can add units after this };
+  { you can add units after this }
+{$IF defined(windows) }
+  ,windows
+{$ENDIF}
+{ There is a semicolon here }
+;
 
 {$R *.res}
+const
+  APP_UUID = '8e746524-2d28-11ea-978f-2e728ce88125';
 
-//var
+var
   //AppController: TController;
   //FormWidget: TMainForm;
   //DefaultConfig: TDefaultConfig;
+  MutexHandle: THandle;
 begin
   RequireDerivedFormResource:=True;
+  { Checks to ensure that only one instance of the application runs at a time }
+  {$IF defined(windows) }
+  MutexHandle := CreateMutex(nil, True, APP_UUID);
+  if GetLastError = ERROR_ALREADY_EXISTS then
+  begin
+    ShowMessage('Another instance of the application is already running. ' +
+      'Cannot run multiple instances.');
+    Exit;
+  end;
+  {$ENDIF}
+
   Application.Initialize;
 
   InitSettings;
@@ -66,5 +85,10 @@ begin
 //  AppController.Destroy;
   //FormWidget.Destroy;
   CleanupSettings;
+  {$IF defined(windows) }
+  if MutexHandle <> 0 then
+    CloseHandle(MutexHandle);
+  {$ENDIF}
+
 end.
 
