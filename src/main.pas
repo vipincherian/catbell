@@ -519,6 +519,7 @@ procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   CurrPosNormal, CurrPosRestored: TRect;
   Count: integer;
+  StartTickCount: longword;
 begin
   { if any audio is playing, stop }
   if TAudio.Loaded then
@@ -528,9 +529,16 @@ begin
     for Count := 0 to FTimerFrames.Count - 1 do
     begin
       FTimerFrames.Data[Count].Audio.Abort;
+
+      StartTickCount:=GetTickCount64;
       { Abort is asynchronous, wait till each timer aborts }
       while FTimerFrames.Data[Count].Audio.Playing do
+      begin
+        DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
         Application.ProcessMessages;
+        if GetTickCount64 > (StartTickCount + 2000) then
+          break;
+      end;
     end;
   end;
 

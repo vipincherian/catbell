@@ -128,7 +128,7 @@ begin
   if TAudio.Loaded then
   begin
     RefreshAudioDevices;
-    lblDefaultDeviceName.Caption := TAudio.Devices.Strings[TAudio.DefaultDevice];
+    lblDefaultDeviceName.Caption := TAudio.DefaultDeviceName;
   end;
 end;
 
@@ -260,7 +260,7 @@ begin
   if TAudio.Loaded then
   begin
     RefreshAudioDevices;
-    lblDefaultDeviceName.Caption := TAudio.Devices.Strings[TAudio.DefaultDevice];
+    lblDefaultDeviceName.Caption := TAudio.DefaultDeviceName;//TAudio.Devices.Strings[TAudio.DefaultDevice];
     Audio := TAudio.Create;
     bbPlay.Enabled := True;
   end

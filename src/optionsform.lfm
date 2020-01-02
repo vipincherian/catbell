@@ -73,8 +73,8 @@ object frmOptions: TfrmOptions
         Width = 490
         Anchors = [akTop, akLeft, akRight]
         Caption = 'For new timers'
-        ClientHeight = 70
-        ClientWidth = 486
+        ClientHeight = 74
+        ClientWidth = 488
         TabOrder = 0
         object Label1: TLabel
           Left = 13
@@ -131,8 +131,8 @@ object frmOptions: TfrmOptions
         Width = 490
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Alerts'
-        ClientHeight = 86
-        ClientWidth = 486
+        ClientHeight = 90
+        ClientWidth = 488
         TabOrder = 1
         object cbTrayAlert: TCheckBox
           Left = 14
@@ -166,8 +166,8 @@ object frmOptions: TfrmOptions
         Width = 491
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Default'
-        ClientHeight = 61
-        ClientWidth = 487
+        ClientHeight = 65
+        ClientWidth = 489
         TabOrder = 2
         object Label9: TLabel
           Left = 8
@@ -251,8 +251,8 @@ object frmOptions: TfrmOptions
         Width = 489
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Application'
-        ClientHeight = 62
-        ClientWidth = 485
+        ClientHeight = 66
+        ClientWidth = 487
         TabOrder = 0
         object ckbQueryExit: TCheckBox
           Left = 16
@@ -283,7 +283,7 @@ object frmOptions: TfrmOptions
           Height = 21
           Top = 13
           Width = 120
-          ItemHeight = 13
+          ItemHeight = 0
           ItemIndex = 0
           Items.Strings = (
             '12-hour clock'
@@ -301,8 +301,8 @@ object frmOptions: TfrmOptions
         Width = 489
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Override icon sizes'
-        ClientHeight = 86
-        ClientWidth = 485
+        ClientHeight = 90
+        ClientWidth = 487
         TabOrder = 1
         object CheckBox1: TCheckBox
           Left = 16
@@ -386,35 +386,35 @@ object frmOptions: TfrmOptions
     end
     object tsAudio: TTabSheet
       Caption = 'Audio'
-      ClientHeight = 317
-      ClientWidth = 515
+      ClientHeight = 318
+      ClientWidth = 521
       ImageIndex = 3
       OnShow = tsAudioShow
       object GroupBox5: TGroupBox
         Left = 16
-        Height = 247
+        Height = 248
         Top = 8
-        Width = 483
+        Width = 489
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Output'
-        ClientHeight = 229
-        ClientWidth = 479
+        ClientHeight = 234
+        ClientWidth = 487
         TabOrder = 0
         object Label7: TLabel
           Left = 16
           Height = 13
           Top = 50
-          Width = 75
+          Width = 89
           Caption = 'Device to use : '
           ParentColor = False
         end
         object cmbAudioDevice: TComboBox
           Left = 136
-          Height = 21
+          Height = 23
           Top = 42
-          Width = 332
+          Width = 340
           Anchors = [akTop, akLeft, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           Style = csDropDownList
           TabOrder = 0
         end
@@ -431,7 +431,7 @@ object frmOptions: TfrmOptions
           Left = 16
           Height = 13
           Top = 16
-          Width = 79
+          Width = 92
           Caption = 'Default device : '
           ParentColor = False
           OnClick = Label8Click
@@ -440,7 +440,7 @@ object frmOptions: TfrmOptions
           Left = 136
           Height = 13
           Top = 16
-          Width = 104
+          Width = 123
           Caption = 'lblDefaultDeviceName'
           ParentColor = False
           OnClick = Label8Click
@@ -458,7 +458,7 @@ object frmOptions: TfrmOptions
           Left = 136
           Height = 20
           Top = 79
-          Width = 328
+          Width = 336
           Anchors = [akTop, akLeft, akRight]
           Enabled = False
           TabOrder = 3
