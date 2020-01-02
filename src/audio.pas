@@ -284,6 +284,7 @@ begin
   end;
   DebugLn('Default device is ' + IntToStr(DefaultDeviceId)); }
 
+  DebugLn('Enumerating devices:-');
   for Count := 0 to NumDevices - 1 do
   begin
     DeviceInfo := Pa_GetDeviceInfo(Count);
@@ -295,8 +296,15 @@ begin
     end
     else
     begin
-      DeviceName := StrPas(DeviceInfo^.Name);
-      FDeviceNames.Add(DeviceName);
+      if DeviceInfo^.maxOutputChannels > 0 then
+      begin
+        DeviceName := StrPas(DeviceInfo^.Name);
+        FDeviceNames.Add(DeviceName);
+        DebugLn('Devide ID - ' + IntToStr(Count));
+        DebugLn('Device name - ' + DeviceInfo^.Name);
+        DebugLn('Device output channels - ' + IntToStr(DeviceInfo^.maxOutputChannels));
+      end;
+
     end;
 
   end;
