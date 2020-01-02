@@ -26,7 +26,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
-  Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils, {portaudio, }LazLogger, audio;
+  Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
+  {portaudio, }LazLogger, audio;
 
 type
 
@@ -126,7 +127,7 @@ begin
   if TAudio.Loaded then
   begin
     RefreshAudioDevices;
-    lblDefaultDeviceName.Caption:=TAudio.Devices.Strings[TAudio.DefaultDevice];
+    lblDefaultDeviceName.Caption := TAudio.Devices.Strings[TAudio.DefaultDevice];
   end;
 end;
 
@@ -163,10 +164,11 @@ begin
       begin
         Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
         if index >= 0 then
-          cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
+          cmbAudioDevice.ItemIndex :=
+            cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
         else
         begin
-          DefaultDeviceId:= TAudio.GetDefaultDevice; //Pa_GetDefaultOutputDevice();
+          DefaultDeviceId := TAudio.GetDefaultDevice; //Pa_GetDefaultOutputDevice();
           {if DefaultDevice = paNoDevice then
           begin
             DebugLn('No default device');
@@ -174,7 +176,7 @@ begin
             cmbAudioDevice.Enabled := False;
           end
           else}
-            cmbAudioDevice.ItemIndex := TAudio.GetDefaultDevice;
+          cmbAudioDevice.ItemIndex := TAudio.GetDefaultDevice;
         end;
       end;
     end;
@@ -185,22 +187,22 @@ end;
 procedure TfrmOptions.RefreshAudioDevices;
 var
   DefaultDeviceId: AudioDeviceIndex;
-  DeviceNames: TSTringList;
+  DeviceNames: TStringList;
   DeviceName: string;
   Count: integer;
 begin
   { Load audio devices }
   //tsAudio.Enabled:=frmMain.AudioWorking;
-  tsAudio.Enabled:=TAudio.Loaded;
+  tsAudio.Enabled := TAudio.Loaded;
 
   if TAudio.Loaded then
   begin
     cmbAudioDevice.Items.Clear;
-    DefaultDeviceId:= TAudio.GetDefaultDevice;
+    DefaultDeviceId := TAudio.GetDefaultDevice;
     DeviceNames := TAudio.Devices;
-    for Count := 0 to  Devicenames.Count - 1 do
+    for Count := 0 to Devicenames.Count - 1 do
     begin
-      DeviceName:=DeviceNames.Strings[Count];
+      DeviceName := DeviceNames.Strings[Count];
       {if Count = DefaultDeviceId then
         DeviceName := DeviceName + ' (Default)';}
       cmbAudioDevice.Items.Add(DeviceName);
@@ -209,9 +211,9 @@ begin
     if cmbAudioDevice.Items.Count > 0 then
     begin
       if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-        cmbAudioDevice.ItemIndex:=0//DefaultDevice
+        cmbAudioDevice.ItemIndex := 0//DefaultDevice
       else
-        cmbAudioDevice.ItemIndex:=cmbAudioDevice.Items.IndexOf(
+        cmbAudioDevice.ItemIndex := cmbAudioDevice.Items.IndexOf(
           GlobalUserConfig.AudioDeviceName);
     end;
   end;
@@ -238,7 +240,9 @@ begin
     AdjustCompletebyDefault := dtpCompleteBy.Time;
 
     //AudioDevice := cmbAudioDevice.ItemIndex;
-    AudioDeviceName:=cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
+    if TAudio.Loaded and (cmbAudioDevice.ItemIndex >= 0) then
+      AudioDeviceName := cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
+
 
   end;
 end;
@@ -251,21 +255,20 @@ begin
   FDefaultConfig := TUserConfig.Create;
   SetControlsAs(GlobalUserConfig);
   pgcOptions.ActivePage := tsTimers;
-  Audio := Nil;
+  Audio := nil;
   if TAudio.Loaded then
   begin
     RefreshAudioDevices;
-    lblDefaultDeviceName.Caption:=TAudio.Devices.Strings[TAudio.DefaultDevice];
+    lblDefaultDeviceName.Caption := TAudio.Devices.Strings[TAudio.DefaultDevice];
     Audio := TAudio.Create;
   end
   else
   begin
-    cmbAudioDevice.Enabled:=False;
+    cmbAudioDevice.Enabled := False;
     lblDefaultDeviceName.Caption := 'Audio libraries not loaded. Audio will not work';
     bbPlay.Enabled := False;
     bbStop.Enabled := False;
-  end
-
+  end;
 
 end;
 
@@ -311,7 +314,7 @@ begin
     if cmbAudioDevice.ItemIndex >= 0 then
     begin
 
-      Audio.OutputDevice:=cmbAudioDevice.Items[cmbAudioDevice.ItemIndex];
+      Audio.OutputDevice := cmbAudioDevice.Items[cmbAudioDevice.ItemIndex];
       //ShowMessage(Audio.OutputDevice);
       Audio.PlaySine;
     end;
@@ -322,7 +325,7 @@ end;
 procedure TfrmOptions.bbStopClick(Sender: TObject);
 begin
   if TAudio.Loaded then;
-    Audio.Abort;
+  Audio.Abort;
 end;
 
 procedure TfrmOptions.bbtnDefaultClick(Sender: TObject);
