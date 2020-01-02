@@ -273,12 +273,12 @@ implementation
 { TfrmMain }
 
 procedure TfrmMain.FormCreate(Sender: TObject);
-var
+//var
   //PaErrCode: PaError;
 {$IFNDEF AUDIO_STATIC}
   //Status: boolean;
 {$ENDIF}
-  DefaultDevice: integer;
+  //DefaultDevice: integer;
   //DeviceInfo: PPaDeviceInfo;
 begin
   //InitCriticalSection(TimerCriticalSection);
@@ -809,6 +809,19 @@ begin
 
       CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
+
+      { To give it a glossy feel, we try to add a translucent
+      white sheen to the left semi-circle }
+      CanvasBGRA.Brush.Opacity:=100;
+      CanvasBGRA.Pen.Opacity:=100;
+      CanvasBGRA.Brush.Color := clWhite;
+      CanvasBGRA.Pen.Color := clWhite;
+      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
+        90 * RAD_MULTIPLIER,
+        { We need to draw only half the circle, or the current pie,
+        whichever is lesser. }
+        -(15 * RAD_MULTIPLIER * Max((Count - 1),12))
+        );
     end;
     //DrawBaseIconForeground(FinalBmp);
 
@@ -1324,7 +1337,7 @@ var
   TotalCount, Count: integer;
   NewTimerClock: TfraTimer;
   ErrorText: string;
-  Success: boolean;
+  //Success: boolean;
   //Order: TIdList;
   //OrderString: TStringList;
   //Pos: string;
@@ -1386,12 +1399,12 @@ begin
           on E : EInvalidAudio do
           begin
              ErrorText := ErrorText + 'Could not load audio file ' +
-               Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '') +
+               string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
                ' - unsupported format or invalide file. File name will be reset to blank.'#13#10;
           end
           else
           ErrorText := ErrorText + 'Could not load audio file ' +
-            Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '') +
+            string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
             ' - unknown error. File name will be reset to blank.'#13#10;
         end;
       end
