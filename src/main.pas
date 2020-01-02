@@ -1229,7 +1229,7 @@ begin
       begin
         tiMain.Icon.Assign(FTrayProgressIcons[Index + 1]);
         //FForm.tiMain.Icon.Handle:=FTrayProgressIcons[Index + 1].Handle;
-        Icon.Assign(FAppProgressIcons[Index + 1]);
+        Icon.Assign(FTrayProgressIcons[Index + 1]);
         //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
         Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         FLastTrayIconIndex := Index;
