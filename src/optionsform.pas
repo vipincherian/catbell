@@ -168,7 +168,7 @@ begin
             cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
         else
         begin
-          DefaultDeviceId := TAudio.GetDefaultDevice; //Pa_GetDefaultOutputDevice();
+          //DefaultDeviceId := TAudio.GetDefaultDevice; //Pa_GetDefaultOutputDevice();
           {if DefaultDevice = paNoDevice then
           begin
             DebugLn('No default device');
@@ -176,7 +176,7 @@ begin
             cmbAudioDevice.Enabled := False;
           end
           else}
-          cmbAudioDevice.ItemIndex := TAudio.GetDefaultDevice;
+          cmbAudioDevice.ItemIndex := TAudio.DefaultDevice;
         end;
       end;
     end;
@@ -211,7 +211,7 @@ begin
     if cmbAudioDevice.Items.Count > 0 then
     begin
       if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-        cmbAudioDevice.ItemIndex := 0//DefaultDevice
+        cmbAudioDevice.ItemIndex := TAudio.DefaultDevice
       else
         cmbAudioDevice.ItemIndex := cmbAudioDevice.Items.IndexOf(
           GlobalUserConfig.AudioDeviceName);
