@@ -820,7 +820,7 @@ begin
         90 * RAD_MULTIPLIER,
         { We need to draw only half the circle, or the current pie,
         whichever is lesser. }
-        -(15 * RAD_MULTIPLIER * Max((Count - 1),12))
+        -(15 * RAD_MULTIPLIER * Max((Count - 1),TRAY_PROGRESS_ICON_COUNT div 2))
         );
     end;
     //DrawBaseIconForeground(FinalBmp);
