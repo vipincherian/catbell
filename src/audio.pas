@@ -76,6 +76,7 @@ type
     Data : PaTestData;
     DataPointer : PPaTestData;
 
+    class function GetDefaultDeviceName: string; static;
     class function GetDevices: TStringList; static;
     procedure SetFileName(AValue: string);
     procedure SetOutputDevice(AValue: string);
@@ -92,6 +93,7 @@ type
     class function GetDeviceIndex(DeviceName: string): AudioDeviceIndex; static;
     //class procedure GetAllDevices
     class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
+    class property DefaultDeviceName: string read GetDefaultDeviceName;
     class property Devices: TStringList read GetDevices;
     procedure Play;
     procedure PlaySine;
@@ -299,6 +301,31 @@ begin
 
   end;
   Result := FDeviceNames;
+  LeaveCriticalSection(AudioCriticalSection);
+end;
+
+class function TAudio.GetDefaultDeviceName: string; static;
+var
+  DevideId: integer;
+  DeviceInfo: PPaDeviceInfo;
+  DeviceName: string;
+begin
+  EnterCriticalSection(AudioCriticalSection);
+  DevideId := TAudio.GetDefaultDevice;
+  DeviceInfo := Pa_GetDeviceInfo(DevideId);
+  if DeviceInfo = nil then
+  begin
+    //DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
+    //FDeviceNames.Clear;
+    //FDeviceNames.Add('Unknown');
+    Result := '';
+  end
+  else
+  begin
+    DeviceName := StrPas(DeviceInfo^.Name);
+    //FDeviceNames.Add(DeviceName);
+    Result := DeviceName;
+  end;
   LeaveCriticalSection(AudioCriticalSection);
 end;
 

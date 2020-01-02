@@ -1104,7 +1104,10 @@ begin
       StopButtonEnabled := True;
       //PlayAudio;
 
-      FAudio.OutputDevice:= GlobalUserConfig.AudioDeviceName;
+      if GlobalUserConfig.AudioDeviceName = '' then
+        FAudio.OutputDevice := TAudio.DefaultDeviceName
+      else
+        FAudio.OutputDevice:= GlobalUserConfig.AudioDeviceName;
       //FAudio.Looped := AudioLooped;
       FAudio.Play;
       DebugLn('FAudio.Play');
