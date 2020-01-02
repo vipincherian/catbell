@@ -1134,7 +1134,7 @@ begin
       ShowMessage('Error(1): ' + E.ClassName + #13#10 + E.Message);
   end;
 
-  if (Sender.TrayNotification and (not UserInitiated)) then
+  if Sender.TrayNotification and (not UserInitiated) then
   begin
     tiMain.BalloonHint :=
       Sender.Caption + ' completed. (' + Format('%.2d', [Hours]) +
@@ -1142,7 +1142,7 @@ begin
     tiMain.ShowBalloonHint;
   end;
 
-  if (Sender.ModalAlert = True and (not UserInitiated)) then
+  if Sender.ModalAlert and (not UserInitiated) then
   begin
     Message :=
       Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +

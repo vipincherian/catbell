@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, LazLogger, adjustform, {sndfile, portaudio,} audio,
-  ctypes, LMessages, LCLIntf;
+  ctypes, LMessages, LCLIntf, StrUtils;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -1048,6 +1048,7 @@ procedure TfraTimer.Stop(UserInitiated: boolean);
   PaErrCode: PaError;}
 begin
   { The audio is playing and the user request is to terminate the audio.}
+  DebugLn('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));
   if TAudio.Loaded and FAudio.Playing then
   begin
     FRunning := False;
