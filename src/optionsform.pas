@@ -73,6 +73,7 @@ type
     Label8: TLabel;
     Label9: TLabel;
     pgcOptions: TPageControl;
+    pgbAudio: TProgressBar;
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
@@ -213,8 +214,8 @@ begin
       if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
         cmbAudioDevice.ItemIndex := TAudio.DefaultDevice
       else
-        cmbAudioDevice.ItemIndex := cmbAudioDevice.Items.IndexOf(
-          GlobalUserConfig.AudioDeviceName);
+        cmbAudioDevice.ItemIndex :=
+          cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
     end;
   end;
 end;
@@ -243,7 +244,6 @@ begin
     if TAudio.Loaded and (cmbAudioDevice.ItemIndex >= 0) then
       AudioDeviceName := cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
 
-
   end;
 end;
 
@@ -256,18 +256,19 @@ begin
   SetControlsAs(GlobalUserConfig);
   pgcOptions.ActivePage := tsTimers;
   Audio := nil;
+  bbStop.Enabled := False;
   if TAudio.Loaded then
   begin
     RefreshAudioDevices;
     lblDefaultDeviceName.Caption := TAudio.Devices.Strings[TAudio.DefaultDevice];
     Audio := TAudio.Create;
+    bbPlay.Enabled := True;
   end
   else
   begin
     cmbAudioDevice.Enabled := False;
     lblDefaultDeviceName.Caption := 'Audio libraries not loaded. Audio will not work';
     bbPlay.Enabled := False;
-    bbStop.Enabled := False;
   end;
 
 end;
@@ -285,6 +286,9 @@ begin
   if TAudio.Loaded and Audio.Playing then
   begin
     Audio.Abort;
+    pgbAudio.Style := pbstNormal;
+    bbPlay.Enabled := True;
+    bbStop.Enabled := False;
     {while Audio.Playing do
       Application.ProcessMessages;}
   end;
@@ -317,6 +321,9 @@ begin
       Audio.OutputDevice := cmbAudioDevice.Items[cmbAudioDevice.ItemIndex];
       //ShowMessage(Audio.OutputDevice);
       Audio.PlaySine;
+      pgbAudio.Style := pbstMarquee;
+      bbPlay.Enabled := False;
+      bbStop.Enabled := True;
     end;
 
   end;
@@ -325,7 +332,13 @@ end;
 procedure TfrmOptions.bbStopClick(Sender: TObject);
 begin
   if TAudio.Loaded then;
-  Audio.Abort;
+  begin
+    Audio.Abort;
+    pgbAudio.Style := pbstNormal;
+    bbPlay.Enabled := True;
+    bbStop.Enabled := False;
+
+  end;
 end;
 
 procedure TfrmOptions.bbtnDefaultClick(Sender: TObject);

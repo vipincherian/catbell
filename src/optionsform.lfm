@@ -73,8 +73,8 @@ object frmOptions: TfrmOptions
         Width = 490
         Anchors = [akTop, akLeft, akRight]
         Caption = 'For new timers'
-        ClientHeight = 74
-        ClientWidth = 488
+        ClientHeight = 70
+        ClientWidth = 486
         TabOrder = 0
         object Label1: TLabel
           Left = 13
@@ -131,8 +131,8 @@ object frmOptions: TfrmOptions
         Width = 490
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Alerts'
-        ClientHeight = 90
-        ClientWidth = 488
+        ClientHeight = 86
+        ClientWidth = 486
         TabOrder = 1
         object cbTrayAlert: TCheckBox
           Left = 14
@@ -166,8 +166,8 @@ object frmOptions: TfrmOptions
         Width = 491
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Default'
-        ClientHeight = 65
-        ClientWidth = 489
+        ClientHeight = 61
+        ClientWidth = 487
         TabOrder = 2
         object Label9: TLabel
           Left = 8
@@ -251,8 +251,8 @@ object frmOptions: TfrmOptions
         Width = 489
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Application'
-        ClientHeight = 66
-        ClientWidth = 487
+        ClientHeight = 62
+        ClientWidth = 485
         TabOrder = 0
         object ckbQueryExit: TCheckBox
           Left = 16
@@ -283,7 +283,7 @@ object frmOptions: TfrmOptions
           Height = 21
           Top = 13
           Width = 120
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           Items.Strings = (
             '12-hour clock'
@@ -301,8 +301,8 @@ object frmOptions: TfrmOptions
         Width = 489
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Override icon sizes'
-        ClientHeight = 90
-        ClientWidth = 487
+        ClientHeight = 86
+        ClientWidth = 485
         TabOrder = 1
         object CheckBox1: TCheckBox
           Left = 16
@@ -386,44 +386,44 @@ object frmOptions: TfrmOptions
     end
     object tsAudio: TTabSheet
       Caption = 'Audio'
-      ClientHeight = 318
-      ClientWidth = 521
+      ClientHeight = 317
+      ClientWidth = 515
       ImageIndex = 3
       OnShow = tsAudioShow
       object GroupBox5: TGroupBox
         Left = 16
-        Height = 248
+        Height = 247
         Top = 8
-        Width = 489
+        Width = 483
         Anchors = [akTop, akLeft, akRight, akBottom]
         Caption = 'Output'
-        ClientHeight = 234
-        ClientWidth = 487
+        ClientHeight = 229
+        ClientWidth = 479
         TabOrder = 0
         object Label7: TLabel
           Left = 16
           Height = 13
           Top = 50
-          Width = 89
+          Width = 75
           Caption = 'Device to use : '
           ParentColor = False
         end
         object cmbAudioDevice: TComboBox
           Left = 136
-          Height = 23
+          Height = 21
           Top = 42
-          Width = 312
+          Width = 332
           Anchors = [akTop, akLeft, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           Style = csDropDownList
           TabOrder = 0
         end
         object bbPlay: TBitBtn
-          Left = 288
+          Left = 304
           Height = 30
-          Top = 104
+          Top = 112
           Width = 75
-          Caption = 'bbPlay'
+          Caption = 'Test'
           OnClick = bbPlayClick
           TabOrder = 1
         end
@@ -431,7 +431,7 @@ object frmOptions: TfrmOptions
           Left = 16
           Height = 13
           Top = 16
-          Width = 92
+          Width = 79
           Caption = 'Default device : '
           ParentColor = False
           OnClick = Label8Click
@@ -440,19 +440,28 @@ object frmOptions: TfrmOptions
           Left = 136
           Height = 13
           Top = 16
-          Width = 123
+          Width = 104
           Caption = 'lblDefaultDeviceName'
           ParentColor = False
           OnClick = Label8Click
         end
         object bbStop: TBitBtn
-          Left = 373
+          Left = 389
           Height = 30
-          Top = 104
+          Top = 112
           Width = 75
-          Caption = 'bbStop'
+          Caption = 'Stop'
           OnClick = bbStopClick
           TabOrder = 2
+        end
+        object pgbAudio: TProgressBar
+          Left = 136
+          Height = 20
+          Top = 79
+          Width = 328
+          Anchors = [akTop, akLeft, akRight]
+          Enabled = False
+          TabOrder = 3
         end
       end
     end
