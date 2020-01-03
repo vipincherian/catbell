@@ -66,8 +66,6 @@ type
 
     FAudioPlaying: boolean;
 
-    FOutputDevice: string;
-
     //PlayCriticalSection: TRTLCriticalSection;
 
     //FOwner: TForm;
@@ -79,12 +77,13 @@ type
     class function GetDefaultDeviceName: string; static;
     class function GetDevices: TStringList; static;
     procedure SetFileName(AValue: string);
-    procedure SetOutputDevice(AValue: string);
+    class procedure SetOutputDevice(AValue: string); static;
   public
     Loaded: boolean; static;
     FDeviceNames: TStringList; static;
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
+    FOutputDevice: string; static;
     OnPlayCompletion: TNotifyEvent;
     Looped: boolean;
     constructor Create();
@@ -102,7 +101,7 @@ type
     property FileName: string read FFileName write SetFileName;
     property Duration: double read FAudioLength;
     property Playing: boolean read FAudioPlaying;
-    property OutputDevice: string read FOutputDevice write SetOutputDevice;
+    class property OutputDevice: string read FOutputDevice write SetOutputDevice;
 
   end;
 
@@ -390,7 +389,7 @@ begin
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
-procedure TAudio.SetOutputDevice(AValue: string);
+class procedure TAudio.SetOutputDevice(AValue: string);
 var
   Id: AudioDeviceIndex;
 begin
