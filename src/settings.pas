@@ -263,7 +263,12 @@ begin
 
     //AdjustExtendDefault:=FConf.GetValue(ADJ_EXTEND, AdjustExtendDefault);
     AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, AdjustDiffDefault);
+    if AdjustDiffDefault <= 0 then
+      AdjustDiffDefault := DEF_TIMER_DURATION;
+
     AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
+    if AdjustCompletebyDefault <= 0 then
+      AdjustCompletebyDefault := DEF_TIMER_DURATION;
 
     //AudioDevice:= FConf.GetValue(AUDIO_DEVICE, AudioDevice);
     AudioDeviceName:= string(FConf.GetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName)));
