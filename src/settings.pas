@@ -25,7 +25,7 @@ unit settings;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf;
+  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf, audio;
 
 type
 
@@ -262,11 +262,11 @@ begin
     DefaultTimeFormat := FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
 
     //AdjustExtendDefault:=FConf.GetValue(ADJ_EXTEND, AdjustExtendDefault);
-    AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, AdjustDiffDefault);
+    AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, DEF_TIMER_DURATION);
     if AdjustDiffDefault <= 0 then
       AdjustDiffDefault := DEF_TIMER_DURATION;
 
-    AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
+    AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, DEF_TIMER_DURATION);
     if AdjustCompletebyDefault <= 0 then
       AdjustCompletebyDefault := DEF_TIMER_DURATION;
 
@@ -354,7 +354,10 @@ begin
   FConf.SetValue(ADJ_COMPLETEBY, DEF_TIMER_DURATION);
 
   //FConf.SetValue(AUDIO_DEVICE, DEF_AUDIO_DEVICE);
-  FConf.SetValue(AUDIO_DEVICE_NAME, DEF_AUDIO_DEVICE_NAME);
+  if TAudio.Loaded then
+    FConf.SetValue(AUDIO_DEVICE_NAME, TAudio.DefaultDeviceName)
+  else
+    FConf.SetValue(AUDIO_DEVICE_NAME, DEF_AUDIO_DEVICE_NAME);
 
   FConf.Flush;
 end;
