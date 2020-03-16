@@ -274,12 +274,12 @@ implementation
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 //var
-  //PaErrCode: PaError;
+//PaErrCode: PaError;
 {$IFNDEF AUDIO_STATIC}
-  //Status: boolean;
+//Status: boolean;
 {$ENDIF}
-  //DefaultDevice: integer;
-  //DeviceInfo: PPaDeviceInfo;
+//DefaultDevice: integer;
+//DeviceInfo: PPaDeviceInfo;
 begin
   //InitCriticalSection(TimerCriticalSection);
   FOrder := TIdList.Create;
@@ -462,19 +462,19 @@ begin
     { We are not providing an option to keep audio looped by default }
     frmEdit.ckbLoop.Checked := False;
   end;
-  TempAudio := Nil;
+  TempAudio := nil;
 
   if TAudio.Loaded then
   begin
-    TempAudio :=TAudio.Create;
+    TempAudio := TAudio.Create;
     frmEdit.Audio := TempAudio;
   end
   else
   begin
-    frmEdit.Audio := Nil;
-    frmEdit.AudioFileName:= '';
-    frmEdit.AudioDuration:= 0;
-    frmEdit.AudioLooped:=False;
+    frmEdit.Audio := nil;
+    frmEdit.AudioFileName := '';
+    frmEdit.AudioDuration := 0;
+    frmEdit.AudioLooped := False;
   end;
 
   if frmEdit.ShowForAdd then
@@ -488,7 +488,7 @@ begin
     //Added.Audio := TempAudio;
     if TAudio.Loaded then
     begin
-      Added.Audio := TempAudio ;
+      Added.Audio := TempAudio;
       Added.Audio.Looped := frmEdit.ckbLoop.Checked;
     end
     else
@@ -524,13 +524,13 @@ begin
   { if any audio is playing, stop }
   if TAudio.Loaded then
   begin
-    StatusMessage:='Stopping sounds being played if any...';
+    StatusMessage := 'Stopping sounds being played if any...';
     Cursor := crHourglass;
     for Count := 0 to FTimerFrames.Count - 1 do
     begin
       FTimerFrames.Data[Count].Audio.Abort;
 
-      StartTickCount:=GetTickCount64;
+      StartTickCount := GetTickCount64;
       { Abort is asynchronous, wait till each timer aborts.
       Also, we do not wait for more than two seconds per timer.
       After that, it is past caring. Tardiness can be tolerated only as much. }
@@ -822,15 +822,15 @@ begin
 
       { To give it a glossy feel, we try to add a translucent
       white sheen to the left semi-circle }
-      CanvasBGRA.Brush.Opacity:=100;
-      CanvasBGRA.Pen.Opacity:=100;
+      CanvasBGRA.Brush.Opacity := 100;
+      CanvasBGRA.Pen.Opacity := 100;
       CanvasBGRA.Brush.Color := clWhite;
       CanvasBGRA.Pen.Color := clWhite;
       CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER,
         { We need to draw only half the circle, or the current pie,
-        whichever is lesser. }
-        -(15 * RAD_MULTIPLIER * Max((Count - 1),TRAY_PROGRESS_ICON_COUNT div 2))
+        whichever is lesser. } -(15 * RAD_MULTIPLIER * Max(
+        (Count - 1), TRAY_PROGRESS_ICON_COUNT div 2))
         );
     end;
     //DrawBaseIconForeground(FinalBmp);
@@ -1347,6 +1347,7 @@ var
   TotalCount, Count: integer;
   NewTimerClock: TfraTimer;
   ErrorText: string;
+  fs: TFormatSettings;
   //Success: boolean;
   //Order: TIdList;
   //OrderString: TStringList;
@@ -1385,8 +1386,12 @@ begin
       NewTimerClock.Duration :=
         EncodeTime(Hours, Mins, Secs, 0);}
 
+      // When float is saved, it is saved as
+      fs := FormatSettings;
+      fs.DecimalSeparator := '.';
+      //ErrorText := (string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')));
       NewTimerClock.Duration :=
-        StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')));
+        StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')), fs);
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
@@ -1403,26 +1408,29 @@ begin
       if TAudio.Loaded then
       begin
         try
-          NewTimerClock.Audio.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-          NewTimerClock.Audio.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+          NewTimerClock.Audio.FileName :=
+            string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          NewTimerClock.Audio.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
         except
-          on E : EInvalidAudio do
+          on E: EInvalidAudio do
           begin
-             ErrorText := ErrorText + 'Could not load audio file ' +
-               string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-               ' - unsupported format or invalide file. File name will be reset to blank.'#13#10;
+            ErrorText := ErrorText + 'Could not load audio file ' +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              ' - unsupported format or invalide file. File name will be reset to blank.'#13#10;
           end
           else
-          ErrorText := ErrorText + 'Could not load audio file ' +
-            string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-            ' - unknown error. File name will be reset to blank.'#13#10;
+            ErrorText := ErrorText + 'Could not load audio file ' +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              ' - unknown error. File name will be reset to blank.'#13#10;
         end;
       end
       else
       begin
-        NewTimerclock.AudioInfo.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-        NewTimerClock.AudioInfo.Duration:=StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0')));
-        NewTimerClock.AudioInfo.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+        NewTimerclock.AudioInfo.FileName :=
+          string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+        NewTimerClock.AudioInfo.Duration :=
+          StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0')), fs);
+        NewTimerClock.AudioInfo.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
       end;
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
@@ -1588,6 +1596,7 @@ var
   OrderStrings: TStringList;
   //Order: TIdList;
   Id: longword;
+  fs: TFormatSettings;
   //Index: integer;
 begin
   //Order := TIdList.Create;
@@ -1628,14 +1637,16 @@ begin
     //Conf.SetValue(TIMER_CONF_NOTIFIER,
     //  TimerClock.Audio.Looped);
 
-    Conf.SetValue(TIMER_CONF_DURATION, TimerClock.Duration);
-    Conf.SetValue(TIMER_CONF_NOTIFIER, TimerClock.TrayNotification);
+    fs := FormatSettings;
+    fs.DecimalSeparator := '.';
+    Conf.SetValue(UTF8Decode(TIMER_CONF_DURATION), UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
+    Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.TrayNotification);
     if TAudio.Loaded then
     begin
       Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
         UTF8Decode(TimerClock.Audio.FileName));
-      Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
-        TimerClock.Audio.Duration);
+      Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
+        UTF8Decode(FloatToStr(TimerClock.Audio.Duration, fs)));
       Conf.SetValue(TIMER_CONF_AUDIOLOOP,
         TimerClock.Audio.Looped);
     end
@@ -1643,8 +1654,8 @@ begin
     begin
       Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
         UTF8Decode(TimerClock.AudioInfo.FileName));
-      Conf.SetValue(TIMER_CONF_AUDIOLENGTH,
-        TimerClock.AudioInfo.Duration);
+      Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
+        UTF8Decode(FloatToStr(TimerClock.AudioInfo.Duration, fs)));
       Conf.SetValue(TIMER_CONF_AUDIOLOOP,
         TimerClock.AudioInfo.Looped);
     end;
@@ -1806,7 +1817,6 @@ begin
   finally
     //LeaveCriticalSection(TimerCriticalSection);
   end;
-
 
 end;
 
