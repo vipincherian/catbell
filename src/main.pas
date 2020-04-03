@@ -30,6 +30,9 @@ uses
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
   timerframe, fgl, sequence, editform, Math, LazLogger, LMessages,
+  {$IF defined(windows) }
+  ShlObj, comobj, Win32Int, InterfaceBase,
+  {$ENDIF}
   {portaudio, sndfile,} ctypes, audio;
 
 const
@@ -183,6 +186,13 @@ type
     FWidgetProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FTrayStoppedBitmap, FAppStoppedBitmap, FWidgetStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
+    FLastTrayPercent: integer;
+
+    {$IF defined(windows) }
+    AppHandle: THandle;
+    FTaskBarList: ITaskbarList3;
+    {$ENDIF}
+
     //FClockWidget: TClocksWidget;
     //FClocks: TClocks;
     FDbFileName: string;
@@ -282,6 +292,16 @@ procedure TfrmMain.FormCreate(Sender: TObject);
   //DeviceInfo: PPaDeviceInfo;
 begin
   //InitCriticalSection(TimerCriticalSection);
+
+  { Obtain the application handle, and the taskbar COM object.
+  This has to be done at the beginning, as calls are made to progressupdate
+  from within FormCreate. This cannot be pushed down }
+
+  {$IF defined(windows) }
+  AppHandle := TWin32WidgetSet(WidgetSet).AppHandle;
+  FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
+  {$ENDIF}
+
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
   Constraints.MinHeight := FORM_MIN_HEIGHT;
@@ -296,6 +316,7 @@ begin
   //OnNewTimer := nil;
   //OnEXport := nil;
   FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+  FLastTrayPercent:=0;
 
   //FClocks := TClocks.Create;
   FDbDefault := True;
@@ -1208,6 +1229,7 @@ procedure TfrmMain.ProgressUpdate(Widget: TfraTimer; Progress: single);
 var
   //Bmp: TBitmap;
   Index: integer;
+  TaskbarPercent: integer;
 begin
   if (Progress > 1.99) and (Progress < 2.01) then
   begin
@@ -1215,17 +1237,25 @@ begin
     Icon.Assign(FTrayStoppedBitmap);
     Application.Icon.Assign(FAppStoppedBitmap);
 
+    {$IF defined(windows) }
+    FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
+    //FTaskBarList.SetProgressValue(AppHandle, 0, 100);
+    {$ENDIF}
+
     FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+    FLastTrayPercent:=0;
 
     if Widget <> nil then
     begin
       Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
       Widget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
+      Widget.LastProgressPercent:=0;
     end;
   end
   else
   begin
     Index := Floor(Progress * 24.0);
+    TaskbarPercent := Round(Progress * 100);
     //WriteLn('Index is ' + IntToStr(Index));
     if Index >= 24 then
       Index := 23;
@@ -1243,13 +1273,25 @@ begin
         //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
         Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         FLastTrayIconIndex := Index;
-
       end;
+      {In Windows, set the progress in task bar}
+      {$IF defined(windows) }
+      if FLastTrayPercent <> TaskbarPercent then
+      begin
+        FTaskBarList.SetProgressState(AppHandle, TBPF_Normal);
+        FTaskBarList.SetProgressValue(AppHandle, TaskbarPercent, 100);
+      end;
+      {$ENDIF}
     end;
     if Widget.LastProgressIconIndex <> Index then
     begin
       Widget.imgTimer.Picture.Assign(FWidgetProgressIcons[Index + 1]);
       Widget.LastProgressIconIndex := Index;
+    end;
+
+    if Widget.LastProgressPercent <> TaskbarPercent then
+    begin
+      Widget.LastProgressPercent := TaskbarPercent;
     end;
 
   end;
@@ -1482,6 +1524,7 @@ begin
   //NewWidget.OnTimerStop := @TimerFinished;
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
+  NewWidget.LastProgressPercent:=0;
 
   //NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then

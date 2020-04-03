@@ -125,11 +125,13 @@
       <IncludeFiles Value="$(ProjOutDir)"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
-    <Other>
-      <OtherDefines Count="1">
-        <Define0 Value="FORCE_AUDIO_NOTLOADED"/>
-      </OtherDefines>
-    </Other>
+    <Linking>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

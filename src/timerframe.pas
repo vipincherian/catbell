@@ -188,6 +188,7 @@ type
     //OnTimerStop: TNotifyEvent;
 
     LastProgressIconIndex: integer;
+    LastProgressPercent: integer;
     AudioInfo: TTimerAudioInfo;
     //AudioLooped: boolean;
 
