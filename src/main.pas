@@ -1255,7 +1255,7 @@ begin
   else
   begin
     Index := Floor(Progress * 24.0);
-    TaskbarPercent := Round(Progress * 100);
+    TaskbarPercent := Ceil(Progress * 100);
     //WriteLn('Index is ' + IntToStr(Index));
     if Index >= 24 then
       Index := 23;
