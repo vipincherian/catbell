@@ -1643,6 +1643,8 @@ procedure TfrmMain.HandleTimerFrameIconProgressChange(Sender: TfraTimer);
 var
   Temp: TfraTimer;
   Count: integer;
+  //TODO: This variable is not needed now?
+  //ForcefulUncheck: boolean;
 begin
   //Sender := TfraTimer(Sender);
   { Tray checkboxes can be checked by only one timer at time, as the status
@@ -1651,7 +1653,10 @@ begin
   1 - Unchecking a checked timer. This would mean that no timers are now
       publishing the progrss. All are unchecked.
   2 - Checking another timer. This would mean that the checked timer now
-      becomes active and the previous one gets unchecked.}
+      becomes active and the previous one gets unchecked.
+  3 - No timers were checked before, checking one. There is nothing to be done
+      in this case.
+  }
 
   {This is option 1}
   if not Sender.IsProgressOnIcon then
@@ -1661,10 +1666,16 @@ begin
     Exit;
   end;
 
-  {This is option 2
-  Note that in this option, the timer that is going off the tray
-  need not publish progress as the new timer that is taking over will
-  start publishing and override anyway.}
+  {This is to handle option 2.
+  We also check if it a case of option 3 using variable ForcefulUncheck.
+  Note that in this option,
+    a) If the timer that is taking over is in running state, then the
+       previously checked timer need to publish progress, as the new one
+       will forcefully override and take over.
+    b) If the timre that is taking over is not running, then the progress
+       has to be published for the previous one.
+  }
+  //ForcefulUncheck := False;
   // For all timers other than the sender, uncheck if checked
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
@@ -1675,9 +1686,16 @@ begin
         Temp.CallbackOnProgressOnIconChange := False;
         Temp.IsProgressOnIcon := False;
         Temp.CallbackOnProgressOnIconChange := True;
-        //Temp.PublishProgress(TIMER_PROGRESS_OFFTRAY);
+        //ForcefulUncheck := True;
+        { If the timer that has been checked is not running, then
+        we have a special case where there is no one to take over and
+        override the publishing. So manually take the previously running one
+        off the tray.}
+        if not Sender.Running then
+          Temp.PublishProgress(TIMER_PROGRESS_OFFTRAY);
       end;
   end;
+
 
 end;
 

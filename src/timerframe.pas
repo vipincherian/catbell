@@ -212,7 +212,7 @@ type
     procedure SetCounter(AValue: string);
     procedure CheckForZeroTime;
 
-    procedure HandleTimerTrigger();
+    procedure HandleTimerTrigger(const Forced: boolean = False);
     procedure Start;
     procedure Pause;
     procedure Stop(UserInitiated: boolean);
@@ -382,6 +382,11 @@ begin
   if CallbackOnProgressOnIconChange then
   begin
     frmMain.HandleTimerFrameIconProgressChange(Self);
+    {We have a special case if the timer is in paused state. In this case
+    timer events are not triggered for this timer. Manually trigger one so that
+    the icons are updated. }
+    if ckbIconProgress.Checked and FPaused then
+      HandleTimerTrigger(True);
     {if OnProgressOnIconChanged <> nil then
     begin
       OnProgressOnIconChanged(Self);
@@ -927,7 +932,7 @@ begin
   bbPlay.Enabled := not ((Hours = 0) and (Minutes = 0) and (Seconds = 0));
 end;
 
-procedure TfraTimer.HandleTimerTrigger();
+procedure TfraTimer.HandleTimerTrigger(const Forced:boolean = False);
 var
   PendingMilliseconds: longword;
   CurrTickCount: longword;
@@ -938,7 +943,7 @@ begin
   //Counter := DEF_COUNTDOWN_CAPTION
   //FEndTickCount
   //else if FPaused = False then
-  if FRunning and (FPaused = False) then
+  if (FRunning and (FPaused = False)) or Forced then
   begin
     CurrTickCount := GetTickCount64;
 
