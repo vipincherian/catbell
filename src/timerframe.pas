@@ -188,7 +188,7 @@ type
     //OnTimerStop: TNotifyEvent;
 
     LastProgressIconIndex: integer;
-    LastProgressPercent: integer;
+    //LastProgressPercent: integer;
     AudioInfo: TTimerAudioInfo;
     //AudioLooped: boolean;
 
@@ -250,6 +250,7 @@ type
 
     //property Notifier: boolean read FNotifier write SetNotifier;
     property Running: boolean read FRunning;
+    property Paused: boolean read FPaused;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;

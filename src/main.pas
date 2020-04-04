@@ -64,6 +64,7 @@ const
 
   DEF_COUNTDOWN_CAPTION: string = '00:00:00';
   TIMER_PROGRESS_FINISHED: single = 2.0;
+  TIMER_PROGRESS_OFFTRAY: single = 3.0;
 
   TIMER_CONF_CLOCKS = 'clocks';
   TIMER_CONF_TIMERS = 'timers';
@@ -284,12 +285,12 @@ implementation
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 //var
-  //PaErrCode: PaError;
+//PaErrCode: PaError;
 {$IFNDEF AUDIO_STATIC}
-  //Status: boolean;
+//Status: boolean;
 {$ENDIF}
-  //DefaultDevice: integer;
-  //DeviceInfo: PPaDeviceInfo;
+//DefaultDevice: integer;
+//DeviceInfo: PPaDeviceInfo;
 begin
   //InitCriticalSection(TimerCriticalSection);
 
@@ -316,7 +317,7 @@ begin
   //OnNewTimer := nil;
   //OnEXport := nil;
   FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
-  FLastTrayPercent:=0;
+  FLastTrayPercent := 0;
 
   //FClocks := TClocks.Create;
   FDbDefault := True;
@@ -483,19 +484,19 @@ begin
     { We are not providing an option to keep audio looped by default }
     frmEdit.ckbLoop.Checked := False;
   end;
-  TempAudio := Nil;
+  TempAudio := nil;
 
   if TAudio.Loaded then
   begin
-    TempAudio :=TAudio.Create;
+    TempAudio := TAudio.Create;
     frmEdit.Audio := TempAudio;
   end
   else
   begin
-    frmEdit.Audio := Nil;
-    frmEdit.AudioFileName:= '';
-    frmEdit.AudioDuration:= 0;
-    frmEdit.AudioLooped:=False;
+    frmEdit.Audio := nil;
+    frmEdit.AudioFileName := '';
+    frmEdit.AudioDuration := 0;
+    frmEdit.AudioLooped := False;
   end;
 
   if frmEdit.ShowForAdd then
@@ -509,7 +510,7 @@ begin
     //Added.Audio := TempAudio;
     if TAudio.Loaded then
     begin
-      Added.Audio := TempAudio ;
+      Added.Audio := TempAudio;
       Added.Audio.Looped := frmEdit.ckbLoop.Checked;
     end
     else
@@ -545,13 +546,13 @@ begin
   { if any audio is playing, stop }
   if TAudio.Loaded then
   begin
-    StatusMessage:='Stopping sounds being played if any...';
+    StatusMessage := 'Stopping sounds being played if any...';
     Cursor := crHourglass;
     for Count := 0 to FTimerFrames.Count - 1 do
     begin
       FTimerFrames.Data[Count].Audio.Abort;
 
-      StartTickCount:=GetTickCount64;
+      StartTickCount := GetTickCount64;
       { Abort is asynchronous, wait till each timer aborts.
       Also, we do not wait for more than two seconds per timer.
       After that, it is past caring. Tardiness can be tolerated only as much. }
@@ -843,15 +844,15 @@ begin
 
       { To give it a glossy feel, we try to add a translucent
       white sheen to the left semi-circle }
-      CanvasBGRA.Brush.Opacity:=100;
-      CanvasBGRA.Pen.Opacity:=100;
+      CanvasBGRA.Brush.Opacity := 100;
+      CanvasBGRA.Pen.Opacity := 100;
       CanvasBGRA.Brush.Color := clWhite;
       CanvasBGRA.Pen.Color := clWhite;
       CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER,
         { We need to draw only half the circle, or the current pie,
-        whichever is lesser. }
-        -(15 * RAD_MULTIPLIER * Max((Count - 1),TRAY_PROGRESS_ICON_COUNT div 2))
+        whichever is lesser. } -(15 * RAD_MULTIPLIER * Max(
+        (Count - 1), TRAY_PROGRESS_ICON_COUNT div 2))
         );
     end;
     //DrawBaseIconForeground(FinalBmp);
@@ -1198,6 +1199,14 @@ begin
     FActiveTimerFrames.Remove(Sender);
     //end;
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
+
+    {$IF defined(windows)}
+    { If progress of this timer is shown, then pause it in taskbar}
+    if Sender.IsProgressOnIcon then
+    begin
+      FTaskBarList.SetProgressState(AppHandle, TBPF_PAUSED);
+    end;
+    {$ENDIF}
   except
     on E: Exception do
       ShowMessage('Error (2): ' + E.ClassName + #13#10 + E.Message);
@@ -1218,6 +1227,14 @@ begin
       FActiveTimerFrames.Add(Sender);
     end;
     UpdateStatusTimerCount;
+
+    {$IF defined(windows)}
+    { If progress of this timer is shown, then un-pause it in taskbar}
+    if Sender.IsProgressOnIcon then
+    begin
+      FTaskBarList.SetProgressState(AppHandle, TBPF_NORMAL);
+    end;
+    {$ENDIF}
   except
     on E: Exception do
       ShowMessage('Error (3): ' + E.ClassName + #13#10 + E.Message);
@@ -1231,7 +1248,35 @@ var
   Index: integer;
   TaskbarPercent: integer;
 begin
-  if (Progress > 1.99) and (Progress < 2.01) then
+  if (Progress > (TIMER_PROGRESS_FINISHED - 0.01)) and
+    (Progress < (TIMER_PROGRESS_OFFTRAY + 0.01)) then
+  begin
+    {If the timer has stopped or has been taken off the tray then
+    fix the tray and application icons accordingly.}
+    tiMain.Icon.Assign(FTrayStoppedBitmap);
+    Icon.Assign(FTrayStoppedBitmap);
+    Application.Icon.Assign(FAppStoppedBitmap);
+
+    {$IF defined(windows) }
+    FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
+    //FTaskBarList.SetProgressValue(AppHandle, 0, 100);
+    {$ENDIF}
+
+    FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+    FLastTrayPercent := 0;
+
+    { Change the timer image only if it has really finished.}
+    if (Widget <> nil) and (Progress < (TIMER_PROGRESS_FINISHED + 0.01)) then
+    begin
+      Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
+      Widget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
+      //Widget.LastProgressPercent:=0;
+    end;
+  end
+  { Timer has not been stopped, but its progress is not not published
+  through the tray}
+  {else if (Progress > (TIMER_PROGRESS_OFFTRAY - 0.01)) and
+    (Progress < (TIMER_PROGRESS_OFFTRAY + 0.01)) then
   begin
     tiMain.Icon.Assign(FTrayStoppedBitmap);
     Icon.Assign(FTrayStoppedBitmap);
@@ -1243,15 +1288,8 @@ begin
     {$ENDIF}
 
     FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
-    FLastTrayPercent:=0;
-
-    if Widget <> nil then
-    begin
-      Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
-      Widget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
-      Widget.LastProgressPercent:=0;
-    end;
-  end
+    FLastTrayPercent := 0;
+  end }
   else
   begin
     Index := Floor(Progress * 24.0);
@@ -1274,6 +1312,7 @@ begin
         Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         FLastTrayIconIndex := Index;
       end;
+
       {In Windows, set the progress in task bar}
       {$IF defined(windows) }
       if FLastTrayPercent <> TaskbarPercent then
@@ -1283,16 +1322,19 @@ begin
       end;
       {$ENDIF}
     end;
+
+    { Irrespective of whether progress is shown in tray/application icon,
+    for all icons, progress is shown in the image in the timer UI frame }
     if Widget.LastProgressIconIndex <> Index then
     begin
       Widget.imgTimer.Picture.Assign(FWidgetProgressIcons[Index + 1]);
       Widget.LastProgressIconIndex := Index;
     end;
 
-    if Widget.LastProgressPercent <> TaskbarPercent then
+    {if Widget.LastProgressPercent <> TaskbarPercent then
     begin
       Widget.LastProgressPercent := TaskbarPercent;
-    end;
+    end;}
 
   end;
 
@@ -1445,26 +1487,29 @@ begin
       if TAudio.Loaded then
       begin
         try
-          NewTimerClock.Audio.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-          NewTimerClock.Audio.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+          NewTimerClock.Audio.FileName :=
+            string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          NewTimerClock.Audio.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
         except
-          on E : EInvalidAudio do
+          on E: EInvalidAudio do
           begin
-             ErrorText := ErrorText + 'Could not load audio file ' +
-               string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-               ' - unsupported format or invalide file. File name will be reset to blank.'#13#10;
+            ErrorText := ErrorText + 'Could not load audio file ' +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              ' - unsupported format or invalide file. File name will be reset to blank.'#13#10;
           end
           else
-          ErrorText := ErrorText + 'Could not load audio file ' +
-            string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-            ' - unknown error. File name will be reset to blank.'#13#10;
+            ErrorText := ErrorText + 'Could not load audio file ' +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              ' - unknown error. File name will be reset to blank.'#13#10;
         end;
       end
       else
       begin
-        NewTimerclock.AudioInfo.FileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-        NewTimerClock.AudioInfo.Duration:=StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0')));
-        NewTimerClock.AudioInfo.Looped:=Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+        NewTimerclock.AudioInfo.FileName :=
+          string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+        NewTimerClock.AudioInfo.Duration :=
+          StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0')));
+        NewTimerClock.AudioInfo.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
       end;
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
@@ -1524,7 +1569,7 @@ begin
   //NewWidget.OnTimerStop := @TimerFinished;
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
-  NewWidget.LastProgressPercent:=0;
+  //NewWidget.LastProgressPercent:=0;
 
   //NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
@@ -1600,14 +1645,26 @@ var
   Count: integer;
 begin
   //Sender := TfraTimer(Sender);
+  { Tray checkboxes can be checked by only one timer at time, as the status
+  of only one timer can be shown in the System Tray.
+  Tray checkboxes can be changed by
+  1 - Unchecking a checked timer. This would mean that no timers are now
+      publishing the progrss. All are unchecked.
+  2 - Checking another timer. This would mean that the checked timer now
+      becomes active and the previous one gets unchecked.}
 
+  {This is option 1}
   if not Sender.IsProgressOnIcon then
   begin
-    Sender.PublishProgress(TIMER_PROGRESS_FINISHED);
+    Sender.PublishProgress(TIMER_PROGRESS_OFFTRAY);
     //Notifier.IsProgressOnIcon := False;
     Exit;
   end;
 
+  {This is option 2
+  Note that in this option, the timer that is going off the tray
+  need not publish progress as the new timer that is taking over will
+  start publishing and override anyway.}
   // For all timers other than the sender, uncheck if checked
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
@@ -1618,7 +1675,7 @@ begin
         Temp.CallbackOnProgressOnIconChange := False;
         Temp.IsProgressOnIcon := False;
         Temp.CallbackOnProgressOnIconChange := True;
-        Temp.PublishProgress(TIMER_PROGRESS_FINISHED);
+        //Temp.PublishProgress(TIMER_PROGRESS_OFFTRAY);
       end;
   end;
 
@@ -1849,7 +1906,6 @@ begin
   finally
     //LeaveCriticalSection(TimerCriticalSection);
   end;
-
 
 end;
 
