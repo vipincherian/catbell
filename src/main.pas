@@ -1317,7 +1317,12 @@ begin
       {$IF defined(windows) }
       if FLastTrayPercent <> TaskbarPercent then
       begin
-        FTaskBarList.SetProgressState(AppHandle, TBPF_Normal);
+        if Widget.Running then
+          FTaskBarList.SetProgressState(AppHandle, TBPF_Normal)
+        else if Widget.Paused then
+          FTaskBarList.SetProgressState(AppHandle, TBPF_PAUSED)
+        else
+          Assert(False);
         FTaskBarList.SetProgressValue(AppHandle, TaskbarPercent, 100);
       end;
       {$ENDIF}
