@@ -1178,7 +1178,9 @@ procedure TfraTimer.PublishProgress(Percent: single);
 begin
   //for Observer in FObservers do
   //  Observer.ProgressUpdate(Percent);
-  FProgress := Percent;
+  {Save only actual percentage progress, or finished states.}
+  if Percent <= (TIMER_PROGRESS_OFFTRAY - 0.01) then
+    FProgress := Percent;
   //if OnTimerProgressUpdate <> nil then
   //  OnTimerProgressUpdate(Self);
   frmMain.ProgressUpdate(Self, Percent);
