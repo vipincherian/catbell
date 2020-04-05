@@ -24,9 +24,16 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
+      <local>
+        <CommandLineParams Value="--debug-log=catbell.log"/>
+      </local>
       <FormatVersion Value="2"/>
       <Modes Count="1">
-        <Mode0 Name="default"/>
+        <Mode0 Name="default">
+          <local>
+            <CommandLineParams Value="--debug-log=catbell.log"/>
+          </local>
+        </Mode0>
       </Modes>
     </RunParams>
     <RequiredPackages Count="3">
@@ -132,11 +139,6 @@
         </Win32>
       </Options>
     </Linking>
-    <Other>
-      <OtherDefines Count="1">
-        <Define0 Value="FORCE_AUDIO_NOTLOADED"/>
-      </OtherDefines>
-    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

@@ -30,6 +30,9 @@ uses
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
   timerframe, fgl, sequence, editform, Math, LazLogger, LMessages,
+  {$IF defined(windows) }
+  ShlObj, comobj, Win32Int, InterfaceBase,
+  {$ENDIF}
   {portaudio, sndfile,} ctypes, audio;
 
 const
@@ -61,6 +64,7 @@ const
 
   DEF_COUNTDOWN_CAPTION: string = '00:00:00';
   TIMER_PROGRESS_FINISHED: single = 2.0;
+  TIMER_PROGRESS_OFFTRAY: single = 3.0;
 
   TIMER_CONF_CLOCKS = 'clocks';
   TIMER_CONF_TIMERS = 'timers';
@@ -183,6 +187,13 @@ type
     FWidgetProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FTrayStoppedBitmap, FAppStoppedBitmap, FWidgetStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
+    FLastTrayPercent: integer;
+
+    {$IF defined(windows) }
+    AppHandle: THandle;
+    FTaskBarList: ITaskbarList3;
+    {$ENDIF}
+
     //FClockWidget: TClocksWidget;
     //FClocks: TClocks;
     FDbFileName: string;
@@ -282,6 +293,16 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 //DeviceInfo: PPaDeviceInfo;
 begin
   //InitCriticalSection(TimerCriticalSection);
+
+  { Obtain the application handle, and the taskbar COM object.
+  This has to be done at the beginning, as calls are made to progressupdate
+  from within FormCreate. This cannot be pushed down }
+
+  {$IF defined(windows) }
+  AppHandle := TWin32WidgetSet(WidgetSet).AppHandle;
+  FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
+  {$ENDIF}
+
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
   Constraints.MinHeight := FORM_MIN_HEIGHT;
@@ -296,6 +317,7 @@ begin
   //OnNewTimer := nil;
   //OnEXport := nil;
   FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+  FLastTrayPercent := 0;
 
   //FClocks := TClocks.Create;
   FDbDefault := True;
@@ -1177,6 +1199,14 @@ begin
     FActiveTimerFrames.Remove(Sender);
     //end;
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
+
+    {$IF defined(windows)}
+    { If progress of this timer is shown, then pause it in taskbar}
+    if Sender.IsProgressOnIcon then
+    begin
+      FTaskBarList.SetProgressState(AppHandle, TBPF_PAUSED);
+    end;
+    {$ENDIF}
   except
     on E: Exception do
       ShowMessage('Error (2): ' + E.ClassName + #13#10 + E.Message);
@@ -1197,6 +1227,14 @@ begin
       FActiveTimerFrames.Add(Sender);
     end;
     UpdateStatusTimerCount;
+
+    {$IF defined(windows)}
+    { If progress of this timer is shown, then un-pause it in taskbar}
+    if Sender.IsProgressOnIcon then
+    begin
+      FTaskBarList.SetProgressState(AppHandle, TBPF_NORMAL);
+    end;
+    {$ENDIF}
   except
     on E: Exception do
       ShowMessage('Error (3): ' + E.ClassName + #13#10 + E.Message);
@@ -1208,24 +1246,54 @@ procedure TfrmMain.ProgressUpdate(Widget: TfraTimer; Progress: single);
 var
   //Bmp: TBitmap;
   Index: integer;
+  TaskbarPercent: integer;
 begin
-  if (Progress > 1.99) and (Progress < 2.01) then
+  if (Progress > (TIMER_PROGRESS_FINISHED - 0.01)) and
+    (Progress < (TIMER_PROGRESS_OFFTRAY + 0.01)) then
+  begin
+    {If the timer has stopped or has been taken off the tray then
+    fix the tray and application icons accordingly.}
+    tiMain.Icon.Assign(FTrayStoppedBitmap);
+    Icon.Assign(FTrayStoppedBitmap);
+    Application.Icon.Assign(FAppStoppedBitmap);
+
+    {$IF defined(windows) }
+    FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
+    //FTaskBarList.SetProgressValue(AppHandle, 0, 100);
+    {$ENDIF}
+
+    FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+    FLastTrayPercent := 0;
+
+    { Change the timer image only if it has really finished.}
+    if (Widget <> nil) and (Progress < (TIMER_PROGRESS_FINISHED + 0.01)) then
+    begin
+      Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
+      Widget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
+      //Widget.LastProgressPercent:=0;
+    end;
+  end
+  { Timer has not been stopped, but its progress is not not published
+  through the tray}
+  {else if (Progress > (TIMER_PROGRESS_OFFTRAY - 0.01)) and
+    (Progress < (TIMER_PROGRESS_OFFTRAY + 0.01)) then
   begin
     tiMain.Icon.Assign(FTrayStoppedBitmap);
     Icon.Assign(FTrayStoppedBitmap);
     Application.Icon.Assign(FAppStoppedBitmap);
 
-    FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+    {$IF defined(windows) }
+    FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
+    //FTaskBarList.SetProgressValue(AppHandle, 0, 100);
+    {$ENDIF}
 
-    if Widget <> nil then
-    begin
-      Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
-      Widget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
-    end;
-  end
+    FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
+    FLastTrayPercent := 0;
+  end }
   else
   begin
     Index := Floor(Progress * 24.0);
+    TaskbarPercent := Ceil(Progress * 100);
     //WriteLn('Index is ' + IntToStr(Index));
     if Index >= 24 then
       Index := 23;
@@ -1243,14 +1311,35 @@ begin
         //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
         Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         FLastTrayIconIndex := Index;
-
       end;
+
+      {In Windows, set the progress in task bar}
+      {$IF defined(windows) }
+      if FLastTrayPercent <> TaskbarPercent then
+      begin
+        if Widget.Running and (not Widget.Paused) then
+          FTaskBarList.SetProgressState(AppHandle, TBPF_Normal)
+        else if Widget.Paused then
+          FTaskBarList.SetProgressState(AppHandle, TBPF_PAUSED)
+        else
+          Assert(False); // We should not come here
+        FTaskBarList.SetProgressValue(AppHandle, TaskbarPercent, 100);
+      end;
+      {$ENDIF}
     end;
+
+    { Irrespective of whether progress is shown in tray/application icon,
+    for all icons, progress is shown in the image in the timer UI frame }
     if Widget.LastProgressIconIndex <> Index then
     begin
       Widget.imgTimer.Picture.Assign(FWidgetProgressIcons[Index + 1]);
       Widget.LastProgressIconIndex := Index;
     end;
+
+    {if Widget.LastProgressPercent <> TaskbarPercent then
+    begin
+      Widget.LastProgressPercent := TaskbarPercent;
+    end;}
 
   end;
 
@@ -1490,6 +1579,7 @@ begin
   //NewWidget.OnTimerStop := @TimerFinished;
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
+  //NewWidget.LastProgressPercent:=0;
 
   //NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
   {if not GlobalUserConfig.AllowTimerTitleEdit then
@@ -1563,16 +1653,39 @@ procedure TfrmMain.HandleTimerFrameIconProgressChange(Sender: TfraTimer);
 var
   Temp: TfraTimer;
   Count: integer;
+  //TODO: This variable is not needed now?
+  //ForcefulUncheck: boolean;
 begin
   //Sender := TfraTimer(Sender);
+  { Tray checkboxes can be checked by only one timer at time, as the status
+  of only one timer can be shown in the System Tray.
+  Tray checkboxes can be changed by
+  1 - Unchecking a checked timer. This would mean that no timers are now
+      publishing the progrss. All are unchecked.
+  2 - Checking another timer. This would mean that the checked timer now
+      becomes active and the previous one gets unchecked.
+  3 - No timers were checked before, checking one. There is nothing to be done
+      in this case.
+  }
 
+  {This is option 1}
   if not Sender.IsProgressOnIcon then
   begin
-    Sender.PublishProgress(TIMER_PROGRESS_FINISHED);
+    Sender.PublishProgress(TIMER_PROGRESS_OFFTRAY);
     //Notifier.IsProgressOnIcon := False;
     Exit;
   end;
 
+  {This is to handle option 2.
+  We also check if it a case of option 3 using variable ForcefulUncheck.
+  Note that in this option,
+    a) If the timer that is taking over is in running state, then the
+       previously checked timer need to publish progress, as the new one
+       will forcefully override and take over.
+    b) If the timre that is taking over is not running, then the progress
+       has to be published for the previous one.
+  }
+  //ForcefulUncheck := False;
   // For all timers other than the sender, uncheck if checked
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
@@ -1583,9 +1696,16 @@ begin
         Temp.CallbackOnProgressOnIconChange := False;
         Temp.IsProgressOnIcon := False;
         Temp.CallbackOnProgressOnIconChange := True;
-        Temp.PublishProgress(TIMER_PROGRESS_FINISHED);
+        //ForcefulUncheck := True;
+        { If the timer that has been checked is not running, then
+        we have a special case where there is no one to take over and
+        override the publishing. So manually take the previously running one
+        off the tray.}
+        if not Sender.Running then
+          Temp.PublishProgress(TIMER_PROGRESS_OFFTRAY);
       end;
   end;
+
 
 end;
 
