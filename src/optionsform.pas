@@ -42,6 +42,7 @@ type
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
+    cbUseDefaultAudio: TCheckBox;
     ckbQueryExit: TCheckBox;
     cbTrayAlert: TCheckBox;
     cbModalAlert: TCheckBox;
@@ -87,6 +88,7 @@ type
     procedure bbtnCancelClick(Sender: TObject);
     procedure bbtnDefaultClick(Sender: TObject);
     procedure bbtnSaveClick(Sender: TObject);
+    procedure cbUseDefaultAudioChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormHide(Sender: TObject);
@@ -414,6 +416,11 @@ begin
   Sleep(3000);
   Audio.Free;}
   Close;
+end;
+
+procedure TfrmOptions.cbUseDefaultAudioChange(Sender: TObject);
+begin
+  lsvAudioDevices.Enabled := (not cbUseDefaultAudio.Checked);
 end;
 
 
