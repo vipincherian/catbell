@@ -1052,8 +1052,8 @@ begin
 end;
 
 procedure TfraTimer.Stop(UserInitiated: boolean);
-{var
-  PaErrCode: PaError;}
+var
+  AudioDevice: TAudioDevice;
 begin
   { The audio is playing and the user request is to terminate the audio.}
   DebugLn('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));
@@ -1113,10 +1113,15 @@ begin
       StopButtonEnabled := True;
       //PlayAudio;
 
-      if GlobalUserConfig.AudioDeviceName = '' then
-        FAudio.OutputDevice := TAudio.DefaultDeviceName
+      if (GlobalUserConfig.AudioDeviceName = '') or
+        (GlobalUserConfig.AudioHostAPIName = '') then
+        TAudio.SetDefaulDevice
       else
-        FAudio.OutputDevice:= GlobalUserConfig.AudioDeviceName;
+      begin
+        TAudio.FOutputDevice.DeviceName:=GlobalUserConfig.AudioDeviceName;
+        TAudio.FOutputDevice.HostAPIName:=GlobalUserConfig.AudioHostAPIName;
+      end;
+
       //FAudio.Looped := AudioLooped;
       FAudio.Play;
       DebugLn('FAudio.Play');

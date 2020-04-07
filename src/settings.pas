@@ -81,6 +81,7 @@ type
     AdjustCompletebyDefault: double;
     //AudioDevice: integer;
     AudioDeviceName: string;
+    AudioHostAPIName: string;
     constructor Create();
     destructor Destroy; override;
     //procedure Load;
@@ -173,6 +174,8 @@ const
 
   AUDIO_DEVICE_NAME = 'audio_device_name';
   DEF_AUDIO_DEVICE_NAME = '';
+  AUDIO_HOSTAPI_NAME = 'audio_hostapi_name';
+  DEF_AUDIO_HOSTAPI_NAME = '';
 
 procedure InitSettings;
 procedure CleanupSettings;
@@ -272,6 +275,7 @@ begin
 
     //AudioDevice:= FConf.GetValue(AUDIO_DEVICE, AudioDevice);
     AudioDeviceName:= string(FConf.GetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName)));
+    AudioHostAPIName:= string(FConf.GetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName)));
 
   except
     CreateAnew;
@@ -317,10 +321,13 @@ begin
 
   //FConf.SetValue(AUDIO_DEVICE, AudioDevice);
   FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName));
+  FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName));
 
 end;
 
 procedure TUserFileConfig.CreateAnew;
+var
+  AudioDevice: TAudioDevice;
 begin
   FConf.OpenKey(LAST_POS_NORMAL, True);
   FConf.SetValue(LAST_POS_TOP, FDefaultPos.Top);
@@ -355,9 +362,14 @@ begin
 
   //FConf.SetValue(AUDIO_DEVICE, DEF_AUDIO_DEVICE);
   if TAudio.Loaded then
-    FConf.SetValue(AUDIO_DEVICE_NAME, TAudio.DefaultDeviceName)
+  begin
+    TAudio.GetDefaultDevice(@AudioDevice);
+    FConf.SetValue(AUDIO_DEVICE_NAME, AudioDevice.DeviceName);
+    FConf.SetValue(AUDIO_HOSTAPI_NAME, AudioDevice.HostAPIName);
+  end
   else
     FConf.SetValue(AUDIO_DEVICE_NAME, DEF_AUDIO_DEVICE_NAME);
+    FConf.SetValue(AUDIO_HOSTAPI_NAME, DEF_AUDIO_HOSTAPI_NAME);
 
   FConf.Flush;
 end;
@@ -410,6 +422,7 @@ begin
   DefaultTimeFormat := integer(DEF_TIME_FORMAT);
 
   AudioDeviceName:=DEF_AUDIO_DEVICE_NAME;
+  AudioHostAPIName:=DEF_AUDIO_HOSTAPI_NAME;
 
 end;
 
@@ -440,6 +453,7 @@ begin
   AdjustCompletebyDefault := From.AdjustCompletebyDefault;
 
   AudioDeviceName:=From.AudioDeviceName;
+  AudioHostAPIName:=From.AudioHostAPIName;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -512,6 +526,11 @@ begin
     Exit;
   end;
   if AudioDeviceName <> From.AudioDeviceName then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if AudioHostAPIName <> From.AudioHostAPIName then
   begin
     Result := False;
     Exit;

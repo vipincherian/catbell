@@ -29,8 +29,8 @@ type
   AudioDeviceIndex = PaDeviceIndex;
 
   TAudioDevice = record
-    HostAPI: string;
-    Device: string;
+    HostAPIName: string;
+    DeviceName: string;
     //class operator = (aLeft, aRight: TAudioDevice): Boolean;
   end;
 
@@ -84,27 +84,28 @@ type
     Data : PaTestData;
     DataPointer : PPaTestData;
 
-    class function GetDefaultDeviceName: string; static;
     class function GetDevices: TAudioDeviceList; static;
     procedure SetFileName(AValue: string);
-    class procedure SetOutputDevice(AValue: string); static;
+    class procedure SetOutputDevice(AValue: TAudioDevice); static;
   public
     Loaded: boolean; static;
     FDevices: TAudioDeviceList; static;
     //FAudioDevices: TAudioDeviceList; static;
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
-    FOutputDevice: string; static;
+    FOutputDevice: TAudioDevice; static;
     OnPlayCompletion: TNotifyEvent;
     Looped: boolean;
     constructor Create();
     destructor Destroy; override;
-    class function GetDefaultDevice: AudioDeviceIndex; static;
-    class function GetDeviceIndex(DeviceName: string): AudioDeviceIndex; static;
+    class function GetDefaultDeviceIndex: AudioDeviceIndex; static;
+    class procedure GetDefaultDevice(Device: PAudioDevice); static;
+    class function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex; static;
     //class procedure GetAllDevices
-    class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
-    class property DefaultDeviceName: string read GetDefaultDeviceName;
+    class property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
+    //class property DefaultDeviceName: string read GetDefaultDeviceName;
     class property Devices: TAudioDeviceList read GetDevices;
+    class procedure SetDefaulDevice; static;
     procedure Play;
     procedure PlaySine;
     procedure Abort;
@@ -112,7 +113,7 @@ type
     property FileName: string read FFileName write SetFileName;
     property Duration: double read FAudioLength;
     property Playing: boolean read FAudioPlaying;
-    class property OutputDevice: string read FOutputDevice write SetOutputDevice;
+    class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
 
   end;
 
@@ -352,8 +353,8 @@ begin
         end;
         Device := New(PAudioDevice);
 
-        Device^.Device:=Devicename;
-        Device^.HostAPI:=HostAPIInfo^.Name;
+        Device^.DeviceName:=Devicename;
+        Device^.HostAPIName:=HostAPIInfo^.Name;
 
         FDevices.Add(Device);
         DebugLn('Devide ID - ' + IntToStr(Count));
@@ -371,28 +372,38 @@ begin
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class function TAudio.GetDefaultDeviceName: string; static;
+class procedure TAudio.GetDefaultDevice(Device: PAudioDevice); static;
 var
   DevideId: integer;
   DeviceInfo: PPaDeviceInfo;
-  DeviceName: string;
+  HostAPIInfo: PPaHostApiInfo;
+  DeviceName, HostAPIName: string;
 begin
   EnterCriticalSection(AudioCriticalSection);
-  DevideId := TAudio.GetDefaultDevice;
+  DevideId := TAudio.GetDefaultDeviceIndex;
   DeviceInfo := Pa_GetDeviceInfo(DevideId);
   if DeviceInfo = nil then
   begin
-    //DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
+    DebugLn('Error after GetDeviceInfo for device #' + IntToStr(DevideId));
     //FDevices.Clear;
     //FDevices.Add('Unknown');
-    Result := '';
-  end
-  else
-  begin
-    DeviceName := StrPas(DeviceInfo^.Name);
-    //FDevices.Add(DeviceName);
-    Result := DeviceName;
+    //Result := '';
+    Exit;
   end;
+
+  DeviceName := StrPas(DeviceInfo^.Name);
+  HostAPIInfo := Pa_GetHostApiInfo(DeviceInfo^.hostApi);
+  if HostAPIInfo = nil then
+  begin
+    DebugLn('Could not get HostAPI details');
+    Exit;
+  end;
+  HostAPIName:=StrPas(HostAPIInfo^.Name);
+  //FDevices.Add(DeviceName);
+  //Result := DeviceName;
+  Device^.DeviceName:=DeviceName;
+  Device^.HostAPIName:=HostAPIName;
+
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
@@ -449,13 +460,14 @@ begin
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class procedure TAudio.SetOutputDevice(AValue: string);
+class procedure TAudio.SetOutputDevice(AValue: TAudioDevice);
 var
   Id: AudioDeviceIndex;
 begin
   try
-    Id := GetDeviceIndex(Avalue);
-    FOutputDevice:=AValue;
+    //Id := GetDeviceIndex(Avalue);
+    FOutputDevice.DeviceName:=AValue.DeviceName;
+    FOutputDevice.HostAPIName:=AValue.HostAPIName;
   finally
   end;
 end;
@@ -503,7 +515,7 @@ begin
   inherited Destroy;
 end;
 
-class function TAudio.GetDefaultDevice: AudioDeviceIndex;
+class function TAudio.GetDefaultDeviceIndex: AudioDeviceIndex;
 var
   DeviceId: AudioDeviceIndex;
 begin
@@ -522,11 +534,12 @@ begin
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class function TAudio.GetDeviceIndex(DeviceName: string): AudioDeviceIndex;
+class function TAudio.GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
 var
-  NumDevices, Count: integer;
+  NumDevices, CountDevice, CountHostAPI: integer;
   DeviceInfo: PPaDeviceInfo;
   //DeviceName: string;
+  HostAPIInfo: PPaHostApiInfo;
 begin
   EnterCriticalSection(AudioCriticalSection);
   if not TAudio.Loaded then
@@ -546,26 +559,45 @@ begin
   end;
   DebugLn('Default device is ' + IntToStr(DefaultDeviceId)); }
 
-  for Count := 0 to NumDevices - 1 do
+  for CountDevice := 0 to NumDevices - 1 do
   begin
-    DeviceInfo := Pa_GetDeviceInfo(Count);
+    DeviceInfo := Pa_GetDeviceInfo(CountDevice);
     if DeviceInfo = nil then
     begin
-      DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
+      DebugLn('Error after GetDeviceInfo for device #' + IntToStr(CountDevice));
+      Continue;
+      //raise EInvalidDevice.Create('No matching device for ' + Device);
+    end;
       //FDevices.Clear;
       //FDevices.Add('Unknown');
-    end
-    else
-    if DeviceName = StrPas(DeviceInfo^.Name) then
+    if Device.DeviceName = StrPas(DeviceInfo^.Name) then
     begin
-      Result := Count;
-      LeaveCriticalSection(AudioCriticalSection);
-      Exit;
+      HostAPIInfo := Pa_GetHostApiInfo(DeviceInfo^.hostApi);
+      if HostAPIInfo = nil then
+      begin
+        DebugLn('Error after Pa_GetHostApiInfo for device #' + IntToStr(CountDevice) + ' host api #' + IntToStr(DeviceInfo^.hostApi));
+        Continue;
+      end;
+      if HostAPIInfo^.Name = Device.HostAPIName then
+      begin
+        Result := CountDevice;
+        LeaveCriticalSection(AudioCriticalSection);
+        Exit;
+      end;
     end;
   end;
   LeaveCriticalSection(AudioCriticalSection);
-  raise EInvalidDevice.Create('No matching device for ' + DeviceName);
+  raise EInvalidDevice.Create('No matching device for '
+    + Device.DeviceName + ':' + Device.HostAPIName);
 
+end;
+
+class procedure TAudio.SetDefaulDevice;
+{var
+  Device: TAudioDevice;}
+begin
+  TAudio.GetDefaultDevice(@FOutputDevice);
+  //FOutputDevice.DeviceName:=;
 end;
 
 procedure TAudio.Play;
@@ -596,8 +628,8 @@ begin
       DebugLn('Sf_seek returned error');
     end;
 
-    if FOutputDevice = '' then
-      DeviceId := DefaultDevice
+    if (FOutputDevice.HostAPIName = '') or (FOutputDevice.DeviceName = '') then
+      DeviceId := DefaultDeviceIndex
     else
       DeviceId := GetDeviceIndex(FOutputDevice);
     StreamParams.device := DeviceId;
@@ -667,8 +699,8 @@ begin
     //OutDevice:= StrToInt(  trim( LeftStr( ComboBox1.Caption, 2)));
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
-  if FOutputDevice = '' then
-    DeviceId := DefaultDevice
+  if (FOutputDevice.DeviceName = '') or (FOutputDevice.HostAPIName = '') then
+    DeviceId := DefaultDeviceIndex
   else
     DeviceId := GetDeviceIndex(FOutputDevice);
   OutputParameters.Device := DeviceId;
