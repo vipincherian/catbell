@@ -188,8 +188,8 @@ end;
 procedure TfrmOptions.RefreshAudioDevices;
 var
   DefaultDeviceId: AudioDeviceIndex;
-  DeviceNames: TStringList;
-  DeviceName: string;
+  Devices: TAudioDeviceList;
+  Device: PAudioDevice;
   Count: integer;
 begin
   { Load audio devices }
@@ -200,13 +200,13 @@ begin
   begin
     cmbAudioDevice.Items.Clear;
     DefaultDeviceId := TAudio.GetDefaultDevice;
-    DeviceNames := TAudio.Devices;
-    for Count := 0 to Devicenames.Count - 1 do
+    Devices := TAudio.Devices;
+    for Device in Devices do
     begin
-      DeviceName := DeviceNames.Strings[Count];
+      //Device := Devices.Strings[Count];
       {if Count = DefaultDeviceId then
-        DeviceName := DeviceName + ' (Default)';}
-      cmbAudioDevice.Items.Add(DeviceName);
+        Device := Device + ' (Default)';}
+      cmbAudioDevice.Items.Add(Device^.Device);
     end;
 
     if cmbAudioDevice.Items.Count > 0 then

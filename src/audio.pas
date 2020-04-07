@@ -1,12 +1,13 @@
 unit audio;
 
 {$mode objfpc}{$H+}
+{$MODESWITCH ADVANCEDRECORDS}
 
 interface
 
 uses
   Classes, SysUtils, sndfile, portaudio, LazLogger, ctypes, Forms,
-  Dialogs, LCLIntf, lcltype;
+  Dialogs, LCLIntf, lcltype, fgl;
 
 const
   READ_NOTLOADED = -1;
@@ -26,6 +27,15 @@ type
   EInvalidDevice = class(Exception);
   EInvalidAudio = class(Exception);
   AudioDeviceIndex = PaDeviceIndex;
+
+  TAudioDevice = record
+    HostAPI: string;
+    Device: string;
+    //class operator = (aLeft, aRight: TAudioDevice): Boolean;
+  end;
+
+  PAudioDevice = ^TAudioDevice;
+  TAudioDeviceList = specialize TFPGList<PAudioDevice>;
 
   TUserInfo = record
     //name : string[30];
@@ -75,12 +85,13 @@ type
     DataPointer : PPaTestData;
 
     class function GetDefaultDeviceName: string; static;
-    class function GetDevices: TStringList; static;
+    class function GetDevices: TAudioDeviceList; static;
     procedure SetFileName(AValue: string);
     class procedure SetOutputDevice(AValue: string); static;
   public
     Loaded: boolean; static;
-    FDeviceNames: TStringList; static;
+    FDevices: TAudioDeviceList; static;
+    //FAudioDevices: TAudioDeviceList; static;
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
     FOutputDevice: string; static;
@@ -93,7 +104,7 @@ type
     //class procedure GetAllDevices
     class property DefaultDevice: AudioDeviceIndex read GetDefaultDevice;
     class property DefaultDeviceName: string read GetDefaultDeviceName;
-    class property Devices: TStringList read GetDevices;
+    class property Devices: TAudioDeviceList read GetDevices;
     procedure Play;
     procedure PlaySine;
     procedure Abort;
@@ -108,6 +119,10 @@ type
 
 implementation
 
+{class operator TAudioDevice.=(aLeft, aRight: TAudioDevice): Boolean;
+begin
+   Result := (aLeft.Device = aRight.Device) and (aLeft.HostAPI = aRight.HostAPI);
+end;}
 {This function is called by PortAudio to request for audio data, and is passed
 as a parameter while opening the stream.
 It tries to read from the sound file and supply the data.
@@ -255,11 +270,15 @@ end;
 
 { TAudio }
 
-class function TAudio.GetDevices: TStringList; static;
+class function TAudio.GetDevices: TAudioDeviceList; static;
 var
-  NumDevices, Count: integer;
+  NumDevices, NumHostAPIs, Count, CountY: integer;
   DeviceInfo: PPaDeviceInfo;
-  DeviceName: string;
+  HostAPIInfo: PPaHostApiInfo;
+  HostAPIName, DeviceName: string;
+  DeviceList: TAudioDeviceList;
+  Device: PAudioDevice;
+  DeviceIndex: Integer;
 begin
   EnterCriticalSection(AudioCriticalSection);
   if not TAudio.Loaded then
@@ -268,7 +287,33 @@ begin
     raise EAudioNotLoaded.Create('Audio not loaded.');
   end;
 
-  TAudio.FDeviceNames.Clear;
+  {Clean-up the list of audio devices}
+  {for Device in TAudio.FAudioDevices do
+  begin
+    Dispose(Device);
+  end;
+  TAudio.FAudioDevices.Clear;  }
+
+  {NumHostAPIs := Pa_GetHostApiCount();
+  DebugLn('Enumerating Host APIs:-');
+  for Count := 0 to NumHostAPIs - 1 do
+  begin
+    HostAPIInfo :=Pa_GetHostApiInfo(Count);
+    HostAPIName := StrPas(HostAPIInfo^.Name);
+    for CountY := 0 to HostAPIInfo^.deviceCount - 1 do
+    begin
+       DeviceIndex := Pa_HostApiDeviceIndexToDeviceIndex(Count, CountY);
+       DeviceInfo := Pa_GetDeviceInfo(DeviceIndex);
+       DeviceName := StrPas(DeviceInfo^.Name);
+       DebugLn('Device found - ' + HostAPIName + ' : ' + DeviceName);
+    end;
+  end;  }
+
+  for Device in TAudio.FDevices do
+  begin
+    Dispose(Device);
+  end;
+  TAudio.FDevices.Clear;
   NumDevices := Pa_GetDeviceCount();
   if NumDevices < 0 then
   begin
@@ -290,24 +335,39 @@ begin
     if DeviceInfo = nil then
     begin
       DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
-      //FDeviceNames.Clear;
-      FDeviceNames.Add('Unknown');
+      //FDevices.Clear;
+      //FDevices.Add('Unknown');
     end
     else
     begin
       if DeviceInfo^.maxOutputChannels > 0 then
       begin
         DeviceName := StrPas(DeviceInfo^.Name);
-        FDeviceNames.Add(DeviceName);
+        HostAPIInfo := Pa_GetHostApiInfo(DeviceInfo^.hostApi);
+
+        if HostAPIInfo = nil then
+        begin
+          DebugLn('Error in getting HostAPI for devide #' + IntToStr(Count)
+           + ' (' + DeviceName + ')');
+        end;
+        Device := New(PAudioDevice);
+
+        Device^.Device:=Devicename;
+        Device^.HostAPI:=HostAPIInfo^.Name;
+
+        FDevices.Add(Device);
         DebugLn('Devide ID - ' + IntToStr(Count));
         DebugLn('Device name - ' + DeviceInfo^.Name);
+        DebugLn('Host API name - ' + HostAPIInfo^.Name);
         DebugLn('Device output channels - ' + IntToStr(DeviceInfo^.maxOutputChannels));
       end;
 
     end;
 
   end;
-  Result := FDeviceNames;
+  Result := FDevices;
+
+  //DeviceList.Destroy;
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
@@ -323,14 +383,14 @@ begin
   if DeviceInfo = nil then
   begin
     //DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
-    //FDeviceNames.Clear;
-    //FDeviceNames.Add('Unknown');
+    //FDevices.Clear;
+    //FDevices.Add('Unknown');
     Result := '';
   end
   else
   begin
     DeviceName := StrPas(DeviceInfo^.Name);
-    //FDeviceNames.Add(DeviceName);
+    //FDevices.Add(DeviceName);
     Result := DeviceName;
   end;
   LeaveCriticalSection(AudioCriticalSection);
@@ -492,8 +552,8 @@ begin
     if DeviceInfo = nil then
     begin
       DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
-      //FDeviceNames.Clear;
-      //FDeviceNames.Add('Unknown');
+      //FDevices.Clear;
+      //FDevices.Add('Unknown');
     end
     else
     if DeviceName = StrPas(DeviceInfo^.Name) then
@@ -714,7 +774,8 @@ var
 
 initialization
   TAudio.Loaded := False;
-  TAudio.FDeviceNames := TStringList.Create;
+  TAudio.FDevices := TAudioDeviceList.Create;
+  //TAudio.FAudioDevices := TAudioDeviceList.Create;
   {$IFNDEF AUDIO_STATIC}
   TAudio.Loaded := Pa_Load(LIB_PORTAUDIO);
   if not TAudio.Loaded then
@@ -793,5 +854,6 @@ finalization
     Pa_Unload;
     {$ENDIF}
   end;
-  TAudio.FDeviceNames.Free;
+  TAudio.FDevices.Free;
+  //TAudio.FAudioDevices.Free;
 end.
