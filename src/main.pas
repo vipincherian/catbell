@@ -215,7 +215,7 @@ type
 
     procedure CreateBitmaps;
     function GetStatusMessage: string;
-    procedure PostTimerCreation(AValue: TfraTimer);
+    procedure PostTimerCreation({%H-}AValue: TfraTimer);
     procedure SetListButtonsStatus;
     procedure ResizeHeaderSections;
 
@@ -249,10 +249,8 @@ type
     procedure MoveSelectedClocksUp;
     procedure MoveSelectedClocksDown;
     procedure OnShortTimer(Sender: TObject);
-    //TODO: We need only one of these
-    procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
-    procedure AfterShow2(Data: PtrInt);
-    procedure ShowModalAlert(Data: PtrInt);
+    procedure AfterShow({%H-}Data: PtrInt);
+    procedure ShowModalAlert({%H-}Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
 
   end;
@@ -569,7 +567,7 @@ begin
         LastPosNormal.Width, LastPosNormal.Height);
     end;
 
-    Application.QueueAsyncCall(@AfterShow2, 0);
+    Application.QueueAsyncCall(@AfterShow, 0);
 
     tbProgressAuto.Down := AutoProgress;
 
@@ -935,7 +933,7 @@ var
   Seconds: word;
 
   Duration: TDateTime;
-  Message, DurationText: string;
+  DurationText: string;
   Item: TListItem;
 begin
 
@@ -1532,13 +1530,7 @@ begin
 
 end;
 
-procedure TfrmMain.AfterShow(var Msg: TLMessage);
-begin
-  if FTimerFrames.Count = 0 then
-    aiNewTimer.Execute;
-end;
-
-procedure TfrmMain.AfterShow2(Data: PtrInt);
+procedure TfrmMain.AfterShow(Data: PtrInt);
 begin
   if FTimerFrames.Count = 0 then
     aiNewTimer.Execute;
