@@ -396,7 +396,7 @@ object frmOptions: TfrmOptions
         Top = 8
         Width = 483
         Anchors = [akTop, akLeft, akRight, akBottom]
-        Caption = 'Output'
+        Caption = 'Output device'
         ClientHeight = 212
         ClientWidth = 479
         TabOrder = 0
@@ -404,8 +404,8 @@ object frmOptions: TfrmOptions
           Left = 16
           Height = 15
           Top = 32
-          Width = 184
-          Caption = 'Select audio output device to use : '
+          Width = 110
+          Caption = 'Or, select manually : '
           ParentColor = False
         end
         object lsvAudioDevices: TListView
@@ -435,19 +435,30 @@ object frmOptions: TfrmOptions
           Left = 16
           Height = 19
           Top = 8
-          Width = 188
-          Caption = 'Use default audio output device'
+          Width = 79
+          Caption = 'Use default'
           OnChange = cbUseDefaultAudioChange
           TabOrder = 1
         end
         object edtDefaultDeviceName: TEdit
-          Left = 218
+          Left = 104
           Height = 23
-          Top = 4
-          Width = 246
+          Top = 8
+          Width = 192
+          Anchors = [akTop, akLeft, akRight]
           ReadOnly = True
           TabOrder = 2
           Text = 'edtDefaultDeviceName'
+        end
+        object edtDefaultHostAPI: TEdit
+          Left = 304
+          Height = 23
+          Top = 8
+          Width = 160
+          Anchors = [akTop, akRight]
+          ReadOnly = True
+          TabOrder = 3
+          Text = 'edtDefaultHostAPI'
         end
       end
       object GroupBox6: TGroupBox
