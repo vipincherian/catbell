@@ -392,11 +392,12 @@ begin
           TAudio.FOutputDevice.HostAPIName:=Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
         end;
       end;
-      Audio.PlaySine;
-      pgbAudio.Style := pbstMarquee;
-      bbPlay.Enabled := False;
-      bbStop.Enabled := True;
     end;
+
+    Audio.PlaySine;
+    pgbAudio.Style := pbstMarquee;
+    bbPlay.Enabled := False;
+    bbStop.Enabled := True;
 
     {if cmbAudioDevice.ItemIndex >= 0 then
     begin
