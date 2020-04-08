@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, LazLogger, adjustform, {sndfile, portaudio,} audio,
-  ctypes, LMessages, LCLIntf, StrUtils;
+  {ctypes,} LMessages, LCLIntf, StrUtils;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -60,17 +60,6 @@ const
 
 type
 
-  {TUserInfo = record
-    //name : string[30];
-    //age  : byte;
-    SoundFile: PSndFile;
-    Info: SF_INFO;
-    //Handle: THandle;
-    Widget: Pointer;
-  end;
-  PAudioInfo = ^TUserInfo; }
-  { TfraTimer }
-
   TfraTimer = class(TFrame)
     aiAdjust: TAction;
     aiEdit: TAction;
@@ -99,8 +88,7 @@ type
     procedure ckbIconProgressChange(Sender: TObject);
     procedure dtpSetChange(Sender: TObject);
     procedure imgTimerClick(Sender: TObject);
-    //procedure sbNotifyClick(Sender: TObject);
-    //procedure UpdateNotifyButton;
+
   private
     { private declarations }
     FId: longword;
@@ -109,9 +97,6 @@ type
     FModalAlert: boolean;
     FTrayNotification: boolean;
     FTitleEditable: boolean;
-    //FObservers: TTimerObserverList;
-    //FShortTimer: TTimer;
-    //FNotifier: boolean;
 
     FOrigTickDuration: longword;
     FStartTickCount: longword;
@@ -120,92 +105,50 @@ type
 
     FPaused: boolean;
     FRunning: boolean;
-    //FAudioPlaying: boolean;
-
     FProgress: single;
 
-    //FSoundFile: PSndFile;
-
-    //FUserInfo: TUserInfo;
-    //FStream: PPaStream;
-
-    //FInfo: SF_INFO;
     FAudio: TAudio;
 
-
-    //FAudioCallback: PPaStreamCallback;
-    //FObservers: TListTimerObservers;
-    //function GetShowProgressOnIcon: boolean;
     procedure SetAudio(AValue: TAudio);
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
     function GetDuration: TDateTime;
     function GetDurationEnabled: boolean;
-    //function GetImageGreyed: boolean;
     function GetIsProgressOnIcon: boolean;
     function GetPauseButtonEnabled: boolean;
     function GetPlayButtonEnabled: boolean;
     function GetSelected: boolean;
     function GetStopButtonEnabled: boolean;
     procedure SetCaption(AValue: string);
-    //procedure SetCounter(AValue: string);
     procedure SetDuration(AValue: TDateTime);
     procedure SetDurationEnabled(AValue: boolean);
-    //procedure SetId(AValue: longword);
-    //procedure SetImageGreyed(AValue: boolean);
     procedure SetIsProgressOnIcon(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
     procedure SetPauseButtonEnabled(AValue: boolean);
     procedure SetPlayButtonEnabled(AValue: boolean);
-    //procedure SetShowProgressOnIcon(AValue: boolean);
+
     procedure SetStopButtonEnabled(AValue: boolean);
     function GetId: longword;
     procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: longword);
 
-    //procedure SetNotifier(AValue: boolean);
-    {function GetTop: integer;
-    procedure SetTop(AValue: integer);
-    function GetHeight: integer;
-    procedure SetHeight(AValue: integer);
-    function GetWidth: integer;
-    procedure SetWidth(AValue: integer);   }
   public
     { public declarations }
-    {TODO: Review these two events and remove dynamic bindings}
-    //OnNotifyClick: TNotifyEvent;
-    //OnNotifyChange: TNotifyEvent;
-    //OnProgressOnIconChanged: TNotifyEvent;
-    //OnPlay: TNotifyEvent;
-    //OnStop: TNotifyEvent;
-    //OnPause: TNotifyEvent;
-    //OnNotify: TNotifyEvent;
-    //OnSelect: TNotifyEvent;
-    //OnTimerStart: TNotifyEvent;
-    //OnTimerPause: TNotifyEvent;
-    //OnTimerStop: TNotifyEvent;
 
     LastProgressIconIndex: integer;
-    //LastProgressPercent: integer;
-    AudioInfo: TTimerAudioInfo;
-    //AudioLooped: boolean;
 
-    //AudioFileName: string;
-    //AudioLength: double;
-    //OnTimerProgressUpdate: TNotifyEvent;
+    AudioInfo: TTimerAudioInfo;
 
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
     CallbackOnProgressOnIconChange: boolean;
-    //procedure PlayClicked(Sender: TObject);
-    //procedure Stopclicked(Sender: TObject);
-    //procedure PauseClicked(Sender: TObject);
-    //procedure NotifyClicked(Sender: TObject);
+
     procedure ClockSelected(Sender: TObject);
     procedure AudioPlayed(Sender: TObject);
     procedure Hide;
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Id: longword read FId write SetId;
@@ -216,17 +159,11 @@ type
     procedure Start;
     procedure Pause;
     procedure Stop(UserInitiated: boolean);
-    //procedure NotifyChange(Sender: TObject);
+
     procedure Finish;
     procedure PublishProgress(Percent: single);
-    //procedure AddSubscription(aObserver: ITimerObserver);
-    //procedure RemoveSubscription(aObserver: ITimerObserver);
+
     procedure AdjustTimer(Sender: TObject);
-    //function SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
-    //procedure PlayAudio;
-    //procedure FinishedAudio(var Msg: TLMessage); message UM_FINISHED_AUDIO;
-    //procedure FinishedAud(Data: PtrInt);
-    //procedure TriggerAudio(Data: PtrInt);
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
@@ -238,17 +175,12 @@ type
     property Duration: TDateTime read GetDuration write SetDuration;
     property DurationEnabled: boolean read GetDurationEnabled write SetDurationEnabled;
     property Caption: string read GetCaption write SetCaption;
-    //property ImageGreyed: boolean read GetImageGreyed write SetImageGreyed;
+
     property IsProgressOnIcon: boolean read GetIsProgressOnIcon
       write SetIsProgressOnIcon;
-    //property ShowProgressOnIcon: boolean read GetShowProgressOnIcon write SetShowProgressOnIcon;
-    property Selected: boolean read GetSelected;
-    //property Id: longword read GetId write SetId;
-    //property Top: integer read GetTop write SetTop;
-    //property Height: integer read GetHeight write SetHeight;
-    //property Width: integer read GetWidth write SetWidth;
 
-    //property Notifier: boolean read FNotifier write SetNotifier;
+    property Selected: boolean read GetSelected;
+
     property Running: boolean read FRunning;
     property Paused: boolean read FPaused;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
@@ -256,102 +188,17 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     property Audio: TAudio read FAudio write SetAudio;
-    //property AudioInfo: TTimerAudioInfo read FAudioInfo write FAudioInfo;
-    //property AudioFile: string read AudioFileName;
-    //property AudioLength: double read AudioLength;
-    //function AudioCallback(const input: pointer; output: pointer; frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
+
   end;
 
-//function AudioCallback(input: pointer; output: pointer; frameCount: culong; timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
 implementation
 
 uses
   main;
 
-{This function is called by PortAudio to request for audio data, and is passed
-as a parameter while opening the stream.
-It tries to read from the sound file and supply the data.
-If read does not return any data, or if it is less than the number of frames
-requested, it assumes tha the entire data has been exhausted and
-it closes the sound file and returns paComplete.
-This will stop the stream and the associated callback - which
-triggers on stoppage of the steam - gets called.}
-
-{function FeedStream(input: pointer; output: pointer; frameCount: culong;
-  timeInfo: PPaStreamCallbackTimeInfo; statusFlags: PaStreamCallbackFlags;
-  userData: pointer): cint; cdecl;
-var
-  AudioInfo: PAudioInfo;
-  //AudBuffer: pointer;
-  readCount: cint;
-  Widget: TfraTimer;
-begin
-  //DebugLn('Inside audio callback');
-  AudioInfo := PAudioinfo(userData);
-  Widget := TfraTimer(AudioInfo^.Widget);
-
-  readCount := 0;
-  readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
-    (AudioInfo^.Info.channels));
-
-  if Widget.AudioLooped then
-  begin
-    { If audio is lopped and if no audio data could be read,
-    seek to the beginning and then read again }
-    if readCount = 0 then
-    begin
-      if sf_seek(AudioInfo^.SoundFile, 0, SEEK_SET) = -1 then
-      begin
-        DebugLn('Sf_seek returned error');
-      end;
-      readCount := 0;
-      readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
-        (AudioInfo^.Info.channels));
-      if readCount = 0 then
-      begin
-        DebugLn('readCount zero immediately after seek to beginning');
-        Result := cint(paAbort);
-        Exit;
-      end;
-    end;
-    { If audio is looped, always continue }
-    Result := cint(paContinue);
-  end { when audio is not looped }
-  else
-  begin
-    if readCount = (frameCount * AudioInfo^.Info.channels) then
-    begin
-      Result := cint(paContinue);
-    end
-    else
-    begin
-      //sf_close(AudioInfo^.SoundFile);
-      Result := cint(paComplete);
-    end;
-  end;
-
-
-end;}
-
-{This function is called by PortAudio to signal that the stream has stopped.
-As this is a non-class function, it sends a message to frame using the frame's
-handle.}
-{procedure StreamFinished(UserData: pointer); cdecl;
-var
-  AudioInfo: PAudioInfo;
-  Widget: TfraTimer;
-begin
-  //DebugLn('Inside streamFinished');
-  AudioInfo := PAudioinfo(userData);
-  Widget := TfraTimer(AudioInfo^.Widget);
-  //PostMessage(AudioInfo^.Handle, UM_FINISHED_AUDIO, 0, 0);
-  Application.QueueAsyncCall(@(Widget.FinishedAud), 0);
-end;}
-
 {$R *.lfm}
 
 { TfraTimer }
-
 
 procedure TfraTimer.dtpSetChange(Sender: TObject);
 begin
@@ -360,13 +207,11 @@ end;
 
 procedure TfraTimer.aiPlayExecute(Sender: TObject);
 begin
-  //PlayClicked(Sender);
   Start;
 end;
 
 procedure TfraTimer.aiStopExecute(Sender: TObject);
 begin
-  //Stopclicked(Sender);
   Stop(True);
 end;
 
@@ -377,8 +222,6 @@ end;
 
 procedure TfraTimer.ckbIconProgressChange(Sender: TObject);
 begin
-  //if not ckbIconProgress.Checked then
-  //  Exit;
   if CallbackOnProgressOnIconChange then
   begin
     frmMain.HandleTimerFrameIconProgressChange(Self);
@@ -387,36 +230,21 @@ begin
     the icons are updated. }
     if ckbIconProgress.Checked and FPaused then
       frmMain.ProgressUpdate(Self, FProgress);
-      //HandleTimerTrigger(True);
-    {if OnProgressOnIconChanged <> nil then
-    begin
-      OnProgressOnIconChanged(Self);
-    end
-    else
-      ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-        +' ' +
-{$I %LINE%}
-        +': OnProgressOnIconChanged was found to be Nil');}
   end;
 end;
 
 procedure TfraTimer.aiPauseExecute(Sender: TObject);
 begin
-  //PauseClicked(Sender);
   Pause;
 end;
 
 procedure TfraTimer.aiEditExecute(Sender: TObject);
-{var
-  //Hour, Min, Sec, Milli: word;
-  ErrorText: string;}
 begin
   frmEdit.Description := edtTitle.Text;
   frmEdit.Duration := dtpSet.Time;
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
-  //frmEdit.SetAudioFile(AudioFileName, ErrorText);
+
   if TAudio.Loaded then
   begin
     frmEdit.Audio := FAudio;
@@ -429,7 +257,6 @@ begin
     frmEdit.AudioDuration:= AudioInfo.Duration;
     frmEdit.AudioLooped:=AudioInfo.Looped;
   end;
-  //frmEdit.AudioFileName:=FAudio.FileName;
 
   if frmEdit.ShowForEdit(Self) then
   begin
@@ -437,8 +264,7 @@ begin
     dtpSet.Time := frmEdit.Duration;
     FTrayNotification := frmEdit.TrayNotification;
     FModalAlert := frmEdit.ModalAlert;
-    //AudioFileName := frmEditTimer.AudioFile;
-    //SetAudioFile(frmEdit.AudioFileName, frmEdit.AudioDuration, ErrorText);
+
     if TAudio.Loaded then
       frmEdit.Audio.Looped:=  frmEdit.ckbLoop.Checked
     else
@@ -447,7 +273,6 @@ begin
       AudioInfo.Duration := frmEdit.AudioDuration;
       AudioInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
-    //Audio.Looped:=frmEdit.ckbLoop.Checked;
   end;
 end;
 
@@ -478,28 +303,6 @@ begin
 
 end;
 
-{procedure TfraTimer.sbNotifyClick(Sender: TObject);
-begin
-  //UpdateNotifyButton;
-  if OnNotifyClick <> nil then
-    OnNotifyClick(Self)
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnNotifyClick was found to be Nil');
-end;}
-
-{procedure TfraTimer.UpdateNotifyButton;
-begin
-  if sbNotify.Down then
-    ilTimer.GetBitmap(TIMER_IMG_NOTIFY_YES, sbNotify.Glyph)
-  else
-    ilTimer.GetBitmap(TIMER_IMG_NOTIFY_NO, sbNotify.Glyph);
-end;}
-
-
 procedure TfraTimer.SetId(AValue: longword);
 begin
   Assert(AValue > 0);
@@ -509,7 +312,6 @@ begin
     Exit;
   FId := AValue;
   Name := Name + IntToStr(AValue);
-  //Id := IdNew;
 end;
 
 procedure TfraTimer.SetAudio(AValue: TAudio);
@@ -517,11 +319,6 @@ begin
   FAudio.Free;
   FAudio := AValue
 end;
-
-{function TfraTimer.GetShowProgressOnIcon: boolean;
-begin
-  Result:=ckbIconProgress.Checked;
-end;}
 
 function TfraTimer.GetCaption: string;
 begin
@@ -543,14 +340,8 @@ begin
   Result := dtpSet.Enabled;
 end;
 
-{function TfraTimer.GetImageGreyed: boolean;
-begin
-  Result := imgTimer.Visible;
-end;}
-
 function TfraTimer.GetIsProgressOnIcon: boolean;
 begin
-  //Result := sbNotify.Down;
   Result := ckbIconProgress.Checked;
 end;
 
@@ -590,21 +381,9 @@ begin
   dtpSet.Enabled := AValue;
 end;
 
-{procedure TfraTimer.SetImageGreyed(AValue: boolean);
-begin
-  ;{if AValue then
-    ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap)
-  else
-    ilTimer.GetBitmap(TIMER_IMG_COLOUR_TIMER, imgTimer.Picture.Bitmap);}
-  //FFrame.imgTimer.Picture.Bitmap;
-end;}
-
 procedure TfraTimer.SetIsProgressOnIcon(AValue: boolean);
 begin
-  //sbNotify.Down := AValue;
   ckbIconProgress.Checked := AValue;
-  //UpdateNotifyButton;
-  //FNotifier:=AValue;
 end;
 
 procedure TfraTimer.SetModalAlert(AValue: boolean);
@@ -623,11 +402,6 @@ procedure TfraTimer.SetPlayButtonEnabled(AValue: boolean);
 begin
   bbPlay.Enabled := AValue;
 end;
-
-{procedure TfraTimer.SetShowProgressOnIcon(AValue: boolean);
-begin
-  ckbIconProgress.Checked:=AValue;
-end;}
 
 procedure TfraTimer.SetStopButtonEnabled(AValue: boolean);
 begin
@@ -679,8 +453,7 @@ begin
     Counter := CounterText;
 
   // Calculate percentage ProgressPercentage
-  //if IsProgressOnIcon then
-  //begin
+
   ProgressPercentage := 1 - (PendingMilliseconds / FOrigTickDuration);
   // Elapsed time can exceed total pending tick duration, in certain cases.
   // The system could go on sleep mode while a timer is running
@@ -692,87 +465,11 @@ begin
     ProgressPercentage := 0;
   Assert(ProgressPercentage <= 1);
   PUblishProgress(1 - (PendingMilliseconds / FOrigTickDuration));
-  //end;
+
 end;
-
-{procedure TfraTimer.SetNotifier(AValue: boolean);
-begin
-  if FNotifier = AValue then
-    Exit;
-  FNotifier := AValue;
-  IsProgressOnIcon := AValue;
-end;}
-
-{procedure TfraTimer.PlayClicked(Sender: TObject);
-begin
-  //ShowMessage('In Widget');
-  if OnPlay <> nil then
-  begin
-    OnPlay(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnPlay was found to be Nil');
-end;
-
-procedure TfraTimer.Stopclicked(Sender: TObject);
-begin
-  if OnStop <> nil then
-  begin
-    OnStop(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnStop was found to be Nil');
-end;
-
-procedure TfraTimer.PauseClicked(Sender: TObject);
-begin
-  if OnPause <> nil then
-  begin
-    OnPause(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnPause was found to be Nil');
-end;}
-
-{procedure TfraTimer.NotifyClicked(Sender: TObject);
-begin
-  if OnNotify <> nil then
-  begin
-    OnNotify(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnNotify was found to be Nil');
-end;}
 
 procedure TfraTimer.ClockSelected(Sender: TObject);
 begin
-  //ShowMessage('TTimerClockWidget.Selected');
-  {if OnSelect <> nil then
-  begin
-    OnSelect(Self);
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnSelect was found to be Nil');}
   frmMain.ClockSelected(Self);
 end;
 
@@ -782,11 +479,8 @@ begin
   PauseButtonEnabled := False;
   StopButtonEnabled := False;
   DurationEnabled := True;
-  //ImageGreyed := True;
-  //Counter := DEF_COUNTDOWN_CAPTION;
-  bbAdjust.Enabled := False;
 
-  //FAudioPlaying := False;
+  bbAdjust.Enabled := False;
 end;
 
 procedure TfraTimer.Hide;
@@ -794,80 +488,25 @@ begin
   Top := Top + Height;
 end;
 
-{function TfraTimer.GetTop: integer;
-begin
-  Result := FFrame.Top;
-end;
-
-procedure TfraTimer.SetTop(AValue: integer);
-begin
-  FFrame.Top := AValue;
-end;
-
-function TfraTimer.GetHeight: integer;
-begin
-  Result := FFrame.Height;
-end;
-
-procedure TfraTimer.SetHeight(AValue: integer);
-begin
-  FFrame.Height := AValue;
-end;
-
-function TfraTimer.GetWidth: integer;
-begin
-  Result := FFrame.Width;
-end;
-
-procedure TfraTimer.SetWidth(AValue: integer);
-begin
-  FFrame.Width := AValue;
-end; }
-
 constructor TfraTimer.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   InitCriticalSection(AudioCriticalSection);
   FId := 0;
   FProgress := 0.0;
-  //teSet.Time := EncodeTime(0, GlobalDefault.TimerInitMins, 0, 0);
+
   with GlobalUserConfig do
   begin
     dtpSet.Time := DefaultTimerDuration;
-    //EncodeTime(DefaultTimerHours, DefaultTimerMins,
-    //  DefaultTimerSecs, 0);
     edtTitle.Text := DefaultTimerTitle;
   end;
 
-  //  sbNotify.Glyph;
-  //ilTimer.GetBitmap(TIMER_IMG_NOTIFY_NO, sbNotify.Glyph);
-  //teSet.
-
-  //OnPlay := nil;
-
   Parent := TWinControl(AOwner);
-  //Name := Name + IntToStr(IdNew);
-  //Id := IdNew;
-  //sbPlay.OnClick := @PlayClicked;
-  //sbStop.OnClick := @StopClicked;
-  //sbPause.OnClick := @PauseClicked;
-  //OnNotifyClick := @NotifyClicked;
-  cbSelect.OnChange := @ClockSelected;
-  //OnProgressOnIconChanged := nil;
 
-  //ilTimer.GetBitmap(TIMER_IMG_GREY_TIMER, imgTimer.Picture.Bitmap);
+  cbSelect.OnChange := @ClockSelected;
 
   FRunning := False;
   FPaused := False;
-  //FAudioPlaying := False;
-  //FNotifier := False;
-
-  //FObservers := TListTimerObservers.Create;
-
-  {FShortTimer := TTimer.Create(nil);
-  FShortTimer.Interval := 200;
-  FShortTimer.Enabled := False;
-  FShortTimer.OnTimer := @HandleTimerTrigger;}
 
   bbPlay.Caption := '';
   bbPause.Caption := '';
@@ -885,9 +524,6 @@ begin
 
   CallbackOnProgressOnIconChange := True;
 
-  //FStream := nil;
-  //FSoundFile := nil;
-  //AudioLooped := false;
   FAudio := Nil;
   if TAudio.Loaded then
   begin
@@ -895,21 +531,14 @@ begin
     FAudio.OnPlayCompletion:=@AudioPlayed;
   end;
 
-
-  //FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
 end;
 
 destructor TfraTimer.Destroy;
 begin
   FAudio.Free;
   Parent := nil;
-  //FShortTimer.Free;
-  //FObservers.Free;
-  {if (FSoundFile <> nil) and frmMain.AudioWorking then
-  begin
-    sf_close(FSoundFile);
-  end;}
-  DoneCriticalsection(AudioCriticalSection);
+
+  //DoneCriticalsection(AudioCriticalSection);
   inherited Destroy;
 end;
 
@@ -939,22 +568,13 @@ var
   CurrTickCount: longword;
 begin
   EnterCriticalSection(AudioCriticalSection);
-  { If the countdown timer is not running, then default to 00:00:00}
-  //if FRunning = False then
-  //Counter := DEF_COUNTDOWN_CAPTION
-  //FEndTickCount
-  //else if FPaused = False then
+
   if FRunning and (FPaused = False) then
   begin
     CurrTickCount := GetTickCount64;
 
     if FEndTickCount <= CurrTickCount then
     begin
-      {Stop(Self);
-      //TODO: 0 is not okay
-      //TODO: Title is hardcoded
-      for Observer in FObservers do
-        Observer.Finished(0, 'Countdown timer!', FWidget.Duration);}
       Counter := DEF_COUNTDOWN_CAPTION;
       Finish;
       LeaveCriticalSection(AudioCriticalSection);
@@ -973,7 +593,6 @@ var
   Hours: word;
   Minutes: word;
   Seconds: word;
-  //Milliseconds: word;
 begin
   TempDuration := Duration;
 
@@ -984,7 +603,6 @@ begin
   if (Hours = 0) and (Minutes = 0) and (Seconds = 0) then
     Exit;
 
-  //FShortTimer.Enabled := True;
   if FPaused = False then
   begin
     FStartTickCount := GetTickCount64;
@@ -997,7 +615,6 @@ begin
     if GlobalUserConfig.AutoProgress = True then
     begin
       IsProgressOnIcon := True;
-      //NotifyChange(Self);
     end;
   end
   else
@@ -1009,18 +626,13 @@ begin
   FRunning := True;
   FPaused := False;
 
-  // with FWidget do
-  //begin
   PlayButtonEnabled := False;
   PauseButtonEnabled := True;
   StopButtonEnabled := True;
   DurationEnabled := False;
-  //ImageGreyed := False;
-  bbAdjust.Enabled := True;
-  //end;
 
-  {if OnTimerStart <> nil then
-    OnTimerStart(Self);}
+  bbAdjust.Enabled := True;
+
   frmMain.TimerStarted(Self);
 
   if frmEdit.Showing and (frmEdit.Id = FId) then
@@ -1030,30 +642,23 @@ end;
 
 procedure TfraTimer.Pause;
 begin
-  //ShowMessage('Pause');
-  //FShortTimer.Enabled := False;
 
   FPendingTickCount := FEndTickCount - GetTickCount64;
   if FPendingTickCount <= 0 then
     Finish;
 
   FPaused := True;
-  //with FWidget do
-  //begin
+
   PlayButtonEnabled := True;
   PauseButtonEnabled := False;
   StopButtonEnabled := True;
   DurationEnabled := False;
-  //end;
-  //if OnTimerPause <> nil then
-  //  OnTimerPause(Self);
+
   frmMain.TimerPaused(Self);
 
 end;
 
 procedure TfraTimer.Stop(UserInitiated: boolean);
-{var
-  AudioDevice: TAudioDevice;}
 begin
   { The audio is playing and the user request is to terminate the audio.}
   DebugLn('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));
@@ -1065,22 +670,14 @@ begin
     PauseButtonEnabled := False;
     StopButtonEnabled := False;
     DurationEnabled := True;
-    //Counter := DEF_COUNTDOWN_CAPTION;
-    bbAdjust.Enabled := False;
 
-    {PaErrCode := Pa_AbortStream(FStream);
-    if (paErrCode <> Int32(paNoError)) then
-    begin
-      WriteLn('Pa_AbortStream failed ' + Pa_GetErrorText(paErrCode));
-      WriteLn('Error after Pa_AbortStream ' + IntToHex(PaErrCode, 8));
-    end;}
+    bbAdjust.Enabled := False;
 
     {There is no need to close the stream. Stopping/aborting the stream
     will trigger the callback for stream stoppage. The stream will be closed
     in that callback function}
     FAudio.Abort;
 
-    //FAudioPlaying := False;
     Exit;
   end
   else
@@ -1108,10 +705,8 @@ begin
 
     if TAudio.Loaded and (Audio.FileName <> '') and (not UserInitiated) then
     begin
-      //Assert(FSoundFile <> nil);
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
-      //PlayAudio;
 
       TAudio.UseDefaultDevice:=GlobalUserConfig.UseDefaultAudioDevice;
 
@@ -1128,11 +723,8 @@ begin
 
       end;
 
-      //FAudio.Looped := AudioLooped;
       FAudio.Play;
       DebugLn('FAudio.Play');
-      //FAudioPlaying:=True;
-      //Application.QueueAsyncCall(@TriggerAudio, 0);
     end
     else
     begin
@@ -1143,57 +735,22 @@ begin
   frmMain.TimerFinished(Self, UserInitiated);
 end;
 
-{procedure TfraTimer.NotifyChange(Sender: TObject);
-begin
-  if OnNotifyChange <> nil then
-  begin
-    OnNotifyChange(Self);
-    //ShowMessage('Change');
-  end
-  else
-    ShowMessage('Unexpected error at ' +
-{$I %FILE%}
-      +' ' +
-{$I %LINE%}
-      +': OnNotifyChange was found to be Nil');
-end;}
-
 procedure TfraTimer.Finish;
-{var
-  Observer: ITimerObserver;}
 begin
 
-  //WriteLn('At TfraTimer.Finish');
-  //DebugLn('Entering TfraTimer.Finish');
-  //DebugLn('Entering TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
   Stop(False);
-
-  //if OnTimerStop <> nil then
-  //  OnTimerStop(Self);
-
-
-  {for Observer in FObservers do
-  begin
-    Observer.TimerFinished(FId);
-  end;}
 
   if IsProgressOnIcon then
     PublishProgress(TIMER_PROGRESS_FINISHED);
 
-  //DebugLn('Exiting TfraTimer.Finish. Timer ID - ' + InttoStr(FId));
 end;
 
 procedure TfraTimer.PublishProgress(Percent: single);
-{var
-  Observer: ITimerObserver;}
 begin
-  //for Observer in FObservers do
-  //  Observer.ProgressUpdate(Percent);
   {Save only actual percentage progress, or finished states.}
   if Percent <= (TIMER_PROGRESS_OFFTRAY - 0.01) then
     FProgress := Percent;
-  //if OnTimerProgressUpdate <> nil then
-  //  OnTimerProgressUpdate(Self);
+
   frmMain.ProgressUpdate(Self, Percent);
 
 end;
@@ -1216,7 +773,6 @@ begin
 
   case frmAdjust.cmbOptions.ItemIndex of
     ADJUST_SHORTEN:
-      //frmTimerAdjust.dtpAdjust.Time:=;
     begin
       Hours := HourOf(frmAdjust.dtpDiff.Time);
       Mins := MinuteOf(frmAdjust.dtpDiff.Time);
@@ -1292,23 +848,18 @@ begin
       Inc(FOrigTickDuration, Adjustment);
       if FPaused = False then
       begin
-        //FEndTickCount:= FEndTickCount + Adjustment;
         Inc(FEndTickCount, Adjustment);
-        //FOrigTickDuration := FOrigTickDuration + Adjustment;
         HandleTimerTrigger();
       end
       else
       begin
-        //FPendingTickCount:=FPendingTickCount + Adjustment;
         Inc(FPendingTickCount, Adjustment);
-        //FOrigTickDuration := FOrigTickDuration + Adjustment;
         UpdateProgress(FPendingTickCount);
       end;
       frmAdjust.Close;
     end;
     ADJUST_STOPBY:
     begin
-      ;//Diff := MilliSecondsBetween(Now, frmTimerAdjust.dtpTill.DateTime);
       CurrTickCount := GetTickCount64;
       if CurrTickCount >= FEndTickCount then
         Exit;
@@ -1341,311 +892,5 @@ begin
   end;
 end;
 
-{function TfraTimer.SetAudioFile(AValue: string; Duration: double; out Error: string): boolean;
-  //var
-  //Info: SF_INFO;
-  //SoundFile: PSndFile;
-begin
-  Result := False;
-  //FInfo.format := 0;
-
-  if AValue = '' then
-  begin
-    //AudioFileName := '';
-    //AudioLength := 0;
-    ;
-    //lblLengthText.Visible:=False;
-    //edtAudioFile.Text:='';
-    //lblLenthVal.Caption:=FloatToStr(RoundTo(AudioLength, -2));
-    //lblLenthVal.Visible:=False;
-    FAudio.FileName:='';
-    Result := True;
-    Exit;
-  end;
-
-  { If audio is not working, then set the filepath and duration without
-  additional checks. This is done so that the default config does not lose this
-  information when saved later.}
-  if not TAudio.Loaded then
-  begin
-    //DebugLn('SetAudioFile called when audio is not working');
-    //AudioFileName:=AValue;
-    //AudioLength:=Duration;
-    AudioInfo.FileName:=AValue;
-    AudioInfo.Duration:=Duration;
-    //FSoundFile:=Nil;
-    Result := True;
-    Exit;
-  end;
-
-  {if FSoundFile <> nil then
-    sf_close(FSoundFile);
-  FSoundFile := sf_open(PChar(AValue), SFM_READ, @FInfo);
-  if (FSoundFile = nil) then
-  begin
-    DebugLn('Error in sf_open');
-    //sf_perror(nil);
-    //ReadKey;
-    //exit;
-    Error := 'SoundFile is nil';
-    Exit;
-  end;
-  DebugLn(IntToHex(FInfo.format, 8));
-  DebugLn(IntToStr(FInfo.channels));
-  DebugLn(IntToStr(FInfo.frames));
-  DebugLn(IntToStr(FInfo.samplerate));
-  DebugLn(IntToStr(FInfo.sections));
-  AudioLength := (FInfo.frames) / (FInfo.samplerate);
-  //ShowMessage('length is ' + FloatToStr(AudioLength)); }
-
-  FAudio.FileName:=Avalue;
-  //AudioFileName := AValue;
-
-  //sf_close(SoundFile);
-
-
-  //lblLengthText.Visible:=True;
-  //edtAudioFile.Text:=AudioFileName;
-  //lblLenthVal.Caption:=FloatToStr(RoundTo(AudioLength, -2));
-  //lblLenthVal.Visible:=True;
-  Result := True;
-
-end; }
-
-{procedure TfraTimer.PlayAudio;
-{var
-  //SoundFile: PSndFile;
-  //Info: SF_INFO;
-  PaErrCode: PaError;
-  StreamParams: PaStreamParameters;
-  NumDevices, DefaultDevice, DeviceId, Count: integer;
-  DeviceInfo: PPaDeviceInfo;
-  DeviceName: string;}
-begin
-  {
-  if not frmMain.AudioWorking then
-  begin
-    DebugLn('PlayAudio called when audio is not working');
-    Exit;
-  end;
-  DebugLn('Playing audio');
-  FInfo.format := 0;
-
-  {SoundFile := sf_open(PChar(FAudioFile), SFM_READ, @Info);
-  if (SoundFile = nil) then
-  begin
-    DebugLn('Error in sf_open ');
-    sf_perror(nil);
-    //ReadKey;
-    exit;
-  end;}
-  {DebugLn(IntToHex(Info.format, 8));
-  DebugLn(IntToStr(Info.channels));
-  DebugLn(IntToStr(Info.frames));
-  DebugLn(IntToStr(Info.samplerate));
-  DebugLn(IntToStr(Info.sections));}
-
-  Assert(FSoundFile <> nil);
-
-  if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
-  begin
-    DebugLn('Sf_seek returned error');
-  end;
-
-  DefaultDevice:=Pa_GetDefaultOutputDevice();
-  if DefaultDevice = paNoDevice then
-  begin
-    DebugLn('No default device');
-  end;
-
-  DebugLn('Default device is ' + IntToStr(DefaultDevice));
-
-  StreamParams.device := -1;
-
-  if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-    StreamParams.device := DefaultDevice
-  else
-  begin
-    NumDevices := Pa_GetDeviceCount();
-    if NumDevices < 0 then
-    begin
-      DebugLn('Pa_GetDeviceCount failed ');
-      DebugLn('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
-    end;
-
-    for Count := 0 to NumDevices - 1 do
-    begin
-      DeviceInfo := Pa_GetDeviceInfo(Count);
-      if DeviceInfo = Nil then
-        DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count))
-      else
-      begin
-        DeviceName:=StrPas(DeviceInfo^.Name);
-        if DeviceName = GlobalUserConfig.AudioDeviceName then
-        begin
-          StreamParams.device:=Count;
-          break;
-        end;
-      end;
-    end;
-    if StreamParams.device = -1 then
-      StreamParams.device := DefaultDevice;
-  end;
-  //StreamParams.device := 8;
-  DebugLn('Audio device is ' + IntToStr(StreamParams.device));
-
-  StreamParams.channelCount := FInfo.channels;
-  StreamParams.sampleFormat := paFloat32;
-
-  Streamparams.suggestedLatency :=
-    Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
-  StreamParams.hostApiSpecificStreamInfo := nil;
-  DebugLn('Default device is ' + IntToStr(StreamParams.device));
-
-  //Callback := @FeedStream;
-  FUserInfo.SoundFile := FSoundFile;
-  //FUserInfo.Handle := Handle;
-  FUserInfo.Widget := Self;
-  Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
-
-  {PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
-    paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedStream),
-    @FUserInfo);
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
-  end;
-
-  PaErrCode := Pa_SetStreamFinishedCallback(FStream,
-    PPaStreamFinishedCallback(@StreamFinished));
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
-  end;
-
-  PaErrCode := Pa_StartStream(FStream);
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
-  end; }
-
-  FAudioPlaying := True;}
-
-  //DebugLn('All went well');
-  //DebugLn('Played audio');
-end;}
-
-{procedure TfraTimer.FinishedAudio(var Msg: TLMessage);
-{var
-  PaErrCode: PaError;}
-begin
-  DebugLn('Inside finished audio ');
-
-  PlayButtonEnabled := True;
-  PauseButtonEnabled := False;
-  StopButtonEnabled := False;
-  DurationEnabled := True;
-  //ImageGreyed := True;
-  //Counter := DEF_COUNTDOWN_CAPTION;
-  bbAdjust.Enabled := False;
-
-  //FAudioPlaying := False;
-
-
-  {This check might be redundant. Just to be safe}
-  {paErrCode := Pa_IsStreamStopped(FStream);
-  if paErrCode = 0 then
-  begin
-    paErrCode := Pa_StopStream(FStream);
-    if (paErrCode <> Int32(paNoError)) then
-    begin
-      DebugLn('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
-    end;
-  end
-  else if PaErrCode <> 1 then
-  begin
-    DebugLn('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
-  end;
-  paErrCode := Pa_CloseStream(FStream);
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
-  end;
-  FStream := nil; }
-end;}
-
-{procedure TfraTimer.FinishedAud(Data: PtrInt);
-{var
-  PaErrCode: PaError;}
-begin
-  DebugLn('Inside finished audio ');
-
-  PlayButtonEnabled := True;
-  PauseButtonEnabled := False;
-  StopButtonEnabled := False;
-  DurationEnabled := True;
-  //ImageGreyed := True;
-  //Counter := DEF_COUNTDOWN_CAPTION;
-  bbAdjust.Enabled := False;
-
-  //FAudioPlaying := False;
-
-
-  {This check might be redundant. Just to be safe}
-  {paErrCode := Pa_IsStreamStopped(FStream);
-  if paErrCode = 0 then
-  begin
-    paErrCode := Pa_StopStream(FStream);
-    if (paErrCode <> Int32(paNoError)) then
-    begin
-      DebugLn('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
-    end;
-  end
-  else if PaErrCode <> 1 then
-  begin
-    DebugLn('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
-  end;
-  paErrCode := Pa_CloseStream(FStream);
-  if (paErrCode <> Int32(paNoError)) then
-  begin
-    DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
-  end;
-  FStream := nil; }
-end;}
-
-{procedure TfraTimer.TriggerAudio(Data: PtrInt);
-begin
-  FAudio.FileName:='/media/data/down/www/just-like-magic.ogg';
-  FAudio.Play;
-  FAudioPlaying:=True;
-  //Sleep(3000);
-end;}
-
-{function TfraTimer.AudioCallback(const input: pointer; output: pointer;
-  frameCount: culong; const timeInfo: PPaStreamCallbackTimeInfo;
-  statusFlags: PaStreamCallbackFlags; userData: pointer): cint; cdecl;
-begin
-  DebugLn('Inside callback');
-  Result := cint(paAbort);
-end;}
-
-{procedure TfraTimer.AddSubscription(aObserver: ITimerObserver);
-begin
-  FObservers.Add(aObserver);
-end;
-
-procedure TfraTimer.RemoveSubscription(aObserver: ITimerObserver);
-begin
-  FObservers.Remove(aObserver);
-end;}
 
 end.

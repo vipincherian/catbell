@@ -249,7 +249,7 @@ type
     procedure MoveSelectedClocksUp;
     procedure MoveSelectedClocksDown;
     procedure OnShortTimer(Sender: TObject);
-    //TODO: We need only
+    //TODO: We need only one of these
     procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
     procedure AfterShow2(Data: PtrInt);
     procedure ShowModalAlert(Data: PtrInt);
