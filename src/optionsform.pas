@@ -370,10 +370,27 @@ begin
 end;
 
 procedure TfrmOptions.bbPlayClick(Sender: TObject);
+var
+  Item: TListItem;
 begin
   if TAudio.Loaded then
   begin
-    if cmbAudioDevice.ItemIndex >= 0 then
+
+    for Item in lsvAudioDevices.Items do
+    begin
+      if Item.Checked then
+      begin
+        // TODO: FOutpuDevice should be renamed?
+        TAudio.FOutputDevice.DeviceName := Item.Caption;
+        TAudio.FOutputDevice.HostAPIName:=Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
+        Audio.PlaySine;
+        pgbAudio.Style := pbstMarquee;
+        bbPlay.Enabled := False;
+        bbStop.Enabled := True;
+      end;
+    end;
+
+    {if cmbAudioDevice.ItemIndex >= 0 then
     begin
 
       //Audio.OutputDevice := cmbAudioDevice.Items[cmbAudioDevice.ItemIndex];
@@ -383,7 +400,7 @@ begin
       pgbAudio.Style := pbstMarquee;
       bbPlay.Enabled := False;
       bbStop.Enabled := True;
-    end;
+    end;}
 
   end;
 end;

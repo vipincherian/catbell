@@ -706,9 +706,16 @@ begin
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
   if (FOutputDevice.DeviceName = '') or (FOutputDevice.HostAPIName = '') then
-    DeviceId := DefaultDeviceIndex
+  begin
+
+    DeviceId := DefaultDeviceIndex;
+    DebugLn('Playsine - using default device');
+  end
   else
+  begin
     DeviceId := GetDeviceIndex(FOutputDevice);
+    DebugLn('TAudio.PlaySine using device - ' + FOutputDevice.DeviceName + ' host api - ' + FOutputDevice.HostAPIName);
+  end;
   OutputParameters.Device := DeviceId;
   //Label7.Caption:= 'Output Device = ' +IntToStr( OutDevice); //Pa_GetDefaultOutputDevice);
   OutputParameters.ChannelCount := CInt32(2);
