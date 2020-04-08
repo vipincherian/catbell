@@ -29,16 +29,18 @@ uses
   Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
   {portaudio, }LazLogger, audio;
 
+const
+  LSVADUIO_INDEX_HOSTAPI: integer = 0;
 type
 
   { TfrmOptions }
 
   TfrmOptions = class(TForm)
+    bbPlay: TBitBtn;
     bbStop: TBitBtn;
     bbtnDefault: TBitBtn;
     bbtnCancel: TBitBtn;
     bbtnSave: TBitBtn;
-    bbPlay: TBitBtn;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
@@ -60,6 +62,7 @@ type
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     GroupBox5: TGroupBox;
+    GroupBox6: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
     lblDefaultDeviceName: TLabel;
@@ -71,11 +74,10 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
-    Label8: TLabel;
     Label9: TLabel;
     lsvAudioDevices: TListView;
-    pgcOptions: TPageControl;
     pgbAudio: TProgressBar;
+    pgcOptions: TPageControl;
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
@@ -93,7 +95,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormHide(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Label8Click(Sender: TObject);
     procedure pgcOptionsChange(Sender: TObject);
     procedure tsAudioShow(Sender: TObject);
   private
@@ -134,8 +135,8 @@ begin
   begin
     RefreshAudioDevices;
     TAudio.GetDefaultDevice(@AudioDevice);
-    lblDefaultDeviceName.Caption := AudioDevice.DeviceName + ' - '
-      + AudioDevice.HostAPIName;
+    lblDefaultDeviceName.Caption :=
+      AudioDevice.DeviceName + ' - ' + AudioDevice.HostAPIName;
   end;
 end;
 
@@ -143,6 +144,7 @@ procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
 var
   Index: integer;
   DefaultDeviceId: integer;
+  Item: TListItem;
 begin
   with Config do
   begin
@@ -166,9 +168,12 @@ begin
     //dtpExtend.Time:=AdjustExtendDefault;
     dtpCompleteBy.Time := AdjustCompletebyDefault;
 
+    cbUseDefaultAudio.Checked:=UseDefaultAudioDevice;
+
     if TAudio.Loaded then
     begin
-      if GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME then
+      if (GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME) or
+        (GlobalUserConfig.AudioHostAPIName <> DEF_AUDIO_HOSTAPI_NAME) then
       begin
         Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
         if index >= 0 then
@@ -186,6 +191,14 @@ begin
           else}
           cmbAudioDevice.ItemIndex := TAudio.DefaultDeviceIndex;
         end;
+
+        for Item in lsvAudioDevices.Items do
+        begin
+          Item.Checked := ((Item.Caption = GlobalUserConfig.AudioDeviceName) and
+            (Item.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
+          //Item.Checked:=True;
+        end;
+
       end;
     end;
 
@@ -217,8 +230,10 @@ begin
         Device := Device + ' (Default)';}
       cmbAudioDevice.Items.Add(Device^.DeviceName);
       Itm := lsvAudioDevices.Items.Add;
-      Itm.Caption:=Device^.DeviceName;
+      Itm.Caption := Device^.DeviceName;
       Itm.SubItems.Add(Device^.HostAPIName);
+      Itm.Checked := ((Itm.Caption = GlobalUserConfig.AudioDeviceName) and
+        (Itm.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
     end;
 
     if cmbAudioDevice.Items.Count > 0 then
@@ -233,6 +248,10 @@ begin
 end;
 
 procedure TfrmOptions.GetConfigFromControls(Config: TUserConfig);
+var
+  Item: TListItem;
+  DeviceChecked: boolean;
+  Device: TAudioDevice;
 begin
   with Config do
   begin
@@ -256,6 +275,29 @@ begin
     if TAudio.Loaded and (cmbAudioDevice.ItemIndex >= 0) then
       AudioDeviceName := cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
 
+    Config.UseDefaultAudioDevice:=cbUseDefaultAudio.Checked;
+
+    { Find which audio device has been checked }
+    DeviceChecked := False;
+    for Item in lsvAudioDevices.Items do
+    begin
+      if Item.Checked then
+      begin
+        AudioDeviceName:=Item.Caption;
+        AudioHostAPIName:=Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
+        DeviceChecked := True;
+        Break;
+      end;
+    end;
+
+    { If no item was checked, put the default device}
+    if not DeviceChecked then
+    begin
+      TAudio.GetDefaultDevice(@Device);
+      AudioDeviceName:=Device.DeviceName;
+      AudioHostAPIName:=Device.HostAPIName;
+    end;
+
   end;
 end;
 
@@ -275,7 +317,8 @@ begin
   begin
     RefreshAudioDevices;
     TAudio.GetDefaultDevice(@AudioDevice);
-    lblDefaultDeviceName.Caption := AudioDevice.DeviceName + ' - ' + AudioDevice.HostAPIName;
+    lblDefaultDeviceName.Caption :=
+      AudioDevice.DeviceName + ' - ' + AudioDevice.HostAPIName;
     Audio := TAudio.Create;
     bbPlay.Enabled := True;
   end
@@ -420,7 +463,9 @@ end;
 
 procedure TfrmOptions.cbUseDefaultAudioChange(Sender: TObject);
 begin
+  GlobalUserConfig.UseDefaultAudioDevice := cbUseDefaultAudio.Checked;
   lsvAudioDevices.Enabled := (not cbUseDefaultAudio.Checked);
+
 end;
 
 
@@ -430,9 +475,5 @@ begin
   FLastConfig.CopyFrom(GlobalUserConfig);
 end;
 
-procedure TfrmOptions.Label8Click(Sender: TObject);
-begin
-
-end;
 
 end.

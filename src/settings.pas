@@ -80,6 +80,7 @@ type
     //AdjustExtendDefault: double;
     AdjustCompletebyDefault: double;
     //AudioDevice: integer;
+    UseDefaultAudioDevice: boolean;
     AudioDeviceName: string;
     AudioHostAPIName: string;
     constructor Create();
@@ -172,10 +173,13 @@ const
   //AUDIO_DEVICE = 'audio_device';
   //DEF_AUDIO_DEVICE = -1; // Default audio device
 
-  AUDIO_DEVICE_NAME = 'audio_device_name';
-  DEF_AUDIO_DEVICE_NAME = '';
+  USE_DEFAULT_AUDIO_DEVICE = 'audio_device_default';
+  DEF_USE_DEFAULT_AUDIO_DEVICE = True;
   AUDIO_HOSTAPI_NAME = 'audio_hostapi_name';
   DEF_AUDIO_HOSTAPI_NAME = '';
+  AUDIO_DEVICE_NAME = 'audio_device_name';
+  DEF_AUDIO_DEVICE_NAME = '';
+
 
 procedure InitSettings;
 procedure CleanupSettings;
@@ -276,6 +280,8 @@ begin
     //AudioDevice:= FConf.GetValue(AUDIO_DEVICE, AudioDevice);
     AudioDeviceName:= string(FConf.GetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName)));
     AudioHostAPIName:= string(FConf.GetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName)));
+    UseDefaultAudioDevice :=
+      FConf.GetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
 
   except
     CreateAnew;
@@ -322,6 +328,7 @@ begin
   //FConf.SetValue(AUDIO_DEVICE, AudioDevice);
   FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName));
   FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName));
+  FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
 
 end;
 
@@ -366,10 +373,14 @@ begin
     TAudio.GetDefaultDevice(@AudioDevice);
     FConf.SetValue(AUDIO_DEVICE_NAME, AudioDevice.DeviceName);
     FConf.SetValue(AUDIO_HOSTAPI_NAME, AudioDevice.HostAPIName);
+    FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, DEF_USE_DEFAULT_AUDIO_DEVICE);
   end
   else
+  begin
     FConf.SetValue(AUDIO_DEVICE_NAME, DEF_AUDIO_DEVICE_NAME);
     FConf.SetValue(AUDIO_HOSTAPI_NAME, DEF_AUDIO_HOSTAPI_NAME);
+    FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, DEF_USE_DEFAULT_AUDIO_DEVICE);
+  end;
 
   FConf.Flush;
 end;
@@ -423,6 +434,7 @@ begin
 
   AudioDeviceName:=DEF_AUDIO_DEVICE_NAME;
   AudioHostAPIName:=DEF_AUDIO_HOSTAPI_NAME;
+  UseDefaultAudioDevice:=DEF_USE_DEFAULT_AUDIO_DEVICE;
 
 end;
 
@@ -454,6 +466,7 @@ begin
 
   AudioDeviceName:=From.AudioDeviceName;
   AudioHostAPIName:=From.AudioHostAPIName;
+  UseDefaultAudioDevice:=From.UseDefaultAudioDevice;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -531,6 +544,11 @@ begin
     Exit;
   end;
   if AudioHostAPIName <> From.AudioHostAPIName then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if UseDefaultAudioDevice <> From.UseDefaultAudioDevice then
   begin
     Result := False;
     Exit;
