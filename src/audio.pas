@@ -629,9 +629,15 @@ begin
     end;
 
     if (FOutputDevice.HostAPIName = '') or (FOutputDevice.DeviceName = '') then
-      DeviceId := DefaultDeviceIndex
+    begin
+      DeviceId := DefaultDeviceIndex;
+      DebugLn('TAudio using default device to play audio.' + {$INCLUDE %LINE%});
+    end
     else
+    begin
       DeviceId := GetDeviceIndex(FOutputDevice);
+      DebugLn('TAudio using device - ' + FOutputDevice.DeviceName + ' host api - ' + FOutputDevice.HostAPIName);
+    end;
     StreamParams.device := DeviceId;
 
     DebugLn('Audio device is ' + IntToStr(StreamParams.device));

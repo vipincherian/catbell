@@ -1114,7 +1114,8 @@ begin
       //PlayAudio;
 
       if (GlobalUserConfig.AudioDeviceName = '') or
-        (GlobalUserConfig.AudioHostAPIName = '') then
+        (GlobalUserConfig.AudioHostAPIName = '') or
+        GlobalUserConfig.UseDefaultAudioDevice then
         TAudio.SetDefaulDevice
       else
       begin
