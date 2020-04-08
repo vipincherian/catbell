@@ -139,6 +139,11 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <OtherDefines Count="1">
+        <Define0 Value="FORCE_AUDIO_NOTLOADED"/>
+      </OtherDefines>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

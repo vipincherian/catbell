@@ -33,7 +33,7 @@ uses
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
-  {portaudio, sndfile,} ctypes, audio;
+  {portaudio, sndfile,} {ctypes,} audio;
 
 const
   FORM_MIN_WIDTH = 600;
@@ -42,9 +42,6 @@ const
   TICON_GREEN_INDEX: integer = 2;
   TRAY_PROGRESS_ICON_COUNT = 24;
 
-  //TRAY_OUTLINE_COLOUR = $3333f2; //$5A9E60;
-  //TRAY_BG_COLOUR = $c6c6f5; //$DAEADB;
-  //TRAY_CENTRE_COLOUR = TRAY_BG_COLOUR;
   PROGRESS_COLOUR = $4352E2;
 
   PROGRESS_COMPLETED = 2.0;
@@ -83,7 +80,6 @@ const
   TIMER_CONF_MODALALERT = 'modal_alert';
   TIMER_CONF_TRAYNOTIFiCATION = 'tray_notification';
 
-  //TIMER_CONF_ID = 'id';
   TIMER_CONF_COUNT = 'count';
   TIMER_CONF_ORDER = 'order';
 
@@ -167,29 +163,27 @@ type
     procedure aiNewTimerExecute(Sender: TObject);
     procedure aiOptionsExecute(Sender: TObject);
     procedure aiQuitExecute(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
     procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
     procedure sbxClocksResize(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
-    //procedure tbShowModalAlertClick(Sender: TObject);
-    //procedure tbShowTrayAlertClick(Sender: TObject);
+
     procedure tiMainClick(Sender: TObject);
     procedure tiMainDblClick(Sender: TObject);
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: integer);
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
 
   private
     { private declarations }
-    //TimerCriticalSection: TRTLCriticalSection;
     FTrayProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FAppProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FWidgetProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
@@ -202,11 +196,8 @@ type
     FTaskBarList: ITaskbarList3;
     {$ENDIF}
 
-    //FClockWidget: TClocksWidget;
-    //FClocks: TClocks;
     FDbFileName: string;
     FDbDefault: boolean;
-    //function GetClocks: TClocksWidget;
 
     FTimerFrames: TTimerFrameMap;
     FActiveTimerFrames: TTimerFrameList;
@@ -222,8 +213,6 @@ type
     the same functionality.}
     FReference: TfraTimer;
 
-    //FAudioWorking: boolean;
-
     procedure CreateBitmaps;
     function GetStatusMessage: string;
     procedure PostTimerCreation(AValue: TfraTimer);
@@ -231,7 +220,6 @@ type
     procedure ResizeHeaderSections;
 
     function GetAnySelected: boolean;
-    //procedure SetWidget(AValue: TClocksWidget);
     function GetCanselectedMoveDown: boolean;
     function GetCanSelectedMoveUp: boolean;
     procedure Reorder;
@@ -240,45 +228,32 @@ type
     procedure UpdateStatusTimerCount;
 
   public
-    { public declarations }
-    //OnNewTimer: TNotifyEvent;
-    //OnNewAlarm: TNotifyEvent;
-    //OnClockDelete: TNotifyEvent;
-    //OnClockMoveUp: TNotifyEvent;
-    //OnClockMoveDown: TNotifyEvent;
-    //OnEXport: TNotifyEvent;
-
     procedure ClockSelected(Sender: TfraTimer);
     procedure TimerFinished(Sender: TfraTimer; UserInitiated: boolean);
     procedure TimerPaused(Sender: TfraTimer);
     procedure TimerStarted(Sender: TfraTimer);
     procedure ProgressUpdate(Widget: TfraTimer; Progress: single);
-    //procedure TimerProgressUpdated(Sender: TObject);
-
     procedure OptionsFormClosed();
     function GetExportFileName: string;
 
     procedure ProcessCommandline;
     procedure SavetoFile;
     procedure LoadfromFile;
-    //property Clocks: TClocks read FClocks;
 
     function AddTimer(): TfraTimer;
-    //procedure NotifyChange(Sender: TObject);
     procedure HandleTimerFrameIconProgressChange(Sender: TfraTimer);
     procedure SaveClocks(Conf: TJsonConfig);
     procedure DeleteSelected;
-    //property Widget: TClocksWidget read FClocksWidget write SetWidget;
     property AnySelected: boolean read GetAnySelected;
     procedure RemoveTimer(IdNew: longword);
     procedure MoveSelectedClocksUp;
     procedure MoveSelectedClocksDown;
     procedure OnShortTimer(Sender: TObject);
+    //TODO: We need only
     procedure AfterShow(var Msg: TLMessage); message UM_AFTERSHOW;
     procedure AfterShow2(Data: PtrInt);
     procedure ShowModalAlert(Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
-    //property AudioWorking: boolean read FAudioWorking;
 
   end;
 
@@ -292,22 +267,14 @@ implementation
 { TfrmMain }
 
 procedure TfrmMain.FormCreate(Sender: TObject);
-//var
-//PaErrCode: PaError;
-{$IFNDEF AUDIO_STATIC}
-//Status: boolean;
-{$ENDIF}
-//DefaultDevice: integer;
-//DeviceInfo: PPaDeviceInfo;
 begin
-  //InitCriticalSection(TimerCriticalSection);
-
   { Obtain the application handle, and the taskbar COM object.
   This has to be done at the beginning, as calls are made to progressupdate
   from within FormCreate. This cannot be pushed down }
 
   {$IF defined(windows) }
-  AppHandle := TWin32WidgetSet(WidgetSet).AppHandle;
+  AppHandle := TWin32WidgetSet(WidgetSet).{%H-}AppHandle; // Omit the warning
+
   FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
   {$ENDIF}
 
@@ -318,23 +285,13 @@ begin
 
   FTimerFrames := TTimerFrameMap.Create;
   FActiveTimerFrames := TTimerFrameList.Create;
-  //FActiveTimers := TListTimerClockWidgets.Create;
 
   FCounterClockID := TSequence.Create;
 
-  //OnNewTimer := nil;
-  //OnEXport := nil;
   FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
   FLastTrayPercent := 0;
 
-  //FClocks := TClocks.Create;
   FDbDefault := True;
-
-  //DoubleBuffered:=True;
-  //FClockWidget := TClocksWidget.Create;
-  //FClocks.ScrollBox := sbxClocks;
-
-  //FClocks.Widget := FClockWidget;
 
   ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
   tiMain.Visible := True;
@@ -370,98 +327,6 @@ begin
 
   CreateBitmaps;
 
-
-  //FAudioWorking := TAudio.Loaded;
-  {
-  {$IFNDEF AUDIO_STATIC}
-  FAudioWorking := Pa_Load(LIB_PORTAUDIO);
-  if not FAudioWorking then
-  begin
-    DebugLn('Could not load portaudio');
-    //ReadKey;
-    //exit;
-  end;
-
-  //FAudioWorking:=Status;
-
-  { Load sndfile library only if portaudio was loaded successfully }
-
-  if FAudioWorking then
-  begin
-    FAudioWorking := sf_load(LIB_SNDFILE);
-    if not FAudioWorking then
-    begin
-      DebugLn('Could not load sndfile');
-      //ReadKey;
-      //exit;
-      Pa_Unload();
-    end;
-  end;
-
-  //FAudioWorking:=Status;
-
-{$ENDIF}
-
-  if FAudioWorking then
-  begin
-    PaErrCode := Pa_Initialize();
-    if PaErrCode <> cint(paNoError) then
-    begin
-      DebugLn('Error in Pa_Initialize()');
-
-      FAudioWorking := False;
-
-      { If portaudio cannot be initialised, then audio will not work.
-      Unload libraries }
-      {$IFNDEF AUDIO_STATIC}
-      sf_Unload();
-      Pa_Unload();
-      {$ENDIF}
-    end;
-  end;
-  }
-  // Check if default audio device has changed
-  {if FAudioWorking then
-  begin
-    //DefaultDevice:=Pa_GetDefaultOutputDevice();
-    if GlobalUserConfig.AudioDevice >= 0 then
-    begin
-      DeviceInfo := Pa_GetDeviceInfo(GlobalUserConfig.AudioDevice);
-      if DeviceInfo = nil then
-      begin
-        DebugLn('Audio device stored in confi file does not exists. Device #' +
-          IntToStr(GlobalUserConfig.AudioDevice));
-        ShowMessage('Configured audio device not found. Resetting to default');
-        GlobalUserConfig.AudioDevice := DEF_AUDIO_DEVICE;
-      end
-      else
-      begin
-        if StrPas(DeviceInfo^.Name) <> GlobalUserConfig.AudioDeviceName then
-        begin
-          DebugLn('Stored audio device name does not match ' +
-            'with the current ID. ID - ' + IntToStr(
-            GlobalUserConfig.AudioDevice) + ', Stored Device Name - ' +
-            GlobalUserConfig.AudioDeviceName + ', Current Device Name - ' +
-            StrPas(DeviceInfo^.Name));
-          GlobalUserConfig.AudioDevice := DEF_AUDIO_DEVICE;
-          ShowMessage('Configured audio device name does not match. ' +
-            'Resetting to default');
-        end;
-      end;
-    end;
-
-    if GlobalUserConfig.AudioDevice = DEF_AUDIO_DEVICE then
-    begin
-      DefaultDevice := Pa_GetDefaultOutputDevice();
-      if DefaultDevice = paNoDevice then
-      begin
-        DebugLn('No default device found. So no audio.');
-        FAudioWorking := False;
-      end;
-    end;
-
-  end;}
-
   stbMain.BeginUpdate;
   if TAudio.Loaded then
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Ok'
@@ -473,19 +338,12 @@ end;
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
 var
   Added: TfraTimer;
-  //Proceed: boolean;
   TempAudio: TAudio;
 begin
-  {*if OnNewTimer <> nil then
-    OnNewTimer(Sender);*}
-
   with GlobalUserConfig do
   begin
-    //dtpSet.Time := EncodeTime(DefaultTimerHours, DefaultTimerMins,
-    //  DefaultTimerSecs, 0);
     frmEdit.Duration := DefaultTimerDuration;
-    //EncodeTime(DefaultTimerHours, DefaultTimerMins,
-    //  DefaultTimerSecs, 0);
+
     frmEdit.Description := DefaultTimerTitle;
     frmEdit.TrayNotification := ShowTrayAlert;
     frmEdit.ModalAlert := ShowModalAlert;
@@ -514,8 +372,7 @@ begin
     Added.dtpSet.Time := frmEdit.Duration;
     Added.ModalAlert := frmEdit.ModalAlert;
     Added.TrayNotification := frmEdit.TrayNotification;
-    //Added.Audio.Looped := frmEdit.ckbLoop.Checked;
-    //Added.Audio := TempAudio;
+
     if TAudio.Loaded then
     begin
       Added.Audio := TempAudio;
@@ -535,7 +392,6 @@ end;
 
 procedure TfrmMain.aiOptionsExecute(Sender: TObject);
 begin
-  //ShowMessage('Hehe');
   frmOptions.ShowModal;
   OptionsFormClosed;
 end;
@@ -576,10 +432,8 @@ begin
 
   CurrPosNormal.Top := Top;
   CurrPosNormal.Left := Left;
-  //CurrPosNormal.Right := CurrPosNormal.Left + Width;
   CurrPosNormal.Width := Width;
   CurrPosNormal.Height := Height;
-  //CurrPosNormal.Bottom := CurrPosNormal.Top + Height;
 
   CurrPosRestored.Top := RestoredTop;
   CurrPosRestored.Left := RestoredLeft;
@@ -590,16 +444,13 @@ begin
   begin
     LastPosNormal := CurrPosNormal;
     LastPosRestored := CurrPosRestored;
-    //ShowModalAlert := tbShowModalAlert.Down;
-    //ShowTrayAlert := tbShowTrayAlert.Down;
+
     AutoProgress := tbProgressAuto.Down;
     LastWindowState := WindowState;
   end;
 end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-{var
-  CurrPosNormal, CurrPosRestored: TRect;}
 begin
   if GlobalUserConfig.QueryExit then
     CanClose := MessageDlg('Do you really want to close the application?',
@@ -609,10 +460,7 @@ end;
 
 procedure TfrmMain.aiAboutExecute(Sender: TObject);
 begin
-  //ShowMessage(IntToStr(tiMain.Canvas.Width));
-  //ShowMessage('Catbell by Vipin Cherian (c) 2017');
   frmAbout.ShowModal;
-  //tiMain.
 end;
 
 procedure TfrmMain.aiNewAlarmExecute(Sender: TObject);
@@ -671,7 +519,6 @@ begin
   FWidgetStoppedBitmap.Free;
   //inherited Destroy;
   SavetoFile;
-  //FClocks.Destroy;
 
   for I := 0 to FTimerFrames.Count - 1 do
   begin
@@ -682,23 +529,12 @@ begin
 
   FReference.Free;
 
-  //FActiveTimers.Free;
   FActiveTimerFrames.Free;
   FTimerFrames.Free;
 
   FOrder.Free;
 
   FShortTimer.Free;
-  {
-  if FAudioWorking then
-    Pa_Terminate;
-{$IFNDEF AUDIO_STATIC}
-  Sf_Unload;
-  Pa_Unload;
-{$ENDIF}
-}
-  //FClockWidget.Free;
-  //DoneCriticalsection(TimerCriticalSection);
 end;
 
 procedure TfrmMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
@@ -733,22 +569,11 @@ begin
         LastPosNormal.Width, LastPosNormal.Height);
     end;
 
-    {if FTimerFrames.Count = 0 then
-      aiNewTimer.Execute;}
-    //PostMessage(Handle, UM_AFTERSHOW, 0, 0);
     Application.QueueAsyncCall(@AfterShow2, 0);
-    {Top := LastPosNormal.Top;
-    Left := LastPosNormal.Left;
-    Width := LastPosNormal.Width;
-    Height := LastPosNormal.Height;}
-
-    //tbShowModalAlert.Down := ShowModalAlert;
-    //tbShowTrayAlert.Down := ShowTrayAlert;
 
     tbProgressAuto.Down := AutoProgress;
 
   end;
-  //UpdateAlertFormSettings;
 end;
 
 procedure TfrmMain.pmiShowWindowClick(Sender: TObject);
@@ -795,8 +620,6 @@ end;
 
 procedure TfrmMain.PostTimerCreation(AValue: TfraTimer);
 begin
-  //AValue.AddSubscription(Self);
-  //AValue.OnSelect := @ClockSelected;
   ResizeHeaderSections;
 end;
 
@@ -851,13 +674,8 @@ begin
 
   for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
   begin
-
-    //FinalBmp :=
-    //TBGRABitmap.Create(TrayIconSize, TrayIconSize, BGRAPixelTransparent);
     Stream.Seek(0, soFromBeginning);
     HiResBmp := TBGRABitmap.Create(Stream);
-    //BGRAReplace(FinalBmp, FinalBmp.Resample(TrayIconSize, TrayIconSize,
-    //  rmFineResample) as TBGRABitmap);
 
     with HiResBmp do
     begin
@@ -881,7 +699,6 @@ begin
         (Count - 1), TRAY_PROGRESS_ICON_COUNT div 2))
         );
     end;
-    //DrawBaseIconForeground(FinalBmp);
 
     FinalBmp := HiresBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as
       TBGRABitmap;
@@ -894,7 +711,6 @@ begin
     FinalBmp := HiresBmp.Resample(AppIconSize, AppIconSize, rmFineResample) as
       TBGRABitmap;
 
-    //DrawBaseIconForeground(FinalBmp);
     FAppProgressIcons[Count] := TIcon.Create;
     FAppProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
@@ -903,7 +719,6 @@ begin
     FinalBmp := HiresBmp.Resample(WIDGET_ICON_WIDTH, WIDGET_ICON_WIDTH,
       rmFineResample) as TBGRABitmap;
 
-    //DrawBaseIconForeground(FinalBmp);
     FWidgetProgressIcons[Count] := TIcon.Create;
     FWidgetProgressIcons[Count].Assign(FinalBmp.Bitmap);
 
@@ -921,11 +736,8 @@ end;
 
 procedure TfrmMain.SetListButtonsStatus;
 begin
-  //sbDelete.Enabled := AnySelected;
   bbDelete.Enabled := AnySelected;
   tbDelete.Enabled := AnySelected;
-  //sbMoveClockDown.Enabled := GetCanSelectedMoveDown;
-  //sbMoveClockUp.Enabled := getCanSelectedMoveUp;
   bbMoveUp.Enabled := getCanSelectedMoveUp;
   bbMoveDown.Enabled := GetCanselectedMoveDown;
   tbMoveUp.Enabled := getCanSelectedMoveUp;
@@ -934,15 +746,11 @@ end;
 
 procedure TfrmMain.ResizeHeaderSections;
 var
-  //Ids: TIdList;
   Id: longword;
   Timer: TfraTimer;
   Filled: integer = 0;
   Temp: integer;
-  ScrollbarWidth: integer = 0;
 begin
-  //Ids:=TIdList.Create;
-  //GetAllIdS(Ids);
   if FOrder.Count > 0 then
   begin
     Id := FOrder.Items[0];
@@ -950,13 +758,9 @@ begin
   end
   else
   begin
-    //FReference.Width:=sbxClocks.ClientWidth;
-    //FReference.ReAlign;
-    //Freference.Refresh;
-    //FReference.Repaint;
     Timer := FReference;
   end;
-  // Find the
+
   hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
   Inc(Filled, hdrTimers.Sections.Items[0].Width);
 
@@ -969,11 +773,10 @@ begin
     and an adjustment of (sbxClocks.Width - Timer.Width) needs to be made.}
 
   Inc(Temp, sbxClocks.ClientWidth - Timer.Width - Filled);
-  //Temp := Temp - Filled;
+
   hdrTimers.Sections.Items[1].Width := Temp;
 
   Inc(Filled, hdrTimers.Sections.Items[1].Width - (sbxClocks.ClientWidth - Timer.Width));
-  //Filled := Filled - (sbxClocks.Width - Timer.Width);
 
   Temp := Timer.bbAdjust.Left + Timer.bbAdjust.Width;
   Temp := Temp + ((Timer.lblCountdown.Left - Temp) div 2) - Filled;
@@ -993,15 +796,12 @@ begin
   Temp := Timer.Width - Filled;
   hdrTimers.Sections.Items[5].Width := Temp;
   Inc(Filled, Temp);
-
-  //Ids.Free;
 end;
 
 function TfrmMain.GetAnySelected: boolean;
 var
   Count: integer;
   Clock: TfraTimer;
-  //TimerClock: TTimerClock;
 begin
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
@@ -1020,11 +820,9 @@ end;
 function TfrmMain.GetCanselectedMoveDown: boolean;
 var
   Id: longword;
-  //Count: integer;
   EncounteredSelected: boolean;
 begin
   EncounteredSelected := False;
-  //EncounteredUnselected := False;
   for Id in FOrder do
   begin
     if not FTimerFrames.KeyData[Id].Selected then
@@ -1047,10 +845,8 @@ end;
 function TfrmMain.GetCanSelectedMoveUp: boolean;
 var
   Id: longword;
-  //Count: integer;
   EncounteredUnselected: boolean;
 begin
-  //EncounteredSelected := False;
   EncounteredUnselected := False;
   for Id in FOrder do
   begin
@@ -1075,52 +871,25 @@ end;
 procedure TfrmMain.Reorder;
 var
   Id: longword;
-  //Index: integer;
   TimerWidget: TfraTimer;
   Filled: integer;
   CountTabOrder: integer;
 begin
-  //Exit;
   {TODO: Remove the hard coding of the header hight}
   Filled := 24;
-  //FScrollBox.AutoScroll:=False;
-  //FScrollBox.Visible:=False;
-  //sbxClocks.Height := FOrder.Count * CLOCK_HEIGHT;
   CountTabOrder := 0;
   hdrTimers.Top := 0;
   for Id in FOrder do
   begin
-    //Index := FClockWidgets.IndexOf(Id);
     TimerWidget := FTimerFrames.KeyData[Id];
-    //FScrollBox.Height:=Filled + Clock.Height;
-    //FScrollBox.VertScrollBar.Range:=Filled + Clock.Height;
+
     TimerWidget.Top := Filled;
     TimerWidget.TabOrder := CountTabOrder;
-    // + FScrollBox.VertScrollBar.Size - FScrollBox.VertScrollBar.Position;
-    {if sbxClocks.VertScrollBar.IsScrollBarVisible then
-      TimerWidget.Width := sbxClocks.Width - GetSystemMetrics(SM_CYVSCROLL)
-    else
-      TimerWidget.Width := sbxClocks.Width;}
-    //Clock.He;
+
     Inc(Filled, TimerWidget.Height);
     Inc(CountTabOrder);
-    //if Clock.Kind = 'Timer' then
-    //begin
-    //TimerWidget := TTimerClockWidget(Clock);
-
-    //TimerWidget.FFrame.lblCountdown.Hint := IntToStr(TimerWidget.FFrame.Top);
-    //end;
-
   end;
 
-  //FScrollBox.AutoScroll:=True;
-  //FScrollBox.VertScrollBar.Range:=(FOrder.Count) * CLOCK_HEIGHT;
-
-  //FScrollBox.VertScrollBar.Range:=Filled ;
-  //sbxClocks.Refresh;
-  //FScrollBox.Visible:=True;
-  //sbxClocks.Repaint;
-  //sbxClocks.ReAlign;
 
 end;
 
@@ -1164,13 +933,11 @@ var
   Hours: word;
   Minutes: word;
   Seconds: word;
-  //Sender: TfraTimer;
+
   Duration: TDateTime;
   Message: string;
 begin
 
-  //Sender := TfraTimer(Sender);
-  //Id := Sender.Id;
   Duration := Sender.Duration;
 
   Hours := HourOf(Duration);
@@ -1178,13 +945,9 @@ begin
   Seconds := SecondOf(Duration);
 
   try
-    //Index := FActiveTimerFrames.IndexOf(Id);
-    //if Index <> -1 then
-    //begin
     if FActiveTimerFrames.Remove(Sender) = -1 then
       DebugLn('Unable to remove from active timerframes.');
-    ;
-    //end;
+
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
 
   except
@@ -1205,7 +968,6 @@ begin
     Message :=
       Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
       Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
-    //frmTimerAlert.stxAdditional.Caption := Message;
     frmAlert.lbMessages.Items.Add(Message);
 
     Application.QueueAsyncCall(@ShowModalAlert, 0);
@@ -1217,13 +979,8 @@ end;
 
 procedure TfrmMain.TimerPaused(Sender: TfraTimer);
 begin
-  //Sender := TfraTimer(Sender);
   try
-    //Index := FActiveTimerFrames.IndexOf(Sender.Id);
-    //if Index <> -1 then
-    //begin
     FActiveTimerFrames.Remove(Sender);
-    //end;
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
 
     {$IF defined(windows)}
@@ -1270,7 +1027,6 @@ end;
 
 procedure TfrmMain.ProgressUpdate(Widget: TfraTimer; Progress: single);
 var
-  //Bmp: TBitmap;
   Index: integer;
   TaskbarPercent: integer;
 begin
@@ -1285,7 +1041,6 @@ begin
 
     {$IF defined(windows) }
     FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
-    //FTaskBarList.SetProgressValue(AppHandle, 0, 100);
     {$ENDIF}
 
     FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
@@ -1296,31 +1051,13 @@ begin
     begin
       Widget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
       Widget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
-      //Widget.LastProgressPercent:=0;
     end;
   end
-  { Timer has not been stopped, but its progress is not not published
-  through the tray}
-  {else if (Progress > (TIMER_PROGRESS_OFFTRAY - 0.01)) and
-    (Progress < (TIMER_PROGRESS_OFFTRAY + 0.01)) then
-  begin
-    tiMain.Icon.Assign(FTrayStoppedBitmap);
-    Icon.Assign(FTrayStoppedBitmap);
-    Application.Icon.Assign(FAppStoppedBitmap);
-
-    {$IF defined(windows) }
-    FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
-    //FTaskBarList.SetProgressValue(AppHandle, 0, 100);
-    {$ENDIF}
-
-    FLastTrayIconIndex := LAST_TRAY_ICON_DEFAULT;
-    FLastTrayPercent := 0;
-  end }
   else
   begin
     Index := Floor(Progress * 24.0);
     TaskbarPercent := Ceil(Progress * 100);
-    //WriteLn('Index is ' + IntToStr(Index));
+
     if Index >= 24 then
       Index := 23;
     Assert((Index >= 0) and (Index < TRAY_PROGRESS_ICON_COUNT));
@@ -1332,9 +1069,9 @@ begin
       if FLastTrayIconIndex <> Index then
       begin
         tiMain.Icon.Assign(FTrayProgressIcons[Index + 1]);
-        //FForm.tiMain.Icon.Handle:=FTrayProgressIcons[Index + 1].Handle;
+
         Icon.Assign(FTrayProgressIcons[Index + 1]);
-        //FForm.Icon.Handle := FTrayProgressIcons[Index + 1].Handle;
+
         Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         FLastTrayIconIndex := Index;
       end;
@@ -1362,22 +1099,9 @@ begin
       Widget.LastProgressIconIndex := Index;
     end;
 
-    {if Widget.LastProgressPercent <> TaskbarPercent then
-    begin
-      Widget.LastProgressPercent := TaskbarPercent;
-    end;}
-
   end;
 
 end;
-
-{procedure TfrmMain.TimerProgressUpdated(Sender: TObject);
-var
-  TimerFrame: TfraTimer;
-begin
-  TimerFrame := TfraTimer(Sender);
-  ProgressUpdate(TimerFrame.Progress);
-end;}
 
 procedure TfrmMain.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
 var
@@ -1389,18 +1113,6 @@ begin
   to the changed options}
   with GlobalUserConfig do
   begin
-    {if tbShowModalAlert.Down <> ShowModalAlert then
-    begin
-      tbShowModalAlert.Down := ShowModalAlert;
-      tbShowModalAlertClick(Self);
-    end;
-
-    if tbShowTrayAlert.Down <> ShowTrayAlert then
-    begin
-      tbShowTrayAlert.Down := ShowTrayAlert;
-      tbShowTrayAlertClick(Self);
-    end;}
-
     if tbProgressAuto.Down <> AutoProgress then
     begin
       tbProgressAuto.Down := AutoProgress;
@@ -1413,7 +1125,6 @@ begin
     end;
   end;
 
-  //UpdateAlertFormSettings;
 end;
 
 function TfrmMain.GetExportFileName: string;
@@ -1428,7 +1139,6 @@ procedure TfrmMain.ProcessCommandline;
 var
   DefaultDbFile: string;
   PassedDbFile: string;
-  //Conf: TJSONConfig;
 begin
   DefaultDbFile := GetAppConfigDir(False) + 'defdb.ccq';
   FDbFileName := DefaultDbFile;
@@ -1445,14 +1155,12 @@ end;
 procedure TfrmMain.SavetoFile;
 var
   Conf: TJSONConfig;
-  //Count: integer;
 begin
-  //Conf.SetValue(TIMER_TITLE, );
   Conf := TJSONConfig.Create(nil);
   Conf.Formatted := True;
   SaveClocks(Conf);
   Conf.Filename := FDbFileName;
-  //Conf.Flush;
+
   Conf.Free;
 end;
 
@@ -1463,15 +1171,8 @@ var
   NewTimerClock: TfraTimer;
   ErrorText: string;
   fs: TFormatSettings;
-  //Success: boolean;
-  //Order: TIdList;
-  //OrderString: TStringList;
-  //Pos: string;
-  //Id: longword;
-  //IdDir: string;
 begin
-  //Order := nil;
-  //OrderString := nil;
+
   ErrorText := '';
 
   if FileExists(FDbFileName) then
@@ -1479,46 +1180,26 @@ begin
 
     Conf := TJSONConfig.Create(nil);
     Conf.FileName := FDbFileName;
-    //FClocks.LoadClocks(Conf);
+
     TotalCount := Conf.GetValue(TIMER_CONF_COUNT, 0);
-
-    //Keys := TStringList.Create;
-
-    //Keys.Free;
 
     for Count := 0 to TotalCount - 1 do
     begin
       Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
         '/'), False);
-      //IdDir := IntToStr(Count + 1) + '/';
+
       NewTimerClock := AddTimer;
       NewTimerClock.Caption :=
         string(Conf.GetValue(UTF8Decode(TIMER_CONF_TITLE), DEF_TIMER_TITLE));
-      {Hours := Conf.GetValue(UTF8Decode(TIMER_CONF_HOURS), 0);
-      Mins := Conf.GetValue(UTF8Decode(TIMER_CONF_MINUTES), 0);
-      Secs := Conf.GetValue(UTF8Decode(TIMER_CONF_SECONDS), 0);
-
-      NewTimerClock.Duration :=
-        EncodeTime(Hours, Mins, Secs, 0);}
 
       // When float is saved, it is saved as
       fs := FormatSettings;
       fs.DecimalSeparator := '.';
-      //ErrorText := (string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')));
+
       NewTimerClock.Duration :=
         StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')), fs);
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
-
-      {Success := NewTimerClock.SetAudioFile(
-        string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')),
-        StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0'))),
-        ErrorText);
-      if not Success then
-      begin
-        NewTimerClock.SetAudioFile('', 0, ErrorText);
-      end;
-      newTimerClock.Audio.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);}
 
       if TAudio.Loaded then
       begin
@@ -1552,20 +1233,8 @@ begin
       NewTimerClock.TrayNotification :=
         Conf.GetValue(TIMER_CONF_TRAYNOTIFiCATION, False);
 
-      //NewTimerClock.AddSubscription(FFormWidget);
-      //NewTimerClock.Widget.OnSelect:=@ClockSelected;
       PostTimerCreation(NewTimerClock);
 
-      {Order := TIdList.Create;
-      OrderString := TStringList.Create;
-
-      if not Conf.GetValue(TIMER_CONF_ORDER, OrderString, '0') then
-        ShowMessage('Getting order failed');
-
-      for Pos in OrderString do
-      begin
-        Order.Add(StrToInt(Pos));
-      end;  }
       Conf.CloseKey;
     end;
 
@@ -1587,102 +1256,30 @@ end;
 
 function TfrmMain.AddTimer(): TfraTimer;
 var
-  //NewTimer: TTimerClock;
   Id: longword;
   NewWidget: TfraTimer;
 begin
-  //NewTimer := TTimerClock.Create;
-  //frmEditTimer.ShowModal;
   Id := FCounterClockID.NextVal;
-  //NewTimer.Id := Id;
 
-  //NewWidget := FClocksWidget.AddTimer(Id);
   NewWidget := TfraTimer.Create(sbxClocks);
   NewWidget.Id := Id;
   NewWidget.TitleEditable := GlobalUserConfig.AllowTimerTitleEdit;
-  //NewWidget.OnTimerStart := @TimerStarted;
-  //NewWidget.OnTimerPause := @TimerPaused;
-  //NewWidget.OnTimerStop := @TimerFinished;
+
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
-  //NewWidget.LastProgressPercent:=0;
 
-  //NewWidget.OnTimerProgressUpdate := @TimerProgressUpdated;
-  {if not GlobalUserConfig.AllowTimerTitleEdit then
-  begin
-    NewWidget.edtTitle.Color:=clForm;
-    NewWidget.edtTitle.ReadOnly:=True;
-    //NewWidget.edtTitle.ParentColor:=True;
-  end;}
   FTimerFrames.Add(Id, NewWidget);
   FOrder.Insert(0, Id);
   Reorder;
 
-  //NewTimer.Widget := NewWidget;
-  //NewWidget.OnNotifyChange := @NotifyChange;
-  //NewWidget.OnProgressOnIconChanged := @HandleTimerFrameIconProgressChange;
-  //NewTimer.AddSubscription(NewWidget.);
-
-  //FTimerFrames.Add(Id, NewWidget);
-  //NewWidget.Id:=Id;
-  {TODO: This section can be cleaned up}
-  //NewWidget.OnPlay := @NewWidget.Start;
-  //NewWidget.OnStop := @NewWidget.Stop;
-  //NewWidget.OnPause := @NewWidget.Pause;
-  //NewWidget.OnNotify := @NewWidget.NotifyChange;
-  //NewWidget.OnSelect:=@ClockSelected;
-
   Result := NewWidget;
 end;
 
-{procedure TfrmMain.NotifyChange(Sender: TObject);
-var
-  TimerClock: TfraTimer;
-  Notifier: TfraTimer;
-  Count: integer;
-begin
-  ShowMessage('Hehe');
-  Notifier := TfraTimer(Sender);
-  if not Notifier.IsProgressOnIcon then
-  begin
-    Notifier.PublishProgress(TIMER_PROGRESS_FINISHED);
-    Notifier.IsProgressOnIcon := False;
-    Exit;
-  end;
-
-
-  for Count := 0 to FTimerFrames.Count - 1 do
-  begin
-    TimerClock := FTimerFrames.Data[Count];
-    if TimerClock = nil then
-      ShowMessage('Clock is Nil');
-    if TimerClock <> Notifier then
-    begin
-      TimerClock.IsProgressOnIcon := False;
-      if TimerClock.IsProgressOnIcon = True then
-      begin
-        TimerClock.IsProgressOnIcon := False;
-        TimerClock.PublishProgress(TIMER_PROGRESS_FINISHED);
-      end;
-    end;
-
-  end;
-
-  Notifier.IsProgressOnIcon := True;
-  //TODO: Add PublishProgress here
-  //Notifier.OnShortTimer(Self);
-
-end;}
-
-// Procedure to handle if
 procedure TfrmMain.HandleTimerFrameIconProgressChange(Sender: TfraTimer);
 var
   Temp: TfraTimer;
   Count: integer;
-  //TODO: This variable is not needed now?
-  //ForcefulUncheck: boolean;
 begin
-  //Sender := TfraTimer(Sender);
   { Tray checkboxes can be checked by only one timer at time, as the status
   of only one timer can be shown in the System Tray.
   Tray checkboxes can be changed by
@@ -1698,7 +1295,6 @@ begin
   if not Sender.IsProgressOnIcon then
   begin
     Sender.PublishProgress(TIMER_PROGRESS_OFFTRAY);
-    //Notifier.IsProgressOnIcon := False;
     Exit;
   end;
 
@@ -1711,7 +1307,7 @@ begin
     b) If the timre that is taking over is not running, then the progress
        has to be published for the previous one.
   }
-  //ForcefulUncheck := False;
+
   // For all timers other than the sender, uncheck if checked
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
@@ -1722,7 +1318,7 @@ begin
         Temp.CallbackOnProgressOnIconChange := False;
         Temp.IsProgressOnIcon := False;
         Temp.CallbackOnProgressOnIconChange := True;
-        //ForcefulUncheck := True;
+
         { If the timer that has been checked is not running, then
         we have a special case where there is no one to take over and
         override the publishing. So manually take the previously running one
@@ -1740,19 +1336,11 @@ var
   TimerClock: TfraTimer;
   Count: integer;
   OrderStrings: TStringList;
-  //Order: TIdList;
   Id: longword;
   fs: TFormatSettings;
-  //Index: integer;
 begin
-  //Order := TIdList.Create;
-  OrderStrings := TStringList.Create;
 
-  //GetOrder(Order);
-  {for Id in FOrder do
-  begin
-    Order.Add(Id);
-  end;}
+  OrderStrings := TStringList.Create;
 
   // While saving, existing IDs of clocks are ignored.
   // New IDs are generated in sequence.
@@ -1774,14 +1362,6 @@ begin
       ShowMessage('Clock is Nil');
 
     Conf.SetValue(UTF8Decode(TIMER_CONF_TITLE), UTF8Decode(TimerClock.Caption));
-    {Conf.SetValue(TIMER_CONF_HOURS, HourOf(TimerClock.Duration));
-    Conf.SetValue(TIMER_CONF_MINUTES,
-      MinuteOf(TimerClock.Duration));
-    Conf.SetValue(TIMER_CONF_SECONDS,
-      SecondOf(TimerClock.Duration));}
-    //Conf.SetValue(TIMER_CONF_DURATION, TimerClock.Duration);
-    //Conf.SetValue(TIMER_CONF_NOTIFIER,
-    //  TimerClock.Audio.Looped);
 
     fs := FormatSettings;
     fs.DecimalSeparator := '.';
@@ -1812,23 +1392,13 @@ begin
     Conf.SetValue(TIMER_CONF_TRAYNOTIFiCATION,
       TimerClock.TrayNotification);
 
-    // Add the new ID at the beginning of the list
     OrderStrings.Insert(0, IntToStr(Count + 1));
 
-    //Index := FOrder.IndexOf(TimerClock.Id);
-    //Assert(Index >= 0);
-    //Order.Items[Index] := Count + 1;
     Conf.CloseKey;
   end;
 
-
-  {for Id in FOrder do
-    OrderStrings.Add(IntToStr(Id));}
-
   Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
-  //ShowMessage('After Savetofile ' + IntToStr(FOrder.Count));
   OrderStrings.Free;
-  //Order.Free;
 end;
 
 procedure TfrmMain.DeleteSelected;
@@ -1836,7 +1406,6 @@ var
   Id: longword;
   TimerClock: TfraTimer;
   Count: integer;
-  //Index: integer;
   IdList: TIdList;
 begin
   IdList := TIdList.Create;
@@ -1856,9 +1425,7 @@ begin
 
     if TimerClock.Selected then
     begin
-      //RemoveTimer(TimerClock.Id);
       IdList.Add(TimerClock.Id);
-      //TimerClock.Free;
     end;
 
   end;
@@ -1866,8 +1433,6 @@ begin
   for Id in IdList do
   begin
     RemoveTimer(Id);
-    //FTimerFrames.Remove(Id);
-    //TimerClock.Free;
   end;
   IdList.Free;
 
@@ -1943,11 +1508,6 @@ procedure TfrmMain.OnShortTimer(Sender: TObject);
 var
   TimerFrame: TfraTimer;
 begin
-  //EnterCriticalSection(TimerCriticalSection);
-  //for TimerFrame in FActiveTimerFrames.K;
-  //DebugLn('Timer fired. ');
-  //DebugLn('' + IntToStr(FActiveTimerFrames.Count) + ' active timers');
-
   try
     if FActiveTimerFrames.Count = 0 then
       Exit;
@@ -1961,7 +1521,6 @@ begin
         ShowMessage('Error (4): ' + E.ClassName + #13#10 + E.Message);
     end;
   finally
-    //LeaveCriticalSection(TimerCriticalSection);
   end;
 
 end;

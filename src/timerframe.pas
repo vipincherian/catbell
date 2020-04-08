@@ -408,9 +408,9 @@ begin
 end;
 
 procedure TfraTimer.aiEditExecute(Sender: TObject);
-var
+{var
   //Hour, Min, Sec, Milli: word;
-  ErrorText: string;
+  ErrorText: string;}
 begin
   frmEdit.Description := edtTitle.Text;
   frmEdit.Duration := dtpSet.Time;
@@ -1052,8 +1052,8 @@ begin
 end;
 
 procedure TfraTimer.Stop(UserInitiated: boolean);
-var
-  AudioDevice: TAudioDevice;
+{var
+  AudioDevice: TAudioDevice;}
 begin
   { The audio is playing and the user request is to terminate the audio.}
   DebugLn('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));

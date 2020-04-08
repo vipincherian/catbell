@@ -708,7 +708,6 @@ begin
     raise EAudioNotLoaded.Create('Audio not loaded.');
   if UseDefaultDevice or (FOutputDevice.DeviceName = '') or (FOutputDevice.HostAPIName = '') then
   begin
-
     DeviceId := DefaultDeviceIndex;
     DebugLn('Playsine - using default device');
   end
