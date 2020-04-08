@@ -30,7 +30,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, SysUtils, Dialogs, datetimectrls, main,
   sequence, timerframe, settings, optionsform, 
-timeralertform, aboutform, editform, adjustform, audio
+timeralertform, aboutform, editform, adjustform, audio, lazlogger
   { you can add units after this }
 {$IF defined(windows) }
   ,windows
@@ -49,6 +49,9 @@ var
   MutexHandle: THandle;
 begin
   RequireDerivedFormResource:=True;
+
+  DebugLn('Application built on ' + {$INCLUDE %DATE%});
+
   { Checks to ensure that only one instance of the application runs at a time }
   {$IF defined(windows) }
   MutexHandle := CreateMutex(nil, True, APP_UUID);
