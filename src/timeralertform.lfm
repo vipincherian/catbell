@@ -1,12 +1,12 @@
 object frmAlert: TfrmAlert
   Cursor = crHandPoint
   Left = 431
-  Height = 146
+  Height = 190
   Top = 254
   Width = 336
   BorderStyle = bsSingle
   Caption = 'Timer Finished'
-  ClientHeight = 146
+  ClientHeight = 190
   ClientWidth = 336
   Icon.Data = {
     7E04000000000100010010100000010020006804000016000000280000001000
@@ -51,33 +51,45 @@ object frmAlert: TfrmAlert
   OnCreate = FormCreate
   OnShow = FormShow
   LCLVersion = '2.0.6.0'
-  object lbMessages: TListBox
-    Left = 8
-    Height = 80
-    Top = 24
-    Width = 320
-    ItemHeight = 0
-    ScrollWidth = 318
-    TabOrder = 0
-  end
   object bbClose: TBitBtn
-    Left = 131
+    Left = 128
     Height = 30
-    Top = 112
+    Top = 152
     Width = 75
     DefaultCaption = True
     GlyphShowMode = gsmAlways
     Kind = bkClose
     ModalResult = 11
     OnClick = bbCloseClick
-    TabOrder = 1
+    TabOrder = 0
   end
   object Label1: TLabel
     Left = 8
     Height = 15
     Top = 8
-    Width = 177
+    Width = 176
     Caption = 'The following timers completed:-'
     ParentColor = False
+  end
+  object lsvMessages: TListView
+    Left = 8
+    Height = 112
+    Top = 32
+    Width = 320
+    Columns = <    
+      item
+        AutoSize = True
+        Caption = 'Title'
+        Width = 37
+      end    
+      item
+        AutoSize = True
+        Caption = 'Duration'
+        MinWidth = 80
+        Width = 61
+      end>
+    ReadOnly = True
+    TabOrder = 1
+    ViewStyle = vsReport
   end
 end

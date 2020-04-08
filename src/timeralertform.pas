@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  LCLType, ExtCtrls, Buttons, LazLogger;
+  LCLType, ExtCtrls, Buttons, ComCtrls, LazLogger;
 
 type
 
@@ -35,8 +35,8 @@ type
   TfrmAlert = class(TForm)
     bbClose: TBitBtn;
     Label1: TLabel;
-    lbMessages: TListBox;
     FTimer: TTimer;
+    lsvMessages: TListView;
     procedure bbCloseClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -88,7 +88,8 @@ procedure TfrmAlert.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
   //DebugLn('Entering FormClose');
-  lbMessages.Items.Clear;
+  //lbMessages.Items.Clear;
+  lsvMessages.Items.Clear;
   //DebugLn('Exiting FormClose');
 end;
 

@@ -1,7 +1,7 @@
 unit audio;
 
 {$mode objfpc}{$H+}
-{$MODESWITCH ADVANCEDRECORDS}
+//{$MODESWITCH ADVANCEDRECORDS}
 
 interface
 

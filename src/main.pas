@@ -935,7 +935,8 @@ var
   Seconds: word;
 
   Duration: TDateTime;
-  Message: string;
+  Message, DurationText: string;
+  Item: TListItem;
 begin
 
   Duration := Sender.Duration;
@@ -954,21 +955,27 @@ begin
     on E: Exception do
       ShowMessage('Error(1): ' + E.ClassName + #13#10 + E.Message);
   end;
+  DurationText := Format('%.2d', [Hours]) +
+      ':' + Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]);
 
   if Sender.TrayNotification and (not UserInitiated) then
   begin
     tiMain.BalloonHint :=
-      Sender.Caption + ' completed. (' + Format('%.2d', [Hours]) +
-      ':' + Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
+      Sender.Caption + ' completed. (' + DurationText + ')';
     tiMain.ShowBalloonHint;
   end;
 
   if Sender.ModalAlert and (not UserInitiated) then
   begin
-    Message :=
+    {Message :=
       Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
-      Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';
-    frmAlert.lbMessages.Items.Add(Message);
+      Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';}
+    //frmAlert.lbMessages.Items.Add(Message);
+
+    Item := frmAlert.lsvMessages.Items.Add;
+    Item.Caption:=Sender.Caption;
+    Item.SubItems.Add(DurationText);
+
 
     Application.QueueAsyncCall(@ShowModalAlert, 0);
   end;
