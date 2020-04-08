@@ -54,6 +54,7 @@ type
     dtpCompleteBy: TDateTimePicker;
     dtpDefaultTime: TDateTimePicker;
     dtpShorten: TDateTimePicker;
+    edtDefaultDeviceName: TEdit;
     edtDefaultTitle: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
@@ -64,7 +65,6 @@ type
     GroupBox6: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
-    lblDefaultDeviceName: TLabel;
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
@@ -135,8 +135,8 @@ begin
   begin
     RefreshAudioDevices;
     TAudio.GetDefaultDevice(@AudioDevice);
-    lblDefaultDeviceName.Caption :=
-      AudioDevice.DeviceName + ' - ' + AudioDevice.HostAPIName;
+    edtDefaultDeviceName.Text:=
+      AudioDevice.DeviceName + ' -> ' + AudioDevice.HostAPIName;
   end;
 end;
 
@@ -317,15 +317,15 @@ begin
   begin
     RefreshAudioDevices;
     TAudio.GetDefaultDevice(@AudioDevice);
-    lblDefaultDeviceName.Caption :=
-      AudioDevice.DeviceName + ' - ' + AudioDevice.HostAPIName;
+    edtDefaultDeviceName.Text :=
+    AudioDevice.DeviceName + ' -> ' + AudioDevice.HostAPIName;
     Audio := TAudio.Create;
     bbPlay.Enabled := True;
   end
   else
   begin
     //cmbAudioDevice.Enabled := False;
-    lblDefaultDeviceName.Caption := 'Audio libraries not loaded. Audio will not work';
+    edtDefaultDeviceName.Text := 'Audio libraries not loaded. Audio will not work';
     bbPlay.Enabled := False;
   end;
 
