@@ -467,7 +467,7 @@ object frmOptions: TfrmOptions
         Top = 248
         Width = 483
         Anchors = [akLeft, akRight, akBottom]
-        Caption = 'Test audio'
+        Caption = 'Test'
         ClientHeight = 44
         ClientWidth = 479
         TabOrder = 1

@@ -89,6 +89,7 @@ type
     class procedure SetOutputDevice(AValue: TAudioDevice); static;
   public
     Loaded: boolean; static;
+    UseDefaultDevice: boolean; static;
     FDevices: TAudioDeviceList; static;
     //FAudioDevices: TAudioDeviceList; static;
     FDefaultDevice: integer; static;
@@ -628,7 +629,7 @@ begin
       DebugLn('Sf_seek returned error');
     end;
 
-    if (FOutputDevice.HostAPIName = '') or (FOutputDevice.DeviceName = '') then
+    if UseDefaultDevice or (FOutputDevice.HostAPIName = '') or (FOutputDevice.DeviceName = '') then
     begin
       DeviceId := DefaultDeviceIndex;
       DebugLn('TAudio using default device to play audio.' + {$INCLUDE %LINE%});
@@ -705,7 +706,7 @@ begin
     //OutDevice:= StrToInt(  trim( LeftStr( ComboBox1.Caption, 2)));
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
-  if (FOutputDevice.DeviceName = '') or (FOutputDevice.HostAPIName = '') then
+  if UseDefaultDevice or (FOutputDevice.DeviceName = '') or (FOutputDevice.HostAPIName = '') then
   begin
 
     DeviceId := DefaultDeviceIndex;

@@ -121,6 +121,9 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    MenuItem9: TMenuItem;
     pmiQuit: TMenuItem;
     pmiShowWindow: TMenuItem;
     pmiExit: TMenuItem;
@@ -136,6 +139,7 @@ type
     pnlBorder: TPanel;
     pnlClocks: TPanel;
     pmTray: TPopupMenu;
+    pmMain: TPopupMenu;
     sdgExport: TSaveDialog;
     sbxClocks: TScrollBox;
     stbMain: TStatusBar;
@@ -167,9 +171,13 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
+    procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     procedure sbxClocksResize(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
     //procedure tbShowModalAlertClick(Sender: TObject);
@@ -693,6 +701,15 @@ begin
   //DoneCriticalsection(TimerCriticalSection);
 end;
 
+procedure TfrmMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+  begin
+    pmMain.PopUp;
+  end;
+end;
+
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
   ;//ResizeHeaderSections;
@@ -737,6 +754,15 @@ end;
 procedure TfrmMain.pmiShowWindowClick(Sender: TObject);
 begin
   ShowInForeground;
+end;
+
+procedure TfrmMain.sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+  begin
+    pmMain.PopUp;
+  end;
 end;
 
 procedure TfrmMain.sbxClocksResize(Sender: TObject);

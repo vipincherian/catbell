@@ -143,8 +143,8 @@ end;
 
 procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
 var
-  Index: integer;
-  DefaultDeviceId: integer;
+//  Index: integer;
+  //DefaultDeviceId: integer;
   Item: TListItem;
 begin
   with Config do
@@ -183,13 +183,13 @@ begin
         else
         begin
           //DefaultDeviceId := TAudio.GetDefaultDeviceIndex; //Pa_GetDefaultOutputDevice();
-          {if DefaultDevice = paNoDevice then
+          if DefaultDevice = paNoDevice then
           begin
             DebugLn('No default device');
             //tsAudio.Enabled:=False;
             cmbAudioDevice.Enabled := False;
           end
-          else}
+          else
           cmbAudioDevice.ItemIndex := TAudio.DefaultDeviceIndex;
         end;}
 
@@ -208,10 +208,10 @@ end;
 
 procedure TfrmOptions.RefreshAudioDevices;
 var
-  DefaultDeviceId: AudioDeviceIndex;
+  //DefaultDeviceId: AudioDeviceIndex;
   Devices: TAudioDeviceList;
   Device: PAudioDevice;
-  Count: integer;
+  //Count: integer;
   Itm: TListItem;
 begin
   { Load audio devices }
@@ -222,7 +222,7 @@ begin
   begin
     //cmbAudioDevice.Items.Clear;
     lsvAudioDevices.Items.Clear;
-    DefaultDeviceId := TAudio.GetDefaultDeviceIndex;
+    //DefaultDeviceId := TAudio.GetDefaultDeviceIndex;
     Devices := TAudio.Devices;
     for Device in Devices do
     begin
@@ -374,22 +374,28 @@ end;
 procedure TfrmOptions.bbPlayClick(Sender: TObject);
 var
   Item: TListItem;
+
 begin
   if TAudio.Loaded then
   begin
+    TAudio.UseDefaultDevice:=cbUseDefaultAudio.Checked;
 
-    for Item in lsvAudioDevices.Items do
+    if not TAudio.UseDefaultDevice then
     begin
-      if Item.Checked then
+      TAudio.SetDefaulDevice; // In case no items are checked
+      for Item in lsvAudioDevices.Items do
       begin
-        // TODO: FOutpuDevice should be renamed?
-        TAudio.FOutputDevice.DeviceName := Item.Caption;
-        TAudio.FOutputDevice.HostAPIName:=Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
-        Audio.PlaySine;
-        pgbAudio.Style := pbstMarquee;
-        bbPlay.Enabled := False;
-        bbStop.Enabled := True;
+        if Item.Checked then
+        begin
+          // TODO: FOutpuDevice should be renamed?
+          TAudio.FOutputDevice.DeviceName := Item.Caption;
+          TAudio.FOutputDevice.HostAPIName:=Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
+        end;
       end;
+      Audio.PlaySine;
+      pgbAudio.Style := pbstMarquee;
+      bbPlay.Enabled := False;
+      bbStop.Enabled := True;
     end;
 
     {if cmbAudioDevice.ItemIndex >= 0 then

@@ -1113,14 +1113,19 @@ begin
       StopButtonEnabled := True;
       //PlayAudio;
 
-      if (GlobalUserConfig.AudioDeviceName = '') or
-        (GlobalUserConfig.AudioHostAPIName = '') or
-        GlobalUserConfig.UseDefaultAudioDevice then
-        TAudio.SetDefaulDevice
-      else
+      TAudio.UseDefaultDevice:=GlobalUserConfig.UseDefaultAudioDevice;
+
+      if not TAudio.UseDefaultDevice then
       begin
-        TAudio.FOutputDevice.DeviceName:=GlobalUserConfig.AudioDeviceName;
-        TAudio.FOutputDevice.HostAPIName:=GlobalUserConfig.AudioHostAPIName;
+        if (GlobalUserConfig.AudioDeviceName = '') or
+          (GlobalUserConfig.AudioHostAPIName = '') then
+          TAudio.SetDefaulDevice
+        else
+        begin
+          TAudio.FOutputDevice.DeviceName:=GlobalUserConfig.AudioDeviceName;
+          TAudio.FOutputDevice.HostAPIName:=GlobalUserConfig.AudioHostAPIName;
+        end;
+
       end;
 
       //FAudio.Looped := AudioLooped;
