@@ -408,18 +408,8 @@ object frmOptions: TfrmOptions
           Caption = 'Select audio output device to use : '
           ParentColor = False
         end
-        object cmbAudioDevice: TComboBox
-          Left = 272
-          Height = 23
-          Top = 8
-          Width = 212
-          Anchors = [akTop, akLeft, akRight]
-          ItemHeight = 15
-          Style = csDropDownList
-          TabOrder = 0
-        end
         object lblDefaultDeviceName: TLabel
-          Left = 192
+          Left = 336
           Height = 15
           Top = 8
           Width = 118
@@ -444,8 +434,9 @@ object frmOptions: TfrmOptions
             end>
           ColumnClick = False
           ReadOnly = True
-          TabOrder = 1
+          TabOrder = 0
           ViewStyle = vsReport
+          OnItemChecked = lsvAudioDevicesItemChecked
         end
         object cbUseDefaultAudio: TCheckBox
           Left = 16
@@ -454,7 +445,7 @@ object frmOptions: TfrmOptions
           Width = 151
           Caption = 'Use default audio output'
           OnChange = cbUseDefaultAudioChange
-          TabOrder = 2
+          TabOrder = 1
         end
       end
       object GroupBox6: TGroupBox
@@ -462,7 +453,7 @@ object frmOptions: TfrmOptions
         Height = 72
         Top = 240
         Width = 483
-        Caption = 'GroupBox6'
+        Caption = 'Test audio'
         ClientHeight = 52
         ClientWidth = 479
         TabOrder = 1

@@ -50,7 +50,6 @@ type
     cbModalAlert: TCheckBox;
     cbAutoProgress: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
-    cmbAudioDevice: TComboBox;
     cmbTimeFormat: TComboBox;
     dtpCompleteBy: TDateTimePicker;
     dtpDefaultTime: TDateTimePicker;
@@ -95,6 +94,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormHide(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure lsvAudioDevicesItemChecked(Sender: TObject; Item: TListItem);
     procedure pgcOptionsChange(Sender: TObject);
     procedure tsAudioShow(Sender: TObject);
   private
@@ -175,7 +175,7 @@ begin
       if (GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME) or
         (GlobalUserConfig.AudioHostAPIName <> DEF_AUDIO_HOSTAPI_NAME) then
       begin
-        Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
+        {Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
         if index >= 0 then
           cmbAudioDevice.ItemIndex :=
             cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
@@ -190,7 +190,7 @@ begin
           end
           else}
           cmbAudioDevice.ItemIndex := TAudio.DefaultDeviceIndex;
-        end;
+        end;}
 
         for Item in lsvAudioDevices.Items do
         begin
@@ -219,7 +219,7 @@ begin
 
   if TAudio.Loaded then
   begin
-    cmbAudioDevice.Items.Clear;
+    //cmbAudioDevice.Items.Clear;
     lsvAudioDevices.Items.Clear;
     DefaultDeviceId := TAudio.GetDefaultDeviceIndex;
     Devices := TAudio.Devices;
@@ -228,7 +228,7 @@ begin
       //Device := Devices.Strings[Count];
       {if Count = DefaultDeviceId then
         Device := Device + ' (Default)';}
-      cmbAudioDevice.Items.Add(Device^.DeviceName);
+      //cmbAudioDevice.Items.Add(Device^.DeviceName);
       Itm := lsvAudioDevices.Items.Add;
       Itm.Caption := Device^.DeviceName;
       Itm.SubItems.Add(Device^.HostAPIName);
@@ -236,14 +236,14 @@ begin
         (Itm.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
     end;
 
-    if cmbAudioDevice.Items.Count > 0 then
+    {if cmbAudioDevice.Items.Count > 0 then
     begin
       if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
         cmbAudioDevice.ItemIndex := TAudio.DefaultDeviceIndex
       else
         cmbAudioDevice.ItemIndex :=
           cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
-    end;
+    end;}
   end;
 end;
 
@@ -272,8 +272,8 @@ begin
     AdjustCompletebyDefault := dtpCompleteBy.Time;
 
     //AudioDevice := cmbAudioDevice.ItemIndex;
-    if TAudio.Loaded and (cmbAudioDevice.ItemIndex >= 0) then
-      AudioDeviceName := cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
+    //if TAudio.Loaded and (cmbAudioDevice.ItemIndex >= 0) then
+    //  AudioDeviceName := cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
 
     Config.UseDefaultAudioDevice:=cbUseDefaultAudio.Checked;
 
@@ -324,7 +324,7 @@ begin
   end
   else
   begin
-    cmbAudioDevice.Enabled := False;
+    //cmbAudioDevice.Enabled := False;
     lblDefaultDeviceName.Caption := 'Audio libraries not loaded. Audio will not work';
     bbPlay.Enabled := False;
   end;
@@ -490,6 +490,18 @@ procedure TfrmOptions.FormShow(Sender: TObject);
 begin
   SetControlsAs(GlobalUserConfig);
   FLastConfig.CopyFrom(GlobalUserConfig);
+end;
+
+procedure TfrmOptions.lsvAudioDevicesItemChecked(Sender: TObject;
+  Item: TListItem);
+var
+  AnItem: TListitem;
+begin
+  for AnItem in lsvAudioDevices.Items do
+  begin
+    if Anitem <> item then
+      AnItem.Checked:=False;
+  end;
 end;
 
 
