@@ -1,5 +1,4 @@
 object frmAlert: TfrmAlert
-  Cursor = crHandPoint
   Left = 431
   Height = 190
   Top = 254
