@@ -29,37 +29,12 @@ uses
 
 type
 
-  { TDefaultConfig }
-
-  {TDefaultConfig = class(TObject)
-  private
-    FTimerInitMins: Integer;
-    FTimerInitSecs: Integer;
-    FTimerInitTitle: String;
-    FConf: TJSONConfig;
-    procedure Load;
-    procedure CreateAnew;
-  public
-    constructor Create();
-    Destructor  Destroy; override;
-    property TimerInitMins: Integer read FTimerInitMins;
-    property TimerInitSecs: Integer read FTimerInitSecs;
-    property TimerInitTitle: String read FTimerInitTitle;
-  end;}
-
   { TUserConfig }
 
   TUserConfig = class(TObject)
   private
-    //FFileName: string;
     FDefaultPos: TRect;
-    //FLastPosNormal: TRect;
-
-    //FConf: TJSONConfig;
-    //procedure Save;
-    //procedure CreateAnew;
     function GetDefaultStartPosition: TRect;
-    //procedure SetFileName(AValue: string);
   public
     ShowModalAlert: boolean;
     ShowTrayAlert: boolean;
@@ -69,28 +44,24 @@ type
     QueryExit: boolean;
     AllowTimerTitleEdit: boolean;
     DefaultTimerTitle: string;
-    //DefaultTimerHours: integer;
-    //DefaultTimerMins: integer;
-    //DefaultTimerSecs: integer;
+
     DefaultTimerDuration: double;
 
     LastWindowState: TWindowState;
     DefaultTimeFormat: integer;
     AdjustDiffDefault: double;
-    //AdjustExtendDefault: double;
+
     AdjustCompletebyDefault: double;
-    //AudioDevice: integer;
+
     UseDefaultAudioDevice: boolean;
     AudioDeviceName: string;
     AudioHostAPIName: string;
     constructor Create();
     destructor Destroy; override;
-    //procedure Load;
-    //procedure Flush;
+
     procedure CopyFrom(From: TUserConfig);
     function CompareWith(From: TUserConfig): boolean;
-    //property LastPosNormal: TRect read FLastPosNormal write FLastPosNormal;
-    //property FileName: string read FFileName write SetFileName;
+
   end;
 
   { TUserFileConfig }
@@ -166,12 +137,8 @@ const
   TIME_FORMAT = 'time_format';
   DEF_TIME_FORMAT = tf12;
 
-  //ADJ_EXTEND = 'adjust_extend';
   ADJ_DIFF = 'adjust_diff';
   ADJ_COMPLETEBY = 'adust_completeby';
-
-  //AUDIO_DEVICE = 'audio_device';
-  //DEF_AUDIO_DEVICE = -1; // Default audio device
 
   USE_DEFAULT_AUDIO_DEVICE = 'audio_device_default';
   DEF_USE_DEFAULT_AUDIO_DEVICE = True;
@@ -192,20 +159,17 @@ begin
   Assert(integer(tf12) = 0);
   Assert(integer(tf24) = 1);
 
-  //DEF_TIMER_DURATION := EncodeTime(0, 5, 0, 0);
-
   if not DirectoryExists(GetAppConfigDir(False)) then
     CreateDir(GetAppConfigDir(False));
-  //GlobalDefault := TDefaultConfig.Create;
+
   GlobalUserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
-  //GlobalUserConfig.FileName:=GetAppConfigDir(False) + 'user.json';
+
   GlobalUserConfig.Load;
 end;
 
 procedure CleanupSettings;
 begin
   GlobalUserConfig.Free;
-  //GlobalDefault.Free;
 end;
 
 
@@ -256,19 +220,16 @@ begin
     {TODO: Is the defaulting correct here?}
     ShowModalAlert := FConf.GetValue(SHOW_MODAL_ALERT, ShowModalAlert);
     ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
-    //ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
+
     AutoProgress := FConf.GetValue(AUTO_PROGRESS, AutoProgress);
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
     AllowTimerTitleEdit := FConf.GetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
     DefaultTimerTitle := string(FConf.GetValue(UTF8Decode(TIMER_TITLE), UTF8Decode(DefaultTimerTitle)));
-    //DefaultTimerHours := FConf.GetValue(TIMER_HOURS, DefaultTimerHours);
-    //DefaultTimerMins := FConf.GetValue(TIMER_MINS, DefaultTimerMins);
-    //DefaultTimerSecs := FConf.GetValue(TIMER_SECS, DefaultTimerSecs);
+
     DefaultTimerDuration := FConf.GetValue(TIMER_DURATION, DefaultTimerDuration);
 
     DefaultTimeFormat := FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
 
-    //AdjustExtendDefault:=FConf.GetValue(ADJ_EXTEND, AdjustExtendDefault);
     AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, DEF_TIMER_DURATION);
     if AdjustDiffDefault <= 0 then
       AdjustDiffDefault := DEF_TIMER_DURATION;
@@ -277,7 +238,6 @@ begin
     if AdjustCompletebyDefault <= 0 then
       AdjustCompletebyDefault := DEF_TIMER_DURATION;
 
-    //AudioDevice:= FConf.GetValue(AUDIO_DEVICE, AudioDevice);
     AudioDeviceName:= string(FConf.GetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName)));
     AudioHostAPIName:= string(FConf.GetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName)));
     UseDefaultAudioDevice :=
@@ -314,18 +274,14 @@ begin
   FConf.SetValue(QUERY_EXIT, QueryExit);
   FConf.SetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
   Fconf.SetValue(TIMER_TITLE, UTF8Decode(DefaultTimerTitle));
-  //FConf.SetValue(TIMER_HOURS, DefaultTimerHours);
-  //FConf.SetValue(TIMER_MINS, DefaultTimerMins);
-  //FConf.SetValue(TIMER_SECS, DefaultTimerSecs);
+
   FConf.SetValue(TIMER_DURATION, DefaultTimerDuration);
 
   FConf.SetValue(TIME_FORMAT, DefaultTimeFormat);
 
-  //FConf.SetValue(ADJ_EXTEND, AdjustExtendDefault);
   FConf.SetValue(ADJ_DIFF, AdjustDiffDefault);
   FConf.SetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
 
-  //FConf.SetValue(AUDIO_DEVICE, AudioDevice);
   FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName));
   FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName));
   FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
@@ -363,16 +319,14 @@ begin
 
   FConf.SetValue(TIME_FORMAT, integer(DEF_TIME_FORMAT));
 
-  //FConf.SetValue(ADJ_EXTEND, DEF_TIMER_DURATION);
   FConf.SetValue(ADJ_DIFF, DEF_TIMER_DURATION);
   FConf.SetValue(ADJ_COMPLETEBY, DEF_TIMER_DURATION);
 
-  //FConf.SetValue(AUDIO_DEVICE, DEF_AUDIO_DEVICE);
   if TAudio.Loaded then
   begin
     TAudio.GetDefaultDevice(@AudioDevice);
-    FConf.SetValue(AUDIO_DEVICE_NAME, AudioDevice.DeviceName);
-    FConf.SetValue(AUDIO_HOSTAPI_NAME, AudioDevice.HostAPIName);
+    FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDevice.DeviceName));
+    FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioDevice.HostAPIName));
     FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, DEF_USE_DEFAULT_AUDIO_DEVICE);
   end
   else
@@ -413,11 +367,9 @@ end;
 
 constructor TUserConfig.Create;
 begin
-  //FFileName := GetAppConfigDir(False) + 'user.json';
-  //FFileName := '';
+
   FDefaultPos := GetDefaultStartPosition;
-  //FConf := TJSONConfig.Create(nil);
-  //FConf := Nil;
+
   ShowModalAlert := DEF_SHOW_MODAL_ALERT;
   ShowTrayAlert := DEF_SHOW_TRAY_ALERT;
   AutoProgress := DEF_AUTO_PROGRESS;
@@ -425,9 +377,7 @@ begin
 
   LastWindowState := wsNormal;
   DefaultTimerTitle := DEF_TIMER_TITLE;
-  //DefaultTimerHours := DEF_TIMER_HOURS;
-  //DefaultTimerMins := DEF_TIMER_MINS;
-  //DefaultTimerSecs := DEF_TIMER_SECS;
+
   DefaultTimerDuration := DEF_TIMER_DURATION;
 
   DefaultTimeFormat := integer(DEF_TIME_FORMAT);
@@ -440,8 +390,6 @@ end;
 
 destructor TUserConfig.Destroy;
 begin
-  //Save;
-  //FConf.Free;
   inherited Destroy;
 end;
 
@@ -453,14 +401,11 @@ begin
   QueryExit := From.QueryExit;
 
   DefaultTimerTitle := From.DefaultTimerTitle;
-  //DefaultTimerHours := From.DefaultTimerHours;
-  //DefaultTimerMins := From.DefaultTimerMins;
-  //DefaultTimerSecs := From.DefaultTimerSecs;
+
   DefaultTimerDuration := From.DefaultTimerDuration;
   AllowTimerTitleEdit := From.AllowTimerTitleEdit;
   DefaultTimeFormat := From.DefaultTimeFormat;
 
-  //AdjustExtendDefault:=From.AdjustCompletebyDefault;
   AdjustDiffDefault := From.AdjustDiffDefault;
   AdjustCompletebyDefault := From.AdjustCompletebyDefault;
 
@@ -496,21 +441,6 @@ begin
     Result := False;
     Exit;
   end;
-  {if DefaultTimerHours <> From.DefaultTimerHours then
-  begin
-    Result := False;
-    Exit;
-  end;
-  if DefaultTimerMins <> From.DefaultTimerMins then
-  begin
-    Result := False;
-    Exit;
-  end;
-  if DefaultTimerSecs <> From.DefaultTimerSecs then
-  begin
-    Result := False;
-    Exit;
-  end;}
 
   if DefaultTimerDuration <> From.DefaultTimerDuration then
   begin
@@ -522,12 +452,6 @@ begin
     Result := False;
     Exit;
   end;
-
-  {if AdjustExtendDefault <> From.AdjustExtendDefault then
-  begin
-    Result := False;
-    Exit;
-  end;}
   if AdjustDiffDefault <> From.AdjustDiffDefault then
   begin
     Result := False;
@@ -556,45 +480,6 @@ begin
   Result := True;
 end;
 
-{ TDefaultConfig }
-{
-procedure TDefaultConfig.Load;
-var
-  FileName: String;
-begin
-  FConf.Filename:= GetAppConfigDir(False) + 'override.json';
-  FileName := GetAppConfigDir(False) + 'override.json';
-  if not FileExists(FileName)
-  then
-    CreateAnew;
-  //else
-    //;//TODO: Verify
-
-  FTimerInitMins := FConf.GetValue(TIMER_INIT_MINS, DEF_TIMER_INIT_MINS);
-  FTimerInitSecs := FConf.GetValue(TIMER_INIT_SECS, DEF_TIMER_INIT_SECS);
-  FTimerInitTitle := FConf.GetValue(TIMER_INIT_TITLE, DEF_TIMER_INIT_TITLE);
-end;
-
-procedure TDefaultConfig.CreateAnew;
-begin
-  FConf.SetValue(TIMER_INIT_MINS, DEF_TIMER_INIT_MINS);
-  FConf.SetValue(TIMER_INIT_SECS, DEF_TIMER_INIT_SECS);
-  FConf.SetValue(TIMER_INIT_TITLE, DEF_TIMER_INIT_TITLE);
-  FConf.SetValue('haha/hihi', 0);
-  FConf.Flush;
-end;
-
-constructor TDefaultConfig.Create;
-begin
-  FConf := TJSONConfig.Create(nil);
-  Load;
-end;
-
-destructor TDefaultConfig.Destroy;
-begin
-  FConf.Free;
-  inherited Destroy;
-end; }
 
 end.
 

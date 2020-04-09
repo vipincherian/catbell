@@ -51,10 +51,10 @@ type
     at which offset in the wavetable each channel is currently
     playing (= phase), and a message: }
   PaTestData = record
-    Sine : array[0..TableSize] of CFloat;
-    LeftPhase : CInt32;
-    RightPhase : CInt32;
-    AMessage : PChar;
+    Sine: array[0..TableSize] of CFloat;
+    LeftPhase: CInt32;
+    RightPhase: CInt32;
+    AMessage: PChar;
     Player: Pointer;
   end;
   PPaTestData = ^PaTestData;
@@ -74,8 +74,8 @@ type
 
     FAudioPlaying: boolean;
 
-    Data : PaTestData;
-    DataPointer : PPaTestData;
+    Data: PaTestData;
+    DataPointer: PPaTestData;
 
     class function GetDevices: TAudioDeviceList; static;
     procedure SetFileName(AValue: string);
@@ -198,21 +198,22 @@ end;
 { The callback function which is called by PA everytime new Data is needed.
   Remember: ALWAYS USE CDECL or your pointers will be messed up!
   Pointers to this function must be castable to PPaStreamCallback: }
-function PaTestCallback({%H-}inputBuffer : pointer; OutputBuffer : pointer;
-      framesPerBuffer : culong; {%H-}timeInfo : PPaStreamCallbackTimeInfo;
-      {%H-}statusFlags : PaStreamCallbackFlags; UserData : pointer ) : CInt32;
-      cdecl;
+function PaTestCallback({%H-}inputBuffer: pointer; OutputBuffer: pointer;
+  framesPerBuffer: culong; {%H-}timeInfo: PPaStreamCallbackTimeInfo;
+  {%H-}statusFlags: PaStreamCallbackFlags; UserData: pointer): CInt32;
+  cdecl;
 var
-  OutBuffer : PCFloat;
-  i : culong;
-  LocalDataPointer : PPaTestData;
+  OutBuffer: PCFloat;
+  i: culong;
+  LocalDataPointer: PPaTestData;
 begin
   EnterCriticalSection(TAudio.AudioCriticalSection);
   OutBuffer := PCFloat(OutputBuffer);
   LocalDataPointer := PPaTestData(UserData);
 
   // Fill the buffer...
-  for i := 0 to (FramesPerBuffer-1) do begin
+  for i := 0 to (FramesPerBuffer - 1) do
+  begin
 
     OutBuffer^ := LocalDataPointer^.Sine[LocalDataPointer^.LeftPhase];
     Inc(OutBuffer);
@@ -221,18 +222,18 @@ begin
     Inc(OutBuffer);
 
     Inc(LocalDataPointer^.LeftPhase);
-    if (LocalDataPointer^.LeftPhase >= TableSize ) then
-        LocalDataPointer^.LeftPhase :=
-          (LocalDataPointer^.LeftPhase - TableSize);
+    if (LocalDataPointer^.LeftPhase >= TableSize) then
+      LocalDataPointer^.LeftPhase :=
+        (LocalDataPointer^.LeftPhase - TableSize);
 
     Inc(LocalDataPointer^.RightPhase);
     Inc(LocalDataPointer^.RightPhase);
-    if ( LocalDataPointer^.RightPhase >= TableSize ) then
-        LocalDataPointer^.RightPhase :=
-          (LocalDataPointer^.RightPhase - TableSize);
+    if (LocalDataPointer^.RightPhase >= TableSize) then
+      LocalDataPointer^.RightPhase :=
+        (LocalDataPointer^.RightPhase - TableSize);
   end;
 
-  PaTestCallback:= CInt32( 0);
+  Result := CInt32(0);
   LeaveCriticalSection(TAudio.AudioCriticalSection);
 end;
 
@@ -240,16 +241,16 @@ end;
 { This is called when playback is finished.
   Remember: ALWAYS USE CDECL or your pointers will be messed up!
   Pointers to this function must be castable to PPaStreamFinishedCallback: }
-procedure StreamFinished( UserData : pointer ); cdecl;
+procedure StreamFinished(UserData: pointer); cdecl;
 var
-  LocalDataPointer : PPaTestData;
+  LocalDataPointer: PPaTestData;
   {%H-}AudioTemp: TAudio; // buggy hint, omitting
 begin
   EnterCriticalSection(TAudio.AudioCriticalSection);
-  LocalDataPointer := PPaTestData( UserData);
+  LocalDataPointer := PPaTestData(UserData);
   AudioTemp := TAudio(LocalDataPointer^.Player);
-    Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
-    LeaveCriticalSection(TAudio.AudioCriticalSection);
+  Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
+  LeaveCriticalSection(TAudio.AudioCriticalSection);
 end;
 
 { TAudio }
@@ -298,13 +299,13 @@ begin
 
         if HostAPIInfo = nil then
         begin
-          DebugLn('Error in getting HostAPI for devide #' + IntToStr(Count)
-           + ' (' + DeviceName + ')');
+          DebugLn('Error in getting HostAPI for devide #' +
+            IntToStr(Count) + ' (' + DeviceName + ')');
         end;
         Device := New(PAudioDevice);
 
-        Device^.DeviceName:=Devicename;
-        Device^.HostAPIName:=HostAPIInfo^.Name;
+        Device^.DeviceName := Devicename;
+        Device^.HostAPIName := HostAPIInfo^.Name;
 
         FDevices.Add(Device);
         DebugLn('Devide ID - ' + IntToStr(Count));
@@ -344,10 +345,10 @@ begin
     DebugLn('Could not get HostAPI details');
     Exit;
   end;
-  HostAPIName:=StrPas(HostAPIInfo^.Name);
+  HostAPIName := StrPas(HostAPIInfo^.Name);
 
-  Device^.DeviceName:=DeviceName;
-  Device^.HostAPIName:=HostAPIName;
+  Device^.DeviceName := DeviceName;
+  Device^.HostAPIName := HostAPIName;
 
   LeaveCriticalSection(AudioCriticalSection);
 end;
@@ -404,8 +405,8 @@ end;
 class procedure TAudio.SetOutputDevice(AValue: TAudioDevice);
 begin
   try
-    FOutputDevice.DeviceName:=AValue.DeviceName;
-    FOutputDevice.HostAPIName:=AValue.HostAPIName;
+    FOutputDevice.DeviceName := AValue.DeviceName;
+    FOutputDevice.HostAPIName := AValue.HostAPIName;
   finally
   end;
 end;
@@ -429,20 +430,19 @@ begin
   OnPlayCompletion := nil;
 
   { Fill a Sine wavetable (Float Data -1 .. +1) }
-  for i := 0 to TableSize - 1
-    do Data.Sine[i]:= CFloat((Sin( ( CFloat(i)/CFloat(TableSize) ) * Pi * 2 )));
+  for i := 0 to TableSize - 1 do
+    Data.Sine[i] := CFloat((Sin((CFloat(i) / CFloat(TableSize)) * Pi * 2)));
 
-  Data.LeftPhase:= 0;
-  Data.RightPhase:= 0;
-  Data.AMessage:= 'No Message'#0;
+  Data.LeftPhase := 0;
+  Data.RightPhase := 0;
+  Data.AMessage := 'No Message'#0;
 
-  DataPointer:= @Data;
+  DataPointer := @Data;
 end;
 
 destructor TAudio.Destroy;
 begin
-  DebugLn('TAudio.Destroy ');
-
+  //DebugLn('TAudio.Destroy ');
   inherited Destroy;
 end;
 
@@ -496,7 +496,8 @@ begin
       HostAPIInfo := Pa_GetHostApiInfo(DeviceInfo^.hostApi);
       if HostAPIInfo = nil then
       begin
-        DebugLn('Error after Pa_GetHostApiInfo for device #' + IntToStr(CountDevice) + ' host api #' + IntToStr(DeviceInfo^.hostApi));
+        DebugLn('Error after Pa_GetHostApiInfo for device #' +
+          IntToStr(CountDevice) + ' host api #' + IntToStr(DeviceInfo^.hostApi));
         Continue;
       end;
       if HostAPIInfo^.Name = Device.HostAPIName then
@@ -508,23 +509,18 @@ begin
     end;
   end;
   LeaveCriticalSection(AudioCriticalSection);
-  raise EInvalidDevice.Create('No matching device for '
-    + Device.DeviceName + ':' + Device.HostAPIName);
+  raise EInvalidDevice.Create('No matching device for ' + Device.DeviceName +
+    ':' + Device.HostAPIName);
 
 end;
 
 class procedure TAudio.SetDefaulDevice;
-{var
-  Device: TAudioDevice;}
 begin
   TAudio.GetDefaultDevice(@FOutputDevice);
-  //FOutputDevice.DeviceName:=;
 end;
 
 procedure TAudio.Play;
 var
-  //SoundFile: PSndFile;
-  //Info: SF_INFO;
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
   DeviceId: integer;
@@ -547,15 +543,17 @@ begin
       DebugLn('Sf_seek returned error');
     end;
 
-    if UseDefaultDevice or (FOutputDevice.HostAPIName = '') or (FOutputDevice.DeviceName = '') then
+    if UseDefaultDevice or (FOutputDevice.HostAPIName = '') or
+      (FOutputDevice.DeviceName = '') then
     begin
       DeviceId := DefaultDeviceIndex;
-      DebugLn('TAudio using default device to play audio.' + {$INCLUDE %LINE%});
+      DebugLn('TAudio using default device to play audio.');
     end
     else
     begin
       DeviceId := GetDeviceIndex(FOutputDevice);
-      DebugLn('TAudio using device - ' + FOutputDevice.DeviceName + ' host api - ' + FOutputDevice.HostAPIName);
+      DebugLn('TAudio using device - ' + FOutputDevice.DeviceName +
+        ' host api - ' + FOutputDevice.HostAPIName);
     end;
     StreamParams.device := DeviceId;
 
@@ -606,7 +604,6 @@ begin
     //LeaveCriticalSection(AudioCriticalSection);
   end;
 
-
 end;
 
 procedure TAudio.PlaySine;
@@ -617,7 +614,8 @@ var
 begin
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
-  if UseDefaultDevice or (FOutputDevice.DeviceName = '') or (FOutputDevice.HostAPIName = '') then
+  if UseDefaultDevice or (FOutputDevice.DeviceName = '') or
+    (FOutputDevice.HostAPIName = '') then
   begin
     DeviceId := DefaultDeviceIndex;
     DebugLn('Playsine - using default device');
@@ -625,20 +623,21 @@ begin
   else
   begin
     DeviceId := GetDeviceIndex(FOutputDevice);
-    DebugLn('TAudio.PlaySine using device - ' + FOutputDevice.DeviceName + ' host api - ' + FOutputDevice.HostAPIName);
+    DebugLn('TAudio.PlaySine using device - ' + FOutputDevice.DeviceName +
+      ' host api - ' + FOutputDevice.HostAPIName);
   end;
   OutputParameters.Device := DeviceId;
   OutputParameters.ChannelCount := CInt32(2);
   OutputParameters.SampleFormat := paFloat32;
   OutputParameters.SuggestedLatency :=
-    (Pa_GetDeviceInfo( OutputParameters.device)^.defaultHighOutputLatency) * 1;
+    (Pa_GetDeviceInfo(OutputParameters.device)^.defaultHighOutputLatency) * 1;
   OutputParameters.HostApiSpecificStreamInfo := nil;
 
-  DataPointer^.Player:=Self;
+  DataPointer^.Player := Self;
 
 
-  PaErrCode := Pa_OpenStream( @FStream, nil, @OutputParameters, SampleRate,
-    FramesPerBuffer, paClipOff, PPaStreamCallback(@PaTestCallback),
+  PaErrCode := Pa_OpenStream(@FStream, nil, @OutputParameters,
+    SampleRate, FramesPerBuffer, paClipOff, PPaStreamCallback(@PaTestCallback),
     DataPointer);
   if (paErrCode <> Int32(paNoError)) then
   begin
@@ -646,15 +645,15 @@ begin
     DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
   end;
 
-  PaErrCode := Pa_SetStreamFinishedCallback( FStream,
-     PPaStreamFinishedCallback( @StreamFinished));
+  PaErrCode := Pa_SetStreamFinishedCallback(
+    FStream, PPaStreamFinishedCallback(@StreamFinished));
   if (paErrCode <> Int32(paNoError)) then
   begin
     DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
     DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
   end;
 
-  PaErrCode := Pa_StartStream( FStream );
+  PaErrCode := Pa_StartStream(FStream);
 
   if (paErrCode <> Int32(paNoError)) then
   begin
@@ -662,7 +661,7 @@ begin
     DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
   end;
 
-  FAudioPlaying:=True;
+  FAudioPlaying := True;
 
 end;
 
@@ -709,7 +708,7 @@ begin
   EnterCriticalSection(AudioCriticalSection);
 
   {This check might be redundant. Just to be safe}
-  Assert(FStream <> Nil);
+  Assert(FStream <> nil);
   paErrCode := Pa_IsStreamStopped(FStream);
   if paErrCode = 0 then
   begin
