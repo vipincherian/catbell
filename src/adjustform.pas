@@ -94,10 +94,10 @@ procedure TfrmAdjust.FormCreate(Sender: TObject);
 begin
   dtpDiff.Show;
   dtpTill.Hide;
-  dtpTill.TimeFormat:=TTimeFormat(GlobalUserConfig.DefaultTimeFormat);
+  dtpTill.TimeFormat := TTimeFormat(GlobalUserConfig.DefaultTimeFormat);
   dtpTill.Left := dtpDiff.Left;
-  //dtpDiff.Time:=EncodeTime(0, 5, 0, 0);
-  dtpDiff.Time:=GlobalUserConfig.AdjustDiffDefault;
+
+  dtpDiff.Time := GlobalUserConfig.AdjustDiffDefault;
   SetTillDateTime;
 
   Id := longword(-1);

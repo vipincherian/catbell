@@ -33,7 +33,7 @@ uses
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
-  {portaudio, sndfile,} {ctypes,} audio;
+  {portaudio, sndfile,}{ctypes,} audio;
 
 const
   FORM_MIN_WIDTH = 600;
@@ -158,7 +158,6 @@ type
     procedure aiExportExecute(Sender: TObject);
     procedure aiMoveDownExecute(Sender: TObject);
     procedure aiMoveUpExecute(Sender: TObject);
-    procedure aiNewAlarmExecute(Sender: TObject);
     procedure aiAboutExecute(Sender: TObject);
     procedure aiNewTimerExecute(Sender: TObject);
     procedure aiOptionsExecute(Sender: TObject);
@@ -168,19 +167,19 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
+    {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
     procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
+    {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
     procedure sbxClocksResize(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
 
     procedure tiMainClick(Sender: TObject);
     procedure tiMainDblClick(Sender: TObject);
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
+    {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
 
   private
     { private declarations }
@@ -461,11 +460,6 @@ begin
   frmAbout.ShowModal;
 end;
 
-procedure TfrmMain.aiNewAlarmExecute(Sender: TObject);
-begin
-
-end;
-
 procedure TfrmMain.aiExportExecute(Sender: TObject);
 var
   FileName: string;
@@ -536,7 +530,7 @@ begin
 end;
 
 procedure TfrmMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 begin
   if Button = mbRight then
   begin
@@ -580,7 +574,7 @@ begin
 end;
 
 procedure TfrmMain.sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 begin
   if Button = mbRight then
   begin
@@ -888,7 +882,6 @@ begin
     Inc(CountTabOrder);
   end;
 
-
 end;
 
 procedure TfrmMain.SetStatusMessage(AValue: string);
@@ -953,8 +946,8 @@ begin
     on E: Exception do
       ShowMessage('Error(1): ' + E.ClassName + #13#10 + E.Message);
   end;
-  DurationText := Format('%.2d', [Hours]) +
-      ':' + Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]);
+  DurationText := Format('%.2d', [Hours]) + ':' + Format('%.2d', [Minutes]) +
+    ':' + Format('%.2d', [Seconds]);
 
   if Sender.TrayNotification and (not UserInitiated) then
   begin
@@ -971,7 +964,7 @@ begin
     //frmAlert.lbMessages.Items.Add(Message);
 
     Item := frmAlert.lsvMessages.Items.Add;
-    Item.Caption:=Sender.Caption;
+    Item.Caption := Sender.Caption;
     Item.SubItems.Add(DurationText);
 
 
@@ -1333,7 +1326,6 @@ begin
       end;
   end;
 
-
 end;
 
 procedure TfrmMain.SaveClocks(Conf: TJsonConfig);
@@ -1370,7 +1362,9 @@ begin
 
     fs := FormatSettings;
     fs.DecimalSeparator := '.';
-    Conf.SetValue(UTF8Decode(TIMER_CONF_DURATION), UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
+    Conf.SetValue(UTF8Decode(TIMER_CONF_DURATION),
+      UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
+
     Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.IsProgressOnIcon);
     if TAudio.Loaded then
     begin

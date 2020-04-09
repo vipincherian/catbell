@@ -26,25 +26,10 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  ComCtrls, DateTimePicker, settings, dateutils, sndfile, ctypes, LazLogger,
+  ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} LazLogger,
   Math, audio;
 
 type
-  { TTimerSpecs }
-  {TTimerSpecs = class(TObject)
-  private
-  public
-    DurationHours: integer;
-    DurationMinutes: integer;
-    DurationSeconds: integer;
-    //ModalAlert: boolean;
-    //TrayNotification: boolean;
-    Description: string;
-    ModalAlert: boolean;
-    TrayNotification: boolean;
-    constructor Create();
-    destructor Destroy; override;
-  end;}
   TTimerAudioInfo = record
     FileName: string;
     Duration: double;
@@ -88,14 +73,12 @@ type
     procedure FormShow(Sender: TObject);
   private
     FProceed: boolean;
-    //FSpecs: TTimerSpecs;
     FDuration: TTime;
     FDescription: string;
     FModalAlert: boolean;
     FTrayNotification: boolean;
     FId: longword;
-    //FAudioFile: string;
-    //FAudioLength: double;
+
     FAudio: TAudio;
     FAudioInfo: TTimerAudioInfo;
     function GetAudioDuration: double;
@@ -110,25 +93,22 @@ type
     procedure SetFTrayNotification(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
     function Validate: boolean;
-    //function VerifyAudioFile(const FileName: string): boolean;
   public
-
     function ShowAndGetSpecs: boolean;
-    function ShowForAdd :boolean;
-    function ShowForEdit (Sender: TFrame):boolean;
-    //property Specs: TTimerSpecs read FSpecs;
+    function ShowForAdd: boolean;
+    function ShowForEdit(Sender: TFrame): boolean;
+
     property Duration: TTime read FDuration write SetDuration;
     property Description: string read FDescription write SetDescription;
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
-    //property AudioFile: string read FAudioInfo.FileName;
-    //property AudioLength: double read FAudioLength.Dur;
+
     property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
     property Id: longword read FId;
-    //function SetAudioFile(AValue: string; out Error: string): boolean;
-    property Audio:TAudio read FAudio write SetAudio;
-    property AudioFileName:string read GetAudioFileName write SetAudioFileName;
-    property AudioDuration:double read GetAudioDuration write SetAudioDuration;
-    property AudioLooped:boolean read GetAudioLooped write SetAudioLooped;
+
+    property Audio: TAudio read FAudio write SetAudio;
+    property AudioFileName: string read GetAudioFileName write SetAudioFileName;
+    property AudioDuration: double read GetAudioDuration write SetAudioDuration;
+    property AudioLooped: boolean read GetAudioLooped write SetAudioLooped;
   end;
 
 
@@ -146,114 +126,73 @@ uses
 
 {$R *.lfm}
 
-{ TTimerSpecs }
-
-{procedure TTimerSpecs.SetDurationHours(AValue: integer);
-begin
-  FDurationHours := AValue;
-end;
-
-procedure TTimerSpecs.SetDescription(AValue: string);
-begin
-  if FDescription='' then Exit;
-  FDescription:=AValue;
-end;}
-
-{constructor TTimerSpecs.Create();
-begin
-
-end;
-
-destructor TTimerSpecs.Destroy;
-begin
-  inherited Destroy;
-end;}
-
 { TfrmEdit }
 
 procedure TfrmEdit.FormCreate(Sender: TObject);
 begin
-  FProceed:=False;
+  FProceed := False;
 
-  //FSpecs:=TTimerSpecs.Create();
-{  FSpecs.DurationHours:=0;
-  FSpecs.DurationMinutes:=10;
-  FSpecs.DurationSeconds:=0;
-  FSpecs.Description:='Countdown Timer';}
   with GlobalUserConfig do
   begin
-    FDuration:=DefaultTimerDuration;//EncodeTime(DefaultTimerHours, DefaultTimerMins, DefaultTimerSecs,0);
-    FDescription:=DefaultTimerTitle;
-    FModalAlert:=ShowModalAlert;
-    FTrayNotification:=ShowTrayAlert;
+    FDuration := DefaultTimerDuration;
+    FDescription := DefaultTimerTitle;
+    FModalAlert := ShowModalAlert;
+    FTrayNotification := ShowTrayAlert;
   end;
 
-  lblLengthText.Visible:=False;
-  lblLenthVal.Visible:=False;
-  bbSave.Enabled:=Validate;
+  lblLengthText.Visible := False;
+  lblLenthVal.Visible := False;
+  bbSave.Enabled := Validate;
 
   if not TAudio.Loaded then
   begin
-    bbSelectAudioFile.Enabled:=False;
+    bbSelectAudioFile.Enabled := False;
   end;
 
-  FAudioInfo.FileName:='';
-  FAudioInfo.Duration:=0;
-  FAudioInfo.Looped:=False;
+  FAudioInfo.FileName := '';
+  FAudioInfo.Duration := 0;
+  FAudioInfo.Looped := False;
 
 end;
 
 procedure TfrmEdit.bbSaveClick(Sender: TObject);
-{var
-  Hour, Min, Sec, Milli : Word;}
 begin
-  FDescription:=edtDescription.Text;
-  {DecodeTime(dtpDuration.Time, Hour, Min, Sec, Milli);
-  FSpecs.DurationHours:=Hour;
-  FSpecs.DurationMinutes:=Min;
-  FSpecs.DurationSeconds:=Sec;}
-  FDuration:=dtpDuration.Time;
-  FModalAlert:=ckbModalAlert.Checked;
-  FTrayNotification:=ckbTrayNotification.Checked;
-  FProceed:=True;
+  FDescription := edtDescription.Text;
+
+  FDuration := dtpDuration.Time;
+  FModalAlert := ckbModalAlert.Checked;
+  FTrayNotification := ckbTrayNotification.Checked;
+  FProceed := True;
   Close;
 end;
 
 procedure TfrmEdit.bbSelectAudioFileClick(Sender: TObject);
 var
   FileName: string;
-  ErrorText: string;
-
 begin
-  odgAudio.InitialDir:='.';
+  odgAudio.InitialDir := '.';
   odgAudio.Options := [ofFileMustExist];
-  //odgAudio.Filter:='Supported audio files|*.wav;*.ogg|All files|*.*';
+
   if odgAudio.Execute then
   begin
-     FileName:=odgAudio.FileName;
-     AudioFileName:=FileName;
-     {if not SetAudioFile(FileName, ErrorText) then
-     begin
-       ShowMessage(ErrorText);
-       end;}
-
+    FileName := odgAudio.FileName;
+    AudioFileName := FileName;
   end;
-  //ShowMessage(FileName);
 end;
 
 procedure TfrmEdit.dtpByChange(Sender: TObject);
 begin
-  bbSave.Enabled:=Validate;
+  bbSave.Enabled := Validate;
 end;
 
 procedure TfrmEdit.dtpDurationChange(Sender: TObject);
 begin
-  bbSave.Enabled:=Validate;
+  bbSave.Enabled := Validate;
 end;
 
 procedure TfrmEdit.edtDescriptionChange(Sender: TObject);
 begin
-  bbSave.Enabled:=Validate;
+  bbSave.Enabled := Validate;
 end;
 
 procedure TfrmEdit.bbCancelClick(Sender: TObject);
@@ -262,12 +201,9 @@ begin
 end;
 
 procedure TfrmEdit.bbClearAudioFileClick(Sender: TObject);
-var
-  ErrorText: string;
 begin
-  //SetAudioFile('', ErrorText);
-  AudioFileName:='';
-  edtAudioFile.Text:='';
+  AudioFileName := '';
+  edtAudioFile.Text := '';
 end;
 
 procedure TfrmEdit.FormDestroy(Sender: TObject);
@@ -290,65 +226,63 @@ begin
     Exit;
   end;
 
-  Hours:= HourOf(dtpDuration.Time);
-  Minutes:= MinuteOf(dtpDuration.Time);
-  Seconds:= SecondOf(dtpDuration.Time);
+  Hours := HourOf(dtpDuration.Time);
+  Minutes := MinuteOf(dtpDuration.Time);
+  Seconds := SecondOf(dtpDuration.Time);
 
-  if((Hours = 0) and (Minutes = 0) and (Seconds = 0)) then
+  if ((Hours = 0) and (Minutes = 0) and (Seconds = 0)) then
   begin
     Result := False;
     Exit;
   end;
 
-  Result:= True;
+  Result := True;
 
 end;
 
 
 procedure TfrmEdit.SetDescription(AValue: string);
 begin
-  FDescription:=AValue;
-  edtDescription.Text:=AValue;
+  FDescription := AValue;
+  edtDescription.Text := AValue;
 end;
 
 procedure TfrmEdit.SetAudioFileName(AValue: string);
 begin
   if TAudio.Loaded then
   begin
-    Audio.FileName:=AValue;
-    edtAudioFile.Text:=Audio.FileName;
-    lblLenthVal.Caption:=FloatToStr(RoundTo(AudioDuration, -2));
+    Audio.FileName := AValue;
+    edtAudioFile.Text := Audio.FileName;
+    lblLenthVal.Caption := FloatToStr(RoundTo(AudioDuration, -2));
   end
   else
   begin
-    FAudioInfo.FileName:=AValue;
+    FAudioInfo.FileName := AValue;
   end;
   if AValue = '' then
   begin
-    //FAudioFile:='';
-    //FAudioLength:=0;;
-    lblLengthText.Visible:=False;
-    edtAudioFile.Text:='';
-    //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
-    lblLenthVal.Visible:=False;
+    lblLengthText.Visible := False;
+    edtAudioFile.Text := '';
+
+    lblLenthVal.Visible := False;
     Exit;
   end
   else
   begin
-    lblLengthText.Visible:=True;
-    edtAudioFile.Text:=AudioFileName;
-    lblLenthVal.Visible:=True;
+    lblLengthText.Visible := True;
+    edtAudioFile.Text := AudioFileName;
+    lblLenthVal.Visible := True;
   end;
 end;
 
 procedure TfrmEdit.SetAudioLooped(AValue: boolean);
 begin
   if TAudio.Loaded then
-   Audio.Looped := AValue
- else
-   FAudioInfo.Looped := AValue;
+    Audio.Looped := AValue
+  else
+    FAudioInfo.Looped := AValue;
 
- ckbLoop.Checked:=AudioLooped;
+  ckbLoop.Checked := AudioLooped;
 end;
 
 function TfrmEdit.GetAudioFileName: string;
@@ -369,7 +303,7 @@ end;
 
 function TfrmEdit.GetAudioLooped: boolean;
 begin
-   if TAudio.Loaded then
+  if TAudio.Loaded then
     Result := Audio.Looped
   else
     Result := FAudioInfo.Looped;
@@ -377,148 +311,81 @@ end;
 
 procedure TfrmEdit.SetAudio(AValue: TAudio);
 begin
-  FAudio:=AValue;
-  if FAudio = Nil then
+  FAudio := AValue;
+  if FAudio = nil then
     Exit;
-   if FAudio.FileName = '' then
-   begin
-     //FAudioFile:='';
-     //FAudioLength:=0;;
-     lblLengthText.Visible:=False;
-     edtAudioFile.Text:='';
-     //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudio.Duration, -2));
-     lblLenthVal.Visible:=False;
-     Exit;
-   end
-   else
-   begin
-     lblLengthText.Visible:=True;
-     edtAudioFile.Text:=AudioFileName;
-     lblLenthVal.Caption:=FloatToStr(RoundTo(FAudio.Duration, -2));
-     lblLenthVal.Visible:=True;
-   end;
+  if FAudio.FileName = '' then
+  begin
+    lblLengthText.Visible := False;
+    edtAudioFile.Text := '';
+
+    lblLenthVal.Visible := False;
+    Exit;
+  end
+  else
+  begin
+    lblLengthText.Visible := True;
+    edtAudioFile.Text := AudioFileName;
+    lblLenthVal.Caption := FloatToStr(RoundTo(FAudio.Duration, -2));
+    lblLenthVal.Visible := True;
+  end;
 end;
 
 procedure TfrmEdit.SetAudioDuration(AValue: double);
 begin
-   if not TAudio.Loaded then
-   begin
-    FAudioInfo.Duration := AValue;
-    lblLenthVal.Caption:=FloatToStr(RoundTo(AudioDuration, -2));
-   end;
-end;
-
-{function TfrmEdit.SetAudioFile(AValue: string; out Error: string): boolean;
-var
-  Info: SF_INFO;
-  SoundFile: PSndFile;
-begin
-  Result := False;
-  Info.format := 0;
-
-  if AValue = '' then
-  begin
-    //FAudioFile:='';
-    //FAudioLength:=0;;
-    lblLengthText.Visible:=False;
-    edtAudioFile.Text:='';
-    //lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
-    lblLenthVal.Visible:=False;
-    Result := True;
-    Exit;
-  end;
-
   if not TAudio.Loaded then
   begin
-    AudioInfo.FileName:=AValue;
-    //AudioInfo.Duration:=AudioLength;
-    edtAudioFile.Text:=AudioInfo.FileName;
-    Result := True;
-    Exit;
+    FAudioInfo.Duration := AValue;
+    lblLenthVal.Caption := FloatToStr(RoundTo(AudioDuration, -2));
   end;
-
-  SoundFile := sf_open(PChar(AValue), SFM_READ, @Info);
-  if (SoundFile = nil) then
-  begin
-    DebugLn('Error in sf_open');
-    //sf_perror(nil);
-    //ReadKey;
-    //exit;
-    Error:='SoundFile is nil';
-    Exit;
-  end;
-  DebugLn(IntToHex(Info.format, 8));
-  DebugLn(IntToStr(Info.channels));
-  DebugLn(IntToStr(Info.frames));
-  DebugLn(IntToStr(Info.samplerate));
-  DebugLn(IntToStr(Info.sections));
-  FAudioLength:=(Info.frames) / (Info.samplerate);
-  //ShowMessage('length is ' + FloatToStr(AudioLength));
-
-  FAudioFile:=AValue;
-
-  sf_close(SoundFile);
-
-
-    lblLengthText.Visible:=True;
-    edtAudioFile.Text:=FAudioFile;
-    lblLenthVal.Caption:=FloatToStr(RoundTo(FAudioLength, -2));
-    lblLenthVal.Visible:=True;
-    Result := True;
-
-end;}
+end;
 
 procedure TfrmEdit.SetDuration(AValue: TTime);
 begin
-  FDuration:=AValue;
-  dtpDuration.Time:=AValue;
+  FDuration := AValue;
+  dtpDuration.Time := AValue;
 end;
 
 procedure TfrmEdit.SetFTrayNotification(AValue: boolean);
 begin
-  //if FTrayNotification=AValue then Exit;
-  FTrayNotification:=AValue;
-  ckbTrayNotification.Checked:=AValue;
+  FTrayNotification := AValue;
+  ckbTrayNotification.Checked := AValue;
 end;
 
 procedure TfrmEdit.SetModalAlert(AValue: boolean);
 begin
-  //if FModalAlert=AValue then Exit;
-  FModalAlert:=AValue;
-  ckbModalAlert.Checked:=AValue;
+  FModalAlert := AValue;
+  ckbModalAlert.Checked := AValue;
 end;
 
 function TfrmEdit.ShowAndGetSpecs: boolean;
 begin
-  FProceed:=False;
-  {edtDescription.Text:=FSpecs.Description;
-  dtpDuration.Time := EncodeTime(FSpecs.DurationHours, FSpecs.DurationMinutes,  FSpecs.DurationSeconds, 0);
-  ckbModalAlert.Checked:=FSpecs.ModalAlert;
-  ckbTrayNotification.Checked:=Specs.TrayNotification; }
+  FProceed := False;
+
   ShowModal;
-  Result:=FProceed;
+  Result := FProceed;
 end;
 
 function TfrmEdit.ShowForAdd: boolean;
 begin
-  Caption:='Add Timer';
+  Caption := 'Add Timer';
   tsTimer.Show;
   FId := longword(-1);
-  Result:=ShowAndGetSpecs;
+  Result := ShowAndGetSpecs;
 end;
 
 function TfrmEdit.ShowForEdit(Sender: TFrame): boolean;
 var
   Widget: TfraTimer;
 begin
-  if Sender = Nil then
+  if Sender = nil then
     Exit;
   Widget := TfraTimer(Sender);
   Fid := Widget.Id;
-  Caption:='Edit Timer';
-  //if Widget.Running then
-  dtpDuration.Enabled:=(not Widget.Running);
-  Result:=ShowAndGetSpecs;
+  Caption := 'Edit Timer';
+
+  dtpDuration.Enabled := (not Widget.Running);
+  Result := ShowAndGetSpecs;
   FId := longword(-1);
 end;
 

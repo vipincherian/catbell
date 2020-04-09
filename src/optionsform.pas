@@ -143,8 +143,6 @@ end;
 
 procedure TfrmOptions.SetControlsAs(Config: TUserConfig);
 var
-//  Index: integer;
-  //DefaultDeviceId: integer;
   Item: TListItem;
 begin
   with Config do
@@ -154,8 +152,6 @@ begin
 
     edtDefaultTitle.Text := DefaultTimerTitle;
     dtpDefaultTime.Time := DefaultTimerDuration;
-    //EncodeTime(DefaultTimerHours, DefaultTimerMins,
-    //      DefaultTimerSecs, 0);
 
     cbTrayAlert.Checked := ShowTrayAlert;
     cbModalAlert.Checked := ShowModalAlert;
@@ -166,7 +162,6 @@ begin
     cmbTimeFormat.ItemIndex := DefaultTimeFormat;
 
     dtpShorten.Time := AdjustDiffDefault;
-    //dtpExtend.Time:=AdjustExtendDefault;
     dtpCompleteBy.Time := AdjustCompletebyDefault;
 
     cbUseDefaultAudio.Checked:=UseDefaultAudioDevice;
@@ -176,28 +171,10 @@ begin
       if (GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME) or
         (GlobalUserConfig.AudioHostAPIName <> DEF_AUDIO_HOSTAPI_NAME) then
       begin
-        {Index := cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
-        if index >= 0 then
-          cmbAudioDevice.ItemIndex :=
-            cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName)
-        else
-        begin
-          //DefaultDeviceId := TAudio.GetDefaultDeviceIndex; //Pa_GetDefaultOutputDevice();
-          if DefaultDevice = paNoDevice then
-          begin
-            DebugLn('No default device');
-            //tsAudio.Enabled:=False;
-            cmbAudioDevice.Enabled := False;
-          end
-          else
-          cmbAudioDevice.ItemIndex := TAudio.DefaultDeviceIndex;
-        end;}
-
         for Item in lsvAudioDevices.Items do
         begin
           Item.Checked := ((Item.Caption = GlobalUserConfig.AudioDeviceName) and
             (Item.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
-          //Item.Checked:=True;
         end;
 
       end;
@@ -208,43 +185,25 @@ end;
 
 procedure TfrmOptions.RefreshAudioDevices;
 var
-  //DefaultDeviceId: AudioDeviceIndex;
   Devices: TAudioDeviceList;
   Device: PAudioDevice;
-  //Count: integer;
   Itm: TListItem;
 begin
-  { Load audio devices }
-  //tsAudio.Enabled:=frmMain.AudioWorking;
   tsAudio.Enabled := TAudio.Loaded;
 
   if TAudio.Loaded then
   begin
-    //cmbAudioDevice.Items.Clear;
     lsvAudioDevices.Items.Clear;
-    //DefaultDeviceId := TAudio.GetDefaultDeviceIndex;
+
     Devices := TAudio.Devices;
     for Device in Devices do
     begin
-      //Device := Devices.Strings[Count];
-      {if Count = DefaultDeviceId then
-        Device := Device + ' (Default)';}
-      //cmbAudioDevice.Items.Add(Device^.DeviceName);
       Itm := lsvAudioDevices.Items.Add;
       Itm.Caption := Device^.DeviceName;
       Itm.SubItems.Add(Device^.HostAPIName);
       Itm.Checked := ((Itm.Caption = GlobalUserConfig.AudioDeviceName) and
         (Itm.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
     end;
-
-    {if cmbAudioDevice.Items.Count > 0 then
-    begin
-      if GlobalUserConfig.AudioDeviceName = DEF_AUDIO_DEVICE_NAME then
-        cmbAudioDevice.ItemIndex := TAudio.DefaultDeviceIndex
-      else
-        cmbAudioDevice.ItemIndex :=
-          cmbAudioDevice.Items.IndexOf(GlobalUserConfig.AudioDeviceName);
-    end;}
   end;
 end;
 
@@ -259,9 +218,7 @@ begin
     QueryExit := ckbQueryExit.Checked;
     AllowTimerTitleEdit := ckbTimerTitleEditable.Checked;
     DefaultTimerTitle := edtDefaultTitle.Text;
-    //DefaultTimerHours := HourOf(dtpDefaultTime.Time);
-    //DefaultTimerMins := MinuteOf(dtpDefaultTime.Time);
-    //DefaultTimerSecs := SecondOf(dtpDefaultTime.Time);
+
     DefaultTimerDuration := dtpDefaultTime.Time;
     ShowTrayAlert := cbTrayAlert.Checked;
     ShowModalAlert := cbModalAlert.Checked;
@@ -269,12 +226,8 @@ begin
     DefaultTimeFormat := cmbTimeFormat.ItemIndex;
 
     AdjustDiffDefault := dtpShorten.Time;
-    //AdjustExtendDefault:=dtpExtend.Time;
-    AdjustCompletebyDefault := dtpCompleteBy.Time;
 
-    //AudioDevice := cmbAudioDevice.ItemIndex;
-    //if TAudio.Loaded and (cmbAudioDevice.ItemIndex >= 0) then
-    //  AudioDeviceName := cmbAudioDevice.Items.Strings[cmbAudioDevice.ItemIndex];
+    AdjustCompletebyDefault := dtpCompleteBy.Time;
 
     Config.UseDefaultAudioDevice:=cbUseDefaultAudio.Checked;
 
@@ -325,7 +278,6 @@ begin
   end
   else
   begin
-    //cmbAudioDevice.Enabled := False;
     edtDefaultDeviceName.Text := 'Audio libraries not loaded. Audio will not work';
     edtDefaultHostAPI.Text:='';
     bbPlay.Enabled := False;
@@ -349,8 +301,6 @@ begin
     pgbAudio.Style := pbstNormal;
     bbPlay.Enabled := True;
     bbStop.Enabled := False;
-    {while Audio.Playing do
-      Application.ProcessMessages;}
   end;
 end;
 
@@ -398,19 +348,6 @@ begin
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;
     bbStop.Enabled := True;
-
-    {if cmbAudioDevice.ItemIndex >= 0 then
-    begin
-
-      //Audio.OutputDevice := cmbAudioDevice.Items[cmbAudioDevice.ItemIndex];
-      TAudio.SetDefaulDevice;
-      //ShowMessage(Audio.OutputDevice);
-      Audio.PlaySine;
-      pgbAudio.Style := pbstMarquee;
-      bbPlay.Enabled := False;
-      bbStop.Enabled := True;
-    end;}
-
   end;
 end;
 
@@ -439,51 +376,15 @@ begin
     end;
   end;
 
-
-  {ckbQueryExit.Checked := DEF_QUERY_EXIT;
-
-  edtDefaultTitle.Text := DEF_TIMER_TITLE;
-  dtpDefaultTime.Time := EncodeTime(DEF_TIMER_HOURS, DEF_TIMER_MINS,
-    DEF_TIMER_SECS, 0);
-
-  cbTrayAlert.Checked := DEF_SHOW_TRAY_ALERT;
-  cbModalAlert.Checked := DEF_SHOW_MODAL_ALERT;
-  cbAutoProgress.Checked := DEF_AUTO_PROGRESS;
-
-  crbBackgroundModal.ButtonColor:=DEF_MODAL_BKG_COLOUR;
-  crbCaptionModal.ButtonColor:=DEF_MODAL_CAPTION_COLOUR;
-  crbSubtextModal.ButtonColor:=DEF_MODAL_SUB_COLOUR;}
-
 end;
 
 procedure TfrmOptions.bbtnSaveClick(Sender: TObject);
 {var
   Audio: TAudio;}
 begin
-  {with GlobalUserConfig do
-  begin
-    QueryExit := ckbQueryExit.Checked;
-    DefaultTimerTitle := edtDefaultTitle.Text;
-    DefaultTimerHours := HourOf(dtpDefaultTime.Time);
-    DefaultTimerMins := MinuteOf(dtpDefaultTime.Time);
-    DefaultTimerSecs := SecondOf(dtpDefaultTime.Time);
-    ShowTrayAlert := cbTrayAlert.Checked;
-    ShowModalAlert := cbModalAlert.Checked;
-    AutoProgress := cbAutoProgress.Checked;
-    ModalBackgroundColour:=crbBackgroundModal.ButtonColor;
-    ModalCaptionColour:=crbCaptionModal.ButtonColor;
-    ModalSubtextColour:=crbSubtextModal.ButtonColor;
-  end;}
   GetConfigFromControls(GlobalUserConfig);
-  //  GlobalUserConfig.CopyFrom(FChangedConfig);
   GlobalUserConfig.Flush;
 
-  {Audio := TAudio.Create;
-  Audio.FileName := '/media/data/down/www/just-like-magic.ogg';
-  DebugLn('File is ' + Audio.FileName);
-  Audio.Play;
-  Sleep(3000);
-  Audio.Free;}
   Close;
 end;
 

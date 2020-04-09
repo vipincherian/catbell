@@ -541,7 +541,6 @@ object frmMain: TfrmMain
     end
     object aiNewAlarm: TAction
       Caption = 'aiNewAlarm'
-      OnExecute = aiNewAlarmExecute
     end
     object aiExport: TAction
       Caption = 'aiExport'

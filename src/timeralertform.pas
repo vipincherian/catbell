@@ -38,7 +38,7 @@ type
     FTimer: TTimer;
     lsvMessages: TListView;
     procedure bbCloseClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
@@ -60,10 +60,8 @@ implementation
 
 procedure TfrmAlert.FormCreate(Sender: TObject);
 begin
-  //BorderStyle := bsNone;
-  //OnShow := @FormShow;
   //AlphaBlend:=True;
-  AlphaBlendValue:=50;
+  AlphaBlendValue := 50;
 end;
 
 procedure TfrmAlert.FormShow(Sender: TObject);
@@ -84,14 +82,11 @@ begin
   Close;
 end;
 
-procedure TfrmAlert.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
+procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  //DebugLn('Entering FormClose');
-  //lbMessages.Items.Clear;
   lsvMessages.Items.Clear;
-  //DebugLn('Exiting FormClose');
 end;
 
 end.
+
 
