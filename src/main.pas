@@ -1371,7 +1371,7 @@ begin
     fs := FormatSettings;
     fs.DecimalSeparator := '.';
     Conf.SetValue(UTF8Decode(TIMER_CONF_DURATION), UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
-    Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.TrayNotification);
+    Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.IsProgressOnIcon);
     if TAudio.Loaded then
     begin
       Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
