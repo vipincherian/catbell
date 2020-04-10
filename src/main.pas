@@ -944,7 +944,7 @@ begin
 
   except
     on E: Exception do
-      ShowMessage('Error(1): ' + E.ClassName + #13#10 + E.Message);
+      ShowMessage('Error(1): ' + E.ClassName + LineEnding + E.Message);
   end;
   DurationText := Format('%.2d', [Hours]) + ':' + Format('%.2d', [Minutes]) +
     ':' + Format('%.2d', [Seconds]);
@@ -990,7 +990,8 @@ begin
     {$ENDIF}
   except
     on E: Exception do
-      ShowMessage('Error (2): ' + E.ClassName + #13#10 + E.Message);
+      DebugLn('Exception in TfrmMain.TimerPaused: ' + E.ClassName +
+        LineEnding + E.Message);
   end;
 
 end;
@@ -1018,7 +1019,8 @@ begin
     {$ENDIF}
   except
     on E: Exception do
-      ShowMessage('Error (3): ' + E.ClassName + #13#10 + E.Message);
+      ShowMessage('Exception in TfrmMain.TimerStarted ' + E.ClassName +
+        LineEnding + E.Message);
   end;
 
 end;
@@ -1204,18 +1206,21 @@ begin
         try
           NewTimerClock.Audio.FileName :=
             string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-          NewTimerClock.Audio.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+          NewTimerClock.Audio.Looped :=
+            Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
         except
           on E: EInvalidAudio do
           begin
             ErrorText := ErrorText + 'Could not load audio file ' +
               string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-              ' - unsupported format or invalide file. File name will be reset to blank.'#13#10;
+              ' - unsupported format or invalide file. ' +
+              'File name will be reset to blank.' + LineEnding;
           end
           else
             ErrorText := ErrorText + 'Could not load audio file ' +
               string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-              ' - unknown error. File name will be reset to blank.'#13#10;
+              ' - unknown error. File name will be reset to blank.' +
+              LineEnding;
         end;
       end
       else
@@ -1267,7 +1272,9 @@ begin
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
 
   FTimerFrames.Add(Id, NewWidget);
-  FOrder.Insert(0, Id);
+  //FOrder.Insert(0, Id);
+  FOrder.Add(Id);
+
   Reorder;
 
   Result := NewWidget;
@@ -1345,14 +1352,20 @@ begin
   Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
 
   if FOrder.Count <> FTimerFrames.Count then
-    ShowMessage('FOrder.Count does not match FTimerFrames.Count');
+  begin
+    ShowMessage('Fatal error - FOrder.Count does not match FTimerFrames.Count' +
+      LineEnding + 'Saved timers will be lost.');
+    Exit;
+  end;
 
 
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
     Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) + '/'), True);
-    // FOrder has the order of IDs, but in reverse order.
-    Id := FOrder[FTimerFrames.Count - Count - 1];
+
+    // FOrder has the order of IDs
+    Id := FOrder[Count];
+
     TimerClock := FTimerFrames.KeyData[Id];
 
     if TimerClock = nil then
@@ -1517,7 +1530,8 @@ begin
       end;
     except
       on E: Exception do
-        ShowMessage('Error (4): ' + E.ClassName + #13#10 + E.Message);
+        DebugLn('Exception in TfrmMain.OnShortTimer: ' + E.ClassName +
+          LineEnding + E.Message);
     end;
   finally
   end;
