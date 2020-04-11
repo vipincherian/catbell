@@ -1204,8 +1204,9 @@ begin
       if TAudio.Loaded then
       begin
         try
-          NewTimerClock.Audio.FileName :=
-            string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          //NewTimerClock.Audio.FileName :=
+          //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          NewTimerClock.Audio.LoadFromFile(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')));
           NewTimerClock.Audio.Looped :=
             Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
         except
@@ -1384,7 +1385,7 @@ begin
       Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
         UTF8Decode(TimerClock.Audio.FileName));
       Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
-        UTF8Decode(FloatToStr(TimerClock.Audio.Duration, fs)));
+        UTF8Decode(FloatToStr(TimerClock.Audio.AudioFile.Duration, fs)));
       Conf.SetValue(TIMER_CONF_AUDIOLOOP,
         TimerClock.Audio.Looped);
     end

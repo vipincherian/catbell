@@ -251,7 +251,8 @@ procedure TfrmEdit.SetAudioFileName(AValue: string);
 begin
   if TAudio.Loaded then
   begin
-    Audio.FileName := AValue;
+    //Audio.FileName := AValue;
+    Audio.LoadFromFile(AValue);
     edtAudioFile.Text := Audio.FileName;
     lblLenthVal.Caption := FloatToStr(RoundTo(AudioDuration, -2));
   end
@@ -296,7 +297,7 @@ end;
 function TfrmEdit.GetAudioDuration: double;
 begin
   if TAudio.Loaded then
-    Result := Audio.Duration
+    Result := Audio.AudioFile.Duration
   else
     Result := FAudioInfo.Duration;
 end;
@@ -326,7 +327,7 @@ begin
   begin
     lblLengthText.Visible := True;
     edtAudioFile.Text := AudioFileName;
-    lblLenthVal.Caption := FloatToStr(RoundTo(FAudio.Duration, -2));
+    lblLenthVal.Caption := FloatToStr(RoundTo(FAudio.AudioFile.Duration, -2));
     lblLenthVal.Visible := True;
   end;
 end;

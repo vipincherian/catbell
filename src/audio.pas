@@ -1,6 +1,11 @@
 unit audio;
 
 {$mode objfpc}{$H+}
+
+// We do not want stuck-up, toffee-nosed, half-witted,
+// upper-class piles of COM-style interfaces.
+
+{$interfaces corba}
 //{$MODESWITCH ADVANCEDRECORDS}
 
 interface
@@ -22,6 +27,8 @@ const
   // Wavetable size. Influences your pitch:
   TableSize = 200;
 
+  SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
+
 type
   EAudioNotLoaded = class(Exception);
   EInvalidDevice = class(Exception);
@@ -36,10 +43,26 @@ type
   PAudioDevice = ^TAudioDevice;
   TAudioDeviceList = specialize TFPGList<PAudioDevice>;
 
+  { IAudioFile }
+
+  IAudioFile = interface
+    [SAudioFile]
+    function GetChannels: Integer;
+    function GetSampleRate: Integer;
+    function GetAudioLength: double;
+    property Channels: Integer read GetChannels;
+    property SampleRate: Integer read GetSampleRate;
+    property Duration: double read GetAudioLength;
+    // Seek to begin
+    procedure SeekToBeginning;
+    // Read to buffer
+    function Read(output: pointer; frameCount: LongInt): boolean;
+  end;
+
   TUserInfo = record
 
-    SoundFile: PSndFile;
-    Info: SF_INFO;
+    //SoundFile: PSndFile;
+    //Info: SF_INFO;
 
     Player: Pointer;
     Looped: boolean;
@@ -59,16 +82,50 @@ type
   end;
   PPaTestData = ^PaTestData;
 
-  { TAudio }
-  TAudio = class(TObject)
+
+  {TSndAudioFile}
+  {Implementation of SndFile}
+  TSndAudioFile = class(TObject, IAudioFile)
   private
     FSoundFile: PSNDFILE;
-    FFileType: integer;
+    //FFileType: integer;
 
     FFileName: string;
     FAudioLength: double;
 
     FInfo: SF_INFO;
+    function GetAudioLength: double;
+    function GetChannels: Integer;
+    function GetSampleRate: Integer;
+    procedure SetFileName(AValue: string);
+  public
+    constructor Create();
+    destructor Destroy; override;
+    procedure SeekToBeginning;
+    function Read(output: pointer; frameCount: LongInt): boolean;
+
+    property FileName: string read FFileName write SetFileName;
+    property Channels: Integer read GetChannels;
+    property SampleRate: Integer read GetSampleRate;
+    property Duration: double read GetAudioLength;
+  end;
+
+  { TAudio }
+  TAudio = class(TObject)
+  private
+    //FSoundFile: PSNDFILE;
+    FAudioFile: IAudioFile;
+
+    FSndAudioFile: TSndAudioFile;
+    //FSndAudioF
+    //FFileType: integer;
+
+    FFileName: string;
+    //FAudioLength: double;
+
+    //FInfo: SF_INFO;
+
+
     FUserInfo: TUserInfo;
     FStream: PPaStream;
 
@@ -78,7 +135,7 @@ type
     DataPointer: PPaTestData;
 
     class function GetDevices: TAudioDeviceList; static;
-    procedure SetFileName(AValue: string);
+    //procedure SetFileName(AValue: string);
     class procedure SetOutputDevice(AValue: TAudioDevice); static;
   public
     Loaded: boolean; static;
@@ -101,9 +158,11 @@ type
     procedure PlaySine;
     procedure Abort;
     procedure FinishedAud({%H-}Datax: PtrInt);
-    property FileName: string read FFileName write SetFileName;
-    property Duration: double read FAudioLength;
+    property FileName: string read FFileName;
+    procedure LoadFromFile(AValue: string);
+    //property Duration: double read FAudioLength;
     property Playing: boolean read FAudioPlaying;
+    property AudioFile: IAudioFile read FAudioFile;
     class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
 
   end;
@@ -129,29 +188,38 @@ function FeedAudioStream({%H-}input: pointer; output: pointer; frameCount: culon
   userData: pointer): cint; cdecl;
 var
   AudioInfo: PAudioInfo;
-  readCount: cint;
+  //readCount: cint;
+  readSuccess: boolean;
+  AudioTemp: TAudio;
 begin
   EnterCriticalSection(TAudio.AudioCriticalSection);
+
   AudioInfo := PAudioinfo(userData);
+  AudioTemp := TAudio(AudioInfo^.Player);
 
-  readCount := 0;
-  readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
-    (AudioInfo^.Info.channels));
-
+  //readCount := 0;
+  readSuccess := false;
+  //readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
+  //  (AudioInfo^.Info.channels));
+  readSuccess:=AudioTemp.AudioFile.Read(output, frameCount);
+  DebugLn('here 1');
   if AudioInfo^.Looped then
   begin
     { If audio is lopped and if no audio data could be read,
     seek to the beginning and then read again }
-    if readCount = 0 then
+    if not readSuccess then
     begin
-      if sf_seek(AudioInfo^.SoundFile, 0, SEEK_SET) = -1 then
+      {if sf_seek(AudioInfo^.SoundFile, 0, SEEK_SET) = -1 then
       begin
         DebugLn('Sf_seek returned error');
-      end;
-      readCount := 0;
-      readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
-        (AudioInfo^.Info.channels));
-      if readCount = 0 then
+      end;}
+      AudioTemp.AudioFile.SeekToBeginning;
+      //readCount := 0;
+      readSuccess:=false;
+      //readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
+      //  (AudioInfo^.Info.channels));
+      readSuccess:=AudioTemp.AudioFile.Read(output, frameCount);
+      if not readSuccess then
       begin
         DebugLn('readCount zero immediately after seek to beginning');
         Result := cint(paAbort);
@@ -164,7 +232,7 @@ begin
   end { when audio is not looped }
   else
   begin
-    if readCount = (frameCount * AudioInfo^.Info.channels) then
+    if readSuccess then
     begin
       Result := cint(paContinue);
     end
@@ -251,6 +319,103 @@ begin
   AudioTemp := TAudio(LocalDataPointer^.Player);
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
   LeaveCriticalSection(TAudio.AudioCriticalSection);
+end;
+
+{ TSndAudioFile }
+
+procedure TSndAudioFile.SetFileName(AValue: string);
+var
+  TempSoundFile: PSNDFILE;
+begin
+  //EnterCriticalSection(AudioCriticalSection);
+  if not TAudio.Loaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  {if FAudioPlaying then
+  begin
+    DebugLn('Cannot call SetFileName when audio is playing');
+    //LeaveCriticalSection(AudioCriticalSection);
+    Exit;
+  end;}
+  {if AValue = '' then
+  begin
+    FFileName := '';
+    FAudioLength := 0;
+    if FSoundFile <> nil then
+      sf_close(FSoundFile);
+    Exit;
+  end;}
+
+
+  TempSoundFile := sf_open(PChar(AValue), SFM_READ, @FInfo);
+  if (TempSoundFile = nil) then
+  begin
+    DebugLn('Error in sf_open');
+    //LeaveCriticalSection(AudioCriticalSection);
+    raise EInvalidAudio.Create('sf_open returned nil for ' + AValue);
+    Exit;
+  end;
+
+  if FSoundFile <> nil then
+    sf_close(FSoundFile);
+
+  FSoundFile := TempSoundFile;
+
+  DebugLn(IntToHex(FInfo.format, 8));
+  DebugLn(IntToStr(FInfo.channels));
+  DebugLn(IntToStr(FInfo.frames));
+  DebugLn(IntToStr(FInfo.samplerate));
+  DebugLn(IntToStr(FInfo.sections));
+
+  FFileName := AValue;
+  FAudioLength := (FInfo.frames) / (FInfo.samplerate);
+  //LeaveCriticalSection(AudioCriticalSection);
+end;
+
+function TSndAudioFile.GetChannels: Integer;
+begin
+  Result:=FInfo.channels;
+end;
+
+function TSndAudioFile.GetAudioLength: double;
+begin
+  Result:=FAudioLength;
+end;
+
+function TSndAudioFile.GetSampleRate: Integer;
+begin
+  Result:=FInfo.samplerate;
+end;
+
+constructor TSndAudioFile.Create();
+begin
+  FSoundFile:=Nil;
+end;
+
+destructor TSndAudioFile.Destroy;
+begin
+  if FSoundFile <> nil then
+    sf_close(FSoundFile);
+  inherited Destroy;
+end;
+
+procedure TSndAudioFile.SeekToBeginning;
+begin
+  if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
+  begin
+    DebugLn('Sf_seek returned error');
+  end;
+end;
+
+function TSndAudioFile.Read(output: pointer; frameCount: LongInt): boolean;
+var
+  readCount: cint;
+begin
+  readCount := 0;
+  readCount := sf_read_float(FSoundFile, output, frameCount * FInfo.channels);
+  // If read count matches what was requested, then all the stream has
+  // not completed
+  Result:=(readCount = (frameCount * FInfo.channels));
 end;
 
 { TAudio }
@@ -353,7 +518,7 @@ begin
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
-procedure TAudio.SetFileName(AValue: string);
+{procedure TAudio.SetFileName(AValue: string);
 var
   TempSoundFile: PSNDFILE;
 begin
@@ -400,7 +565,7 @@ begin
   FFileName := AValue;
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
   //LeaveCriticalSection(AudioCriticalSection);
-end;
+end;}
 
 class procedure TAudio.SetOutputDevice(AValue: TAudioDevice);
 begin
@@ -420,8 +585,12 @@ begin
 
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
-  FSoundFile := nil;
-  FFileType := READ_NOTLOADED;
+  //FSoundFile := nil;
+  FAudioFile := nil;
+  FSndAudioFile := TSndAudioFile.Create;
+  FAudioFile := FSndAudioFile;
+  //FFileType := READ_NOTLOADED;
+
 
   FFileName := '';
   Looped := False;
@@ -443,6 +612,7 @@ end;
 destructor TAudio.Destroy;
 begin
   //DebugLn('TAudio.Destroy ');
+  FSndAudioFile.Destroy;
   inherited Destroy;
 end;
 
@@ -538,10 +708,11 @@ begin
       Exit;
     end;
 
-    if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
+    {if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
     begin
       DebugLn('Sf_seek returned error');
-    end;
+    end;}
+    FAudioFile.SeekToBeginning;
 
     if UseDefaultDevice or (FOutputDevice.HostAPIName = '') or
       (FOutputDevice.DeviceName = '') then
@@ -559,7 +730,8 @@ begin
 
     DebugLn('Audio device is ' + IntToStr(StreamParams.device));
 
-    StreamParams.channelCount := FInfo.channels;
+    //StreamParams.channelCount := FInfo.channels;
+    StreamParams.channelCount:=FAudioFile.Channels;
     StreamParams.sampleFormat := paFloat32;
 
     Streamparams.suggestedLatency :=
@@ -567,14 +739,14 @@ begin
     StreamParams.hostApiSpecificStreamInfo := nil;
     DebugLn('Default device is ' + IntToStr(StreamParams.device));
 
-    FUserInfo.SoundFile := FSoundFile;
+    //FUserInfo.SoundFile := FSoundFile;
 
     FUserInfo.Looped := Looped;
     FUserInfo.Player := Self;
 
-    Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
+    //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
-    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FInfo.samplerate,
+    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, FAudioFile.SampleRate,
       paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedAudioStream),
       @FUserInfo);
     if (paErrCode <> Int32(paNoError)) then
@@ -735,6 +907,15 @@ begin
   if OnPlayCompletion <> nil then
     OnPlayCompletion(Self);
   LeaveCriticalSection(AudioCriticalSection);
+end;
+
+procedure TAudio.LoadFromFile(AValue: string);
+var
+  FSnd: TSndAudioFile = nil;
+begin
+  if AValue <> '' then
+    FSndAudioFile.SetFileName(AValue);
+  FFileName:=AValue;
 end;
 
 var
