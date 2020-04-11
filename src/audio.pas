@@ -457,6 +457,7 @@ begin
 
   end;}
 
+  //TODO: Remove the hard coding
   mpg123_format(mh, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
   if mhErr <> MPG123_OK then
     DebugLn('Error after mpg123_format ' + IntToStr(mhErr));

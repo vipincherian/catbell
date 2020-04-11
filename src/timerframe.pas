@@ -481,6 +481,7 @@ begin
   DurationEnabled := True;
 
   bbAdjust.Enabled := False;
+  bbEdit.Enabled := True;
 end;
 
 procedure TfraTimer.Hide;
@@ -632,6 +633,7 @@ begin
   DurationEnabled := False;
 
   bbAdjust.Enabled := True;
+  bbEdit.Enabled:=False;
 
   frmMain.TimerStarted(Self);
 
@@ -672,6 +674,7 @@ begin
     DurationEnabled := True;
 
     bbAdjust.Enabled := False;
+    bbEdit.Enabled:=True;
 
     {There is no need to close the stream. Stopping/aborting the stream
     will trigger the callback for stream stoppage. The stream will be closed
@@ -730,6 +733,8 @@ begin
     begin
       PlayButtonEnabled := True;
       StopButtonEnabled := False;
+
+      bbEdit.Enabled:=True;
     end;
   end;
   frmMain.TimerFinished(Self, UserInitiated);
