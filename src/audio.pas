@@ -243,7 +243,7 @@ begin
   //readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
   //  (AudioInfo^.Info.channels));
   readSuccess:=AudioTemp.AudioFile.Read(output, frameCount);
-  DebugLn('here 1');
+  //DebugLn('here 1');
   if AudioInfo^.Looped then
   begin
     { If audio is lopped and if no audio data could be read,
@@ -377,6 +377,7 @@ end;
 function TMpgAudioFile.GetSampleFormat: PaSampleFormat;
 begin
   Result:=paInt16;
+  //Result:=paFloat32;
 end;
 
 function TMpgAudioFile.GetSampleRate: Integer;
@@ -399,14 +400,20 @@ begin
   if mhErr <> MPG123_OK then
   begin
     DebugLn('Error after mpg123_open ' + IntToStr(mhErr));
-    raise EInvalidAudio.Create('mpg123_open returned error for ' + AValue);
+    //raise EInvalidAudio.Create('mpg123_open returned error for ' + AValue);
+    FFileName:='';
+    Exit;
   end;
   FFileName:=AValue;
   mhErr := mpg123_getformat(mh, rate, channelcount, encoding);
   if mhErr <> MPG123_OK then
   begin
-    raise EInvalidAudio.Create('mpg123_getformat returned error for ' + AValue);
+    //raise EInvalidAudio.Create('mpg123_getformat returned error for ' + AValue);
+    FFileName:='';
+    Exit;
   end;
+  DebugLn('Encoding is ' + IntToStr(encoding));
+
 
   Dur :=  mpg123_tpf(mh);
   DebugLn('Duration is ' + FloatToStr(Duration));
@@ -492,7 +499,8 @@ begin
   begin
     DebugLn('Error in sf_open');
     //LeaveCriticalSection(AudioCriticalSection);
-    raise EInvalidAudio.Create('sf_open returned nil for ' + AValue);
+    //raise EInvalidAudio.Create('sf_open returned nil for ' + AValue);
+    FFileName:='';
     Exit;
   end;
 
@@ -1073,7 +1081,7 @@ begin
   FAudioFileLoaded:=false;
   if AValue <> '' then
   begin
-    try
+    {try
       FSndAudioFile.SetFileName(AValue);
       FAudioFile := FSndAudioFile;
     except
@@ -1085,11 +1093,29 @@ begin
         on E: EInvalidAudio do
           raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
       end;
+    end; }
+    FSndAudioFile.SetFileName(AValue);
+    if FSndAudioFile.FileName <> '' then
+    begin
+      FAudioFile := FSndAudioFile;
+      FAudioFileLoaded:=true;
+      FFileName:=AValue;
+      Exit;
     end;
 
-    FAudioFileLoaded:=true;
+    FMpgAudioFile.SetFileName(AValue);
+    if FMpgAudioFile.FileName <> '' then
+    begin
+      FAudioFile := FMpgAudioFile;
+      FAudioFileLoaded:=true;
+      FFileName:=AValue;
+      Exit;
+    end;
+
+    raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
+
   end;
-  FFileName:=AValue;
+
 end;
 
 var
