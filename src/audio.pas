@@ -11,7 +11,7 @@ unit audio;
 interface
 
 uses
-  Classes, SysUtils, sndfile, portaudio, LazLogger, ctypes, Forms,
+  Classes, SysUtils, sndfile, mpg123, portaudio, LazLogger, ctypes, Forms,
   Dialogs, LCLIntf, lcltype, fgl;
 
 const
@@ -50,9 +50,11 @@ type
     function GetChannels: Integer;
     function GetSampleRate: Integer;
     function GetAudioLength: double;
+    function GetSampleFormat: PaSampleFormat;
     property Channels: Integer read GetChannels;
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
+    property SampleFormat: PaSampleFormat read GetSampleFormat;
     // Seek to begin
     procedure SeekToBeginning;
     // Read to buffer
@@ -96,6 +98,7 @@ type
     FInfo: SF_INFO;
     function GetAudioLength: double;
     function GetChannels: Integer;
+    function GetSampleFormat: PaSampleFormat;
     function GetSampleRate: Integer;
     procedure SetFileName(AValue: string);
   public
@@ -108,6 +111,40 @@ type
     property Channels: Integer read GetChannels;
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
+    property SampleFormat: PaSampleFormat read GetSampleFormat;
+  end;
+
+  {TMpgAudioFile}
+  {Implementation of Mpg123 for MP3}
+  TMpgAudioFile = class(TObject, IAudioFile)
+  private
+    mh: Tmpg123_handle;
+    mhErr: integer;
+    //FFileType: integer;
+
+    FFileName: string;
+    FAudioLength: double;
+
+    rate: cardinal;
+    channelcount: integer;
+    encoding: integer;
+
+    function GetAudioLength: double;
+    function GetChannels: Integer;
+    function GetSampleFormat: PaSampleFormat;
+    function GetSampleRate: Integer;
+    procedure SetFileName(AValue: string);
+  public
+    constructor Create();
+    destructor Destroy; override;
+    procedure SeekToBeginning;
+    function Read(output: pointer; frameCount: LongInt): boolean;
+
+    property FileName: string read FFileName write SetFileName;
+    property Channels: Integer read GetChannels;
+    property SampleRate: Integer read GetSampleRate;
+    property Duration: double read GetAudioLength;
+    property SampleFormat: PaSampleFormat read GetSampleFormat;
   end;
 
   { TAudio }
@@ -117,6 +154,7 @@ type
     FAudioFile: IAudioFile;
 
     FSndAudioFile: TSndAudioFile;
+    FMpgAudioFile: TMpgAudioFile;
     //FSndAudioF
     //FFileType: integer;
 
@@ -324,6 +362,105 @@ begin
   LeaveCriticalSection(TAudio.AudioCriticalSection);
 end;
 
+{ TMpgAudioFile }
+
+function TMpgAudioFile.GetAudioLength: double;
+begin
+  Result:=FAudioLength;
+end;
+
+function TMpgAudioFile.GetChannels: Integer;
+begin
+  Result:=channelcount;
+end;
+
+function TMpgAudioFile.GetSampleFormat: PaSampleFormat;
+begin
+  Result:=paInt16;
+end;
+
+function TMpgAudioFile.GetSampleRate: Integer;
+begin
+  Result:=rate;
+end;
+
+procedure TMpgAudioFile.SetFileName(AValue: string);
+var
+  Dur: double;
+begin
+  mhErr := mpg123_close(mh);
+  if mhErr <> MPG123_OK then
+  begin
+    DebugLn('Error after mpg123_close ' + IntToStr(mhErr));
+    //Exit;
+  end;
+
+  mhErr := mpg123_open(mh, PChar(AValue));
+  if mhErr <> MPG123_OK then
+  begin
+    DebugLn('Error after mpg123_open ' + IntToStr(mhErr));
+    raise EInvalidAudio.Create('mpg123_open returned error for ' + AValue);
+  end;
+  FFileName:=AValue;
+  mhErr := mpg123_getformat(mh, rate, channelcount, encoding);
+  if mhErr <> MPG123_OK then
+  begin
+    raise EInvalidAudio.Create('mpg123_getformat returned error for ' + AValue);
+  end;
+
+  Dur :=  mpg123_tpf(mh);
+  DebugLn('Duration is ' + FloatToStr(Duration));
+  if Dur < 0 then
+  begin
+    DebugLn('Error after mpg123_tpf ' + IntToStr(mhErr));
+  end;
+  FAudioLength:=Dur;
+end;
+
+constructor TMpgAudioFile.Create();
+begin
+  mh:=nil;
+  mh := mpg123_new(nil, mhErr);
+  if mhErr <> MPG123_OK then
+    DebugLn('Error after mpg123_new ' + IntToStr(mhErr));
+end;
+
+destructor TMpgAudioFile.Destroy;
+begin
+  mhErr := mpg123_close(mh);
+  if mhErr <> MPG123_OK then
+  begin
+    DebugLn('Error after mpg123_close ' + IntToStr(mhErr));
+  end;
+  if mh <> nil then
+    mpg123_delete(mh);
+  inherited Destroy;
+end;
+
+procedure TMpgAudioFile.SeekToBeginning;
+begin
+  mhErr :=  mpg123_seek(mh, 0, SEEK_SET);
+end;
+
+function TMpgAudioFile.Read(output: pointer; frameCount: LongInt): boolean;
+var
+  done: size_t;
+begin
+  mhErr := mpg123_read(mh, output, frameCount*4, done);
+  if done = 0 then
+  begin
+    Result := false;
+    Exit;
+  end;
+  if mhErr <> MPG123_OK then
+  begin
+    DebugLn('mpg123_read failed?');
+    Result := false;
+    Exit;
+  end;
+  Result := True;
+end;
+
 { TSndAudioFile }
 
 procedure TSndAudioFile.SetFileName(AValue: string);
@@ -378,6 +515,11 @@ end;
 function TSndAudioFile.GetChannels: Integer;
 begin
   Result:=FInfo.channels;
+end;
+
+function TSndAudioFile.GetSampleFormat: PaSampleFormat;
+begin
+  Result:=paFloat32;
 end;
 
 function TSndAudioFile.GetAudioLength: double;
@@ -593,6 +735,8 @@ begin
   FAudioFileLoaded := False;
 
   FSndAudioFile := TSndAudioFile.Create;
+  FMpgAudioFile := TMpgAudioFile.Create;
+
   FAudioFile := FSndAudioFile;
   //FFileType := READ_NOTLOADED;
 
@@ -617,6 +761,7 @@ end;
 destructor TAudio.Destroy;
 begin
   //DebugLn('TAudio.Destroy ');
+  FMpgAudioFile.Destroy;
   FSndAudioFile.Destroy;
   inherited Destroy;
 end;
@@ -737,7 +882,7 @@ begin
 
     //StreamParams.channelCount := FInfo.channels;
     StreamParams.channelCount:=FAudioFile.Channels;
-    StreamParams.sampleFormat := paFloat32;
+    StreamParams.sampleFormat := FAudioFile.SampleFormat;
 
     Streamparams.suggestedLatency :=
       Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
@@ -928,7 +1073,20 @@ begin
   FAudioFileLoaded:=false;
   if AValue <> '' then
   begin
-    FSndAudioFile.SetFileName(AValue);
+    try
+      FSndAudioFile.SetFileName(AValue);
+      FAudioFile := FSndAudioFile;
+    except
+      on E: EInvalidAudio do
+      try
+        FMpgAudioFile.SetFileName(AValue);
+        FAudioFile := FMpgAudioFile;
+      except
+        on E: EInvalidAudio do
+          raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
+      end;
+    end;
+
     FAudioFileLoaded:=true;
   end;
   FFileName:=AValue;
@@ -963,6 +1121,27 @@ initialization
     end;
   end;
 
+  if TAudio.Loaded then
+  begin
+    TAudio.Loaded := Mp_Load(LIB_MPG123);
+    if not TAudio.Loaded then
+    begin
+      DebugLn('Could not load mpg123');
+      sf_Unload;
+      Pa_Unload;
+      Exit;
+    end;
+   if mpg123_init() <> MPG123_OK then
+   begin
+     TAudio.Loaded := False;
+     DebugLn('mpg123_init() failed');
+     Mp_Unload;
+     sf_Unload;
+     Pa_Unload;
+     Exit;
+   end;
+  end;
+
   //FAudioWorking:=Status;
 
   {$ENDIF}
@@ -982,8 +1161,10 @@ initialization
       { If portaudio cannot be initialised, then audio will not work.
       Unload libraries }
       {$IFNDEF AUDIO_STATIC}
+      Mp_Unload;
       sf_Unload;
       Pa_Unload;
+
       {$ENDIF}
     end;
   end;
@@ -997,6 +1178,7 @@ initialization
       TAudio.Loaded := False;
       Pa_Terminate;
       {$IFNDEF AUDIO_STATIC}
+      Mp_Unload;
       sf_Unload;
       Pa_Unload;
       {$ENDIF}
@@ -1010,7 +1192,9 @@ finalization
   if TAudio.Loaded then
   begin
     Pa_Terminate;
+    mpg123_exit;
     {$IFNDEF AUDIO_STATIC}
+    Mp_Unload;
     Sf_Unload;
     Pa_Unload;
     {$ENDIF}
