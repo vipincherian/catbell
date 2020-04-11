@@ -160,6 +160,7 @@ type
     procedure Abort;
     procedure FinishedAud({%H-}Datax: PtrInt);
     property FileName: string read FFileName;
+    procedure UnloadAudioFile;
     procedure LoadFromFile(AValue: string);
     //property Duration: double read FAudioLength;
     property Playing: boolean read FAudioPlaying;
@@ -911,6 +912,13 @@ begin
   if OnPlayCompletion <> nil then
     OnPlayCompletion(Self);
   LeaveCriticalSection(AudioCriticalSection);
+end;
+
+procedure TAudio.UnloadAudioFile;
+begin
+  FAudioFile:=nil;
+  FAudioFileLoaded:=false;
+  FFileName := '';
 end;
 
 procedure TAudio.LoadFromFile(AValue: string);
