@@ -121,6 +121,7 @@ type
     //FFileType: integer;
 
     FFileName: string;
+    FAudioFileLoaded: boolean;
     //FAudioLength: double;
 
     //FInfo: SF_INFO;
@@ -163,6 +164,7 @@ type
     //property Duration: double read FAudioLength;
     property Playing: boolean read FAudioPlaying;
     property AudioFile: IAudioFile read FAudioFile;
+    property AudioFileLoaded: boolean read FAudioFileLoaded;
     class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
 
   end;
@@ -587,6 +589,8 @@ begin
     raise EAudioNotLoaded.Create('Audio not loaded.');
   //FSoundFile := nil;
   FAudioFile := nil;
+  FAudioFileLoaded := False;
+
   FSndAudioFile := TSndAudioFile.Create;
   FAudioFile := FSndAudioFile;
   //FFileType := READ_NOTLOADED;
@@ -913,8 +917,12 @@ procedure TAudio.LoadFromFile(AValue: string);
 var
   FSnd: TSndAudioFile = nil;
 begin
+  FAudioFileLoaded:=false;
   if AValue <> '' then
+  begin
     FSndAudioFile.SetFileName(AValue);
+    FAudioFileLoaded:=true;
+  end;
   FFileName:=AValue;
 end;
 

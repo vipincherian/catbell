@@ -703,7 +703,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if TAudio.Loaded and (Audio.FileName <> '') and (not UserInitiated) then
+    if TAudio.Loaded and Audio.AudioFileLoaded and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
