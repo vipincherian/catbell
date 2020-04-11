@@ -376,8 +376,8 @@ end;
 
 function TMpgAudioFile.GetSampleFormat: PaSampleFormat;
 begin
-  Result:=paInt16;
-  //Result:=paFloat32;
+  //Result:=paInt16;
+  Result:=paFloat32;
 end;
 
 function TMpgAudioFile.GetSampleRate: Integer;
@@ -425,11 +425,42 @@ begin
 end;
 
 constructor TMpgAudioFile.Create();
+var
+  Rates: pplong;
+  RateCount: integer;
+  X, Y: Pointer;
+  Count: integer;
 begin
   mh:=nil;
   mh := mpg123_new(nil, mhErr);
   if mhErr <> MPG123_OK then
     DebugLn('Error after mpg123_new ' + IntToStr(mhErr));
+
+  mhErr := mpg123_format_none(mh);
+  if mhErr <> MPG123_OK then
+    DebugLn('Error after mpg123_format_none ' + IntToStr(mhErr));
+
+  //RateCount := 0;
+  //X := @RateCount;
+  //Y := @Rates;
+  //Rates := nil;
+  //mpg123_rates(Rates, X);
+
+  //DebugLn('After mpg123_rates. Rate count is ' + IntToStr(RateCount));
+
+
+  {for Count:=0 to RateCount - 1 do
+  begin
+    mpg123_format(mh, Rates^[Count], MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
+    if mhErr <> MPG123_OK then
+      DebugLn('Error after mpg123_format ' + IntToStr(mhErr));
+
+  end;}
+
+  mpg123_format(mh, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
+  if mhErr <> MPG123_OK then
+    DebugLn('Error after mpg123_format ' + IntToStr(mhErr));
+
 end;
 
 destructor TMpgAudioFile.Destroy;
@@ -453,7 +484,7 @@ function TMpgAudioFile.Read(output: pointer; frameCount: LongInt): boolean;
 var
   done: size_t;
 begin
-  mhErr := mpg123_read(mh, output, frameCount*4, done);
+  mhErr := mpg123_read(mh, output, frameCount * SizeOf(real), done);
   if done = 0 then
   begin
     Result := false;
