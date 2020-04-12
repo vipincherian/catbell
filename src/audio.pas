@@ -939,7 +939,7 @@ begin
     Streamparams.suggestedLatency :=
       Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
     StreamParams.hostApiSpecificStreamInfo := nil;
-    DebugLn('Default device is ' + IntToStr(StreamParams.device));
+    //DebugLn('Default device is ' + IntToStr(StreamParams.device));
 
     //FUserInfo.SoundFile := FSoundFile;
 

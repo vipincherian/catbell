@@ -252,7 +252,18 @@ begin
   if TAudio.Loaded then
   begin
     //Audio.FileName := AValue;
-    Audio.LoadFromFile(AValue);
+    try
+      Audio.LoadFromFile(AValue);
+    except
+      on E: EInvalidAudio do
+      begin
+        edtAudioFile.text:='';
+        lblLenthVal.Caption:='';
+        MessageDlg('Cannot load file as audio. Invalid format.'
+          + LineEnding + AValue, mtError, [mbOK], 0);
+        Exit;
+      end;
+    end;
     edtAudioFile.Text := Audio.FileName;
     lblLenthVal.Caption := FloatToStr(RoundTo(AudioDuration, -2));
   end
@@ -260,6 +271,7 @@ begin
   begin
     FAudioInfo.FileName := AValue;
   end;
+
   if AValue = '' then
   begin
     lblLengthText.Visible := False;
