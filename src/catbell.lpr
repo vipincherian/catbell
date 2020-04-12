@@ -50,7 +50,10 @@ var
 begin
   RequireDerivedFormResource:=True;
 
-  //CloseLogFileBetweenWrites :=True;
+  {$if declared(useHeapTrace)}
+  setHeapTraceOutput('catbell_trace.log');
+  {$endIf}
+
   DebugLn('Application built on ' + {$INCLUDE %DATE%});
 
   { Checks to ensure that only one instance of the application runs at a time }

@@ -220,6 +220,7 @@ type
     class function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex; static;
     class property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
     class property Devices: TAudioDeviceList read GetDevices;
+    class procedure CleanUp; static;
     class procedure SetDefaulDevice; static;
     class procedure LoadDefaultSounds; static;
     class procedure FreeDefaultSounds; static;
@@ -1096,6 +1097,25 @@ begin
 
 end;
 
+class procedure TAudio.CleanUp;
+var
+  Device: PAudioDevice;
+begin
+  if not TAudio.Loaded then
+  begin
+    DebugLn('TAudio.Loaded is fales in TAudio.Cleanup');
+    Exit;
+  end;
+
+  for Device in TAudio.FDevices do
+  begin
+    Dispose(Device);
+  end;
+  TAudio.FDevices.Clear;
+
+  FreeMem(TAudio.DefaultSound.Buffer);
+end;
+
 class procedure TAudio.SetDefaulDevice;
 begin
   TAudio.GetDefaultDevice(@FOutputDevice);
@@ -1106,6 +1126,10 @@ var
   Stream: TResourceStream;
   Size, BytesRead: integer;
 begin
+  if not TAudio.Loaded then
+  begin
+    Exit;
+  end;
   Stream := TResourceStream.Create(hinstance, 'DEFAULT_SOUND', RT_RCDATA);
   Size := Stream.Size;
   Assert(Size > 0);
@@ -1523,5 +1547,6 @@ finalization
     Pa_Unload;
     {$ENDIF}
   end;
+  TAudio.CleanUp;
   TAudio.FDevices.Free;
 end.
