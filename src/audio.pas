@@ -65,7 +65,7 @@ type
 
     //SoundFile: PSndFile;
     //Info: SF_INFO;
-
+    AudioFile: IAudioFile;
     Player: Pointer;
     Looped: boolean;
 
@@ -231,18 +231,24 @@ var
   AudioInfo: PAudioInfo;
   //readCount: cint;
   readSuccess: boolean;
-  AudioTemp: TAudio;
+  AudioInstance: TAudio;
+  UsedAudioFile: IAudioFile;
 begin
   EnterCriticalSection(TAudio.AudioCriticalSection);
 
   AudioInfo := PAudioinfo(userData);
-  AudioTemp := TAudio(AudioInfo^.Player);
+  AudioInstance := TAudio(AudioInfo^.Player);
+
+  if AudioInfo^.AudioFile <> nil then
+    UsedAudioFile:=AudioInfo^.AudioFile
+  else
+    UsedAudioFile:=AudioInstance.AudioFile;
 
   //readCount := 0;
   readSuccess := false;
   //readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
   //  (AudioInfo^.Info.channels));
-  readSuccess:=AudioTemp.AudioFile.Read(output, frameCount);
+  readSuccess:=UsedAudioFile.Read(output, frameCount);
   //DebugLn('here 1');
   if AudioInfo^.Looped then
   begin
@@ -254,12 +260,12 @@ begin
       begin
         DebugLn('Sf_seek returned error');
       end;}
-      AudioTemp.AudioFile.SeekToBeginning;
+      UsedAudioFile.SeekToBeginning;
       //readCount := 0;
       readSuccess:=false;
       //readCount := sf_read_float(AudioInfo^.SoundFile, output, frameCount *
       //  (AudioInfo^.Info.channels));
-      readSuccess:=AudioTemp.AudioFile.Read(output, frameCount);
+      readSuccess:=UsedAudioFile.Read(output, frameCount);
       if not readSuccess then
       begin
         DebugLn('readCount zero immediately after seek to beginning');
@@ -448,9 +454,9 @@ end;
 
 constructor TMpgAudioFile.Create();
 var
-  Rates: plong;
-  RateCount: size_t;
-  X, Y: Pointer;
+  Rates: plong = nil;
+  RateCount: size_t = 0;
+  //X, Y: Pointer;
   Count: integer;
 begin
   mh:=nil;
@@ -463,9 +469,10 @@ begin
     DebugLn('Error after mpg123_format_none ' + IntToStr(mhErr));
 
   //RateCount := 1;
-  X := Addr(Rates);
-  Y := Addr(RateCount);
+  //X := Addr(Rates);
+  //Y := Addr(RateCount);
   //Rates := nil;
+
   mpg123_rates(Rates, RateCount);
 
   if Rates <> nil then
@@ -510,7 +517,7 @@ end;
 
 function TMpgAudioFile.Read(output: pointer; frameCount: LongInt): boolean;
 var
-  done: size_t;
+  done: size_t = 0;
 begin
   mhErr := mpg123_read(mh, output, frameCount * SizeOf(real), done);
   if done = 0 then
@@ -1136,8 +1143,8 @@ begin
 end;
 
 procedure TAudio.LoadFromFile(AValue: string);
-var
-  FSnd: TSndAudioFile = nil;
+{var
+  FSnd: TSndAudioFile = nil;}
 begin
   //FAudioFileLoaded:=false;
   if AValue <> '' then
