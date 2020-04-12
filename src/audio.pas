@@ -118,16 +118,16 @@ type
   {Implementation of Mpg123 for MP3}
   TMpgAudioFile = class(TObject, IAudioFile)
   private
-    mh: Tmpg123_handle;
-    mhErr: integer;
+    FHandle: Tmpg123_handle;
+    FError: integer;
     //FFileType: integer;
 
     FFileName: string;
     FAudioLength: double;
 
-    rate: cardinal;
-    channelcount: integer;
-    encoding: integer;
+    FRate: cardinal;
+    FChannelCount: integer;
+    FEncoding: integer;
 
     function GetAudioLength: double;
     function GetChannels: Integer;
@@ -377,7 +377,7 @@ end;
 
 function TMpgAudioFile.GetChannels: Integer;
 begin
-  Result:=channelcount;
+  Result:=FChannelCount;
 end;
 
 function TMpgAudioFile.GetSampleFormat: PaSampleFormat;
@@ -388,7 +388,7 @@ end;
 
 function TMpgAudioFile.GetSampleRate: Integer;
 begin
-  Result:=rate;
+  Result:=FRate;
 end;
 
 procedure TMpgAudioFile.SetFileName(AValue: string);
@@ -396,25 +396,25 @@ var
   Dur: double;
   FrameLength: coff_t;
 begin
-  mhErr := mpg123_close(mh);
-  if mhErr <> MPG123_OK then
+  FError := mpg123_close(FHandle);
+  if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_close ' + IntToStr(mhErr));
+    DebugLn('Error after mpg123_close ' + IntToStr(FError));
     //Exit;
   end;
 
-  mhErr := mpg123_open(mh, PChar(AValue));
-  if mhErr <> MPG123_OK then
+  FError := mpg123_open(FHandle, PChar(AValue));
+  if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_open ' + IntToStr(mhErr));
+    DebugLn('Error after mpg123_open ' + IntToStr(FError));
     //raise EInvalidAudio.Create('mpg123_open returned error for ' + AValue);
     FFileName:='';
     Exit;
   end;
   FFileName:=AValue;
   DebugLn('MPEG audio file loaded: ' + FFileName);
-  mhErr := mpg123_getformat(mh, rate, channelcount, encoding);
-  if mhErr <> MPG123_OK then
+  FError := mpg123_getformat(FHandle, FRate, FChannelCount, FEncoding);
+  if FError <> MPG123_OK then
   begin
     //raise EInvalidAudio.Create('mpg123_getformat returned error for ' + AValue);
 
@@ -422,23 +422,23 @@ begin
     Exit;
   end;
   DebugLnEnter;
-  DebugLn('Rate - ' + IntToStr(rate));
-  DebugLn('Encoding - ' + IntToStr(encoding));
+  DebugLn('Rate - ' + IntToStr(FRate));
+  DebugLn('Encoding - ' + IntToStr(FEncoding));
 
-  mhErr:=mpg123_scan(mh);
-  if mhErr <> MPG123_OK then
+  FError:=mpg123_scan(FHandle);
+  if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_scan ' + IntToStr(mhErr));
+    DebugLn('Error after mpg123_scan ' + IntToStr(FError));
   end;
 
-  FrameLength := mpg123_length(mh);
+  FrameLength := mpg123_length(FHandle);
   DebugLn('FrameLength is ' + IntToStr(FrameLength));
   if FrameLength < 0 then
   begin
     DebugLn('Error after mpg123_scan ' + IntToStr(FrameLength));
   end;
 
-  {Dur :=  mpg123_tpf(mh);
+  {Dur :=  mpg123_tpf(FHandle);
   DebugLn('Duration is ' + FloatToStr(Duration));
   DebugLnExit;
 
@@ -446,7 +446,7 @@ begin
   begin
     DebugLn('Error after mpg123_tpf ' + FloatToStr(Dur));
   end;}
-  Dur := FrameLength / rate;
+  Dur := FrameLength / FRate;
   DebugLn('Duration is ' + FloatToStr(Duration));
 
   FAudioLength:=Dur;
@@ -459,14 +459,14 @@ var
   //X, Y: Pointer;
   Count: integer;
 begin
-  mh:=nil;
-  mh := mpg123_new(nil, mhErr);
-  if mhErr <> MPG123_OK then
-    DebugLn('Error after mpg123_new ' + IntToStr(mhErr));
+  FHandle:=nil;
+  FHandle := mpg123_new(nil, FError);
+  if FError <> MPG123_OK then
+    DebugLn('Error after mpg123_new ' + IntToStr(FError));
 
-  mhErr := mpg123_format_none(mh);
-  if mhErr <> MPG123_OK then
-    DebugLn('Error after mpg123_format_none ' + IntToStr(mhErr));
+  FError := mpg123_format_none(FHandle);
+  if FError <> MPG123_OK then
+    DebugLn('Error after mpg123_format_none ' + IntToStr(FError));
 
   //RateCount := 1;
   //X := Addr(Rates);
@@ -485,47 +485,47 @@ begin
   begin
     //DebugLn('Handling rate count ' + IntToStr(Rates[Count]));
 
-    mpg123_format(mh, Rates[Count], MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
-    if mhErr <> MPG123_OK then
-      DebugLn('Error after mpg123_format ' + IntToStr(mhErr));
+    mpg123_format(FHandle, Rates[Count], MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
+    if FError <> MPG123_OK then
+      DebugLn('Error after mpg123_format ' + IntToStr(FError));
 
   end;
 
   //TODO: Remove the hard coding
-  mpg123_format(mh, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
-  if mhErr <> MPG123_OK then
-    DebugLn('Error after mpg123_format ' + IntToStr(mhErr));
+  mpg123_format(FHandle, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
+  if FError <> MPG123_OK then
+    DebugLn('Error after mpg123_format ' + IntToStr(FError));
 
 end;
 
 destructor TMpgAudioFile.Destroy;
 begin
-  mhErr := mpg123_close(mh);
-  if mhErr <> MPG123_OK then
+  FError := mpg123_close(FHandle);
+  if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_close ' + IntToStr(mhErr));
+    DebugLn('Error after mpg123_close ' + IntToStr(FError));
   end;
-  if mh <> nil then
-    mpg123_delete(mh);
+  if FHandle <> nil then
+    mpg123_delete(FHandle);
   inherited Destroy;
 end;
 
 procedure TMpgAudioFile.SeekToBeginning;
 begin
-  mhErr :=  mpg123_seek(mh, 0, SEEK_SET);
+  FError :=  mpg123_seek(FHandle, 0, SEEK_SET);
 end;
 
 function TMpgAudioFile.Read(output: pointer; frameCount: LongInt): boolean;
 var
   done: size_t = 0;
 begin
-  mhErr := mpg123_read(mh, output, frameCount * SizeOf(real), done);
+  FError := mpg123_read(FHandle, output, frameCount * SizeOf(real), done);
   if done = 0 then
   begin
     Result := false;
     Exit;
   end;
-  if mhErr <> MPG123_OK then
+  if FError <> MPG123_OK then
   begin
     //DebugLn('mpg123_read failed?');
     Result := false;
