@@ -461,7 +461,7 @@ begin
   { Check if this fetch will go beyond the total size of the file buffer }
   if Position >=  SoundData^.Sound^.Size then
     ActualCount:=0
-  else if (Position + Count) > SoundData^.Sound^.Size then
+  else if Position > (SoundData^.Sound^.Size - Count) then
     ActualCount:=(SoundData^.Sound^.Size) - Position
   else
     ActualCount:=Count;

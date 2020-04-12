@@ -66,6 +66,7 @@ type
     procedure bbClearAudioFileClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
     procedure bbSelectAudioFileClick(Sender: TObject);
+    procedure ckbUseDefaultSoundChange(Sender: TObject);
     procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
     procedure edtDescriptionChange(Sender: TObject);
@@ -183,6 +184,16 @@ begin
     FileName := odgAudio.FileName;
     AudioFileName := FileName;
   end;
+end;
+
+procedure TfrmEdit.ckbUseDefaultSoundChange(Sender: TObject);
+var
+  DefaultSoundOff: boolean;
+begin
+  DefaultSoundOff:= not ckbUseDefaultSound.Checked;
+  bbSelectAudioFile.Enabled:= DefaultSoundOff;
+  bbClearAudioFile.Enabled:= DefaultSoundOff;
+  ckbLoop.Enabled:=DefaultSoundOff;
 end;
 
 procedure TfrmEdit.dtpByChange(Sender: TObject);
@@ -381,6 +392,10 @@ procedure TfrmEdit.SetUseDefaultSound(AValue: boolean);
 begin
   FUseDefaultSound:=AValue;
   ckbUseDefaultSound.Checked:=AValue;
+  bbClearAudioFile.Enabled:=(not AValue);
+  bbSelectAudioFile.Enabled:=(not AValue);
+  ckbLoop.Enabled:=(not AValue);
+
 end;
 
 function TfrmEdit.ShowAndGetSpecs: boolean;
@@ -417,9 +432,10 @@ begin
   ButtonStatus:=(not Widget.Running);
   dtpDuration.Enabled := ButtonStatus;
   ckbUseDefaultSound.Enabled:=ButtonStatus;
-  bbSelectAudioFile.Enabled:=ButtonStatus;
-  bbClearAudioFile.Enabled:=ButtonStatus;
-  ckbLoop.Enabled:=ButtonStatus;
+
+  bbSelectAudioFile.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
+  bbClearAudioFile.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
+  ckbLoop.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
 
   Result := ShowAndGetSpecs;
   FId := longword(-1);

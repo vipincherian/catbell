@@ -251,6 +251,7 @@ object frmEdit: TfrmEdit
         Top = 8
         Width = 115
         Caption = 'Use default sound'
+        OnChange = ckbUseDefaultSoundChange
         TabOrder = 4
       end
     end

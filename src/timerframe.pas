@@ -721,9 +721,9 @@ begin
         dtpDuration.Enabled := True;
         //frmEdit.tsAudio.Enabled:=True;
         ckbUseDefaultSound.Enabled:=True;
-        bbSelectAudioFile.Enabled:=True;
-        bbClearAudioFile.Enabled:=True;
-        ckbLoop.Enabled:=True;
+        bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+        bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+        ckbLoop.Enabled:=True and (not ckbUseDefaultSound.Checked);
       end;
     end;
 
