@@ -388,6 +388,7 @@ end;
 procedure TMpgAudioFile.SetFileName(AValue: string);
 var
   Dur: double;
+  FrameLength: coff_t;
 begin
   mhErr := mpg123_close(mh);
   if mhErr <> MPG123_OK then
@@ -417,15 +418,31 @@ begin
   DebugLnEnter;
   DebugLn('Rate - ' + IntToStr(rate));
   DebugLn('Encoding - ' + IntToStr(encoding));
+
+  mhErr:=mpg123_scan(mh);
+  if mhErr <> MPG123_OK then
+  begin
+    DebugLn('Error after mpg123_scan ' + IntToStr(mhErr));
+  end;
+
+  FrameLength := mpg123_length(mh);
+  DebugLn('FrameLength is ' + IntToStr(FrameLength));
+  if FrameLength < 0 then
+  begin
+    DebugLn('Error after mpg123_scan ' + IntToStr(FrameLength));
+  end;
+
+  {Dur :=  mpg123_tpf(mh);
+  DebugLn('Duration is ' + FloatToStr(Duration));
   DebugLnExit;
 
-
-  Dur :=  mpg123_tpf(mh);
-  DebugLn('Duration is ' + FloatToStr(Duration));
   if Dur < 0 then
   begin
-    DebugLn('Error after mpg123_tpf ' + IntToStr(mhErr));
-  end;
+    DebugLn('Error after mpg123_tpf ' + FloatToStr(Dur));
+  end;}
+  Dur := FrameLength / rate;
+  DebugLn('Duration is ' + FloatToStr(Duration));
+
   FAudioLength:=Dur;
 end;
 
@@ -1142,6 +1159,7 @@ begin
     if FSndAudioFile.FileName <> '' then
     begin
       FAudioFile := FSndAudioFile;
+      //Duration := FAudioFile.Duration;
       FAudioFileLoaded:=true;
       FFileName:=AValue;
       Exit;

@@ -257,15 +257,16 @@ begin
     except
       on E: EInvalidAudio do
       begin
-        edtAudioFile.text:='';
-        lblLenthVal.Caption:='';
+        //edtAudioFile.text:='';
+        //lblLenthVal.Caption:='';
         MessageDlg('Cannot load file as audio. Invalid format.'
           + LineEnding + AValue, mtError, [mbOK], 0);
         Exit;
       end;
     end;
     edtAudioFile.Text := Audio.FileName;
-    lblLenthVal.Caption := FloatToStr(RoundTo(AudioDuration, -2));
+    lblLenthVal.Caption := FloatToStr(RoundTo(Audio.AudioFile.Duration, -2));
+    //AudioDuration := Audio.AudioFile.Duration;
   end
   else
   begin
@@ -279,7 +280,7 @@ begin
 
     lblLenthVal.Visible := False;
     Exit;
-  end
+  end    //TODO: What is the else part ?
   else
   begin
     lblLengthText.Visible := True;
@@ -349,7 +350,7 @@ begin
   if not TAudio.Loaded then
   begin
     FAudioInfo.Duration := AValue;
-    lblLenthVal.Caption := FloatToStr(RoundTo(AudioDuration, -2));
+    lblLenthVal.Caption := FloatToStr(RoundTo(FAudioInfo.Duration, -2));
   end;
 end;
 
