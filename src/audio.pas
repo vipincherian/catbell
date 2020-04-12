@@ -405,14 +405,19 @@ begin
     Exit;
   end;
   FFileName:=AValue;
+  DebugLn('MPEG audio file loaded: ' + FFileName);
   mhErr := mpg123_getformat(mh, rate, channelcount, encoding);
   if mhErr <> MPG123_OK then
   begin
     //raise EInvalidAudio.Create('mpg123_getformat returned error for ' + AValue);
+
     FFileName:='';
     Exit;
   end;
-  DebugLn('Encoding is ' + IntToStr(encoding));
+  DebugLnEnter;
+  DebugLn('Rate - ' + IntToStr(rate));
+  DebugLn('Encoding - ' + IntToStr(encoding));
+  DebugLnExit;
 
 
   Dur :=  mpg123_tpf(mh);
@@ -426,8 +431,8 @@ end;
 
 constructor TMpgAudioFile.Create();
 var
-  Rates: pplong;
-  RateCount: integer;
+  Rates: plong;
+  RateCount: size_t;
   X, Y: Pointer;
   Count: integer;
 begin
@@ -440,22 +445,27 @@ begin
   if mhErr <> MPG123_OK then
     DebugLn('Error after mpg123_format_none ' + IntToStr(mhErr));
 
-  //RateCount := 0;
-  //X := @RateCount;
-  //Y := @Rates;
+  //RateCount := 1;
+  X := Addr(Rates);
+  Y := Addr(RateCount);
   //Rates := nil;
-  //mpg123_rates(Rates, X);
+  mpg123_rates(Rates, RateCount);
 
-  //DebugLn('After mpg123_rates. Rate count is ' + IntToStr(RateCount));
+  if Rates <> nil then
+    DebugLn('Rates is not nil');
+
+  //DebugLn('After mpg123_rates. Rate count is ' + IntToStr(Rates[0]));
 
 
-  {for Count:=0 to RateCount - 1 do
+  for Count:=0 to RateCount - 1 do
   begin
-    mpg123_format(mh, Rates^[Count], MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
+    //DebugLn('Handling rate count ' + IntToStr(Rates[Count]));
+
+    mpg123_format(mh, Rates[Count], MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
     if mhErr <> MPG123_OK then
       DebugLn('Error after mpg123_format ' + IntToStr(mhErr));
 
-  end;}
+  end;
 
   //TODO: Remove the hard coding
   mpg123_format(mh, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
@@ -493,7 +503,7 @@ begin
   end;
   if mhErr <> MPG123_OK then
   begin
-    DebugLn('mpg123_read failed?');
+    //DebugLn('mpg123_read failed?');
     Result := false;
     Exit;
   end;
@@ -633,6 +643,7 @@ begin
   end;
 
   DebugLn('Enumerating devices:-');
+  DebugLnEnter;
   for Count := 0 to NumDevices - 1 do
   begin
     DeviceInfo := Pa_GetDeviceInfo(Count);
@@ -667,6 +678,7 @@ begin
     end;
 
   end;
+  DebugLnExit;
   Result := FDevices;
 
   LeaveCriticalSection(AudioCriticalSection);

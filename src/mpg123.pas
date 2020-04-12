@@ -322,7 +322,6 @@ cuint32 = LongWord;
 {$endif}
 
 psize_t = ^size_t;
-pcsize_t = ^csize_t;
 
 
                  { as defined in the C standard }
@@ -336,10 +335,10 @@ type   //FixMe: use unit ctypes in LAZARUS instead !
 
 type
 //FixMe:  this is experimental - NOT TESTED !!!
-  PLong = Pointer;
-  //pplong = array of PLong;        //pplong in mpg123 means: (a Pointer to) a list of Pointers
-  pplong = ^pclong;
-  //hint: use size_t to dim the pplong array
+  //PLong = Pointer;
+  plong = ^clong;
+  pplong = array of PLong;        //pplong in mpg123 means: (a Pointer to) a list of Pointers
+  //hint: use size_t to dim the pplong array  
 
   PInteger = Pointer;
 
@@ -351,8 +350,7 @@ type
  *  you will only get audio in one of these samplings.
  *  \param list Store a pointer to the sample rates array there.
  *  \param number Store the number of sample rates there. *)
- // Manually fixed a possible
-type Tmpg123_rates = procedure( var list : pplong; var number: pcsize_t{size_t}); cdecl;
+type Tmpg123_rates = procedure( var list : plong; var number : size_t); cdecl;
 
 (** An array of supported audio encodings.
  *  An audio encoding is one of the fully qualified members of mpg123_enc_enum
