@@ -43,6 +43,7 @@ type
     bbClearAudioFile: TBitBtn;
     bbSave: TBitBtn;
     bbSelectAudioFile: TBitBtn;
+    ckbUseDefaultSound: TCheckBox;
     ckbLoop: TCheckBox;
     ckbModalAlert: TCheckBox;
     ckbTrayNotification: TCheckBox;
@@ -77,6 +78,7 @@ type
     FDescription: string;
     FModalAlert: boolean;
     FTrayNotification: boolean;
+    FUseDefaultSound: boolean;
     FId: longword;
 
     FAudio: TAudio;
@@ -92,6 +94,7 @@ type
     procedure SetDuration(AValue: TTime);
     procedure SetFTrayNotification(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
+    procedure SetUseDefaultSound(AValue: boolean);
     function Validate: boolean;
   public
     function ShowAndGetSpecs: boolean;
@@ -103,6 +106,7 @@ type
     property ModalAlert: boolean read FModalAlert write SetModalAlert;
 
     property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
+    property UseDefaultSound: boolean read FUseDefaultSound write SetUseDefaultSound;
     property Id: longword read FId;
 
     property Audio: TAudio read FAudio write SetAudio;
@@ -162,6 +166,7 @@ begin
   FDuration := dtpDuration.Time;
   FModalAlert := ckbModalAlert.Checked;
   FTrayNotification := ckbTrayNotification.Checked;
+  FUseDefaultSound:=ckbUseDefaultSound.Checked;
   FProceed := True;
   Close;
 end;
@@ -370,6 +375,12 @@ procedure TfrmEdit.SetModalAlert(AValue: boolean);
 begin
   FModalAlert := AValue;
   ckbModalAlert.Checked := AValue;
+end;
+
+procedure TfrmEdit.SetUseDefaultSound(AValue: boolean);
+begin
+  FUseDefaultSound:=AValue;
+  ckbUseDefaultSound.Checked:=AValue;
 end;
 
 function TfrmEdit.ShowAndGetSpecs: boolean;

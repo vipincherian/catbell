@@ -78,10 +78,12 @@ const
   TIMER_CONF_AUDIOLOOP = 'audio_loop';
 
   TIMER_CONF_MODALALERT = 'modal_alert';
-  TIMER_CONF_TRAYNOTIFiCATION = 'tray_notification';
+  TIMER_CONF_TRAYNOTIFICATION = 'tray_notification';
 
   TIMER_CONF_COUNT = 'count';
   TIMER_CONF_ORDER = 'order';
+
+  TIMER_CONF_USEDEFSOUND = 'use_default_audio';
 
   //WM_USER = $400;
   UM_AFTERSHOW = LM_USER;
@@ -1239,7 +1241,9 @@ begin
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
-        Conf.GetValue(TIMER_CONF_TRAYNOTIFiCATION, False);
+        Conf.GetValue(TIMER_CONF_TRAYNOTIFICATION, False);
+      NewTimerClock.UseDefaultSound:=
+        Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
 
       PostTimerCreation(NewTimerClock);
 
@@ -1417,8 +1421,10 @@ begin
 
     Conf.SetValue(TIMER_CONF_MODALALERT,
       TimerClock.ModalAlert);
-    Conf.SetValue(TIMER_CONF_TRAYNOTIFiCATION,
+    Conf.SetValue(TIMER_CONF_TRAYNOTIFICATION,
       TimerClock.TrayNotification);
+    Conf.SetValue(TIMER_CONF_USEDEFSOUND,
+      TimerClock.UseDefaultSound);
 
     OrderStrings.Insert(0, IntToStr(Count + 1));
 

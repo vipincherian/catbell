@@ -138,6 +138,7 @@ type
     { public declarations }
 
     LastProgressIconIndex: integer;
+    UseDefaultSound: boolean;
 
     AudioInfo: TTimerAudioInfo;
 
@@ -244,6 +245,7 @@ begin
   frmEdit.Duration := dtpSet.Time;
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
+  frmEdit.UseDefaultSound:=UseDefaultSound;
 
   if TAudio.Loaded then
   begin
@@ -263,6 +265,7 @@ begin
     Caption := frmEdit.Description;
     dtpSet.Time := frmEdit.Duration;
     FTrayNotification := frmEdit.TrayNotification;
+    UseDefaultSound:=frmEdit.UseDefaultSound;
     FModalAlert := frmEdit.ModalAlert;
 
     if TAudio.Loaded then
@@ -505,6 +508,8 @@ begin
   Parent := TWinControl(AOwner);
 
   cbSelect.OnChange := @ClockSelected;
+
+  UseDefaultSound:=True;
 
   FRunning := False;
   FPaused := False;
