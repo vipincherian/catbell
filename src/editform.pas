@@ -59,9 +59,9 @@ type
     lblLengthText: TLabel;
     lblLenthVal: TLabel;
     odgAudio: TOpenDialog;
-    tsAudio: TPageControl;
+    pgEditTimer: TPageControl;
     tsTimer: TTabSheet;
-    TabSheet2: TTabSheet;
+    tsAudio: TTabSheet;
     procedure bbCancelClick(Sender: TObject);
     procedure bbClearAudioFileClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
@@ -402,14 +402,25 @@ end;
 function TfrmEdit.ShowForEdit(Sender: TFrame): boolean;
 var
   Widget: TfraTimer;
+  ButtonStatus: boolean;
 begin
   if Sender = nil then
     Exit;
+  tsTimer.Show;
   Widget := TfraTimer(Sender);
   Fid := Widget.Id;
   Caption := 'Edit Timer';
 
-  dtpDuration.Enabled := (not Widget.Running);
+  { When we are showing the form to edit the timer, some controls
+  are disabled. For example, you cannot change the duration of the timer,
+  nor can you change the audio/sound details }
+  ButtonStatus:=(not Widget.Running);
+  dtpDuration.Enabled := ButtonStatus;
+  ckbUseDefaultSound.Enabled:=ButtonStatus;
+  bbSelectAudioFile.Enabled:=ButtonStatus;
+  bbClearAudioFile.Enabled:=ButtonStatus;
+  ckbLoop.Enabled:=ButtonStatus;
+
   Result := ShowAndGetSpecs;
   FId := longword(-1);
 end;

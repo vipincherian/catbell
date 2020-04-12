@@ -484,7 +484,7 @@ begin
   DurationEnabled := True;
 
   bbAdjust.Enabled := False;
-  bbEdit.Enabled := True;
+  //bbEdit.Enabled := True;
 end;
 
 procedure TfraTimer.Hide;
@@ -638,12 +638,22 @@ begin
   DurationEnabled := False;
 
   bbAdjust.Enabled := True;
-  bbEdit.Enabled:=False;
+  //bbEdit.Enabled:=False;
 
   frmMain.TimerStarted(Self);
 
-  if frmEdit.Showing and (frmEdit.Id = FId) then
-    frmEdit.dtpDuration.Enabled := True;
+  {if frmEdit.Showing and (frmEdit.Id = FId) then
+  begin
+    with frmEdit do
+    begin
+      //dtpDuration.Enabled := False;
+      //frmEdit.tsAudio.Enabled:=True;
+      ckbUseDefaultSound.Enabled:=False;
+      bbSelectAudioFile.Enabled:=False;
+      bbClearAudioFile.Enabled:=False;
+      ckbLoop.Enabled:=False;
+    end;
+  end;}
 
 end;
 
@@ -679,7 +689,7 @@ begin
     DurationEnabled := True;
 
     bbAdjust.Enabled := False;
-    bbEdit.Enabled:=True;
+    //bbEdit.Enabled:=True;
 
     {There is no need to close the stream. Stopping/aborting the stream
     will trigger the callback for stream stoppage. The stream will be closed
@@ -702,8 +712,20 @@ begin
     FOrigTickDuration := 0;
     FStartTickCount := 0;
 
+    { When a timer stops, check if the same timer was being edited?
+    If so, a few controls which were disabled can be re-enabled }
     if frmEdit.Showing and (frmEdit.Id = FId) then
-      frmEdit.dtpDuration.Enabled := True;
+    begin
+      with frmEdit do
+      begin
+        dtpDuration.Enabled := True;
+        //frmEdit.tsAudio.Enabled:=True;
+        ckbUseDefaultSound.Enabled:=True;
+        bbSelectAudioFile.Enabled:=True;
+        bbClearAudioFile.Enabled:=True;
+        ckbLoop.Enabled:=True;
+      end;
+    end;
 
     if frmAdjust.Showing and (frmAdjust.Id = Fid) then
       frmAdjust.bbApply.Enabled := False;
@@ -739,7 +761,7 @@ begin
       PlayButtonEnabled := True;
       StopButtonEnabled := False;
 
-      bbEdit.Enabled:=True;
+      //bbEdit.Enabled:=True;
     end;
   end;
   frmMain.TimerFinished(Self, UserInitiated);

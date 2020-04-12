@@ -76,15 +76,15 @@ object frmEdit: TfrmEdit
     OnClick = bbSaveClick
     TabOrder = 0
   end
-  object tsAudio: TPageControl
+  object pgEditTimer: TPageControl
     Left = 16
     Height = 191
     Top = 8
     Width = 479
-    ActivePage = tsTimer
+    ActivePage = tsAudio
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = imlEdit
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 2
     object tsTimer: TTabSheet
       Caption = 'Timer'
@@ -167,7 +167,7 @@ object frmEdit: TfrmEdit
         TabOrder = 3
       end
     end
-    object TabSheet2: TTabSheet
+    object tsAudio: TTabSheet
       Caption = 'Audio'
       ClientHeight = 163
       ClientWidth = 471
