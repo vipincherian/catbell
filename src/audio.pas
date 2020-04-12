@@ -1139,7 +1139,7 @@ procedure TAudio.LoadFromFile(AValue: string);
 var
   FSnd: TSndAudioFile = nil;
 begin
-  FAudioFileLoaded:=false;
+  //FAudioFileLoaded:=false;
   if AValue <> '' then
   begin
     {try
