@@ -1889,6 +1889,8 @@ begin
         DynLibs.GetProcedureAddress(sf_Handle, PChar('sf_read_double'));
       Pointer(sf_seek) :=
         DynLibs.GetProcedureAddress(sf_Handle, PChar('sf_seek'));
+      Pointer(sf_open_virtual) :=
+        DynLibs.GetProcedureAddress(sf_Handle, PChar('sf_open_virtual'));
 
     end;
     Result := sf_IsLoaded();

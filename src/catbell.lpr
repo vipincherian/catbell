@@ -50,6 +50,7 @@ var
 begin
   RequireDerivedFormResource:=True;
 
+  //CloseLogFileBetweenWrites :=True;
   DebugLn('Application built on ' + {$INCLUDE %DATE%});
 
   { Checks to ensure that only one instance of the application runs at a time }

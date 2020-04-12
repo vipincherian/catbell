@@ -61,6 +61,7 @@ type
     function Read(output: pointer; frameCount: LongInt): boolean;
   end;
 
+  { The record passed to port audio callbacks }
   TUserInfo = record
 
     //SoundFile: PSndFile;
@@ -71,6 +72,21 @@ type
 
   end;
   PAudioInfo = ^TUserInfo;
+
+  {The record to hold sound data }
+  TSoundData = record
+    Buffer: PAnsiChar;
+    Size: integer;
+    Loaded: boolean;
+  end;
+  PSoundData = ^TSoundData;
+
+  { The record passed to sndfile virtual file io callbacks }
+  TSndVIOUserData = record
+    Sound: PSoundData;
+    Position: sf_count_t;
+  end;
+  PSndVIOUserData = ^TSndVIOUserData;
 
   { A type which holds a wavetable, two integers keeping track of
     at which offset in the wavetable each channel is currently
@@ -96,6 +112,10 @@ type
     FAudioLength: double;
 
     FInfo: SF_INFO;
+
+    FVirtualIOCallbacks: SF_VIRTUAL_IO;
+    FVIOUserData: TSndVIOUserData;
+
     function GetAudioLength: double;
     function GetChannels: Integer;
     function GetSampleFormat: PaSampleFormat;
@@ -108,6 +128,7 @@ type
     function Read(output: pointer; frameCount: LongInt): boolean;
 
     property FileName: string read FFileName write SetFileName;
+    procedure LoadDefaultSound;
     property Channels: Integer read GetChannels;
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
@@ -155,6 +176,8 @@ type
 
     FSndAudioFile: TSndAudioFile;
     FMpgAudioFile: TMpgAudioFile;
+
+    //FSndDefaultSoundFile: TSndAudioFile;
     //FSndAudioF
     //FFileType: integer;
 
@@ -183,6 +206,11 @@ type
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
     FOutputDevice: TAudioDevice; static;
+
+    {Default sounds }
+    DefaultSound: TSoundData; static;
+    DefaultTick: TSoundData; static;
+
     OnPlayCompletion: TNotifyEvent;
     Looped: boolean;
     constructor Create();
@@ -193,9 +221,12 @@ type
     class property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
     class property Devices: TAudioDeviceList read GetDevices;
     class procedure SetDefaulDevice; static;
+    class procedure LoadDefaultSounds; static;
+    class procedure FreeDefaultSounds; static;
     procedure Play;
     procedure PlaySine;
     procedure Abort;
+    procedure SetDefaultSound;
     procedure FinishedAud({%H-}Datax: PtrInt);
     property FileName: string read FFileName;
     procedure UnloadAudioFile;
@@ -366,6 +397,106 @@ begin
   AudioTemp := TAudio(LocalDataPointer^.Player);
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
   LeaveCriticalSection(TAudio.AudioCriticalSection);
+end;
+
+function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
+var
+  SoundData: PSndVIOUserData;
+begin
+  DebugLn('Entering sf_vio_get_filelen_impl');
+  SoundData := PSndVIOUserData(user_data);
+  Result:=SoundData^.Sound^.Size;
+  DebugLn('Return value is ' + IntToStr(SoundData^.Sound^.Size));
+  DebugLn('Exiting sf_vio_get_filelen_impl');
+end;
+function sf_vio_seek_impl(offset: sf_count_t; whence: cint;
+    user_data: pointer): sf_count_t; cdecl;
+var
+  SoundData: PSndVIOUserData;
+begin
+  DebugLn('Entering sf_vio_seek_impl');
+  DebugLnEnter;
+
+  SoundData := PSndVIOUserData(user_data);
+
+  DebugLn('Offset - ' + IntToStr(offset));
+  case whence of
+    SEEK_CUR:
+      begin
+        DebugLn('SEEK_CUR');
+        SoundData^.Position:=(SoundData^.Position)+offset;
+      end;
+    SEEK_SET:
+      begin
+        DebugLn('SEEK_SET');
+        SoundData^.Position:=offset;
+      end;
+    SEEK_END:
+    begin
+      DebugLn('SEEK_END');
+      SoundData^.Position:=(SoundData^.Position)-offset;
+    end;
+  end;
+  Result:=SoundData^.Position;
+
+  DebugLnExit;
+  DebugLn('Exiting sf_vio_seek_impl');
+end;
+function sf_vio_read_impl(ptr: pointer; Count: sf_count_t;
+  user_data: pointer): sf_count_t; cdecl;
+var
+  SoundData: PSndVIOUserData;
+  Position, ActualCount: sf_count_t;
+begin
+  DebugLn('Entering sf_vio_read_impl');
+  DebugLnEnter;
+
+  SoundData := PSndVIOUserData(user_data);
+
+  DebugLn('Count - ' + IntToStr(Count));
+  DebugLn('Size - ' + IntToStr(SoundData^.Sound^.Size));
+
+  Position := SoundData^.Position;
+  DebugLn('Position - ' + IntToStr(SoundData^.Position));
+  { Check if this fetch will go beyond the total size of the file buffer }
+  if Position >=  SoundData^.Sound^.Size then
+    ActualCount:=0
+  else if (Position + Count) > SoundData^.Sound^.Size then
+    ActualCount:=(SoundData^.Sound^.Size) - Position
+  else
+    ActualCount:=Count;
+
+  Move(SoundData^.Sound^.Buffer[SoundData^.Position], ptr^, ActualCount);
+  SoundData^.Position:=(SoundData^.Position)+ActualCount;
+  Result:=ActualCount;
+
+  DebugLn('New position - ' + IntToStr(SoundData^.Position));
+
+  DebugLnExit;
+  DebugLn('Exiting sf_vio_read_impl');
+end;
+
+function sf_vio_write_impl(const ptr: pointer; Count: sf_count_t;
+  user_data: pointer): sf_count_t; cdecl;
+begin
+  DebugLn('Entering sf_vio_write_impl');
+  Result:=0;
+  DebugLn('Exiting sf_vio_write_impl');
+end;
+
+function sf_vio_tell_impl(user_data: pointer): sf_count_t; cdecl;
+var
+  SoundData: PSndVIOUserData;
+begin
+  DebugLn('Entering sf_vio_tell_impl');
+  DebugLnEnter;
+
+  SoundData := PSndVIOUserData(user_data);
+  Result:=SoundData^.Position;
+
+  DebugLn('Position - ' + IntToStr(SoundData^.Position));
+  DebugLnExit;
+  DebugLn('Exiting sf_vio_tell_impl');
 end;
 
 { TMpgAudioFile }
@@ -609,6 +740,18 @@ end;
 constructor TSndAudioFile.Create();
 begin
   FSoundFile:=Nil;
+  with FVirtualIOCallbacks do
+  begin
+    get_filelen:=@sf_vio_get_filelen_impl;
+    Read:=@sf_vio_read_impl;
+    seek:=@sf_vio_seek_impl;
+    tell:=@sf_vio_tell_impl;
+    Write:=@sf_vio_write_impl;
+  end;
+
+  FVIOUserData.Sound:=@TAudio.DefaultSound;
+  FVIOUserData.Position:=0;
+
 end;
 
 destructor TSndAudioFile.Destroy;
@@ -635,6 +778,48 @@ begin
   // If read count matches what was requested, then all the stream has
   // not completed
   Result:=(readCount = (frameCount * FInfo.channels));
+end;
+
+procedure TSndAudioFile.LoadDefaultSound;
+var
+  TempSoundFile: PSNDFILE;
+begin
+  //EnterCriticalSection(AudioCriticalSection);
+  if not TAudio.Loaded then
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  DebugLn('Before calling sf_open_virtual');
+  DebugLnEnter;
+  DebugLn('Position - ' + IntToStr(FVIOUserData.Position));
+  DebugLn('Size - ' + IntToStr(FVIOUserData.Sound^.Size));
+  DebugLnExit;
+
+  TempSoundFile := sf_open_virtual(@FVirtualIOCallbacks, SFM_READ, @FInfo, @FVIOUserData);
+  if (TempSoundFile = nil) then
+  begin
+    DebugLn('Error in sf_open_virtual');
+    Exit;
+  end;
+  DebugLn('sf_open_virtual successful');
+  if FSoundFile <> nil then
+    sf_close(FSoundFile);
+
+  FSoundFile := TempSoundFile;
+  FFileName:='';
+
+  DebugLn('Default audio loaded.');
+  DebugLnEnter;
+
+  DebugLn('Format - ' + IntToHex(FInfo.format, 8));
+  DebugLn('Channels - ' + IntToStr(FInfo.channels));
+  DebugLn('Frames - ' + IntToStr(FInfo.frames));
+  DebugLn('Sample Rate - ' + IntToStr(FInfo.samplerate));
+  DebugLn('Sections - ' + IntToStr(FInfo.sections));
+  DebugLnExit;
+
+  FAudioLength := (FInfo.frames) / (FInfo.samplerate);
+  //LeaveCriticalSection(AudioCriticalSection);
+
 end;
 
 { TAudio }
@@ -832,6 +1017,7 @@ begin
   Data.AMessage := 'No Message'#0;
 
   DataPointer := @Data;
+
 end;
 
 destructor TAudio.Destroy;
@@ -915,6 +1101,35 @@ begin
   TAudio.GetDefaultDevice(@FOutputDevice);
 end;
 
+class procedure TAudio.LoadDefaultSounds;
+var
+  Stream: TResourceStream;
+  Size, BytesRead: integer;
+begin
+  Stream := TResourceStream.Create(hinstance, 'DEFAULT_SOUND', RT_RCDATA);
+  Size := Stream.Size;
+  Assert(Size > 0);
+  if Size <= 0 then
+    DebugLn('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds');
+
+  TAudio.DefaultSound.Buffer:=AllocMem(Size);
+  TAudio.DefaultSound.Size:=Size;
+  BytesRead:=0;
+  BytesRead := Stream.Read(TAudio.DefaultSound.Buffer^, Size);
+
+  if BytesRead <> Size then
+    DebugLn('BytesRead does not match Size in TAudio.LoadDefaultSounds');
+
+  DebugLn('Size of the stream is ' + IntToStr(Size));
+  TAudio.DefaultSound.Loaded:=True;
+  Stream.Destroy;
+end;
+
+class procedure TAudio.FreeDefaultSounds;
+begin
+  FreeMem(DefaultSound.Buffer);
+end;
+
 procedure TAudio.Play;
 var
   PaErrCode: PaError;
@@ -979,6 +1194,7 @@ begin
     begin
       DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
       DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+      Exit;
     end;
 
     PaErrCode := Pa_SetStreamFinishedCallback(FStream,
@@ -987,6 +1203,7 @@ begin
     begin
       DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
       DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
+      Exit;
     end;
 
     PaErrCode := Pa_StartStream(FStream);
@@ -994,6 +1211,7 @@ begin
     begin
       DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
       DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
+      Exit;
     end;
 
     FAudioPlaying := True;
@@ -1096,6 +1314,16 @@ begin
 
 end;
 
+procedure TAudio.SetDefaultSound;
+begin
+  FSndAudioFile.LoadDefaultSound;
+
+  FAudioFile := FSndAudioFile;
+  //Duration := FAudioFile.Duration;
+  FAudioFileLoaded:=true;
+  FFileName:='';
+end;
+
 procedure TAudio.FinishedAud(Datax: PtrInt);
 var
   PaErrCode: PaError;
@@ -1193,6 +1421,7 @@ var
 
 initialization
   TAudio.Loaded := False;
+  TAudio.DefaultSound.Loaded:=False;
   TAudio.FDevices := TAudioDeviceList.Create;
 
   {$IFNDEF AUDIO_STATIC}

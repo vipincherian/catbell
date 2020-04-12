@@ -277,6 +277,8 @@ begin
   FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
   {$ENDIF}
 
+  TAudio.LoadDefaultSounds;
+
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
   Constraints.MinHeight := FORM_MIN_HEIGHT;
@@ -332,6 +334,8 @@ begin
   else
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Error';
   stbMain.EndUpdate;
+
+
 end;
 
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
@@ -1203,32 +1207,43 @@ begin
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
+      NewTimerClock.UseDefaultSound:=
+        Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
+
       if TAudio.Loaded then
       begin
-        try
-          //NewTimerClock.Audio.FileName :=
-          //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-          AudioFileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-          if AudioFileName = '' then
-            NewTimerclock.Audio.UnloadAudioFile
-          else
-            NewTimerClock.Audio.LoadFromFile(AudioFileName);
-          NewTimerClock.Audio.Looped :=
-            Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
-        except
-          on E: EInvalidAudio do
-          begin
-            ErrorText := ErrorText + 'Could not load audio file ' +
-              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-              ' - unsupported format or invalide file. ' +
-              'File name will be reset to blank.' + LineEnding;
-          end
-          else
-            ErrorText := ErrorText + 'Could not load audio file ' +
-              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-              ' - unknown error. File name will be reset to blank.' +
-              LineEnding;
+        if  NewTimerClock.UseDefaultSound then
+        begin
+          NewTimerClock.Audio.SetDefaultSound;
+        end
+        else
+        begin
+          try
+            //NewTimerClock.Audio.FileName :=
+            //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+            AudioFileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+            if AudioFileName = '' then
+              NewTimerclock.Audio.UnloadAudioFile
+            else
+              NewTimerClock.Audio.LoadFromFile(AudioFileName);
+            //NewTimerClock.Audio.Looped :=
+            //  Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+          except
+            on E: EInvalidAudio do
+            begin
+              ErrorText := ErrorText + 'Could not load audio file ' +
+                string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+                ' - unsupported format or invalide file. ' +
+                'File name will be reset to blank.' + LineEnding;
+            end
+            else
+              ErrorText := ErrorText + 'Could not load audio file ' +
+                string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+                ' - unknown error. File name will be reset to blank.' +
+                LineEnding;
+          end;
         end;
+
       end
       else
       begin
@@ -1236,14 +1251,14 @@ begin
           string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
         NewTimerClock.AudioInfo.Duration :=
           StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0')), fs);
-        NewTimerClock.AudioInfo.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+        //NewTimerClock.AudioInfo.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
       end;
+
+      NewTimerClock.AudioInfo.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
         Conf.GetValue(TIMER_CONF_TRAYNOTIFICATION, False);
-      NewTimerClock.UseDefaultSound:=
-        Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
 
       PostTimerCreation(NewTimerClock);
 
