@@ -197,6 +197,7 @@ begin
     lsvAudioDevices.Items.Clear;
 
     Devices := TAudio.Devices;
+    lsvAudioDevices.Items.BeginUpdate;
     for Device in Devices do
     begin
       Itm := lsvAudioDevices.Items.Add;
@@ -205,6 +206,7 @@ begin
       Itm.Checked := ((Itm.Caption = GlobalUserConfig.AudioDeviceName) and
         (Itm.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
     end;
+    lsvAudioDevices.Items.EndUpdate;
   end;
 end;
 
