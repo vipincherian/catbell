@@ -192,7 +192,7 @@ begin
   DefaultSoundOff:= not ckbUseDefaultSound.Checked;
   bbSelectAudioFile.Enabled:= DefaultSoundOff;
   bbClearAudioFile.Enabled:= DefaultSoundOff;
-  ckbLoop.Enabled:=DefaultSoundOff;
+  //ckbLoop.Enabled:=DefaultSoundOff;
 end;
 
 procedure TfrmEdit.dtpByChange(Sender: TObject);
