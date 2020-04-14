@@ -484,6 +484,24 @@ begin
   DurationEnabled := True;
 
   bbAdjust.Enabled := False;
+
+  { When a timer stops, check if the same timer was being edited?
+  If so, a few controls which were disabled can be re-enabled }
+  if frmEdit.Showing and (frmEdit.Id = FId) then
+  begin
+    with frmEdit do
+    begin
+      dtpDuration.Enabled := True;
+      //frmEdit.tsAudio.Enabled:=True;
+      ckbUseDefaultSound.Enabled:=True;
+      bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+      bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+      // Looped is enabled irrespective of whether default sound is
+      // used or not.
+      ckbLoop.Enabled:=True;
+    end;
+  end;
+
   //bbEdit.Enabled := True;
 end;
 
@@ -712,21 +730,6 @@ begin
     FOrigTickDuration := 0;
     FStartTickCount := 0;
 
-    { When a timer stops, check if the same timer was being edited?
-    If so, a few controls which were disabled can be re-enabled }
-    if frmEdit.Showing and (frmEdit.Id = FId) then
-    begin
-      with frmEdit do
-      begin
-        dtpDuration.Enabled := True;
-        //frmEdit.tsAudio.Enabled:=True;
-        ckbUseDefaultSound.Enabled:=True;
-        bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-        bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-        ckbLoop.Enabled:=True and (not ckbUseDefaultSound.Checked);
-      end;
-    end;
-
     if frmAdjust.Showing and (frmAdjust.Id = Fid) then
       frmAdjust.bbApply.Enabled := False;
 
@@ -768,7 +771,20 @@ begin
     begin
       PlayButtonEnabled := True;
       StopButtonEnabled := False;
-
+      { When a timer stops, check if the same timer was being edited?
+      If so, a few controls which were disabled can be re-enabled }
+      if frmEdit.Showing and (frmEdit.Id = FId) then
+      begin
+        with frmEdit do
+        begin
+          dtpDuration.Enabled := True;
+          //frmEdit.tsAudio.Enabled:=True;
+          ckbUseDefaultSound.Enabled:=True;
+          bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+          bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+          ckbLoop.Enabled:=True;
+        end;
+      end;
       //bbEdit.Enabled:=True;
     end;
   end;
