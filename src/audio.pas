@@ -177,6 +177,8 @@ type
     FSndAudioFile: TSndAudioFile;
     FMpgAudioFile: TMpgAudioFile;
 
+    FDefAudioFile: TSndAudioFile;
+
     //FSndDefaultSoundFile: TSndAudioFile;
     //FSndAudioF
     //FFileType: integer;
@@ -195,6 +197,7 @@ type
 
     Data: PaTestData;
     DataPointer: PPaTestData;
+    procedure Play(AudioFile: IAudioFile; PlayLooped: boolean);
 
     class function GetDevices: TAudioDeviceList; static;
     //procedure SetFileName(AValue: string);
@@ -225,9 +228,11 @@ type
     class procedure LoadDefaultSounds; static;
     class procedure FreeDefaultSounds; static;
     procedure Play;
+    procedure PlayDefaultSound;
+    procedure PlayTest;
     procedure PlaySine;
     procedure Abort;
-    procedure SetDefaultSound;
+    //procedure SetDefaultSound;
     procedure FinishedAud({%H-}Datax: PtrInt);
     property FileName: string read FFileName;
     procedure UnloadAudioFile;
@@ -825,6 +830,98 @@ end;
 
 { TAudio }
 
+procedure TAudio.Play(AudioFile: IAudioFile; PlayLooped: boolean);
+var
+  PaErrCode: PaError;
+  StreamParams: PaStreamParameters;
+  DeviceId: integer;
+begin
+  //EnterCriticalSection(AudioCriticalSection);
+
+  try
+    if not TAudio.Loaded then
+      raise EAudioNotLoaded.Create('Audio not loaded.');
+
+    if FAudioPlaying then
+    begin
+      ShowMessage('Again?');
+      //LeaveCriticalsection(AudioCriticalSection);
+      Exit;
+    end;
+
+    {if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
+    begin
+      DebugLn('Sf_seek returned error');
+    end;}
+    AudioFile.SeekToBeginning;
+
+    if UseDefaultDevice or (FOutputDevice.HostAPIName = '') or
+      (FOutputDevice.DeviceName = '') then
+    begin
+      DeviceId := DefaultDeviceIndex;
+      DebugLn('TAudio using default device to play audio.');
+    end
+    else
+    begin
+      DeviceId := GetDeviceIndex(FOutputDevice);
+      DebugLn('TAudio using device - ' + FOutputDevice.DeviceName +
+        ' host api - ' + FOutputDevice.HostAPIName);
+    end;
+    StreamParams.device := DeviceId;
+
+    DebugLn('Audio device is ' + IntToStr(StreamParams.device));
+
+    //StreamParams.channelCount := FInfo.channels;
+    StreamParams.channelCount:=AudioFile.Channels;
+    StreamParams.sampleFormat := AudioFile.SampleFormat;
+
+    Streamparams.suggestedLatency :=
+      Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
+    StreamParams.hostApiSpecificStreamInfo := nil;
+    //DebugLn('Default device is ' + IntToStr(StreamParams.device));
+
+    //FUserInfo.SoundFile := FSoundFile;
+
+    FUserInfo.AudioFile:=AudioFile;
+    FUserInfo.Looped := PlayLooped;
+    FUserInfo.Player := Self;
+
+    //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
+
+    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, AudioFile.SampleRate,
+      paFramesPerBufferUnspecified, paClipOff, PPaStreamCallback(@FeedAudioStream),
+      @FUserInfo);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+      Exit;
+    end;
+
+    PaErrCode := Pa_SetStreamFinishedCallback(FStream,
+      PPaStreamFinishedCallback(@AudioStreamFinished));
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
+      Exit;
+    end;
+
+    PaErrCode := Pa_StartStream(FStream);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
+      DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
+      Exit;
+    end;
+
+    FAudioPlaying := True;
+
+  finally
+    //LeaveCriticalSection(AudioCriticalSection);
+  end;
+end;
+
 class function TAudio.GetDevices: TAudioDeviceList; static;
 var
   NumDevices, Count: integer;
@@ -999,6 +1096,9 @@ begin
   FSndAudioFile := TSndAudioFile.Create;
   FMpgAudioFile := TMpgAudioFile.Create;
 
+  FDefAudioFile := TSndAudioFile.Create;
+  FDefAudioFile.LoadDefaultSound;
+
   FAudioFile := FSndAudioFile;
   //FFileType := READ_NOTLOADED;
 
@@ -1024,6 +1124,7 @@ end;
 destructor TAudio.Destroy;
 begin
   //DebugLn('TAudio.Destroy ');
+  FDefAudioFile.Destroy;
   FMpgAudioFile.Destroy;
   FSndAudioFile.Destroy;
   inherited Destroy;
@@ -1155,14 +1256,14 @@ begin
 end;
 
 procedure TAudio.Play;
-var
+{var
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
-  DeviceId: integer;
+  DeviceId: integer;}
 begin
   //EnterCriticalSection(AudioCriticalSection);
-
-  try
+  Play(FAudioFile, Looped);
+  {try
     if not TAudio.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
 
@@ -1206,6 +1307,7 @@ begin
 
     //FUserInfo.SoundFile := FSoundFile;
 
+    FUserInfo.AudioFile:=nil;
     FUserInfo.Looped := Looped;
     FUserInfo.Player := Self;
 
@@ -1242,8 +1344,18 @@ begin
 
   finally
     //LeaveCriticalSection(AudioCriticalSection);
-  end;
+  end; }
 
+end;
+
+procedure TAudio.PlayDefaultSound;
+begin
+  Play(FDefAudioFile, Looped);
+end;
+
+procedure TAudio.PlayTest;
+begin
+  Play(FDefAudioFile, True);
 end;
 
 procedure TAudio.PlaySine;
@@ -1338,7 +1450,7 @@ begin
 
 end;
 
-procedure TAudio.SetDefaultSound;
+{procedure TAudio.SetDefaultSound;
 begin
   FSndAudioFile.LoadDefaultSound;
 
@@ -1346,7 +1458,7 @@ begin
   //Duration := FAudioFile.Duration;
   FAudioFileLoaded:=true;
   FFileName:='';
-end;
+end;}
 
 procedure TAudio.FinishedAud(Datax: PtrInt);
 var

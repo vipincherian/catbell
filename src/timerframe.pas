@@ -733,7 +733,8 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if TAudio.Loaded and Audio.AudioFileLoaded and (not UserInitiated) then
+    if TAudio.Loaded and (Audio.AudioFileLoaded or UseDefaultSound)
+      and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
@@ -753,8 +754,15 @@ begin
 
       end;
 
-      FAudio.Play;
-      DebugLn('FAudio.Play');
+      // Play the sound as per configuration
+      if UseDefaultSound then
+        FAudio.PlayDefaultSound
+      else
+        // If UseDefaultSound is false, then audio is loaded.
+        // This is alredy checked. No need to check ...
+        FAudio.Play;
+
+      //DebugLn('FAudio.Play');
     end
     else
     begin

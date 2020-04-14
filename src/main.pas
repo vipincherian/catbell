@@ -1212,12 +1212,6 @@ begin
 
       if TAudio.Loaded then
       begin
-        if  NewTimerClock.UseDefaultSound then
-        begin
-          NewTimerClock.Audio.SetDefaultSound;
-        end
-        else
-        begin
           try
             //NewTimerClock.Audio.FileName :=
             //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
@@ -1242,7 +1236,7 @@ begin
                 ' - unknown error. File name will be reset to blank.' +
                 LineEnding;
           end;
-        end;
+
 
       end
       else

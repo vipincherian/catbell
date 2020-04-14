@@ -344,7 +344,8 @@ begin
       end;
     end;
 
-    Audio.PlaySine;
+    //Audio.PlaySine;
+    Audio.PlayTest;
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;
     bbStop.Enabled := True;
