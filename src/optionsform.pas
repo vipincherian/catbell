@@ -95,6 +95,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormHide(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure lsvAudioDevicesDblClick(Sender: TObject);
     procedure lsvAudioDevicesItemChecked(Sender: TObject; Item: TListItem);
     procedure pgcOptionsChange(Sender: TObject);
     procedure tsAudioShow(Sender: TObject);
@@ -401,6 +402,29 @@ procedure TfrmOptions.FormShow(Sender: TObject);
 begin
   SetControlsAs(GlobalUserConfig);
   FLastConfig.CopyFrom(GlobalUserConfig);
+end;
+
+procedure TfrmOptions.lsvAudioDevicesDblClick(Sender: TObject);
+var
+  hts : THitTests;
+  //ht : THitTest;
+  //sht : string;
+  CurrPos : TPoint;
+
+  Selected, AnItem : TListItem;
+begin
+  // Get the position of the mouse cursor related to ListView
+  CurrPos := lsvAudioDevices.ScreenToClient(Mouse.CursorPos) ;
+
+  // Where was the double-click received?
+  hts := lsvAudioDevices.GetHitTestInfoAt(CurrPos.X, CurrPos.Y) ;
+  if hts <= [htOnIcon, htOnItem, htOnLabel, htOnStateIcon] then
+  begin
+    Selected := lsvAudioDevices.Selected;
+    //Selected.Checked:=True;
+    for AnItem in lsvAudioDevices.Items do
+      AnItem.Checked:=(Selected = Anitem);
+  end;
 end;
 
 procedure TfrmOptions.lsvAudioDevicesItemChecked(Sender: TObject;

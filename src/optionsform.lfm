@@ -429,6 +429,7 @@ object frmOptions: TfrmOptions
           ReadOnly = True
           TabOrder = 0
           ViewStyle = vsReport
+          OnDblClick = lsvAudioDevicesDblClick
           OnItemChecked = lsvAudioDevicesItemChecked
         end
         object cbUseDefaultAudio: TCheckBox
