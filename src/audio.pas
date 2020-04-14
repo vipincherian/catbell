@@ -184,7 +184,7 @@ type
     //FFileType: integer;
 
     FFileName: string;
-    FAudioFileLoaded: boolean;
+    //FAudioFileLoaded: boolean;
     //FAudioLength: double;
 
     //FInfo: SF_INFO;
@@ -197,6 +197,8 @@ type
 
     Data: PaTestData;
     DataPointer: PPaTestData;
+    function GetAudioFileLoaded: boolean;
+    function GetDuration: double;
     procedure Play(AudioFile: IAudioFile; PlayLooped: boolean);
 
     class function GetDevices: TAudioDeviceList; static;
@@ -237,10 +239,10 @@ type
     property FileName: string read FFileName;
     procedure UnloadAudioFile;
     procedure LoadFromFile(AValue: string);
-    //property Duration: double read FAudioLength;
+    property Duration: double read GetDuration;
     property Playing: boolean read FAudioPlaying;
-    property AudioFile: IAudioFile read FAudioFile;
-    property AudioFileLoaded: boolean read FAudioFileLoaded;
+    //property AudioFile: IAudioFile read FAudioFile;
+    property AudioFileLoaded: boolean read GetAudioFileLoaded;
     class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
 
   end;
@@ -276,10 +278,12 @@ begin
   AudioInfo := PAudioinfo(userData);
   AudioInstance := TAudio(AudioInfo^.Player);
 
-  if AudioInfo^.AudioFile <> nil then
-    UsedAudioFile:=AudioInfo^.AudioFile
-  else
-    UsedAudioFile:=AudioInstance.AudioFile;
+  Assert(AudioInfo^.AudioFile <> nil);
+
+  //if AudioInfo^.AudioFile <> nil then
+    UsedAudioFile:=AudioInfo^.AudioFile;
+  //else
+  //  UsedAudioFile:=AudioInstance.AudioFile;
 
   //readCount := 0;
   readSuccess := false;
@@ -922,6 +926,22 @@ begin
   end;
 end;
 
+function TAudio.GetDuration: double;
+begin
+  if not AudioFileLoaded then
+  begin
+    Result := -1;
+    Exit;
+  end;
+  Assert(FAudioFile <> nil);
+  Result:=FAudioFile.Duration;
+end;
+
+function TAudio.GetAudioFileLoaded: boolean;
+begin
+  Result:=(FAudioFile <> nil);
+end;
+
 class function TAudio.GetDevices: TAudioDeviceList; static;
 var
   NumDevices, Count: integer;
@@ -1091,7 +1111,7 @@ begin
     raise EAudioNotLoaded.Create('Audio not loaded.');
   //FSoundFile := nil;
   FAudioFile := nil;
-  FAudioFileLoaded := False;
+  //FAudioFileLoaded := False;
 
   FSndAudioFile := TSndAudioFile.Create;
   FMpgAudioFile := TMpgAudioFile.Create;
@@ -1502,7 +1522,7 @@ end;
 procedure TAudio.UnloadAudioFile;
 begin
   FAudioFile:=nil;
-  FAudioFileLoaded:=false;
+  //FAudioFileLoaded:=false;
   FFileName := '';
 end;
 
@@ -1529,9 +1549,10 @@ begin
     FSndAudioFile.SetFileName(AValue);
     if FSndAudioFile.FileName <> '' then
     begin
+      Assert(FSndAudioFile <> nil);
       FAudioFile := FSndAudioFile;
       //Duration := FAudioFile.Duration;
-      FAudioFileLoaded:=true;
+      //FAudioFileLoaded:=true;
       FFileName:=AValue;
       Exit;
     end;
@@ -1539,8 +1560,9 @@ begin
     FMpgAudioFile.SetFileName(AValue);
     if FMpgAudioFile.FileName <> '' then
     begin
+      Assert(FMpgAudioFile <> nil);
       FAudioFile := FMpgAudioFile;
-      FAudioFileLoaded:=true;
+      //FAudioFileLoaded:=true;
       FFileName:=AValue;
       Exit;
     end;

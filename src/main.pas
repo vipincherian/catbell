@@ -1404,7 +1404,7 @@ begin
         Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
           UTF8Decode(TimerClock.Audio.FileName));
         Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
-          UTF8Decode(FloatToStr(TimerClock.Audio.AudioFile.Duration, fs)));
+          UTF8Decode(FloatToStr(TimerClock.Audio.Duration, fs)));
         Conf.SetValue(TIMER_CONF_AUDIOLOOP,
           TimerClock.Audio.Looped);
       end
