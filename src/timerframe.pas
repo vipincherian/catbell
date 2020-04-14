@@ -53,6 +53,9 @@ const
   TIMER_CONF_COUNT = 'count';
   TIMER_CONF_ORDER = 'order';
 
+  TIMER_CONF_PENDINGTICKCOUNT = 'pending_tick_count';
+  TIMER_CONF_ENDTIME = 'end_time';
+
   //UM_PLAY_AUDIO = LM_USER + 1;
   UM_FINISHED_AUDIO = LM_USER + 2;
 
@@ -192,6 +195,7 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     property Audio: TAudio read FAudio write SetAudio;
+    property PendingTickCount: longword read FPendingTickCount;
 
   end;
 

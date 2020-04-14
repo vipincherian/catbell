@@ -85,6 +85,10 @@ const
 
   TIMER_CONF_USEDEFSOUND = 'use_default_audio';
 
+  TIMER_CONF_RUNNING = 'running';
+  TIMER_CONF_PAUSED = 'paused';
+
+
   //WM_USER = $400;
   UM_AFTERSHOW = LM_USER;
 
@@ -1360,6 +1364,7 @@ var
   OrderStrings: TStringList;
   Id: longword;
   fs: TFormatSettings;
+  EndTime: TDateTime;
 begin
 
   OrderStrings := TStringList.Create;
@@ -1434,6 +1439,26 @@ begin
       TimerClock.TrayNotification);
     Conf.SetValue(TIMER_CONF_USEDEFSOUND,
       TimerClock.UseDefaultSound);
+
+    Conf.SetValue(TIMER_CONF_RUNNING, TimerClock.Running);
+    Conf.SetValue(TIMER_CONF_PAUSED, TimerClock.Paused);
+
+    // Set pending tick count and end time to zero to begin with
+    // Then udpate the ones applicable afterwards.
+    Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
+    Conf.SetValue(TIMER_CONF_ENDTIME, 0);
+
+    if TimerClock.Running then
+      if TimerClock.Paused then
+      begin
+        Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, TimerClock.PendingTickCount)
+      end
+      else
+      begin
+        EndTime := IncMilliSecond(Now, TimerClock.PendingTickCount);
+        Conf.SetValue(TIMER_CONF_ENDTIME, EndTime);
+      end;
+
 
     OrderStrings.Insert(0, IntToStr(Count + 1));
 
