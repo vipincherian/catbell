@@ -60,6 +60,8 @@ const
 
 type
 
+  { TfraTimer }
+
   TfraTimer = class(TFrame)
     aiAdjust: TAction;
     aiEdit: TAction;
@@ -133,6 +135,7 @@ type
     procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: longword);
+    procedure ReEnableEditAudioControls;
 
   public
     { public declarations }
@@ -471,20 +474,8 @@ begin
 
 end;
 
-procedure TfraTimer.ClockSelected(Sender: TObject);
+procedure TfraTimer.ReEnableEditAudioControls;
 begin
-  frmMain.ClockSelected(Self);
-end;
-
-procedure TfraTimer.AudioPlayed(Sender: TObject);
-begin
-  PlayButtonEnabled := True;
-  PauseButtonEnabled := False;
-  StopButtonEnabled := False;
-  DurationEnabled := True;
-
-  bbAdjust.Enabled := False;
-
   { When a timer stops, check if the same timer was being edited?
   If so, a few controls which were disabled can be re-enabled }
   if frmEdit.Showing and (frmEdit.Id = FId) then
@@ -501,6 +492,39 @@ begin
       ckbLoop.Enabled:=True;
     end;
   end;
+end;
+
+procedure TfraTimer.ClockSelected(Sender: TObject);
+begin
+  frmMain.ClockSelected(Self);
+end;
+
+procedure TfraTimer.AudioPlayed(Sender: TObject);
+begin
+  PlayButtonEnabled := True;
+  PauseButtonEnabled := False;
+  StopButtonEnabled := False;
+  DurationEnabled := True;
+
+  bbAdjust.Enabled := False;
+
+  { When a timer stops, check if the same timer was being edited?
+  If so, a few controls which were disabled can be re-enabled }
+  {if frmEdit.Showing and (frmEdit.Id = FId) then
+  begin
+    with frmEdit do
+    begin
+      dtpDuration.Enabled := True;
+      //frmEdit.tsAudio.Enabled:=True;
+      ckbUseDefaultSound.Enabled:=True;
+      bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+      bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+      // Looped is enabled irrespective of whether default sound is
+      // used or not.
+      ckbLoop.Enabled:=True;
+    end;
+  end;}
+  ReEnableEditAudioControls;
 
   //bbEdit.Enabled := True;
 end;
@@ -773,7 +797,7 @@ begin
       StopButtonEnabled := False;
       { When a timer stops, check if the same timer was being edited?
       If so, a few controls which were disabled can be re-enabled }
-      if frmEdit.Showing and (frmEdit.Id = FId) then
+      {if frmEdit.Showing and (frmEdit.Id = FId) then
       begin
         with frmEdit do
         begin
@@ -784,7 +808,8 @@ begin
           bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
           ckbLoop.Enabled:=True;
         end;
-      end;
+      end; }
+      ReEnableEditAudioControls;
       //bbEdit.Enabled:=True;
     end;
   end;
