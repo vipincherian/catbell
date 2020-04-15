@@ -491,6 +491,8 @@ begin
 
   // Calculate percentage ProgressPercentage
 
+  Assert(FOrigTickDuration > 0);
+
   ProgressPercentage := 1 - (PendingMilliseconds / FOrigTickDuration);
   // Elapsed time can exceed total pending tick duration, in certain cases.
   // The system could go on sleep mode while a timer is running
@@ -932,14 +934,16 @@ begin
             Exit;
           // Adjustment is too large and cannot be used for computations
           // As a circumvention, set NewEndTickCount to 0;
-          NewPendingTickCount := 0;
+          // NewPendingTickCount := 0;
+          Stop(True);
         end
         else
         begin
+          FPendingTickCount := NewPendingTickCount;
           NewPendingTickCount := FPendingTickCount - Adjustment;
+          UpdateProgress(FPendingTickCount);
         end;
-        FPendingTickCount := NewPendingTickCount;
-        UpdateProgress(FPendingTickCount);
+
       end;
       frmAdjust.Close;
     end;
