@@ -939,8 +939,9 @@ begin
         end
         else
         begin
-          FPendingTickCount := NewPendingTickCount;
-          NewPendingTickCount := FPendingTickCount - Adjustment;
+          //FPendingTickCount := NewPendingTickCount;
+          FPendingTickCount := FPendingTickCount - Adjustment;
+          //FPendingTickCount := NewPendingTickCount;
           UpdateProgress(FPendingTickCount);
         end;
 
@@ -979,6 +980,7 @@ begin
       CurrTickCount := GetTickCount64;
       if CurrTickCount >= FEndTickCount then
         Exit;
+      // No need for UTC, as this is base don local TZ time selected by user
       EndTime := IncMilliSecond(Now, (FEndTickCount - CurrTickCount));
 
       // If extension
@@ -1016,7 +1018,7 @@ begin
     Paused := FPaused;
     PendingTicks:=FPendingTickCount;
     // FPendingTickCount is reliable only if the timer is paused
-    EndTime:=IncMilliSecond(Now, FEndTickCount - GetTickCount64);
+    EndTime:=IncMilliSecond(LocalTimeToUniversal(Now), FEndTickCount - GetTickCount64);
     DurationTicks:=FOrigTickDuration;
   end;
 end;
@@ -1044,7 +1046,7 @@ begin
     else
     begin
       // Now moves as the processer executes. Save it in a variable.
-      TimeNow:=Now;
+      TimeNow:=LocalTimeToUniversal(Now);
       if LoadFrom.EndTime <= TimeNow then
       begin
 
