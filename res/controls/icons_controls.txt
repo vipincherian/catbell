@@ -19,4 +19,7 @@ notify_progress_auto.svg|24
 pencil.svg|16,24
 wrench.svg|16,24
 sound.svg|16
+bell.svg|16
+play_bare.svg|16
+stop_bare.svg|16
 progress_base.svg|256

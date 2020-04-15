@@ -60,7 +60,7 @@ type
     odgAudio: TOpenDialog;
     pgEditTimer: TPageControl;
     tsTimer: TTabSheet;
-    tsAudio: TTabSheet;
+    tsSound: TTabSheet;
     procedure bbCancelClick(Sender: TObject);
     procedure bbClearAudioFileClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
