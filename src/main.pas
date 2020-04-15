@@ -1262,7 +1262,7 @@ begin
       State.Running:=Conf.GetValue(TIMER_CONF_RUNNING, False);
       State.Paused:=Conf.GetValue(TIMER_CONF_PAUSED, False);
       State.PendingTicks:=Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
-      State.EndTime:=Conf.GetValue(TIMER_CONF_ENDTIME, 0);
+      State.EndTime:=StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_ENDTIME), '0')), fs);
       State.DurationTicks:=Conf.GetValue(TIMER_CONF_ORIGTICKCOUNT, 0);
 
       NewTimerClock.LoadState(State);
@@ -1460,9 +1460,8 @@ begin
     // Set pending tick count and end time to zero to begin with
     // Then udpate the ones applicable afterwards.
     Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, State.PendingTicks);
-    Conf.SetValue(TIMER_CONF_ENDTIME, State.EndTime);
+    Conf.SetValue(TIMER_CONF_ENDTIME, UTF8Decode(FloatToStr(State.EndTime, fs)));
     Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, State.DurationTicks);
-
 
     OrderStrings.Insert(0, IntToStr(Count + 1));
 

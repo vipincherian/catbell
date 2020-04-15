@@ -996,12 +996,16 @@ begin
     Running := FRunning;
     Paused := FPaused;
     PendingTicks:=FPendingTickCount;
-    EndTime:=0;
+    // FPendingTickCount is reliable only if the timer is paused
+    EndTime:=IncMilliSecond(Now, FEndTickCount - GetTickCount64);
     DurationTicks:=FOrigTickDuration;
   end;
 end;
 
 procedure TfraTimer.LoadState(var LoadFrom: TTimerState);
+var
+  NewPendingTickCount: longword;
+  TimeNow: TDateTime;
 begin
 
   if LoadFrom.Running and (not FRunning) then
@@ -1020,7 +1024,26 @@ begin
     end
     else
     begin
-      ;
+      TimeNow:=Now;
+      if LoadFrom.EndTime <= TimeNow then
+      begin
+        //TODO: Handle this and show modal window
+        DebugLn('Timer completed');
+      end
+      else
+      begin
+        NewPendingTickCount:=MilliSecondsBetween(TimeNow, LoadFrom.EndTime);
+        Start;
+        with LoadFrom do
+        begin
+          FRunning := Running;
+          FPaused := Paused;
+          FPendingTickCount:=NewPendingTickCount;
+          FEndTickCount:=GetTickCount64 + NewPendingTickCount;
+          FOrigTickDuration:=DurationTicks;
+        end;
+        UpdateProgress(NewPendingTickCount);
+      end;
     end;
   end;
 end;
