@@ -1029,6 +1029,7 @@ begin
       begin
         //TODO: Handle this and show modal window
         DebugLn('Timer completed');
+        frmMain.TimerFinished(Self, False);
       end
       else
       begin
