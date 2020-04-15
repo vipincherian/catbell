@@ -41,14 +41,16 @@ type
     bbtnDefault: TBitBtn;
     bbtnCancel: TBitBtn;
     bbtnSave: TBitBtn;
+    cbAutoProgress: TCheckBox;
+    cbModalAlert: TCheckBox;
+    cbTrayAlert: TCheckBox;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     cbUseDefaultAudio: TCheckBox;
+    CheckBox4: TCheckBox;
+    CheckBox5: TCheckBox;
     ckbQueryExit: TCheckBox;
-    cbTrayAlert: TCheckBox;
-    cbModalAlert: TCheckBox;
-    cbAutoProgress: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
     dtpCompleteBy: TDateTimePicker;
@@ -64,6 +66,7 @@ type
     GroupBox4: TGroupBox;
     GroupBox5: TGroupBox;
     GroupBox6: TGroupBox;
+    GroupBox7: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
     Label11: TLabel;
@@ -81,6 +84,7 @@ type
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
+    TabSheet1: TTabSheet;
     tsAudio: TTabSheet;
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;

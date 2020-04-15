@@ -1007,7 +1007,7 @@ var
   NewPendingTickCount: longword;
   TimeNow: TDateTime;
 begin
-
+  { If any of the timers saved as running/paused re-instate the same state}
   if LoadFrom.Running and (not FRunning) then
   begin
     if LoadFrom.Paused then
@@ -1024,11 +1024,11 @@ begin
     end
     else
     begin
+      // Now moves as the processer executes. Save it in a variable.
       TimeNow:=Now;
       if LoadFrom.EndTime <= TimeNow then
       begin
-        //TODO: Handle this and show modal window
-        DebugLn('Timer completed');
+
         frmMain.TimerFinished(Self, False);
       end
       else
