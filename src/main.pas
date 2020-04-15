@@ -63,34 +63,24 @@ const
   TIMER_PROGRESS_FINISHED: single = 2.0;
   TIMER_PROGRESS_OFFTRAY: single = 3.0;
 
-  TIMER_CONF_CLOCKS = 'clocks';
-  TIMER_CONF_TIMERS = 'timers';
-  TIMER_CONF_TITLE = 'timer_title';
-  TIMER_CONF_TIME = 'time';
+  //TIMER_CONF_CLOCKS = 'clocks';
+  //TIMER_CONF_TIMERS = 'timers';
+  //TIMER_CONF_TITLE = 'timer_title';
+  //TIMER_CONF_TIME = 'time';
   //TIMER_CONF_HOURS = 'hours';
   //TIMER_CONF_MINUTES = 'minutes';
   //TIMER_CONF_SECONDS = 'seconds';
-  TIMER_CONF_DURATION = 'duration';
-  TIMER_CONF_NOTIFIER = 'notifier';
+  //TIMER_CONF_DURATION = 'duration';
+  //TIMER_CONF_NOTIFIER = 'notifier';
 
-  TIMER_CONF_AUDIOFILE = 'audio_file';
-  TIMER_CONF_AUDIOLENGTH = 'audio_duration';
-  TIMER_CONF_AUDIOLOOP = 'audio_loop';
 
-  TIMER_CONF_MODALALERT = 'modal_alert';
-  TIMER_CONF_TRAYNOTIFICATION = 'tray_notification';
+  //TIMER_CONF_COUNT = 'count';
+  //TIMER_CONF_ORDER = 'order';
 
-  TIMER_CONF_COUNT = 'count';
-  TIMER_CONF_ORDER = 'order';
-
-  TIMER_CONF_USEDEFSOUND = 'use_default_audio';
-
-  TIMER_CONF_RUNNING = 'running';
-  TIMER_CONF_PAUSED = 'paused';
 
 
   //WM_USER = $400;
-  UM_AFTERSHOW = LM_USER;
+  //UM_AFTERSHOW = LM_USER;
 
   PANEL_TIMERCOUNT = 0;
   PANEL_AUDIO = 1;

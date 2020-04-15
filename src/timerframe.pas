@@ -53,12 +53,26 @@ const
   TIMER_CONF_COUNT = 'count';
   TIMER_CONF_ORDER = 'order';
 
+  TIMER_CONF_AUDIOFILE = 'audio_file';
+  TIMER_CONF_AUDIOLENGTH = 'audio_duration';
+  TIMER_CONF_AUDIOLOOP = 'audio_loop';
+
+
+  TIMER_CONF_MODALALERT = 'modal_alert';
+  TIMER_CONF_TRAYNOTIFICATION = 'tray_notification';
+
   TIMER_CONF_PENDINGTICKCOUNT = 'pending_tick_count';
   TIMER_CONF_ENDTIME = 'end_time';
   TIMER_CONF_ORIGTICKCOUNT = 'orig_tick_count';
 
+
+  TIMER_CONF_USEDEFSOUND = 'use_default_audio';
+
+  TIMER_CONF_RUNNING = 'running';
+  TIMER_CONF_PAUSED = 'paused';
+
   //UM_PLAY_AUDIO = LM_USER + 1;
-  UM_FINISHED_AUDIO = LM_USER + 2;
+  //UM_FINISHED_AUDIO = LM_USER + 2;
 
 //BUFFER_SIZE = 1024;
 
