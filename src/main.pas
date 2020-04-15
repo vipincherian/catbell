@@ -1181,6 +1181,7 @@ var
   NewTimerClock: TfraTimer;
   ErrorText, AudioFileName: string;
   fs: TFormatSettings;
+  State: TTimerState;
 begin
 
   ErrorText := '';
@@ -1257,6 +1258,14 @@ begin
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
         Conf.GetValue(TIMER_CONF_TRAYNOTIFICATION, False);
+
+      State.Running:=Conf.GetValue(TIMER_CONF_RUNNING, False);
+      State.Paused:=Conf.GetValue(TIMER_CONF_PAUSED, False);
+      State.PendingTicks:=Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
+      State.EndTime:=Conf.GetValue(TIMER_CONF_ENDTIME, 0);
+      State.DurationTicks:=Conf.GetValue(TIMER_CONF_ORIGTICKCOUNT, 0);
+
+      NewTimerClock.LoadState(State);
 
       PostTimerCreation(NewTimerClock);
 
@@ -1364,7 +1373,8 @@ var
   OrderStrings: TStringList;
   Id: longword;
   fs: TFormatSettings;
-  EndTime: TDateTime;
+  //EndTime: TDateTime;
+  State: TTimerState;
 begin
 
   OrderStrings := TStringList.Create;
@@ -1440,24 +1450,18 @@ begin
     Conf.SetValue(TIMER_CONF_USEDEFSOUND,
       TimerClock.UseDefaultSound);
 
-    Conf.SetValue(TIMER_CONF_RUNNING, TimerClock.Running);
-    Conf.SetValue(TIMER_CONF_PAUSED, TimerClock.Paused);
+    State.Paused:=False;
+
+    TimerClock.SaveState(State);
+
+    Conf.SetValue(TIMER_CONF_RUNNING, State.Running);
+    Conf.SetValue(TIMER_CONF_PAUSED, State.Paused);
 
     // Set pending tick count and end time to zero to begin with
     // Then udpate the ones applicable afterwards.
-    Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
-    Conf.SetValue(TIMER_CONF_ENDTIME, 0);
-
-    if TimerClock.Running then
-      if TimerClock.Paused then
-      begin
-        Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, TimerClock.PendingTickCount)
-      end
-      else
-      begin
-        EndTime := IncMilliSecond(Now, TimerClock.PendingTickCount);
-        Conf.SetValue(TIMER_CONF_ENDTIME, EndTime);
-      end;
+    Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, State.PendingTicks);
+    Conf.SetValue(TIMER_CONF_ENDTIME, State.EndTime);
+    Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, State.DurationTicks);
 
 
     OrderStrings.Insert(0, IntToStr(Count + 1));

@@ -55,6 +55,7 @@ const
 
   TIMER_CONF_PENDINGTICKCOUNT = 'pending_tick_count';
   TIMER_CONF_ENDTIME = 'end_time';
+  TIMER_CONF_ORIGTICKCOUNT = 'orig_tick_count';
 
   //UM_PLAY_AUDIO = LM_USER + 1;
   UM_FINISHED_AUDIO = LM_USER + 2;
@@ -62,6 +63,14 @@ const
 //BUFFER_SIZE = 1024;
 
 type
+
+  TTimerState = record
+    Running: boolean;
+    Paused: boolean;
+    PendingTicks: longword;
+    EndTime: TDateTime;
+    DurationTicks: longword;
+  end;
 
   { TfraTimer }
 
@@ -172,6 +181,9 @@ type
 
     procedure AdjustTimer(Sender: TObject);
 
+    procedure SaveState(var SaveTo: TTimerState);
+    procedure LoadState(var LoadFrom: TTimerState);
+
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
     property PauseButtonEnabled: boolean read GetPauseButtonEnabled
@@ -195,7 +207,7 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     property Audio: TAudio read FAudio write SetAudio;
-    property PendingTickCount: longword read FPendingTickCount;
+    //property PendingTickCount: longword read FPendingTickCount;
 
   end;
 
@@ -973,6 +985,42 @@ begin
       end;
       HandleTimerTrigger();
       frmAdjust.Close;
+    end;
+  end;
+end;
+
+procedure TfraTimer.SaveState(var SaveTo: TTimerState);
+begin
+  with SaveTo do
+  begin
+    Running := FRunning;
+    Paused := FPaused;
+    PendingTicks:=FPendingTickCount;
+    EndTime:=0;
+    DurationTicks:=FOrigTickDuration;
+  end;
+end;
+
+procedure TfraTimer.LoadState(var LoadFrom: TTimerState);
+begin
+
+  if LoadFrom.Running and (not FRunning) then
+  begin
+    if LoadFrom.Paused then
+    begin
+      Pause;
+      with LoadFrom do
+      begin
+        FRunning := Running;
+        FPaused := Paused;
+        FPendingTickCount:=PendingTicks;
+        FOrigTickDuration:=DurationTicks;
+      end;
+      UpdateProgress(FPendingTickCount);
+    end
+    else
+    begin
+      ;
     end;
   end;
 end;
