@@ -295,6 +295,7 @@ begin
       AudioInfo.Duration := frmEdit.AudioDuration;
       AudioInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
+    frmMain.SavetoFile;
   end;
 end;
 

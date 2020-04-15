@@ -392,6 +392,7 @@ begin
       Added.AudioInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
     PostTimerCreation(Added);
+    SavetoFile;
   end
   else
     TempAudio.Free;
@@ -491,18 +492,21 @@ procedure TfrmMain.aiMoveDownExecute(Sender: TObject);
 begin
   MoveSelectedClocksDown;
   SetListButtonsStatus;
+  SavetoFile;
 end;
 
 procedure TfrmMain.aiMoveUpExecute(Sender: TObject);
 begin
   MoveSelectedClocksUp;
   SetListButtonsStatus;
+  SavetoFile;
 end;
 
 procedure TfrmMain.aiDeleteTimerExecute(Sender: TObject);
 begin
   DeleteSelected;
   SetListButtonsStatus;
+  SavetoFile;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
