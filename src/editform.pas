@@ -43,6 +43,8 @@ type
     bbClearAudioFile: TBitBtn;
     bbSave: TBitBtn;
     bbSelectAudioFile: TBitBtn;
+    BitBtn1: TBitBtn;
+    BitBtn2: TBitBtn;
     ckbUseDefaultSound: TCheckBox;
     ckbLoop: TCheckBox;
     ckbModalAlert: TCheckBox;
