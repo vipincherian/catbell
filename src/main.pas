@@ -674,7 +674,7 @@ begin
 
   FinalBmp.Free;
 
-  ProgressUpdate(nil, PROGRESS_COMPLETED);
+  //ProgressUpdate(nil, PROGRESS_COMPLETED);
   HiresBmp.Free;
   Stream.Free;
 
@@ -1092,6 +1092,9 @@ procedure TfrmMain.ProgressUpdate(Widget: TfraTimer; Progress: single);
 var
   Index: integer;
   TaskbarPercent: integer;
+  {$IF defined(windows)}
+  Result: HRESULT;
+  {$ENDIF}
 begin
   if Progress < 0 then
     Progress := 0;
@@ -1151,8 +1154,13 @@ begin
           Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         {$IF defined(windows)}
         if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
-          FTaskBarList.SetOverlayIcon(AppHandle, FOverlayProgressIcons[Index + 1].Handle,
+        begin
+          Result := FTaskBarList.SetOverlayIcon(AppHandle, FOverlayProgressIcons[Index + 1].Handle,
             PWideChar(''));
+          if Result <> S_OK then
+            DebugLn('SetOverlayIcon failed ' + IntToStr(Result));
+
+        end;
         {$ENDIF}
 
 
@@ -1675,9 +1683,25 @@ begin
 end;
 
 procedure TfrmMain.AfterShow(Data: PtrInt);
+var
+  TimerFrame: TfraTimer;
+  Count: Integer;
 begin
   if FTimerFrames.Count = 0 then
-    aiNewTimer.Execute;
+    aiNewTimer.Execute
+  else
+  { If there are loaded timers which are running/paused, ask them
+  to handle a timer trigger so that bitmaps are set properly. This is
+  done here solely because of overlay icons, which does not seem to get
+  updated before the form is shown.}
+  begin
+    for Count := 0 to FTimerFrames.Count - 1 do
+    begin
+      TimerFrame := FTimerFrames.Data[Count];
+      if TimerFrame.Running then
+        TimerFrame.HandleTimerTrigger;
+    end;
+  end;
 end;
 
 procedure TfrmMain.ShowModalAlert(Data: PtrInt);

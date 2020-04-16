@@ -1041,7 +1041,7 @@ begin
         FPendingTickCount:=PendingTicks;
         FOrigTickDuration:=DurationTicks;
       end;
-      UpdateProgress(FPendingTickCount);
+      //UpdateProgress(FPendingTickCount);
     end
     else
     begin
@@ -1064,7 +1064,7 @@ begin
           FEndTickCount:=GetTickCount64 + NewPendingTickCount;
           FOrigTickDuration:=DurationTicks;
         end;
-        UpdateProgress(NewPendingTickCount);
+        //UpdateProgress(NewPendingTickCount);
       end;
     end;
   end;
