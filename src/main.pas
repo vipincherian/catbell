@@ -47,6 +47,11 @@ const
   PROGRESS_COMPLETED = 2.0;
 
   TRAY_OUTLINE_INSET = 2;
+
+  OVERLAY_STROKE_WIDTH = 16;
+  OVERLAY_STROKE_COLOUR = $515151;
+  OVERLAY_BACKGROUND_COLOUR = $5CEFFF;
+
   TRAY_CENTRE_INNER_RADIUS = 2;
   TRAY_CENTRE_OUTER_RADIUS = 4;
   TRAY_BASE_WIDTH = 16;
@@ -182,6 +187,10 @@ type
     FTrayProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FAppProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
     FWidgetProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
+    {$IF defined(windows) }
+    FOverlayProgressIcons: array[1..TRAY_PROGRESS_ICON_COUNT] of TIcon;
+    {$ENDIF}
+
     FTrayStoppedBitmap, FAppStoppedBitmap, FWidgetStoppedBitmap: TIcon;
     FLastTrayIconIndex: integer;
     FLastTrayPercent: integer;
@@ -328,7 +337,6 @@ begin
   else
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Error';
   stbMain.EndUpdate;
-
 
 end;
 
@@ -509,10 +517,14 @@ begin
     FTrayProgressIcons[Count].Free;
     FAppProgressIcons[Count].Free;
     FWidgetProgressIcons[Count].Free;
+    {$IF defined(windows) }
+    FOverlayProgressIcons[Count].Free;
+    {$ENDIF}
   end;
   FTrayStoppedBitmap.Free;
   FAppStoppedBitmap.Free;
   FWidgetStoppedBitmap.Free;
+
   //inherited Destroy;
   SavetoFile;
 
@@ -626,6 +638,7 @@ var
   TrayIconSize, AppIconSize: integer;
   Stream: TResourceStream;
   Count: integer;
+  //ctx: TBGRACanvas2D;
 begin
   TrayIconSize := GetSystemMetrics(SM_CXSMICON);
   AppIconSize := GetSystemMetrics(SM_CXICON);
@@ -721,6 +734,51 @@ begin
     FinalBmp.Free;
 
     HiresBmp.Free;
+
+
+    {$IF defined(windows) }
+    // Create overlay icons, only in the case of windows
+    HiResBmp := TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE);
+    with HiResBmp do
+    begin
+      CanvasBGRA.Brush.Color := OVERLAY_BACKGROUND_COLOUR;
+      CanvasBGRA.Pen.Color := OVERLAY_STROKE_COLOUR;
+      CanvasBGRA.Pen.Width := OVERLAY_STROKE_WIDTH;
+
+      CanvasBGRA.Ellipse(OVERLAY_STROKE_WIDTH div 2,
+        OVERLAY_STROKE_WIDTH div 2,
+        APP_ICON_SIZE - (OVERLAY_STROKE_WIDTH div 2),
+        APP_ICON_SIZE - (OVERLAY_STROKE_WIDTH div 2));
+
+
+      CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
+      CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
+      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
+        90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
+
+      { To give it a glossy feel, we try to add a translucent
+      white sheen to the left semi-circle }
+      CanvasBGRA.Brush.Opacity := 100;
+      CanvasBGRA.Pen.Opacity := 100;
+      CanvasBGRA.Brush.Color := clWhite;
+      CanvasBGRA.Pen.Color := clWhite;
+      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
+        90 * RAD_MULTIPLIER,
+        { We need to draw only half the circle, or the current pie,
+        whichever is lesser. } -(15 * RAD_MULTIPLIER * Max(
+        (Count - 1), TRAY_PROGRESS_ICON_COUNT div 2))
+        );
+    end;
+
+    FinalBmp := HiresBmp.Resample(TrayIconSize, TrayIconSize, rmFineResample) as
+      TBGRABitmap;
+
+    FOverlayProgressIcons[Count] := TIcon.Create;
+    FOverlayProgressIcons[Count].Assign(FinalBmp.Bitmap);
+    FinalBmp.Free;
+
+    HiresBmp.Free;
+    {$ENDIF}
   end;
   Stream.Free;
 end;
@@ -1041,9 +1099,17 @@ begin
     fix the tray and application icons accordingly.}
     tiMain.Icon.Assign(FTrayStoppedBitmap);
     Icon.Assign(FTrayStoppedBitmap);
-    Application.Icon.Assign(FAppStoppedBitmap);
+
+    {$IF not defined(windows)}
+    Assert(GlobalUserConfig.TaskbarIconType <> TaskbarOverlayIcon);
+    {$ENDIF}
+
+    if GlobalUserConfig.TaskbarIconType = TaskbarAppIcon then
+      Application.Icon.Assign(FAppStoppedBitmap);
 
     {$IF defined(windows) }
+    if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
+      FTaskbarList.SetOverlayIcon(AppHandle, 0, PWideChar(''));
     FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
     {$ENDIF}
 
@@ -1076,7 +1142,17 @@ begin
 
         Icon.Assign(FTrayProgressIcons[Index + 1]);
 
-        Application.Icon.Assign(FAppProgressIcons[Index + 1]);
+
+
+        if GlobalUserConfig.TaskbarIconType = TaskbarAppIcon then
+          Application.Icon.Assign(FAppProgressIcons[Index + 1]);
+        {$IF defined(windows)}
+        if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
+          FTaskBarList.SetOverlayIcon(AppHandle, FOverlayProgressIcons[Index + 1].Handle,
+            PWideChar(''));
+        {$ENDIF}
+
+
         FLastTrayIconIndex := Index;
       end;
 
@@ -1091,6 +1167,7 @@ begin
         else
           Assert(False); // We should not come here
         FTaskBarList.SetProgressValue(AppHandle, TaskbarPercent, 100);
+
       end;
       {$ENDIF}
     end;
@@ -1206,36 +1283,35 @@ begin
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
-      NewTimerClock.UseDefaultSound:=
+      NewTimerClock.UseDefaultSound :=
         Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
 
       if TAudio.Loaded then
       begin
-          try
-            //NewTimerClock.Audio.FileName :=
-            //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-            AudioFileName:=string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-            if AudioFileName = '' then
-              NewTimerclock.Audio.UnloadAudioFile
-            else
-              NewTimerClock.Audio.LoadFromFile(AudioFileName);
-            //NewTimerClock.Audio.Looped :=
-            //  Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
-          except
-            on E: EInvalidAudio do
-            begin
-              ErrorText := ErrorText + 'Could not load audio file ' +
-                string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-                ' - unsupported format or invalide file. ' +
-                'File name will be reset to blank.' + LineEnding;
-            end
-            else
-              ErrorText := ErrorText + 'Could not load audio file ' +
-                string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
-                ' - unknown error. File name will be reset to blank.' +
-                LineEnding;
-          end;
-
+        try
+          //NewTimerClock.Audio.FileName :=
+          //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          AudioFileName := string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          if AudioFileName = '' then
+            NewTimerclock.Audio.UnloadAudioFile
+          else
+            NewTimerClock.Audio.LoadFromFile(AudioFileName);
+          //NewTimerClock.Audio.Looped :=
+          //  Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+        except
+          on E: EInvalidAudio do
+          begin
+            ErrorText := ErrorText + 'Could not load audio file ' +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              ' - unsupported format or invalide file. ' +
+              'File name will be reset to blank.' + LineEnding;
+          end
+          else
+            ErrorText := ErrorText + 'Could not load audio file ' +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              ' - unknown error. File name will be reset to blank.' +
+              LineEnding;
+        end;
 
       end
       else
@@ -1253,11 +1329,12 @@ begin
       NewTimerClock.TrayNotification :=
         Conf.GetValue(TIMER_CONF_TRAYNOTIFICATION, False);
 
-      State.Running:=Conf.GetValue(TIMER_CONF_RUNNING, False);
-      State.Paused:=Conf.GetValue(TIMER_CONF_PAUSED, False);
-      State.PendingTicks:=Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
-      State.EndTime:=StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_ENDTIME), '0')), fs);
-      State.DurationTicks:=Conf.GetValue(TIMER_CONF_ORIGTICKCOUNT, 0);
+      State.Running := Conf.GetValue(TIMER_CONF_RUNNING, False);
+      State.Paused := Conf.GetValue(TIMER_CONF_PAUSED, False);
+      State.PendingTicks := Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
+      State.EndTime := StrToFloat(
+        string(Conf.GetValue(UTF8Decode(TIMER_CONF_ENDTIME), '0')), fs);
+      State.DurationTicks := Conf.GetValue(TIMER_CONF_ORIGTICKCOUNT, 0);
 
       NewTimerClock.LoadState(State);
 
@@ -1444,7 +1521,7 @@ begin
     Conf.SetValue(TIMER_CONF_USEDEFSOUND,
       TimerClock.UseDefaultSound);
 
-    State.Paused:=False;
+    State.Paused := False;
 
     TimerClock.SaveState(State);
 

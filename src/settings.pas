@@ -29,6 +29,7 @@ uses
 
 type
 
+  TTaskbarIconType = (TaskbarAppIcon, TaskbarOverlayIcon);
   { TUserConfig }
 
   TUserConfig = class(TObject)
@@ -56,6 +57,12 @@ type
     UseDefaultAudioDevice: boolean;
     AudioDeviceName: string;
     AudioHostAPIName: string;
+
+    TaskbarIconType: TTaskbarIconType;
+
+    UseDefaultSound: boolean;
+    LoopSound: boolean;
+
     constructor Create();
     destructor Destroy; override;
 
@@ -147,6 +154,22 @@ const
   AUDIO_DEVICE_NAME = 'audio_device_name';
   DEF_AUDIO_DEVICE_NAME = '';
 
+  //TASKBAR_SHOW_APPICON = 1;
+  //TASKBAR_SHOW_OVERLAY = 2;
+
+  TASKBAR_ICON_TYPE = 'taskbar_appicon';
+  {$IF defined(windows)}
+  DEF_TASKBAR_ICON_TYPE = TaskbarOverlayIcon;
+  {$ELSE}
+  DEF_TASKBAR_ICON_TYPE = TaskbarAppIcon;
+  {$ENDIF}
+
+  USE_DEFAULT_SOUND = 'use_default_sound';
+  DEF_USE_DEFAULT_SOUND = True;
+
+  LOOP_SOUND = 'loop_sound';
+  DEF_LOOP_SOUND = True;
+
 
 procedure InitSettings;
 procedure CleanupSettings;
@@ -224,7 +247,8 @@ begin
     AutoProgress := FConf.GetValue(AUTO_PROGRESS, AutoProgress);
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
     AllowTimerTitleEdit := FConf.GetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
-    DefaultTimerTitle := string(FConf.GetValue(UTF8Decode(TIMER_TITLE), UTF8Decode(DefaultTimerTitle)));
+    DefaultTimerTitle := string(FConf.GetValue(UTF8Decode(TIMER_TITLE),
+      UTF8Decode(DefaultTimerTitle)));
 
     DefaultTimerDuration := FConf.GetValue(TIMER_DURATION, DefaultTimerDuration);
 
@@ -238,10 +262,18 @@ begin
     if AdjustCompletebyDefault <= 0 then
       AdjustCompletebyDefault := DEF_TIMER_DURATION;
 
-    AudioDeviceName:= string(FConf.GetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName)));
-    AudioHostAPIName:= string(FConf.GetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName)));
+    AudioDeviceName := string(FConf.GetValue(AUDIO_DEVICE_NAME,
+      UTF8Decode(AudioDeviceName)));
+    AudioHostAPIName := string(FConf.GetValue(AUDIO_HOSTAPI_NAME,
+      UTF8Decode(AudioHostAPIName)));
     UseDefaultAudioDevice :=
       FConf.GetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
+
+    TaskbarIconType := TTaskbarIconType(FConf.GetValue(TASKBAR_ICON_TYPE,
+      integer(DEF_TASKBAR_ICON_TYPE)));
+
+    UseDefaultAudioDevice:=FConf.GetValue(USE_DEFAULT_SOUND, DEF_USE_DEFAULT_AUDIO_DEVICE);
+    LoopSound:=FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
 
   except
     CreateAnew;
@@ -285,6 +317,11 @@ begin
   FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName));
   FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName));
   FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
+
+  FConf.SetValue(TASKBAR_ICON_TYPE, integer(TaskbarIconType));
+
+  FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
+  FConf.SetValue(LOOP_SOUND, LoopSound);
 
 end;
 
@@ -336,6 +373,11 @@ begin
     FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, DEF_USE_DEFAULT_AUDIO_DEVICE);
   end;
 
+  FConf.SetValue(TASKBAR_ICON_TYPE, integer(DEF_TASKBAR_ICON_TYPE));
+
+  FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
+  FConf.SetValue(LOOP_SOUND, LoopSound);
+
   FConf.Flush;
 end;
 
@@ -382,9 +424,14 @@ begin
 
   DefaultTimeFormat := integer(DEF_TIME_FORMAT);
 
-  AudioDeviceName:=DEF_AUDIO_DEVICE_NAME;
-  AudioHostAPIName:=DEF_AUDIO_HOSTAPI_NAME;
-  UseDefaultAudioDevice:=DEF_USE_DEFAULT_AUDIO_DEVICE;
+  AudioDeviceName := DEF_AUDIO_DEVICE_NAME;
+  AudioHostAPIName := DEF_AUDIO_HOSTAPI_NAME;
+  UseDefaultAudioDevice := DEF_USE_DEFAULT_AUDIO_DEVICE;
+
+  TaskbarIconType := DEF_TASKBAR_ICON_TYPE;
+
+  UseDefaultSound:=DEF_USE_DEFAULT_SOUND;
+  LoopSound:=DEF_LOOP_SOUND;
 
 end;
 
@@ -409,9 +456,14 @@ begin
   AdjustDiffDefault := From.AdjustDiffDefault;
   AdjustCompletebyDefault := From.AdjustCompletebyDefault;
 
-  AudioDeviceName:=From.AudioDeviceName;
-  AudioHostAPIName:=From.AudioHostAPIName;
-  UseDefaultAudioDevice:=From.UseDefaultAudioDevice;
+  AudioDeviceName := From.AudioDeviceName;
+  AudioHostAPIName := From.AudioHostAPIName;
+  UseDefaultAudioDevice := From.UseDefaultAudioDevice;
+
+  TaskbarIconType := From.TaskbarIconType;
+
+  UseDefaultSound:=From.UseDefaultSound;
+  LoopSound:=From.LoopSound;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -477,14 +529,24 @@ begin
     Result := False;
     Exit;
   end;
+  if TaskbarIconType <> From.TaskbarIconType then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if UseDefaultSound <> From.UseDefaultSound then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if LoopSound <> From.LoopSound then
+  begin
+    Result := False;
+    Exit;
+  end;
   Result := True;
 end;
 
 
 end.
-
-
-
-
-
 

@@ -55,10 +55,10 @@ object frmOptions: TfrmOptions
     Height = 352
     Top = 8
     Width = 523
-    ActivePage = tsAudio
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 3
+    TabIndex = 1
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
@@ -211,12 +211,12 @@ object frmOptions: TfrmOptions
       ImageIndex = 4
       object GroupBox3: TGroupBox
         Left = 16
-        Height = 104
+        Height = 200
         Top = 8
         Width = 484
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Progress and completion'
-        ClientHeight = 84
+        ClientHeight = 180
         ClientWidth = 480
         TabOrder = 0
         object cbTrayAlert: TCheckBox
@@ -243,18 +243,42 @@ object frmOptions: TfrmOptions
           Caption = 'Automatically show the progress of the last timer started'
           TabOrder = 2
         end
+        object Label8: TLabel
+          Left = 16
+          Height = 15
+          Top = 88
+          Width = 51
+          Caption = 'In taskbar'
+          ParentColor = False
+        end
+        object rbProgressOnAppIcon: TRadioButton
+          Left = 40
+          Height = 19
+          Top = 104
+          Width = 160
+          Caption = 'Changing application icon'
+          TabOrder = 3
+        end
+        object rbProgressOnOverlayIcon: TRadioButton
+          Left = 40
+          Height = 19
+          Top = 128
+          Width = 91
+          Caption = 'Overlay icons'
+          TabOrder = 4
+        end
       end
       object GroupBox7: TGroupBox
         Left = 16
-        Height = 105
-        Top = 128
+        Height = 88
+        Top = 224
         Width = 484
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Sound'
-        ClientHeight = 85
+        ClientHeight = 68
         ClientWidth = 480
         TabOrder = 1
-        object CheckBox4: TCheckBox
+        object cbUseDefaultSound: TCheckBox
           Left = 14
           Height = 19
           Top = 8
@@ -262,7 +286,7 @@ object frmOptions: TfrmOptions
           Caption = 'Use default sound'
           TabOrder = 0
         end
-        object CheckBox5: TCheckBox
+        object cbLoopSound: TCheckBox
           Left = 14
           Height = 19
           Top = 32

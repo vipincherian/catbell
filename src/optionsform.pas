@@ -31,6 +31,7 @@ uses
 
 const
   LSVADUIO_INDEX_HOSTAPI: integer = 0;
+
 type
 
   { TfrmOptions }
@@ -48,8 +49,8 @@ type
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     cbUseDefaultAudio: TCheckBox;
-    CheckBox4: TCheckBox;
-    CheckBox5: TCheckBox;
+    cbUseDefaultSound: TCheckBox;
+    cbLoopSound: TCheckBox;
     ckbQueryExit: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
@@ -77,10 +78,13 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
+    Label8: TLabel;
     Label9: TLabel;
     lsvAudioDevices: TListView;
     pgbAudio: TProgressBar;
     pgcOptions: TPageControl;
+    rbProgressOnAppIcon: TRadioButton;
+    rbProgressOnOverlayIcon: TRadioButton;
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
@@ -141,7 +145,7 @@ begin
   begin
     RefreshAudioDevices;
     TAudio.GetDefaultDevice(@AudioDevice);
-    edtDefaultDeviceName.Text:= AudioDevice.DeviceName;
+    edtDefaultDeviceName.Text := AudioDevice.DeviceName;
     edtDefaultHostAPI.Text := AudioDevice.HostAPIName;
   end;
 end;
@@ -169,7 +173,7 @@ begin
     dtpShorten.Time := AdjustDiffDefault;
     dtpCompleteBy.Time := AdjustCompletebyDefault;
 
-    cbUseDefaultAudio.Checked:=UseDefaultAudioDevice;
+    cbUseDefaultAudio.Checked := UseDefaultAudioDevice;
 
     if TAudio.Loaded then
     begin
@@ -184,6 +188,14 @@ begin
 
       end;
     end;
+
+    case TaskbarIconType of
+      TaskbarAppIcon: rbProgressOnAppIcon.Checked := True;
+      TaskbarOverlayIcon: rbProgressOnOverlayIcon.Checked := True;
+    end;
+
+    cbUseDefaultSound.Checked := UseDefaultSound;
+    cbLoopSound.Checked := LoopSound;
 
   end;
 end;
@@ -236,7 +248,7 @@ begin
 
     AdjustCompletebyDefault := dtpCompleteBy.Time;
 
-    Config.UseDefaultAudioDevice:=cbUseDefaultAudio.Checked;
+    UseDefaultAudioDevice := cbUseDefaultAudio.Checked;
 
     { Find which audio device has been checked }
     DeviceChecked := False;
@@ -244,8 +256,8 @@ begin
     begin
       if Item.Checked then
       begin
-        AudioDeviceName:=Item.Caption;
-        AudioHostAPIName:=Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
+        AudioDeviceName := Item.Caption;
+        AudioHostAPIName := Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
         DeviceChecked := True;
         Break;
       end;
@@ -255,9 +267,17 @@ begin
     if not DeviceChecked then
     begin
       TAudio.GetDefaultDevice(@Device);
-      AudioDeviceName:=Device.DeviceName;
-      AudioHostAPIName:=Device.HostAPIName;
+      AudioDeviceName := Device.DeviceName;
+      AudioHostAPIName := Device.HostAPIName;
     end;
+
+    if rbProgressOnOverlayIcon.Checked then
+      TaskbarIconType := TaskbarOverlayIcon
+    else if rbProgressOnAppIcon.Checked then
+      TaskbarIconType := TaskbarAppIcon;
+
+    UseDefaultSound := cbUseDefaultSound.Checked;
+    LoopSound := cbLoopSound.Checked;
 
   end;
 end;
@@ -278,7 +298,7 @@ begin
   begin
     RefreshAudioDevices;
     TAudio.GetDefaultDevice(@AudioDevice);
-    edtDefaultDeviceName.Text :=  AudioDevice.DeviceName;
+    edtDefaultDeviceName.Text := AudioDevice.DeviceName;
     edtDefaultHostAPI.Text := AudioDevice.HostAPIName;
     Audio := TAudio.Create;
     bbPlay.Enabled := True;
@@ -286,7 +306,7 @@ begin
   else
   begin
     edtDefaultDeviceName.Text := 'Audio libraries not loaded. Audio will not work';
-    edtDefaultHostAPI.Text:='';
+    edtDefaultHostAPI.Text := '';
     bbPlay.Enabled := False;
   end;
 
@@ -335,7 +355,7 @@ var
 begin
   if TAudio.Loaded then
   begin
-    TAudio.UseDefaultDevice:=cbUseDefaultAudio.Checked;
+    TAudio.UseDefaultDevice := cbUseDefaultAudio.Checked;
 
     if not TAudio.UseDefaultDevice then
     begin
@@ -346,7 +366,7 @@ begin
         begin
           // TODO: FOutpuDevice should be renamed?
           TAudio.FOutputDevice.DeviceName := Item.Caption;
-          TAudio.FOutputDevice.HostAPIName:=Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
+          TAudio.FOutputDevice.HostAPIName := Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
         end;
       end;
     end;
@@ -412,36 +432,35 @@ end;
 
 procedure TfrmOptions.lsvAudioDevicesDblClick(Sender: TObject);
 var
-  hts : THitTests;
+  hts: THitTests;
   //ht : THitTest;
   //sht : string;
-  CurrPos : TPoint;
+  CurrPos: TPoint;
 
-  Selected, AnItem : TListItem;
+  Selected, AnItem: TListItem;
 begin
   // Get the position of the mouse cursor related to ListView
-  CurrPos := lsvAudioDevices.ScreenToClient(Mouse.CursorPos) ;
+  CurrPos := lsvAudioDevices.ScreenToClient(Mouse.CursorPos);
 
   // Where was the double-click received?
-  hts := lsvAudioDevices.GetHitTestInfoAt(CurrPos.X, CurrPos.Y) ;
+  hts := lsvAudioDevices.GetHitTestInfoAt(CurrPos.X, CurrPos.Y);
   if hts <= [htOnIcon, htOnItem, htOnLabel, htOnStateIcon] then
   begin
     Selected := lsvAudioDevices.Selected;
     //Selected.Checked:=True;
     for AnItem in lsvAudioDevices.Items do
-      AnItem.Checked:=(Selected = Anitem);
+      AnItem.Checked := (Selected = Anitem);
   end;
 end;
 
-procedure TfrmOptions.lsvAudioDevicesItemChecked(Sender: TObject;
-  Item: TListItem);
+procedure TfrmOptions.lsvAudioDevicesItemChecked(Sender: TObject; Item: TListItem);
 var
   AnItem: TListitem;
 begin
   for AnItem in lsvAudioDevices.Items do
   begin
     if Anitem <> item then
-      AnItem.Checked:=False;
+      AnItem.Checked := False;
   end;
 end;
 
