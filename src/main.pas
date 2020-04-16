@@ -1577,7 +1577,7 @@ begin
       ShowMessage('Clock is Nil');
 
     if TimerClock.Running then
-      TimerClock.Stop(False);
+      TimerClock.Stop(True);
 
     if TimerClock.Selected then
     begin

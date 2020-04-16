@@ -650,20 +650,27 @@ var
 begin
   EnterCriticalSection(AudioCriticalSection);
 
-  if FRunning and (FPaused = False) then
+  if FRunning then
   begin
-    CurrTickCount := GetTickCount64;
-
-    if FEndTickCount <= CurrTickCount then
+    if not FPaused then
     begin
-      Counter := DEF_COUNTDOWN_CAPTION;
-      Finish;
-      LeaveCriticalSection(AudioCriticalSection);
-      Exit;
-    end;
-    PendingMilliseconds := FEndTickCount - CurrTickCount;
-    UpdateProgress(PendingMilliseconds);
+      CurrTickCount := GetTickCount64;
 
+      if FEndTickCount <= CurrTickCount then
+      begin
+        Counter := DEF_COUNTDOWN_CAPTION;
+        Finish;
+        LeaveCriticalSection(AudioCriticalSection);
+        Exit;
+      end;
+      PendingMilliseconds := FEndTickCount - CurrTickCount;
+    end
+    else
+      { Generally, there is no timer triggered when a timer is paused,
+      except when the timer is loaded from file.}
+      PendingMilliSeconds := FPendingTickCount;
+
+    UpdateProgress(PendingMilliseconds);
   end;
   LeaveCriticalSection(AudioCriticalSection);
 end;
