@@ -43,6 +43,7 @@ const
   TRAY_PROGRESS_ICON_COUNT = 24;
 
   PROGRESS_COLOUR = $4352E2;
+  PROGRESS_GLOSS_OPACITY = 60;
 
   PROGRESS_COMPLETED = 2.0;
 
@@ -697,8 +698,8 @@ begin
 
       { To give it a glossy feel, we try to add a translucent
       white sheen to the left semi-circle }
-      CanvasBGRA.Brush.Opacity := 100;
-      CanvasBGRA.Pen.Opacity := 100;
+      CanvasBGRA.Brush.Opacity := PROGRESS_GLOSS_OPACITY;
+      CanvasBGRA.Pen.Opacity := PROGRESS_GLOSS_OPACITY;
       CanvasBGRA.Brush.Color := clWhite;
       CanvasBGRA.Pen.Color := clWhite;
       CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
@@ -758,8 +759,8 @@ begin
 
       { To give it a glossy feel, we try to add a translucent
       white sheen to the left semi-circle }
-      CanvasBGRA.Brush.Opacity := 100;
-      CanvasBGRA.Pen.Opacity := 100;
+      CanvasBGRA.Brush.Opacity := PROGRESS_GLOSS_OPACITY;
+      CanvasBGRA.Pen.Opacity := PROGRESS_GLOSS_OPACITY;
       CanvasBGRA.Brush.Color := clWhite;
       CanvasBGRA.Pen.Color := clWhite;
       CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
@@ -1092,6 +1093,8 @@ var
   Index: integer;
   TaskbarPercent: integer;
 begin
+  if Progress < 0 then
+    Progress := 0;
   if (Progress > (TIMER_PROGRESS_FINISHED - 0.01)) and
     (Progress < (TIMER_PROGRESS_OFFTRAY + 0.01)) then
   begin
@@ -1167,7 +1170,10 @@ begin
         else
           Assert(False); // We should not come here
         FTaskBarList.SetProgressValue(AppHandle, TaskbarPercent, 100);
-
+        {if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
+           FTaskBarList.SetOverlayIcon(AppHandle,
+             FOverlayProgressIcons[Index + 1].Handle,
+             PWideChar(''));}
       end;
       {$ENDIF}
     end;
