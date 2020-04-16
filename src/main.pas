@@ -1441,14 +1441,14 @@ procedure TfrmMain.SaveClocks(Conf: TJsonConfig);
 var
   TimerClock: TfraTimer;
   Count: integer;
-  OrderStrings: TStringList;
+  //OrderStrings: TStringList;
   Id: longword;
   fs: TFormatSettings;
   //EndTime: TDateTime;
   State: TTimerState;
 begin
 
-  OrderStrings := TStringList.Create;
+  //OrderStrings := TStringList.Create;
 
   // While saving, existing IDs of clocks are ignored.
   // New IDs are generated in sequence.
@@ -1534,13 +1534,13 @@ begin
     Conf.SetValue(TIMER_CONF_ENDTIME, UTF8Decode(FloatToStr(State.EndTime, fs)));
     Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, State.DurationTicks);
 
-    OrderStrings.Insert(0, IntToStr(Count + 1));
+    //OrderStrings.Insert(0, IntToStr(Count + 1));
 
     Conf.CloseKey;
   end;
 
-  Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
-  OrderStrings.Free;
+  //Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
+  //OrderStrings.Free;
 end;
 
 procedure TfrmMain.DeleteSelected;

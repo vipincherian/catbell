@@ -51,7 +51,7 @@ const
   TIMER_CONF_NOTIFIER = 'notifier';
   //TIMER_CONF_ID = 'id';
   TIMER_CONF_COUNT = 'count';
-  TIMER_CONF_ORDER = 'order';
+  //TIMER_CONF_ORDER = 'order';
 
   TIMER_CONF_AUDIOFILE = 'audio_file';
   TIMER_CONF_AUDIOLENGTH = 'audio_duration';
