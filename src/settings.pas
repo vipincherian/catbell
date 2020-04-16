@@ -168,7 +168,7 @@ const
   DEF_USE_DEFAULT_SOUND = True;
 
   LOOP_SOUND = 'loop_sound';
-  DEF_LOOP_SOUND = True;
+  DEF_LOOP_SOUND = False;
 
 
 procedure InitSettings;

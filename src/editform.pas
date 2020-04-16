@@ -412,6 +412,8 @@ begin
   Caption := 'Add Timer';
   tsTimer.Show;
   FId := longword(-1);
+  ckbUseDefaultSound.Checked := GlobalUserConfig.LoopSound;
+  ckbLoop.Checked := GlobalUserConfig.UseDefaultSound;
   Result := ShowAndGetSpecs;
 end;
 
