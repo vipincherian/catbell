@@ -5,8 +5,8 @@
 /src/*.res
 /src/catbell.lps
 **/*.dll
-**/*.wav
-**/*.ogg
-**/*.mp3
+*/*.wav
+*/*.ogg
+*/*.mp3
 **/*.log
 **/*.bak

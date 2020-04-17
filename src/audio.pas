@@ -178,6 +178,7 @@ type
     FMpgAudioFile: TMpgAudioFile;
 
     FDefAudioFile: TSndAudioFile;
+    FTickAudioFile: TSndAudioFile;
 
     //FSndDefaultSoundFile: TSndAudioFile;
     //FSndAudioF
@@ -199,7 +200,8 @@ type
     DataPointer: PPaTestData;
     function GetAudioFileLoaded: boolean;
     function GetDuration: double;
-    procedure Play(AudioFile: IAudioFile; PlayLooped: boolean);
+    class procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData); static;
+    procedure Play(AudioFile: IAudioFile; PlayLooped: boolean = False);
 
     class function GetDevices: TAudioDeviceList; static;
     //procedure SetFileName(AValue: string);
@@ -231,6 +233,7 @@ type
     class procedure FreeDefaultSounds; static;
     procedure Play;
     procedure PlayDefaultSound;
+    procedure PlayTickSound;
     procedure PlayTest;
     procedure PlaySine;
     procedure Abort;
@@ -937,6 +940,32 @@ begin
   Result:=FAudioFile.Duration;
 end;
 
+class procedure TAudio.LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
+var
+  BytesRead: integer;
+  Size: integer;
+  Stream: TResourceStream;
+begin
+  Stream := TResourceStream.Create(hinstance, ResourceName, RT_RCDATA);
+  Size := Stream.Size;
+  Assert(Size > 0);
+  if Size <= 0 then
+    DebugLn('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
+      );
+
+  Sound.Buffer:=AllocMem(Size);
+  Sound.Size:=Size;
+  BytesRead:=0;
+  BytesRead := Stream.Read(Sound.Buffer^, Size);
+
+  if BytesRead <> Size then
+    DebugLn('BytesRead does not match Size in TAudio.LoadDefaultSounds');
+
+  DebugLn('Size of the stream is ' + IntToStr(Size));
+  Sound.Loaded:=True;
+  Stream.Destroy;
+end;
+
 function TAudio.GetAudioFileLoaded: boolean;
 begin
   Result:=(FAudioFile <> nil);
@@ -1119,6 +1148,9 @@ begin
   FDefAudioFile := TSndAudioFile.Create;
   FDefAudioFile.LoadDefaultSound;
 
+  FTickAudioFile:=TSndAudioFile.Create;
+
+
   FAudioFile := FSndAudioFile;
   //FFileType := READ_NOTLOADED;
 
@@ -1144,6 +1176,7 @@ end;
 destructor TAudio.Destroy;
 begin
   //DebugLn('TAudio.Destroy ');
+  FTickAudioFile.Destroy;
   FDefAudioFile.Destroy;
   FMpgAudioFile.Destroy;
   FSndAudioFile.Destroy;
@@ -1243,31 +1276,13 @@ begin
 end;
 
 class procedure TAudio.LoadDefaultSounds;
-var
-  Stream: TResourceStream;
-  Size, BytesRead: integer;
 begin
   if not TAudio.Loaded then
   begin
     Exit;
   end;
-  Stream := TResourceStream.Create(hinstance, 'DEFAULT_SOUND', RT_RCDATA);
-  Size := Stream.Size;
-  Assert(Size > 0);
-  if Size <= 0 then
-    DebugLn('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds');
-
-  TAudio.DefaultSound.Buffer:=AllocMem(Size);
-  TAudio.DefaultSound.Size:=Size;
-  BytesRead:=0;
-  BytesRead := Stream.Read(TAudio.DefaultSound.Buffer^, Size);
-
-  if BytesRead <> Size then
-    DebugLn('BytesRead does not match Size in TAudio.LoadDefaultSounds');
-
-  DebugLn('Size of the stream is ' + IntToStr(Size));
-  TAudio.DefaultSound.Loaded:=True;
-  Stream.Destroy;
+  LoadSoundFromResource('DEFAULT_SOUND', TAudio.DefaultSound);
+  LoadSoundFromResource('TICK', TAudio.DefaultTick);
 end;
 
 class procedure TAudio.FreeDefaultSounds;
@@ -1371,6 +1386,11 @@ end;
 procedure TAudio.PlayDefaultSound;
 begin
   Play(FDefAudioFile, Looped);
+end;
+
+procedure TAudio.PlayTickSound;
+begin
+  Play(FTickAudioFile);
 end;
 
 procedure TAudio.PlayTest;
