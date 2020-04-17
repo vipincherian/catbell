@@ -1563,6 +1563,7 @@ var
   TimerClock: TfraTimer;
   Count: integer;
   IdList: TIdList;
+  //StartTickCount: longword;
 begin
   IdList := TIdList.Create;
 
@@ -1576,8 +1577,20 @@ begin
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
 
-    if TimerClock.Running then
+    if TimerClock.Running or TimerClock.Audio.Playing then;
       TimerClock.Stop(True);
+
+    //StartTickCount := GetTickCount64;
+    { Abort is asynchronous, wait till each timer aborts.
+    Also, we do not wait for more than two seconds per timer.
+    After that, it is past caring. Tardiness can be tolerated only as much. }
+    while TimerClock.Audio.Playing do
+    begin
+      DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
+      Application.ProcessMessages;
+      //if GetTickCount64 > (StartTickCount + 2000) then
+      //  break;
+    end;
 
     if TimerClock.Selected then
     begin
