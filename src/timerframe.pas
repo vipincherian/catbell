@@ -173,6 +173,7 @@ type
     UseDefaultSound: boolean;
 
     AudioInfo: TTimerAudioInfo;
+    AudioLooped: boolean;
 
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
@@ -277,6 +278,9 @@ begin
 end;
 
 procedure TfraTimer.aiEditExecute(Sender: TObject);
+var
+  NewCustomSound: TAudioFile = nil;
+  OldCustomSound: TAudioFile = nil;
 begin
   frmEdit.Description := edtTitle.Text;
   frmEdit.Duration := dtpSet.Time;
@@ -286,16 +290,16 @@ begin
 
   if TAudio.Loaded then
   begin
-    frmEdit.Audio := FAudio;
-    frmEdit.ckbLoop.Checked:=FAudio.Looped;
+    frmEdit.CurrentSound := FCustomAudioFile;
   end
   else
   begin
-    frmEdit.Audio := Nil;
-    frmEdit.AudioFileName:= AudioInfo.FileName;
+    frmEdit.CurrentSound := Nil;
+    frmEdit.edtAudioFile.Text:= AudioInfo.FileName;
     frmEdit.AudioDuration:= AudioInfo.Duration;
-    frmEdit.AudioLooped:=AudioInfo.Looped;
   end;
+
+  frmEdit.AudioLooped:=AudioLooped;
 
   if frmEdit.ShowForEdit(Self) then
   begin
@@ -305,11 +309,22 @@ begin
     UseDefaultSound:=frmEdit.UseDefaultSound;
     FModalAlert := frmEdit.ModalAlert;
 
+    OldCustomSound := FCustomAudioFile;
+
     if TAudio.Loaded then
-      frmEdit.Audio.Looped:=  frmEdit.ckbLoop.Checked
+    begin
+      frmEdit.AudioLooped:=  frmEdit.ckbLoop.Checked;
+      NewCustomSound := frmEdit.NewSound;
+      if NewCustomSound <> nil then
+      begin
+        OldCustomSound.Free;
+        FCustomAudioFile := NewCustomSound;
+      end;
+
+    end
     else
     begin
-      AudioInfo.FileName := frmEdit.AudioFileName;
+      AudioInfo.FileName := frmEdit.edtAudioFile.Text;
       AudioInfo.Duration := frmEdit.AudioDuration;
       AudioInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
@@ -537,7 +552,7 @@ begin
       ckbUseDefaultSound.Enabled:=True;
       bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
       bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-      // Looped is enabled irrespective of whether default sound is
+      // Looped is enabled irrespective of whether default CurrentSound is
       // used or not.
       ckbLoop.Enabled:=True;
     end;
@@ -824,8 +839,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if TAudio.Loaded and (Audio.AudioFileLoaded or UseDefaultSound)
-      and (not UserInitiated) then
+    if TAudio.Loaded and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
@@ -847,11 +861,14 @@ begin
 
       // Play the sound as per configuration
       if UseDefaultSound then
-        FAudio.Play(FDefaultAudioFile, FAudio.Looped)
+        FAudio.Play(FDefaultAudioFile, AudioLooped)
       else
+      begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
-        FAudio.Play;
+        if FCustomAudioFile <> nil then
+          FAudio.Play(FCustomAudioFile, AudioLooped);
+      end;
 
       //DebugLn('FAudio.Play');
     end

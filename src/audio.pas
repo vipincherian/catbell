@@ -255,6 +255,7 @@ type
     property FileName: string read FFileName;
     procedure UnloadAudioFile;
     procedure LoadFromFile(AValue: string);
+    class function LoadSound(Avalue: string): TAudioFile; static;
     property Duration: double read GetDuration;
     property Playing: boolean read FAudioPlaying;
     //property AudioFile: TAudioFile read FAudioFile;
@@ -1627,6 +1628,40 @@ begin
 
   end;
 
+end;
+
+class function TAudio.LoadSound(Avalue: string): TAudioFile;
+var
+  SndAudioFile: TSndAudioFile;
+  MpgAudioFile: TMpgAudioFile;
+begin
+    SndAudioFile := TSndAudioFile.Create;
+    SndAudioFile.SetFileName(AValue);
+    if SndAudioFile.FileName <> '' then
+    begin
+      Assert(SndAudioFile <> nil);
+      //FAudioFile := FSndAudioFile;
+      //Duration := FAudioFile.Duration;
+      //FAudioFileLoaded:=true;
+      //FFileName:=AValue;
+      Result := SndAudioFile;
+      Exit;
+    end;
+    SndAudioFile.Free;
+
+    MpgAudioFile := TMpgAudioFile.Create;
+    MpgAudioFile.SetFileName(AValue);
+    if MpgAudioFile.FileName <> '' then
+    begin
+      Assert(MpgAudioFile <> nil);
+      Result := MpgAudioFile;
+      //FAudioFileLoaded:=true;
+      //FFileName:=AValue;
+      Exit;
+    end;
+    MpgAudioFile.Free;
+
+    raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
 end;
 
 var

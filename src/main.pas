@@ -358,15 +358,17 @@ begin
   end;
   TempAudio := nil;
 
+  frmEdit.CurrentSound:=nil;
   if TAudio.Loaded then
   begin
     TempAudio := TAudio.Create;
-    frmEdit.Audio := TempAudio;
+    //frmEdit.Audio := TempAudio;
+
   end
   else
   begin
-    frmEdit.Audio := nil;
-    frmEdit.AudioFileName := '';
+    //frmEdit.Audio := nil;
+    //frmEdit.AudioFileName := '';
     frmEdit.AudioDuration := 0;
     frmEdit.AudioLooped := False;
   end;
@@ -381,13 +383,14 @@ begin
 
     if TAudio.Loaded then
     begin
-      Added.Audio := TempAudio;
-      Added.Audio.Looped := frmEdit.ckbLoop.Checked;
+      //Added.Audio := TempAudio;
+      Added.CustomSound := frmEdit.NewSound;
+      Added.AudioLooped := frmEdit.ckbLoop.Checked;
     end
     else
     begin
-      Added.AudioInfo.FileName := frmEdit.AudioFileName;
-      Added.AudioInfo.Duration := frmEdit.AudioDuration;
+      Added.AudioInfo.FileName := frmEdit.edtAudioFile.Text;
+      Added.AudioInfo.Duration := 0;
       Added.AudioInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
     PostTimerCreation(Added);
