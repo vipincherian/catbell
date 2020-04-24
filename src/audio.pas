@@ -47,13 +47,15 @@ type
 
   TAudioFile = class(TObject)
     //[SAudioFile]
+    private
+      function GetChannels: Integer; virtual; abstract;
+      function GetSampleRate: Integer;virtual; abstract;
+      function GetAudioLength: double;virtual; abstract;
+      function GetSampleFormat: PaSampleFormat; virtual; abstract;
     public
       constructor Create;
       destructor Destroy; override;
-    function GetChannels: Integer; virtual; abstract;
-    function GetSampleRate: Integer;virtual; abstract;
-    function GetAudioLength: double;virtual; abstract;
-    function GetSampleFormat: PaSampleFormat; virtual; abstract;
+
     property Channels: Integer read GetChannels;
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
@@ -119,16 +121,16 @@ type
     FVirtualIOCallbacks: SF_VIRTUAL_IO;
     FVIOUserData: TSndVIOUserData;
 
-    function GetAudioLength: double;
-    function GetChannels: Integer;
-    function GetSampleFormat: PaSampleFormat;
-    function GetSampleRate: Integer;
+    function GetAudioLength: double; override;
+    function GetChannels: Integer;override;
+    function GetSampleFormat: PaSampleFormat; override;
+    function GetSampleRate: Integer; override;
     procedure SetFileName(AValue: string);
   public
     constructor Create();
     destructor Destroy; override;
-    procedure SeekToBeginning;
-    function Read(output: pointer; frameCount: LongInt): boolean;
+    procedure SeekToBeginning; override;
+    function Read(output: pointer; frameCount: LongInt): boolean; override;
 
     property FileName: string read FFileName write SetFileName;
     procedure LoadDefaultSound;
@@ -153,16 +155,16 @@ type
     FChannelCount: integer;
     FEncoding: integer;
 
-    function GetAudioLength: double;
-    function GetChannels: Integer;
-    function GetSampleFormat: PaSampleFormat;
-    function GetSampleRate: Integer;
+    function GetAudioLength: double;override;
+    function GetChannels: Integer;override;
+    function GetSampleFormat: PaSampleFormat; override;
+    function GetSampleRate: Integer; override;
     procedure SetFileName(AValue: string);
   public
     constructor Create();
     destructor Destroy; override;
-    procedure SeekToBeginning;
-    function Read(output: pointer; frameCount: LongInt): boolean;
+    procedure SeekToBeginning; override;
+    function Read(output: pointer; frameCount: LongInt): boolean; override;
 
     property FileName: string read FFileName write SetFileName;
     property Channels: Integer read GetChannels;
@@ -519,7 +521,7 @@ end;
 
 constructor TAudioFile.Create;
 begin
-
+  //inherited Create;
 end;
 
 destructor TAudioFile.Destroy;
@@ -767,6 +769,7 @@ end;
 
 constructor TSndAudioFile.Create();
 begin
+  //inherited create;
   FSoundFile:=Nil;
   with FVirtualIOCallbacks do
   begin
