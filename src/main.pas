@@ -529,7 +529,7 @@ begin
   FAppStoppedBitmap.Free;
   FWidgetStoppedBitmap.Free;
 
-  //inherited Destroy;
+
   SavetoFile;
 
   for I := 0 to FTimerFrames.Count - 1 do
@@ -547,6 +547,7 @@ begin
   FOrder.Free;
 
   FShortTimer.Free;
+  //inherited Destroy;
 end;
 
 procedure TfrmMain.FormMouseUp(Sender: TObject; Button: TMouseButton;

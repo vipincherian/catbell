@@ -1306,6 +1306,7 @@ begin
   TAudio.FDevices.Clear;
 
   FreeMem(TAudio.DefaultSound.Buffer);
+  FreeMem(TAudio.DefaultTick.Buffer);
 end;
 
 class procedure TAudio.SetDefaulDevice;
@@ -1672,6 +1673,7 @@ var
 initialization
   TAudio.Loaded := False;
   TAudio.DefaultSound.Loaded:=False;
+  TAudio.DefaultTick.Loaded:=False;
   TAudio.FDevices := TAudioDeviceList.Create;
 
   {$IFNDEF AUDIO_STATIC}

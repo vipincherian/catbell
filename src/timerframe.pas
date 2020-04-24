@@ -323,6 +323,7 @@ begin
       if NewCustomSound <> nil then
       begin
         OldCustomSound.Free;
+        //OldCustomSound := nil;
         FCustomAudioFile := NewCustomSound;
       end;
 
@@ -666,6 +667,7 @@ destructor TfraTimer.Destroy;
 begin
   FAudio.Free;
   FDefaultAudioFile.Free;
+  FCustomAudioFile.Free;
   Parent := nil;
 
   //DoneCriticalsection(AudioCriticalSection);

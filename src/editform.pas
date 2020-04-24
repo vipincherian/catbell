@@ -202,6 +202,7 @@ begin
     begin
       NewSound := NewNewSound;
       OldNewSound.Free;
+      //OldNewSound := nil;
     end;
     //AudioFileName := FileName;
   end;
