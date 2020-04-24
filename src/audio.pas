@@ -43,22 +43,25 @@ type
   PAudioDevice = ^TAudioDevice;
   TAudioDeviceList = specialize TFPGList<PAudioDevice>;
 
-  { IAudioFile }
+  { TAudioFile }
 
-  IAudioFile = interface
-    [SAudioFile]
-    function GetChannels: Integer;
-    function GetSampleRate: Integer;
-    function GetAudioLength: double;
-    function GetSampleFormat: PaSampleFormat;
+  TAudioFile = class(TObject)
+    //[SAudioFile]
+    public
+      constructor Create;
+      destructor Destroy; override;
+    function GetChannels: Integer; virtual; abstract;
+    function GetSampleRate: Integer;virtual; abstract;
+    function GetAudioLength: double;virtual; abstract;
+    function GetSampleFormat: PaSampleFormat; virtual; abstract;
     property Channels: Integer read GetChannels;
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
     property SampleFormat: PaSampleFormat read GetSampleFormat;
     // Seek to begin
-    procedure SeekToBeginning;
+    procedure SeekToBeginning; virtual; abstract;
     // Read to buffer
-    function Read(output: pointer; frameCount: LongInt): boolean;
+    function Read(output: pointer; frameCount: LongInt): boolean; virtual; abstract;
   end;
 
   { The record passed to port audio callbacks }
@@ -66,7 +69,7 @@ type
 
     //SoundFile: PSndFile;
     //Info: SF_INFO;
-    AudioFile: IAudioFile;
+    AudioFile: TAudioFile;
     Player: Pointer;
     Looped: boolean;
 
@@ -103,7 +106,7 @@ type
 
   {TSndAudioFile}
   {Implementation of SndFile}
-  TSndAudioFile = class(TObject, IAudioFile)
+  TSndAudioFile = class(TAudioFile)
   private
     FSoundFile: PSNDFILE;
     //FFileType: integer;
@@ -137,7 +140,7 @@ type
 
   {TMpgAudioFile}
   {Implementation of Mpg123 for MP3}
-  TMpgAudioFile = class(TObject, IAudioFile)
+  TMpgAudioFile = class(TAudioFile)
   private
     FHandle: Tmpg123_handle;
     FError: integer;
@@ -172,7 +175,7 @@ type
   TAudio = class(TObject)
   private
     //FSoundFile: PSNDFILE;
-    FAudioFile: IAudioFile;
+    FAudioFile: TAudioFile;
 
     FSndAudioFile: TSndAudioFile;
     FMpgAudioFile: TMpgAudioFile;
@@ -201,7 +204,7 @@ type
     function GetAudioFileLoaded: boolean;
     function GetDuration: double;
     class procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData); static;
-    procedure Play(AudioFile: IAudioFile; PlayLooped: boolean = False);
+    procedure Play(AudioFile: TAudioFile; PlayLooped: boolean = False);
 
     class function GetDevices: TAudioDeviceList; static;
     //procedure SetFileName(AValue: string);
@@ -244,7 +247,7 @@ type
     procedure LoadFromFile(AValue: string);
     property Duration: double read GetDuration;
     property Playing: boolean read FAudioPlaying;
-    //property AudioFile: IAudioFile read FAudioFile;
+    //property AudioFile: TAudioFile read FAudioFile;
     property AudioFileLoaded: boolean read GetAudioFileLoaded;
     class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
 
@@ -274,7 +277,7 @@ var
   //readCount: cint;
   readSuccess: boolean;
   AudioInstance: TAudio;
-  UsedAudioFile: IAudioFile;
+  UsedAudioFile: TAudioFile;
 begin
   EnterCriticalSection(TAudio.AudioCriticalSection);
 
@@ -510,6 +513,18 @@ begin
   DebugLn('Position - ' + IntToStr(SoundData^.Position));
   DebugLnExit;
   DebugLn('Exiting sf_vio_tell_impl');
+end;
+
+{ TAudioFile }
+
+constructor TAudioFile.Create;
+begin
+
+end;
+
+destructor TAudioFile.Destroy;
+begin
+  inherited Destroy;
 end;
 
 { TMpgAudioFile }
@@ -837,7 +852,7 @@ end;
 
 { TAudio }
 
-procedure TAudio.Play(AudioFile: IAudioFile; PlayLooped: boolean);
+procedure TAudio.Play(AudioFile: TAudioFile; PlayLooped: boolean);
 var
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
