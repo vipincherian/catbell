@@ -136,6 +136,8 @@ type
     FProgress: single;
 
     FAudio: TAudio;
+    FDefaultAudioFile: TAudioFile;
+    FCustomAudioFile: TAudioFile;
 
     procedure SetAudio(AValue: TAudio);
     procedure SetId(AValue: longword);
@@ -568,6 +570,8 @@ begin
 end;
 
 constructor TfraTimer.Create(AOwner: TComponent);
+var
+  SndFile: TSndAudioFile;
 begin
   inherited Create(AOwner);
   InitCriticalSection(AudioCriticalSection);
@@ -610,13 +614,18 @@ begin
   begin
     FAudio := TAudio.Create;
     FAudio.OnPlayCompletion:=@AudioPlayed;
-  end;
 
+    SndFile := TSndAudioFile.Create;
+    SndFile.LoadDefaultSound;
+    FDefaultAudioFile := SndFile;
+  end;
+  FDefaultAudioFile := nil;
 end;
 
 destructor TfraTimer.Destroy;
 begin
   FAudio.Free;
+  FDefaultAudioFile.Free;
   Parent := nil;
 
   //DoneCriticalsection(AudioCriticalSection);
