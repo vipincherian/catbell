@@ -619,7 +619,7 @@ begin
     SndFile.LoadDefaultSound;
     FDefaultAudioFile := SndFile;
   end;
-  FDefaultAudioFile := nil;
+  FCustomAudioFile := nil;
 end;
 
 destructor TfraTimer.Destroy;
@@ -832,7 +832,7 @@ begin
 
       // Play the sound as per configuration
       if UseDefaultSound then
-        FAudio.PlayDefaultSound
+        FAudio.Play(FDefaultAudioFile, FAudio.Looped)
       else
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...

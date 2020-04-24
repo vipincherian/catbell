@@ -206,7 +206,7 @@ type
     function GetAudioFileLoaded: boolean;
     function GetDuration: double;
     class procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData); static;
-    procedure Play(AudioFile: TAudioFile; PlayLooped: boolean = False);
+
 
     class function GetDevices: TAudioDeviceList; static;
     //procedure SetFileName(AValue: string);
@@ -236,6 +236,7 @@ type
     class procedure SetDefaulDevice; static;
     class procedure LoadDefaultSounds; static;
     class procedure FreeDefaultSounds; static;
+    procedure Play(AudioFile: TAudioFile; PlayLooped: boolean = False);
     procedure Play;
     procedure PlayDefaultSound;
     procedure PlayTickSound;
