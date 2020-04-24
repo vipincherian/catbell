@@ -344,7 +344,7 @@ end;
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
 var
   Added: TfraTimer;
-  TempAudio: TAudio;
+  //TempAudio: TAudio;
 begin
   with GlobalUserConfig do
   begin
@@ -356,12 +356,12 @@ begin
     { We are not providing an option to keep audio looped by default }
     frmEdit.ckbLoop.Checked := False;
   end;
-  TempAudio := nil;
+  //TempAudio := nil;
 
   frmEdit.CurrentSound:=nil;
   if TAudio.Loaded then
   begin
-    TempAudio := TAudio.Create;
+    //TempAudio := TAudio.Create;
     //frmEdit.Audio := TempAudio;
 
   end
@@ -395,9 +395,9 @@ begin
     end;
     PostTimerCreation(Added);
     SavetoFile;
-  end
-  else
-    TempAudio.Free;
+  end;
+  //else
+  //  TempAudio.Free;
 end;
 
 procedure TfrmMain.aiOptionsExecute(Sender: TObject);
@@ -424,13 +424,13 @@ begin
     Cursor := crHourglass;
     for Count := 0 to FTimerFrames.Count - 1 do
     begin
-      FTimerFrames.Data[Count].Audio.Abort;
+      FTimerFrames.Data[Count].AbortSound;
 
       StartTickCount := GetTickCount64;
       { Abort is asynchronous, wait till each timer aborts.
       Also, we do not wait for more than two seconds per timer.
       After that, it is past caring. Tardiness can be tolerated only as much. }
-      while FTimerFrames.Data[Count].Audio.Playing do
+      while FTimerFrames.Data[Count].IsSoundPlaying do
       begin
         DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
         Application.ProcessMessages;
@@ -1583,14 +1583,14 @@ begin
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
 
-    if TimerClock.Running or TimerClock.Audio.Playing then;
+    if TimerClock.Running or TimerClock.IsSoundPlaying then;
       TimerClock.Stop(True);
 
     //StartTickCount := GetTickCount64;
     { Abort is asynchronous, wait till each timer aborts.
     Also, we do not wait for more than two seconds per timer.
     After that, it is past caring. Tardiness can be tolerated only as much. }
-    while TimerClock.Audio.Playing do
+    while TimerClock.IsSoundPlaying do
     begin
       DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
       Application.ProcessMessages;

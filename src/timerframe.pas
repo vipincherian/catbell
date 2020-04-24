@@ -140,6 +140,7 @@ type
     FCustomAudioFile: TAudioFile;
 
     //procedure SetAudio(AValue: TAudio);
+    function GetIsSoundPlaying: boolean;
     procedure SetCustomSound(AValue: TAudioFile);
     procedure SetId(AValue: longword);
     function GetCaption: string;
@@ -202,6 +203,8 @@ type
     procedure SaveState(var SaveTo: TTimerState);
     procedure LoadState(var LoadFrom: TTimerState);
 
+    procedure AbortSound;
+
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
     property PauseButtonEnabled: boolean read GetPauseButtonEnabled
@@ -216,6 +219,8 @@ type
     property IsProgressOnIcon: boolean read GetIsProgressOnIcon
       write SetIsProgressOnIcon;
 
+    property IsSoundPlaying: boolean read GetIsSoundPlaying;
+
     property Selected: boolean read GetSelected;
 
     property Running: boolean read FRunning;
@@ -224,7 +229,7 @@ type
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
-    property Audio: TAudio read FAudio;// write SetAudio;
+    //property Audio: TAudio read FAudio;// write SetAudio;
     property CustomSound: TAudioFile read FCustomAudioFile write SetCustomSound;
     //property PendingTickCount: longword read FPendingTickCount;
 
@@ -387,6 +392,11 @@ begin
 
   OldCustomSound.Free;
 
+end;
+
+function TfraTimer.GetIsSoundPlaying: boolean;
+begin
+  Result := FAudio.Playing;
 end;
 
 function TfraTimer.GetCaption: string;
@@ -1116,6 +1126,11 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TfraTimer.AbortSound;
+begin
+  FAudio.Abort;
 end;
 
 
