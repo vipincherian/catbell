@@ -218,6 +218,11 @@ type
     class function GetDevices: TAudioDeviceList; static;
     //procedure SetFileName(AValue: string);
     class procedure SetOutputDevice(AValue: TAudioDevice); static;
+    procedure Play;
+    procedure PlayDefaultSound;
+    procedure PlayTickSound;
+
+    procedure PlaySine;
   public
     Loaded: boolean; static;
     UseDefaultDevice: boolean; static;
@@ -244,11 +249,7 @@ type
     class procedure LoadDefaultSounds; static;
     class procedure FreeDefaultSounds; static;
     procedure Play(AudioFile: TAudioFile; PlayLooped: boolean = False);
-    procedure Play;
-    procedure PlayDefaultSound;
-    procedure PlayTickSound;
     procedure PlayTest;
-    procedure PlaySine;
     procedure Abort;
     //procedure SetDefaultSound;
     procedure FinishedAud({%H-}Datax: PtrInt);

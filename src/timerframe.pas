@@ -139,7 +139,7 @@ type
     FDefaultAudioFile: TAudioFile;
     FCustomAudioFile: TAudioFile;
 
-    procedure SetAudio(AValue: TAudio);
+    //procedure SetAudio(AValue: TAudio);
     procedure SetCustomSound(AValue: TAudioFile);
     procedure SetId(AValue: longword);
     function GetCaption: string;
@@ -224,7 +224,7 @@ type
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
-    property Audio: TAudio read FAudio write SetAudio;
+    property Audio: TAudio read FAudio;// write SetAudio;
     property CustomSound: TAudioFile read FCustomAudioFile write SetCustomSound;
     //property PendingTickCount: longword read FPendingTickCount;
 
@@ -370,11 +370,11 @@ begin
   Name := Name + IntToStr(AValue);
 end;
 
-procedure TfraTimer.SetAudio(AValue: TAudio);
+{procedure TfraTimer.SetAudio(AValue: TAudio);
 begin
   FAudio.Free;
   FAudio := AValue
-end;
+end;}
 
 procedure TfraTimer.SetCustomSound(AValue: TAudioFile);
 var
@@ -839,7 +839,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if TAudio.Loaded and (not UserInitiated) then
+    if TAudio.Loaded and (UseDefaultSound or (FCustomAudioFile <> nil)) and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
