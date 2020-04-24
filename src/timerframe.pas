@@ -140,6 +140,7 @@ type
     FCustomAudioFile: TAudioFile;
 
     procedure SetAudio(AValue: TAudio);
+    procedure SetCustomSound(AValue: TAudioFile);
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
@@ -223,6 +224,7 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     property Audio: TAudio read FAudio write SetAudio;
+    property CustomSound: TAudioFile read FCustomAudioFile write SetCustomSound;
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
@@ -357,6 +359,19 @@ procedure TfraTimer.SetAudio(AValue: TAudio);
 begin
   FAudio.Free;
   FAudio := AValue
+end;
+
+procedure TfraTimer.SetCustomSound(AValue: TAudioFile);
+var
+  OldCustomSound: TAudioFile;
+begin
+  if FCustomAudioFile=AValue then Exit;
+
+  OldCustomSound := FCustomAudioFile;
+  FCustomAudioFile:=AValue;
+
+  OldCustomSound.Free;
+
 end;
 
 function TfraTimer.GetCaption: string;

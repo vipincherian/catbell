@@ -52,6 +52,7 @@ type
       function GetSampleRate: Integer;virtual; abstract;
       function GetAudioLength: double;virtual; abstract;
       function GetSampleFormat: PaSampleFormat; virtual; abstract;
+      function GetSource: string; virtual; abstract;
     public
       constructor Create;
       destructor Destroy; override;
@@ -60,6 +61,7 @@ type
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
     property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property Source: string read GetSource;
     // Seek to begin
     procedure SeekToBeginning; virtual; abstract;
     // Read to buffer
@@ -126,6 +128,7 @@ type
     function GetSampleFormat: PaSampleFormat; override;
     function GetSampleRate: Integer; override;
     procedure SetFileName(AValue: string);
+    function GetSource: string; override;
   public
     constructor Create();
     destructor Destroy; override;
@@ -138,6 +141,7 @@ type
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
     property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property Source: string read GetSource;
   end;
 
   {TMpgAudioFile}
@@ -160,6 +164,8 @@ type
     function GetSampleFormat: PaSampleFormat; override;
     function GetSampleRate: Integer; override;
     procedure SetFileName(AValue: string);
+    function GetSource: string; override;
+
   public
     constructor Create();
     destructor Destroy; override;
@@ -171,6 +177,7 @@ type
     property SampleRate: Integer read GetSampleRate;
     property Duration: double read GetAudioLength;
     property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property Source: string read GetSource;
   end;
 
   { TAudio }
@@ -614,6 +621,11 @@ begin
   FAudioLength:=Dur;
 end;
 
+function TMpgAudioFile.GetSource: string;
+begin
+  Result := FFileName;
+end;
+
 constructor TMpgAudioFile.Create();
 var
   Rates: plong = nil;
@@ -746,6 +758,11 @@ begin
   FFileName := AValue;
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
   //LeaveCriticalSection(AudioCriticalSection);
+end;
+
+function TSndAudioFile.GetSource: string;
+begin
+  Result:=FFileName;
 end;
 
 function TSndAudioFile.GetChannels: Integer;
