@@ -1310,9 +1310,12 @@ begin
           //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
           AudioFileName := string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
           if AudioFileName = '' then
-            NewTimerclock.Audio.UnloadAudioFile
+            NewTimerclock.CustomSound := nil
           else
-            NewTimerClock.Audio.LoadFromFile(AudioFileName);
+          begin
+            //NewTimerClock.Audio.LoadFromFile(AudioFileName);
+            NewTimerclock.CustomSound := TAudio.LoadSound(AudioFileName);
+          end;
           //NewTimerClock.Audio.Looped :=
           //  Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
         except
@@ -1502,14 +1505,14 @@ begin
     Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.IsProgressOnIcon);
     if TAudio.Loaded then
     begin
-      if TimerClock.Audio.AudioFileLoaded then
+      if TimerClock.CustomSound <> nil then
       begin
         Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
-          UTF8Decode(TimerClock.Audio.FileName));
+          UTF8Decode(TimerClock.CustomSound.Source));
         Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
-          UTF8Decode(FloatToStr(TimerClock.Audio.Duration, fs)));
+          UTF8Decode(FloatToStr(TimerClock.CustomSound.Duration, fs)));
         Conf.SetValue(TIMER_CONF_AUDIOLOOP,
-          TimerClock.Audio.Looped);
+          TimerClock.AudioLooped);
       end
       else
       begin
