@@ -43,8 +43,8 @@ type
     bbClearSound: TBitBtn;
     bbSave: TBitBtn;
     bbSelectSound: TBitBtn;
-    BitBtn1: TBitBtn;
-    BitBtn2: TBitBtn;
+    bbTestSound: TBitBtn;
+    bbStopSound: TBitBtn;
     ckbUseDefaultSound: TCheckBox;
     ckbLoop: TCheckBox;
     ckbModalAlert: TCheckBox;
@@ -67,7 +67,8 @@ type
     procedure bbClearSoundClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
     procedure bbSelectSoundClick(Sender: TObject);
-    procedure BitBtn1Click(Sender: TObject);
+    procedure bbStopSoundClick(Sender: TObject);
+    procedure bbTestSoundClick(Sender: TObject);
     procedure ckbUseDefaultSoundChange(Sender: TObject);
     procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
@@ -77,11 +78,11 @@ type
     procedure FormShow(Sender: TObject);
   private
     FProceed: boolean;
-    FDuration: TTime;
-    FDescription: string;
-    FModalAlert: boolean;
-    FTrayNotification: boolean;
-    FUseDefaultSound: boolean;
+    //FDuration: TTime;
+    //FDescription: string;
+    //FModalAlert: boolean;
+    //FTrayNotification: boolean;
+    //FUseDefaultSound: boolean;
     FId: longword;
 
     FAudio: TAudio;
@@ -91,9 +92,15 @@ type
     FCurrentSound: TSound;
     FNewSound: TSound;
 
-    FSoundLooped: boolean;
+    //FSoundLooped: boolean;
 
+    function GetDescription: string;
+    function GetDuration: TTime;
+    function GetModalAlert: boolean;
     function GetSoundDuration: double;
+    function GetSoundLooped: boolean;
+    function GetTrayNotification: boolean;
+    function GetUseDefaultSound: boolean;
     //function GetAudioFileName: string;
     //function GetAudioLooped: boolean;
     //procedure SetAudio(AValue: TAudio);
@@ -108,18 +115,21 @@ type
     procedure SetNewSound(AValue: TSound);
     procedure SetUseDefaultSound(AValue: boolean);
     function Validate: boolean;
+    // Single place where controls are enabled/disabled
+    procedure ReenableControls;
+    procedure AudioPlayed(Sender: TObject);
   public
     //AudioLooped: boolean;
     function ShowAndGetSpecs: boolean;
     function ShowForAdd: boolean;
     function ShowForEdit(Sender: TFrame): boolean;
 
-    property Duration: TTime read FDuration write SetDuration;
-    property Description: string read FDescription write SetDescription;
-    property ModalAlert: boolean read FModalAlert write SetModalAlert;
+    property Duration: TTime read GetDuration write SetDuration;
+    property Description: string read GetDescription write SetDescription;
+    property ModalAlert: boolean read GetModalAlert write SetModalAlert;
 
-    property TrayNotification: boolean read FTrayNotification write SetFTrayNotification;
-    property UseDefaultSound: boolean read FUseDefaultSound write SetUseDefaultSound;
+    property TrayNotification: boolean read GetTrayNotification write SetFTrayNotification;
+    property UseDefaultSound: boolean read GetUseDefaultSound write SetUseDefaultSound;
     property Id: longword read FId;
 
     //property Audio: TAudio read FAudio write SetAudio;
@@ -127,7 +137,7 @@ type
     property NewSound: TSound read FNewSound write SetNewSound;
     //property AudioFileName: string read GetAudioFileName write SetAudioFileName;
     property SoundDuration: double read GetSoundDuration write SetSoundDuration;
-    property SoundLooped: boolean read FSoundLooped write SetSoundLooped;
+    property SoundLooped: boolean read GetSoundLooped write SetSoundLooped;
   end;
 
 
@@ -150,43 +160,68 @@ uses
 procedure TfrmEdit.FormCreate(Sender: TObject);
 begin
   FProceed := False;
+  FAudio := TAudio.Create;
+  FAudio.OnPlayCompletion := @AudioPlayed;
+  FDefaultSound := nil;
 
   with GlobalUserConfig do
   begin
-    FDuration := DefaultTimerDuration;
-    FDescription := DefaultTimerTitle;
-    FModalAlert := ShowModalAlert;
-    FTrayNotification := ShowTrayAlert;
+    Duration := DefaultTimerDuration;
+    Description := DefaultTimerTitle;
+    ModalAlert := ShowModalAlert;
+    TrayNotification := ShowTrayAlert;
   end;
 
   lblLengthText.Visible := False;
   lblLenthVal.Visible := False;
-  bbSave.Enabled := Validate;
+  //bbSave.Enabled := Validate;
 
-  if not TAudio.Loaded then
+  //bbTestSound.Enabled := False;
+  //bbStopSound.Enabled := False;
+  ;
+
+  {if not TAudio.Loaded then
   begin
     bbSelectSound.Enabled := False;
-  end;
+  end;}
 
   FSoundInfo.FileName := '';
   FSoundInfo.Duration := 0;
   FSoundInfo.Looped := False;
 
-  FAudio := TAudio.Create;
-  FDefaultSound := nil;
+
+  ReenableControls;
 
 end;
 
 procedure TfrmEdit.bbSaveClick(Sender: TObject);
+var
+  StartTickCount: longword;
 begin
-  FDescription := edtDescription.Text;
+  //FDescription := edtDescription.Text;
 
-  FDuration := dtpDuration.Time;
-  FModalAlert := ckbModalAlert.Checked;
-  FTrayNotification := ckbTrayNotification.Checked;
-  FUseDefaultSound := ckbUseDefaultSound.Checked;
+  //FDuration := dtpDuration.Time;
+  //FModalAlert := ckbModalAlert.Checked;
+  //FTrayNotification := ckbTrayNotification.Checked;
+  //FUseDefaultSound := ckbUseDefaultSound.Checked;
   FProceed := True;
-  FSoundLooped := ckbLoop.Checked;
+  //FSoundLooped := ckbLoop.Checked;
+
+  StartTickCount := GetTickCount64;
+  { Wait for FAudio to complete }
+  if FAudio.Playing then
+  begin
+    FAudio.Abort;
+    while FAudio.Playing do
+    begin
+      DebugLn('Waiting for');
+      Application.ProcessMessages;
+      //TODO: Remove hardcoding
+      if GetTickCount64 > (StartTickCount + 2000) then
+        break;
+    end;
+  end;
+
   Close;
 end;
 
@@ -208,9 +243,15 @@ begin
       NewSound := TempSound;
     end;
   end;
+  ReenableControls;
 end;
 
-procedure TfrmEdit.BitBtn1Click(Sender: TObject);
+procedure TfrmEdit.bbStopSoundClick(Sender: TObject);
+begin
+  FAudio.Abort;
+end;
+
+procedure TfrmEdit.bbTestSoundClick(Sender: TObject);
 var
   //DefaultSound: TSndSound = nil;
   SoundToPlay: TSound = nil;
@@ -223,7 +264,8 @@ begin
       FDefaultSound := TSndSound.Create;
       FDefaultSound.LoadDefaultSound;
     end;
-    FAudio.Play(FDefaultSound);
+    FAudio.Play(FDefaultSound, SoundLooped);
+    ReenableControls;
     Exit;
   end;
 
@@ -238,32 +280,37 @@ begin
   if SoundToPlay = nil then
     Exit;
 
-  FAudio.Play(SoundToPlay);
+  FAudio.Play(SoundToPlay, SoundLooped);
+  ReenableControls;
 end;
 
 procedure TfrmEdit.ckbUseDefaultSoundChange(Sender: TObject);
-var
-  DefaultSoundOff: boolean;
+{var
+  DefaultSoundOff: boolean;}
 begin
-  DefaultSoundOff := not ckbUseDefaultSound.Checked;
-  bbSelectSound.Enabled := DefaultSoundOff;
-  bbClearSound.Enabled := DefaultSoundOff;
+  //DefaultSoundOff := not ckbUseDefaultSound.Checked;
+  //bbSelectSound.Enabled := DefaultSoundOff;
+  //bbClearSound.Enabled := DefaultSoundOff;
   //ckbLoop.Enabled:=DefaultSoundOff;
+  ReenableControls;
 end;
 
 procedure TfrmEdit.dtpByChange(Sender: TObject);
 begin
-  bbSave.Enabled := Validate;
+  //bbSave.Enabled := Validate;
+  ReenableControls;
 end;
 
 procedure TfrmEdit.dtpDurationChange(Sender: TObject);
 begin
-  bbSave.Enabled := Validate;
+  //bbSave.Enabled := Validate;
+  ReenableControls;
 end;
 
 procedure TfrmEdit.edtDescriptionChange(Sender: TObject);
 begin
-  bbSave.Enabled := Validate;
+  //bbSave.Enabled := Validate;
+  ReenableControls;
 end;
 
 procedure TfrmEdit.bbCancelClick(Sender: TObject);
@@ -275,6 +322,7 @@ procedure TfrmEdit.bbClearSoundClick(Sender: TObject);
 begin
   //AudioFileName := '';
   edtSound.Text := '';
+  ReenableControls;
 end;
 
 procedure TfrmEdit.FormDestroy(Sender: TObject);
@@ -317,10 +365,35 @@ begin
 
 end;
 
+procedure TfrmEdit.ReenableControls;
+begin
+  { This controls takes care of enabling/disabling controls at various
+  junctures.}
+  ckbUseDefaultSound.Enabled := TAudio.Loaded and (not FAudio.Playing);
+  ckbLoop.Enabled := TAudio.Loaded and (not FAudio.Playing);
+
+
+  bbSelectSound.Enabled := TAudio.Loaded and (not FAudio.Playing) and (not ckbUseDefaultSound.Checked);
+  bbClearSound.Enabled := (not FAudio.Playing) and
+    ((not ckbUseDefaultSound.Checked) or (edtSound.Text <> ''));
+
+  bbTestSound.Enabled := TAudio.Loaded and (not FAudio.Playing) and
+    (ckbUseDefaultSound.Checked or (edtSound.Text <> ''));
+  bbStopSound.Enabled := TAudio.Loaded and FAudio.Playing;
+
+  bbSave.Enabled:=Validate;
+end;
+
+procedure TfrmEdit.AudioPlayed(Sender: TObject);
+begin
+  //ShowMessage('Done');
+  ReenableControls;
+end;
+
 
 procedure TfrmEdit.SetDescription(AValue: string);
 begin
-  FDescription := AValue;
+  //FDescription := AValue;
   edtDescription.Text := AValue;
 end;
 
@@ -373,8 +446,8 @@ begin
   else
     FSoundInfo.Looped := AValue;}
 
-  FSoundLooped := AValue;
-  ckbLoop.Checked := FSoundLooped;
+  //FSoundLooped := AValue;
+  ckbLoop.Checked := AValue;
 end;
 
 {function TfrmEdit.GetAudioFileName: string;
@@ -392,6 +465,36 @@ begin
   else
     Result := FSoundInfo.Duration;}
   Result := 0;
+end;
+
+function TfrmEdit.GetDescription: string;
+begin
+  Result := edtDescription.Text;
+end;
+
+function TfrmEdit.GetDuration: TTime;
+begin
+  Result := dtpDuration.Time;
+end;
+
+function TfrmEdit.GetModalAlert: boolean;
+begin
+  Result := ckbModalAlert.Checked;
+end;
+
+function TfrmEdit.GetSoundLooped: boolean;
+begin
+  Result := ckbLoop.Checked;
+end;
+
+function TfrmEdit.GetTrayNotification: boolean;
+begin
+  Result := ckbTrayNotification.Checked;
+end;
+
+function TfrmEdit.GetUseDefaultSound: boolean;
+begin
+  Result := ckbUseDefaultSound.Checked;
 end;
 
 {function TfrmEdit.GetAudioLooped: boolean;
@@ -435,19 +538,19 @@ end;
 
 procedure TfrmEdit.SetDuration(AValue: TTime);
 begin
-  FDuration := AValue;
+  //FDuration := AValue;
   dtpDuration.Time := AValue;
 end;
 
 procedure TfrmEdit.SetFTrayNotification(AValue: boolean);
 begin
-  FTrayNotification := AValue;
+  //FTrayNotification := AValue;
   ckbTrayNotification.Checked := AValue;
 end;
 
 procedure TfrmEdit.SetModalAlert(AValue: boolean);
 begin
-  FModalAlert := AValue;
+  //FModalAlert := AValue;
   ckbModalAlert.Checked := AValue;
 end;
 
@@ -505,11 +608,12 @@ end;
 
 procedure TfrmEdit.SetUseDefaultSound(AValue: boolean);
 begin
-  FUseDefaultSound := AValue;
+  //FUseDefaultSound := AValue;
   ckbUseDefaultSound.Checked := AValue;
-  bbClearSound.Enabled := (not AValue);
-  bbSelectSound.Enabled := (not AValue);
+  //bbClearSound.Enabled := (not AValue);
+  //bbSelectSound.Enabled := (not AValue);
   //ckbLoop.Enabled:=(not AValue);
+  ReenableControls;
 
 end;
 
@@ -528,6 +632,7 @@ begin
   FId := longword(-1);
   ckbUseDefaultSound.Checked := GlobalUserConfig.LoopSound;
   //ckbLoop.Checked := GlobalUserConfig.UseDefaultSound;
+  ReenableControls;
   Result := ShowAndGetSpecs;
 end;
 
@@ -543,6 +648,7 @@ begin
   Fid := Widget.Id;
   Caption := 'Edit Timer';
 
+  ReenableControls;
   { When we are showing the form to edit the timer, some controls
   are disabled. For example, you cannot change the duration of the timer,
   nor can you change the audio/CurrentSound details }

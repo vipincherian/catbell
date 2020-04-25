@@ -434,6 +434,7 @@ begin
       begin
         DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
         Application.ProcessMessages;
+        //TODO: Remove hardcoding
         if GetTickCount64 > (StartTickCount + 2000) then
           break;
       end;

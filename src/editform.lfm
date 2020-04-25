@@ -247,7 +247,7 @@ object frmEdit: TfrmEdit
         OnChange = ckbUseDefaultSoundChange
         TabOrder = 4
       end
-      object BitBtn1: TBitBtn
+      object bbTestSound: TBitBtn
         Left = 296
         Height = 30
         Top = 120
@@ -255,10 +255,10 @@ object frmEdit: TfrmEdit
         Caption = 'Test'
         Images = imlEdit
         ImageIndex = 3
-        OnClick = BitBtn1Click
+        OnClick = bbTestSoundClick
         TabOrder = 5
       end
-      object BitBtn2: TBitBtn
+      object bbStopSound: TBitBtn
         Left = 382
         Height = 30
         Top = 120
@@ -266,6 +266,7 @@ object frmEdit: TfrmEdit
         Caption = 'Stop'
         Images = imlEdit
         ImageIndex = 4
+        OnClick = bbStopSoundClick
         TabOrder = 6
       end
     end
