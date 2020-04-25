@@ -316,9 +316,10 @@ begin
 
     //OldCustomSound := FCustomSound;
 
+    SoundLooped:=frmEdit.SoundLooped;
     if TAudio.Loaded then
     begin
-      frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
+      //frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
       //NewCustomSound := frmEdit.NewSound;
       if frmEdit.NewSound <> nil then
       begin

@@ -181,6 +181,7 @@ begin
   FTrayNotification := ckbTrayNotification.Checked;
   FUseDefaultSound:=ckbUseDefaultSound.Checked;
   FProceed := True;
+  FSoundLooped:=ckbLoop.Checked;
   Close;
 end;
 
@@ -468,7 +469,7 @@ begin
   ckbUseDefaultSound.Checked:=AValue;
   bbClearSound.Enabled:=(not AValue);
   bbSelectSound.Enabled:=(not AValue);
-  ckbLoop.Enabled:=(not AValue);
+  //ckbLoop.Enabled:=(not AValue);
 
 end;
 
@@ -486,7 +487,7 @@ begin
   tsTimer.Show;
   FId := longword(-1);
   ckbUseDefaultSound.Checked := GlobalUserConfig.LoopSound;
-  ckbLoop.Checked := GlobalUserConfig.UseDefaultSound;
+  //ckbLoop.Checked := GlobalUserConfig.UseDefaultSound;
   Result := ShowAndGetSpecs;
 end;
 
@@ -511,7 +512,7 @@ begin
 
   bbSelectSound.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
   bbClearSound.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
-  ckbLoop.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
+  ckbLoop.Enabled:=ButtonStatus;// and (not ckbUseDefaultSound.Checked);
 
   Result := ShowAndGetSpecs;
   FId := longword(-1);

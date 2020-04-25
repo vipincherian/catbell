@@ -1319,6 +1319,7 @@ begin
           end;
           //NewTimerClock.Audio.Looped :=
           //  Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
+          NewTimerClock.SoundLooped:=Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
         except
           on E: EInvalidAudio do
           begin
@@ -1341,7 +1342,7 @@ begin
           string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
         NewTimerClock.SoundInfo.Duration :=
           StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH), '0')), fs);
-        //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
+        NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       end;
 
       NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
