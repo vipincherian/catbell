@@ -224,6 +224,8 @@ type
     procedure PlayTickSound;
 
     procedure PlaySine;
+    procedure UnloadAudioFile;
+    procedure LoadFromFile(AValue: string);
   public
     Loaded: boolean; static;
     UseDefaultDevice: boolean; static;
@@ -255,8 +257,7 @@ type
     //procedure SetDefaultSound;
     procedure FinishedAud({%H-}Datax: PtrInt);
     property FileName: string read FFileName;
-    procedure UnloadAudioFile;
-    procedure LoadFromFile(AValue: string);
+
     class function LoadSound(Avalue: string): TAudioFile; static;
     property Duration: double read GetDuration;
     property Playing: boolean read FAudioPlaying;

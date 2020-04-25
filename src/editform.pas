@@ -187,8 +187,8 @@ end;
 procedure TfrmEdit.bbSelectAudioFileClick(Sender: TObject);
 var
   FileName: string;
-  OldNewSound: TAudioFile = nil;
-  NewNewSound: TAudioFile = nil;
+  //OldNewSound: TAudioFile = nil;
+  TempSound: TAudioFile = nil;
 begin
   odgAudio.InitialDir := '.';
   odgAudio.Options := [ofFileMustExist];
@@ -196,12 +196,14 @@ begin
   if odgAudio.Execute then
   begin
     FileName := odgAudio.FileName;
-    OldNewSound := NewSound;
-    NewNewSound := TAudio.LoadSound(FileName);
-    if NewNewSound <> nil then
+    //OldNewSound := NewSound;
+    TempSound := TAudio.LoadSound(FileName);
+    if TempSound <> nil then
     begin
-      NewSound := NewNewSound;
-      OldNewSound.Free;
+      //NewSound := TempSound;
+      //OldNewSound.Free;
+      FNewSound.Free;
+      FNewSound := TempSound;
       //OldNewSound := nil;
     end;
     //AudioFileName := FileName;
@@ -247,6 +249,9 @@ end;
 procedure TfrmEdit.FormDestroy(Sender: TObject);
 begin
   //FSpecs.Free;
+  // There can be excpetions to this, but just a check to see if this ever
+  // happens
+  Assert(FNewSound = nil);
   FNewSound.Free;
 end;
 

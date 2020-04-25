@@ -283,9 +283,9 @@ begin
 end;
 
 procedure TfraTimer.aiEditExecute(Sender: TObject);
-var
+{var
   NewCustomSound: TAudioFile = nil;
-  OldCustomSound: TAudioFile = nil;
+  OldCustomSound: TAudioFile = nil; }
 begin
   frmEdit.Description := edtTitle.Text;
   frmEdit.Duration := dtpSet.Time;
@@ -314,17 +314,20 @@ begin
     UseDefaultSound:=frmEdit.UseDefaultSound;
     FModalAlert := frmEdit.ModalAlert;
 
-    OldCustomSound := FCustomAudioFile;
+    //OldCustomSound := FCustomAudioFile;
 
     if TAudio.Loaded then
     begin
       frmEdit.AudioLooped:=  frmEdit.ckbLoop.Checked;
-      NewCustomSound := frmEdit.NewSound;
-      if NewCustomSound <> nil then
+      //NewCustomSound := frmEdit.NewSound;
+      if frmEdit.NewSound <> nil then
       begin
-        OldCustomSound.Free;
+        FCustomAudioFile.Free;
         //OldCustomSound := nil;
-        FCustomAudioFile := NewCustomSound;
+        FCustomAudioFile := frmEdit.NewSound;
+        { Now what we have taken over the responsibility of the new sound
+        created, we will set it to nil for frmEdit }
+        frmEdit.NewSound := nil;
       end;
 
     end
@@ -388,10 +391,12 @@ var
 begin
   if FCustomAudioFile=AValue then Exit;
 
-  OldCustomSound := FCustomAudioFile;
-  FCustomAudioFile:=AValue;
+  //OldCustomSound := FCustomAudioFile;
+  //FCustomAudioFile:=AValue;
 
-  OldCustomSound.Free;
+  //OldCustomSound.Free;
+  FCustomAudioFile.Free;
+  FCustomAudioFile:= AValue;
 
 end;
 
