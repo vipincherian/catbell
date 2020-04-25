@@ -243,6 +243,8 @@ var
   AudioInfo: PAudioInfo;
   readSuccess: boolean;
   UsedSound: TSound;
+  Data: pcfloat;
+  Count: integer;
 begin
   EnterCriticalSection(TAudio.AudioCriticalSection);
 
@@ -255,6 +257,13 @@ begin
   readSuccess := False;
 
   readSuccess := UsedSound.Read(output, frameCount);
+  { Apply scaling to amplitude to control volume }
+  Data := output;
+  for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
+  begin
+    Data[Count] := Data[Count] * 0.1;
+  end;
+
 
   if AudioInfo^.Looped then
   begin
@@ -267,6 +276,14 @@ begin
       readSuccess := False;
 
       readSuccess := UsedSound.Read(output, frameCount);
+
+      { Apply scaling to amplitude to control volume }
+      Data := output;
+      for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
+      begin
+        Data[Count] := Data[Count] * 0.1;
+      end;
+
       if not readSuccess then
       begin
         DebugLn('readCount zero immediately after seek to beginning');
@@ -597,6 +614,7 @@ var
   done: size_t = 0;
 begin
   FError := mpg123_read(FHandle, output, frameCount * SizeOf(real), done);
+
   if done = 0 then
   begin
     Result := False;
@@ -724,9 +742,19 @@ end;
 function TSndSound.Read(output: pointer; frameCount: longint): boolean;
 var
   readCount: cint;
+  {Data: pcfloat;
+  Count: integer;}
 begin
   readCount := 0;
   readCount := sf_read_float(FSoundFile, output, frameCount * FInfo.channels);
+
+  { Apply scaling to amplitude to control volume }
+  {Data := output;
+  for Count:=0 to readCount - 1 do
+  begin
+    Data[Count] := Data[Count] * 0.1;
+  end;}
+
   // If read count matches what was requested, then all the stream has
   // not completed
   Result := (readCount = (frameCount * FInfo.channels));

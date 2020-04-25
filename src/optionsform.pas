@@ -333,6 +333,7 @@ begin
   if TAudio.Loaded and Audio.Playing then
   begin
     Audio.Abort;
+    { As there is no audiocompleted completed, it is okay not to wait }
     pgbAudio.Style := pbstNormal;
     bbPlay.Enabled := True;
     bbStop.Enabled := False;
