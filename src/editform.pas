@@ -30,7 +30,7 @@ uses
   Math, audio;
 
 type
-  TTimerAudioInfo = record
+  TTimerSoundInfo = record
     FileName: string;
     Duration: double;
     Looped: boolean;
@@ -40,9 +40,9 @@ type
 
   TfrmEdit = class(TForm)
     bbCancel: TBitBtn;
-    bbClearAudioFile: TBitBtn;
+    bbClearSound: TBitBtn;
     bbSave: TBitBtn;
-    bbSelectAudioFile: TBitBtn;
+    bbSelectSound: TBitBtn;
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     ckbUseDefaultSound: TCheckBox;
@@ -50,7 +50,7 @@ type
     ckbModalAlert: TCheckBox;
     ckbTrayNotification: TCheckBox;
     dtpDuration: TDateTimePicker;
-    edtAudioFile: TEdit;
+    edtSound: TEdit;
     edtDescription: TEdit;
     imlEdit: TImageList;
     Label1: TLabel;
@@ -64,9 +64,9 @@ type
     tsTimer: TTabSheet;
     tsSound: TTabSheet;
     procedure bbCancelClick(Sender: TObject);
-    procedure bbClearAudioFileClick(Sender: TObject);
+    procedure bbClearSoundClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
-    procedure bbSelectAudioFileClick(Sender: TObject);
+    procedure bbSelectSoundClick(Sender: TObject);
     procedure ckbUseDefaultSoundChange(Sender: TObject);
     procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
@@ -84,26 +84,26 @@ type
     FId: longword;
 
     //FAudio: TAudio;
-    FAudioInfo: TTimerAudioInfo;
+    FSoundInfo: TTimerSoundInfo;
 
-    FCurrentSound: TAudioFile;
-    FNewSound: TAudioFile;
+    FCurrentSound: TSound;
+    FNewSound: TSound;
 
-    FAudioLooped: boolean;
+    FSoundLooped: boolean;
 
-    function GetAudioDuration: double;
+    function GetSoundDuration: double;
     //function GetAudioFileName: string;
     //function GetAudioLooped: boolean;
     //procedure SetAudio(AValue: TAudio);
-    procedure SetAudioDuration(AValue: double);
+    procedure SetSoundDuration(AValue: double);
     //procedure SetAudioFileName(AValue: string);
-    procedure SetAudioLooped(AValue: boolean);
+    procedure SetSoundLooped(AValue: boolean);
     procedure SetDescription(AValue: string);
     procedure SetDuration(AValue: TTime);
     procedure SetFTrayNotification(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
-    procedure SetCurrentSound(AValue: TAudioFile);
-    procedure SetNewSound(AValue: TAudioFile);
+    procedure SetCurrentSound(AValue: TSound);
+    procedure SetNewSound(AValue: TSound);
     procedure SetUseDefaultSound(AValue: boolean);
     function Validate: boolean;
   public
@@ -121,11 +121,11 @@ type
     property Id: longword read FId;
 
     //property Audio: TAudio read FAudio write SetAudio;
-    property CurrentSound: TAudioFile read FCurrentSound write SetCurrentSound;
-    property NewSound: TAudioFile read FNewSound write SetNewSound;
+    property CurrentSound: TSound read FCurrentSound write SetCurrentSound;
+    property NewSound: TSound read FNewSound write SetNewSound;
     //property AudioFileName: string read GetAudioFileName write SetAudioFileName;
-    property AudioDuration: double read GetAudioDuration write SetAudioDuration;
-    property AudioLooped: boolean read FAudioLooped write SetAudioLooped;
+    property SoundDuration: double read GetSoundDuration write SetSoundDuration;
+    property SoundLooped: boolean read FSoundLooped write SetSoundLooped;
   end;
 
 
@@ -163,12 +163,12 @@ begin
 
   if not TAudio.Loaded then
   begin
-    bbSelectAudioFile.Enabled := False;
+    bbSelectSound.Enabled := False;
   end;
 
-  FAudioInfo.FileName := '';
-  FAudioInfo.Duration := 0;
-  FAudioInfo.Looped := False;
+  FSoundInfo.FileName := '';
+  FSoundInfo.Duration := 0;
+  FSoundInfo.Looped := False;
 
 end;
 
@@ -184,10 +184,10 @@ begin
   Close;
 end;
 
-procedure TfrmEdit.bbSelectAudioFileClick(Sender: TObject);
+procedure TfrmEdit.bbSelectSoundClick(Sender: TObject);
 var
   FileName: string;
-  TempSound: TAudioFile = nil;
+  TempSound: TSound = nil;
 begin
   odgAudio.InitialDir := '.';
   odgAudio.Options := [ofFileMustExist];
@@ -209,8 +209,8 @@ var
   DefaultSoundOff: boolean;
 begin
   DefaultSoundOff:= not ckbUseDefaultSound.Checked;
-  bbSelectAudioFile.Enabled:= DefaultSoundOff;
-  bbClearAudioFile.Enabled:= DefaultSoundOff;
+  bbSelectSound.Enabled:= DefaultSoundOff;
+  bbClearSound.Enabled:= DefaultSoundOff;
   //ckbLoop.Enabled:=DefaultSoundOff;
 end;
 
@@ -234,10 +234,10 @@ begin
   Close;
 end;
 
-procedure TfrmEdit.bbClearAudioFileClick(Sender: TObject);
+procedure TfrmEdit.bbClearSoundClick(Sender: TObject);
 begin
   //AudioFileName := '';
-  edtAudioFile.Text := '';
+  edtSound.Text := '';
 end;
 
 procedure TfrmEdit.FormDestroy(Sender: TObject);
@@ -295,14 +295,14 @@ begin
     except
       on E: EInvalidAudio do
       begin
-        //edtAudioFile.text:='';
+        //edtSound.text:='';
         //lblLenthVal.Caption:='';
         MessageDlg('Cannot load file as audio. Invalid format.'
           + LineEnding + AValue, mtError, [mbOK], 0);
         Exit;
       end;
     end;
-    edtAudioFile.Text := Audio.FileName;
+    edtSound.Text := Audio.FileName;
     lblLenthVal.Caption := FloatToStr(RoundTo(Audio.Duration, -2));
     //AudioDuration := Audio.AudioFile.Duration;
   end
@@ -314,7 +314,7 @@ begin
   if AValue = '' then
   begin
     lblLengthText.Visible := False;
-    edtAudioFile.Text := '';
+    edtSound.Text := '';
 
     lblLenthVal.Visible := False;
     Exit;
@@ -322,20 +322,20 @@ begin
   else
   begin
     lblLengthText.Visible := True;
-    edtAudioFile.Text := AudioFileName;
+    edtSound.Text := AudioFileName;
     lblLenthVal.Visible := True;
   end;
 end;}
 
-procedure TfrmEdit.SetAudioLooped(AValue: boolean);
+procedure TfrmEdit.SetSoundLooped(AValue: boolean);
 begin
   {if TAudio.Loaded then
     Audio.Looped := AValue
   else
-    FAudioInfo.Looped := AValue;}
+    FSoundInfo.Looped := AValue;}
 
-  FAudioLooped:=AValue;
-  ckbLoop.Checked := FAudioLooped;
+  FSoundLooped:=AValue;
+  ckbLoop.Checked := FSoundLooped;
 end;
 
 {function TfrmEdit.GetAudioFileName: string;
@@ -346,12 +346,12 @@ begin
     Result := FAudioInfo.FileName;
 end;}
 
-function TfrmEdit.GetAudioDuration: double;
+function TfrmEdit.GetSoundDuration: double;
 begin
   {if TAudio.Loaded then
     Result := Audio.Duration
   else
-    Result := FAudioInfo.Duration;}
+    Result := FSoundInfo.Duration;}
   Result := 0;
 end;
 
@@ -371,7 +371,7 @@ begin
   if FAudio.FileName = '' then
   begin
     lblLengthText.Visible := False;
-    edtAudioFile.Text := '';
+    edtSound.Text := '';
 
     lblLenthVal.Visible := False;
     Exit;
@@ -379,18 +379,18 @@ begin
   else
   begin
     lblLengthText.Visible := True;
-    edtAudioFile.Text := AudioFileName;
+    edtSound.Text := AudioFileName;
     lblLenthVal.Caption := FloatToStr(RoundTo(FAudio.Duration, -2));
     lblLenthVal.Visible := True;
   end;
 end;}
 
-procedure TfrmEdit.SetAudioDuration(AValue: double);
+procedure TfrmEdit.SetSoundDuration(AValue: double);
 begin
   if not TAudio.Loaded then
   begin
-    FAudioInfo.Duration := AValue;
-    lblLenthVal.Caption := FloatToStr(RoundTo(FAudioInfo.Duration, -2));
+    FSoundInfo.Duration := AValue;
+    lblLenthVal.Caption := FloatToStr(RoundTo(FSoundInfo.Duration, -2));
   end;
 end;
 
@@ -412,7 +412,7 @@ begin
   ckbModalAlert.Checked := AValue;
 end;
 
-procedure TfrmEdit.SetCurrentSound(AValue: TAudioFile);
+procedure TfrmEdit.SetCurrentSound(AValue: TSound);
 begin
   if FCurrentSound=AValue then Exit;
   FCurrentSound:=AValue;
@@ -423,7 +423,7 @@ begin
   if FCurrentSound.Source = '' then
   begin
     lblLengthText.Visible := False;
-    edtAudioFile.Text := '';
+    edtSound.Text := '';
 
     lblLenthVal.Visible := False;
     Exit;
@@ -431,13 +431,13 @@ begin
   else
   begin
     lblLengthText.Visible := True;
-    edtAudioFile.Text := FCurrentSound.Source;
+    edtSound.Text := FCurrentSound.Source;
     lblLenthVal.Caption := FloatToStr(RoundTo(FCurrentSound.Duration, -2));
     lblLenthVal.Visible := True;
   end;
 end;
 
-procedure TfrmEdit.SetNewSound(AValue: TAudioFile);
+procedure TfrmEdit.SetNewSound(AValue: TSound);
 begin
   if FNewSound=AValue then Exit;
   FNewSound:=AValue;
@@ -448,7 +448,7 @@ begin
   if FNewSound.Source = '' then
   begin
     lblLengthText.Visible := False;
-    edtAudioFile.Text := '';
+    edtSound.Text := '';
 
     lblLenthVal.Visible := False;
     Exit;
@@ -456,7 +456,7 @@ begin
   else
   begin
     lblLengthText.Visible := True;
-    edtAudioFile.Text := FNewSound.Source;
+    edtSound.Text := FNewSound.Source;
     lblLenthVal.Caption := FloatToStr(RoundTo(FNewSound.Duration, -2));
     lblLenthVal.Visible := True;
   end;
@@ -466,8 +466,8 @@ procedure TfrmEdit.SetUseDefaultSound(AValue: boolean);
 begin
   FUseDefaultSound:=AValue;
   ckbUseDefaultSound.Checked:=AValue;
-  bbClearAudioFile.Enabled:=(not AValue);
-  bbSelectAudioFile.Enabled:=(not AValue);
+  bbClearSound.Enabled:=(not AValue);
+  bbSelectSound.Enabled:=(not AValue);
   ckbLoop.Enabled:=(not AValue);
 
 end;
@@ -509,8 +509,8 @@ begin
   dtpDuration.Enabled := ButtonStatus;
   ckbUseDefaultSound.Enabled:=ButtonStatus;
 
-  bbSelectAudioFile.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
-  bbClearAudioFile.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
+  bbSelectSound.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
+  bbClearSound.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
   ckbLoop.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
 
   Result := ShowAndGetSpecs;

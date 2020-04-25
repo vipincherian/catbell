@@ -53,9 +53,9 @@ const
   TIMER_CONF_COUNT = 'count';
   //TIMER_CONF_ORDER = 'order';
 
-  TIMER_CONF_AUDIOFILE = 'audio_file';
-  TIMER_CONF_AUDIOLENGTH = 'audio_duration';
-  TIMER_CONF_AUDIOLOOP = 'audio_loop';
+  TIMER_CONF_SOUND = 'audio_file';
+  TIMER_CONF_SOUNDLENGTH = 'audio_duration';
+  TIMER_CONF_SOUNDLOOP = 'audio_loop';
 
 
   TIMER_CONF_MODALALERT = 'modal_alert';
@@ -136,12 +136,12 @@ type
     FProgress: single;
 
     FAudio: TAudio;
-    FDefaultAudioFile: TAudioFile;
-    FCustomAudioFile: TAudioFile;
+    FDefaultSound: TSound;
+    FCustomSound: TSound;
 
     //procedure SetAudio(AValue: TAudio);
     function GetIsSoundPlaying: boolean;
-    procedure SetCustomSound(AValue: TAudioFile);
+    procedure SetCustomSound(AValue: TSound);
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
@@ -173,8 +173,8 @@ type
     LastProgressIconIndex: integer;
     UseDefaultSound: boolean;
 
-    AudioInfo: TTimerAudioInfo;
-    AudioLooped: boolean;
+    SoundInfo: TTimerSoundInfo;
+    SoundLooped: boolean;
 
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
@@ -230,7 +230,7 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     //property Audio: TAudio read FAudio;// write SetAudio;
-    property CustomSound: TAudioFile read FCustomAudioFile write SetCustomSound;
+    property CustomSound: TSound read FCustomSound write SetCustomSound;
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
@@ -284,8 +284,8 @@ end;
 
 procedure TfraTimer.aiEditExecute(Sender: TObject);
 {var
-  NewCustomSound: TAudioFile = nil;
-  OldCustomSound: TAudioFile = nil; }
+  NewCustomSound: TSound = nil;
+  OldCustomSound: TSound = nil; }
 begin
   frmEdit.Description := edtTitle.Text;
   frmEdit.Duration := dtpSet.Time;
@@ -295,16 +295,16 @@ begin
 
   if TAudio.Loaded then
   begin
-    frmEdit.CurrentSound := FCustomAudioFile;
+    frmEdit.CurrentSound := FCustomSound;
   end
   else
   begin
     frmEdit.CurrentSound := Nil;
-    frmEdit.edtAudioFile.Text:= AudioInfo.FileName;
-    frmEdit.AudioDuration:= AudioInfo.Duration;
+    frmEdit.edtSound.Text:= SoundInfo.FileName;
+    frmEdit.SoundDuration:= SoundInfo.Duration;
   end;
 
-  frmEdit.AudioLooped:=AudioLooped;
+  frmEdit.SoundLooped:=SoundLooped;
 
   if frmEdit.ShowForEdit(Self) then
   begin
@@ -314,17 +314,17 @@ begin
     UseDefaultSound:=frmEdit.UseDefaultSound;
     FModalAlert := frmEdit.ModalAlert;
 
-    //OldCustomSound := FCustomAudioFile;
+    //OldCustomSound := FCustomSound;
 
     if TAudio.Loaded then
     begin
-      frmEdit.AudioLooped:=  frmEdit.ckbLoop.Checked;
+      frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
       //NewCustomSound := frmEdit.NewSound;
       if frmEdit.NewSound <> nil then
       begin
-        FCustomAudioFile.Free;
+        FCustomSound.Free;
         //OldCustomSound := nil;
-        FCustomAudioFile := frmEdit.NewSound;
+        FCustomSound := frmEdit.NewSound;
         { Now what we have taken over the responsibility of the new sound
         created, we will set it to nil for frmEdit }
         frmEdit.NewSound := nil;
@@ -333,9 +333,9 @@ begin
     end
     else
     begin
-      AudioInfo.FileName := frmEdit.edtAudioFile.Text;
-      AudioInfo.Duration := frmEdit.AudioDuration;
-      AudioInfo.Looped := frmEdit.ckbLoop.Checked;
+      SoundInfo.FileName := frmEdit.edtSound.Text;
+      SoundInfo.Duration := frmEdit.SoundDuration;
+      SoundInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
     frmMain.SavetoFile;
   end;
@@ -385,18 +385,18 @@ begin
   FAudio := AValue
 end;}
 
-procedure TfraTimer.SetCustomSound(AValue: TAudioFile);
+procedure TfraTimer.SetCustomSound(AValue: TSound);
 var
-  OldCustomSound: TAudioFile;
+  OldCustomSound: TSound;
 begin
-  if FCustomAudioFile=AValue then Exit;
+  if FCustomSound=AValue then Exit;
 
-  //OldCustomSound := FCustomAudioFile;
-  //FCustomAudioFile:=AValue;
+  //OldCustomSound := FCustomSound;
+  //FCustomSound:=AValue;
 
   //OldCustomSound.Free;
-  FCustomAudioFile.Free;
-  FCustomAudioFile:= AValue;
+  FCustomSound.Free;
+  FCustomSound:= AValue;
 
 end;
 
@@ -566,8 +566,8 @@ begin
       dtpDuration.Enabled := True;
       //frmEdit.tsAudio.Enabled:=True;
       ckbUseDefaultSound.Enabled:=True;
-      bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-      bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
+      bbSelectSound.Enabled:=True and (not ckbUseDefaultSound.Checked);
+      bbClearSound.Enabled:=True and (not ckbUseDefaultSound.Checked);
       // Looped is enabled irrespective of whether default CurrentSound is
       // used or not.
       ckbLoop.Enabled:=True;
@@ -617,7 +617,7 @@ end;
 
 constructor TfraTimer.Create(AOwner: TComponent);
 var
-  SndFile: TSndAudioFile;
+  SndFile: TSndSound;
 begin
   inherited Create(AOwner);
   InitCriticalSection(AudioCriticalSection);
@@ -661,18 +661,18 @@ begin
     FAudio := TAudio.Create;
     FAudio.OnPlayCompletion:=@AudioPlayed;
 
-    SndFile := TSndAudioFile.Create;
+    SndFile := TSndSound.Create;
     SndFile.LoadDefaultSound;
-    FDefaultAudioFile := SndFile;
+    FDefaultSound := SndFile;
   end;
-  FCustomAudioFile := nil;
+  FCustomSound := nil;
 end;
 
 destructor TfraTimer.Destroy;
 begin
   FAudio.Free;
-  FDefaultAudioFile.Free;
-  FCustomAudioFile.Free;
+  FDefaultSound.Free;
+  FCustomSound.Free;
   Parent := nil;
 
   //DoneCriticalsection(AudioCriticalSection);
@@ -856,7 +856,7 @@ begin
     PauseButtonEnabled := False;
     DurationEnabled := True;
 
-    if TAudio.Loaded and (UseDefaultSound or (FCustomAudioFile <> nil)) and (not UserInitiated) then
+    if TAudio.Loaded and (UseDefaultSound or (FCustomSound <> nil)) and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
@@ -878,13 +878,13 @@ begin
 
       // Play the sound as per configuration
       if UseDefaultSound then
-        FAudio.Play(FDefaultAudioFile, AudioLooped)
+        FAudio.Play(FDefaultSound, SoundLooped)
       else
       begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
-        if FCustomAudioFile <> nil then
-          FAudio.Play(FCustomAudioFile, AudioLooped);
+        if FCustomSound <> nil then
+          FAudio.Play(FCustomSound, SoundLooped);
       end;
 
       //DebugLn('FAudio.Play');

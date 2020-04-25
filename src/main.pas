@@ -369,8 +369,8 @@ begin
   begin
     //frmEdit.Audio := nil;
     //frmEdit.AudioFileName := '';
-    frmEdit.AudioDuration := 0;
-    frmEdit.AudioLooped := False;
+    frmEdit.SoundDuration := 0;
+    frmEdit.SoundLooped := False;
   end;
 
   if frmEdit.ShowForAdd then
@@ -385,13 +385,13 @@ begin
     begin
       //Added.Audio := TempAudio;
       Added.CustomSound := frmEdit.NewSound;
-      Added.AudioLooped := frmEdit.ckbLoop.Checked;
+      Added.SoundLooped := frmEdit.ckbLoop.Checked;
     end
     else
     begin
-      Added.AudioInfo.FileName := frmEdit.edtAudioFile.Text;
-      Added.AudioInfo.Duration := 0;
-      Added.AudioInfo.Looped := frmEdit.ckbLoop.Checked;
+      Added.SoundInfo.FileName := frmEdit.edtSound.Text;
+      Added.SoundInfo.Duration := 0;
+      Added.SoundInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
     PostTimerCreation(Added);
     SavetoFile;
@@ -1308,8 +1308,8 @@ begin
       begin
         try
           //NewTimerClock.Audio.FileName :=
-          //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-          AudioFileName := string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
+          //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
+          AudioFileName := string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
           if AudioFileName = '' then
             NewTimerclock.CustomSound := nil
           else
@@ -1318,18 +1318,18 @@ begin
             NewTimerclock.CustomSound := TAudio.LoadSound(AudioFileName);
           end;
           //NewTimerClock.Audio.Looped :=
-          //  Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+          //  Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
         except
           on E: EInvalidAudio do
           begin
             ErrorText := ErrorText + 'Could not load audio file ' +
-              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), '')) +
               ' - unsupported format or invalide file. ' +
               'File name will be reset to blank.' + LineEnding;
           end
           else
             ErrorText := ErrorText + 'Could not load audio file ' +
-              string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), '')) +
+              string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), '')) +
               ' - unknown error. File name will be reset to blank.' +
               LineEnding;
         end;
@@ -1337,14 +1337,14 @@ begin
       end
       else
       begin
-        NewTimerclock.AudioInfo.FileName :=
-          string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOFILE), ''));
-        NewTimerClock.AudioInfo.Duration :=
-          StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH), '0')), fs);
-        //NewTimerClock.AudioInfo.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+        NewTimerclock.SoundInfo.FileName :=
+          string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
+        NewTimerClock.SoundInfo.Duration :=
+          StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH), '0')), fs);
+        //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       end;
 
-      NewTimerClock.AudioInfo.Looped := Conf.GetValue(TIMER_CONF_AUDIOLOOP, False);
+      NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
@@ -1508,30 +1508,30 @@ begin
     begin
       if TimerClock.CustomSound <> nil then
       begin
-        Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
+        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
           UTF8Decode(TimerClock.CustomSound.Source));
-        Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
+        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
           UTF8Decode(FloatToStr(TimerClock.CustomSound.Duration, fs)));
-        Conf.SetValue(TIMER_CONF_AUDIOLOOP,
-          TimerClock.AudioLooped);
+        Conf.SetValue(TIMER_CONF_SOUNDLOOP,
+          TimerClock.SoundLooped);
       end
       else
       begin
-        Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
+        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
           UTF8Decode(''));
-        Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
+        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
           UTF8Decode(FloatToStr(0.0)));
-        Conf.SetValue(TIMER_CONF_AUDIOLOOP, False);
+        Conf.SetValue(TIMER_CONF_SOUNDLOOP, False);
       end;
     end
     else
     begin
-      Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOFILE),
-        UTF8Decode(TimerClock.AudioInfo.FileName));
-      Conf.SetValue(UTF8Decode(TIMER_CONF_AUDIOLENGTH),
-        UTF8Decode(FloatToStr(TimerClock.AudioInfo.Duration, fs)));
-      Conf.SetValue(TIMER_CONF_AUDIOLOOP,
-        TimerClock.AudioInfo.Looped);
+      Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
+        UTF8Decode(TimerClock.SoundInfo.FileName));
+      Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
+        UTF8Decode(FloatToStr(TimerClock.SoundInfo.Duration, fs)));
+      Conf.SetValue(TIMER_CONF_SOUNDLOOP,
+        TimerClock.SoundInfo.Looped);
     end;
 
 

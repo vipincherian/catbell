@@ -172,7 +172,7 @@ object frmEdit: TfrmEdit
       ClientHeight = 163
       ClientWidth = 471
       ImageIndex = 1
-      object bbClearAudioFile: TBitBtn
+      object bbClearSound: TBitBtn
         Left = 112
         Height = 30
         Top = 67
@@ -181,10 +181,10 @@ object frmEdit: TfrmEdit
         Caption = 'Clear'
         Images = imlEdit
         ImageIndex = 2
-        OnClick = bbClearAudioFileClick
+        OnClick = bbClearSoundClick
         TabOrder = 0
       end
-      object bbSelectAudioFile: TBitBtn
+      object bbSelectSound: TBitBtn
         Left = 382
         Height = 30
         Top = 67
@@ -193,10 +193,10 @@ object frmEdit: TfrmEdit
         Caption = 'Select'
         Images = imlEdit
         ImageIndex = 1
-        OnClick = bbSelectAudioFileClick
+        OnClick = bbSelectSoundClick
         TabOrder = 1
       end
-      object edtAudioFile: TEdit
+      object edtSound: TEdit
         Left = 112
         Height = 23
         Top = 35

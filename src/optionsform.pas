@@ -112,7 +112,7 @@ type
     FLastConfig: TUserConfig;
     FChangedConfig: TUserConfig;
     FDefaultConfig: TUserConfig;
-    FTestSound: TSndAudioFile;
+    FTestSound: TSndSound;
     Audio: TAudio;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
@@ -306,7 +306,7 @@ begin
     Audio := TAudio.Create;
     bbPlay.Enabled := True;
 
-    FTestSound := TSndAudioFile.Create;
+    FTestSound := TSndSound.Create;
     FTestSound.LoadDefaultSound;
 
   end
