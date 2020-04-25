@@ -128,7 +128,8 @@ type
     property Description: string read GetDescription write SetDescription;
     property ModalAlert: boolean read GetModalAlert write SetModalAlert;
 
-    property TrayNotification: boolean read GetTrayNotification write SetFTrayNotification;
+    property TrayNotification: boolean read GetTrayNotification
+      write SetFTrayNotification;
     property UseDefaultSound: boolean read GetUseDefaultSound write SetUseDefaultSound;
     property Id: longword read FId;
 
@@ -372,8 +373,8 @@ begin
   ckbUseDefaultSound.Enabled := TAudio.Loaded and (not FAudio.Playing);
   ckbLoop.Enabled := TAudio.Loaded and (not FAudio.Playing);
 
-
-  bbSelectSound.Enabled := TAudio.Loaded and (not FAudio.Playing) and (not ckbUseDefaultSound.Checked);
+  bbSelectSound.Enabled := TAudio.Loaded and (not FAudio.Playing) and
+    (not ckbUseDefaultSound.Checked);
   bbClearSound.Enabled := (not FAudio.Playing) and
     ((not ckbUseDefaultSound.Checked) or (edtSound.Text <> ''));
 
@@ -381,7 +382,7 @@ begin
     (ckbUseDefaultSound.Checked or (edtSound.Text <> ''));
   bbStopSound.Enabled := TAudio.Loaded and FAudio.Playing;
 
-  bbSave.Enabled:=Validate;
+  bbSave.Enabled := Validate;
 end;
 
 procedure TfrmEdit.AudioPlayed(Sender: TObject);
