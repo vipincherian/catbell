@@ -187,7 +187,6 @@ end;
 procedure TfrmEdit.bbSelectAudioFileClick(Sender: TObject);
 var
   FileName: string;
-  //OldNewSound: TAudioFile = nil;
   TempSound: TAudioFile = nil;
 begin
   odgAudio.InitialDir := '.';
@@ -196,17 +195,12 @@ begin
   if odgAudio.Execute then
   begin
     FileName := odgAudio.FileName;
-    //OldNewSound := NewSound;
     TempSound := TAudio.LoadSound(FileName);
     if TempSound <> nil then
     begin
-      //NewSound := TempSound;
-      //OldNewSound.Free;
-      FNewSound.Free;
-      FNewSound := TempSound;
-      //OldNewSound := nil;
+      NewSound.Free;
+      NewSound := TempSound;
     end;
-    //AudioFileName := FileName;
   end;
 end;
 
