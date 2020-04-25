@@ -38,8 +38,8 @@ uses
 const
   FORM_MIN_WIDTH = 600;
   FORM_MIN_HEIGHT = 300;
-  TICON_RED_INDEX: integer = 1;
-  TICON_GREEN_INDEX: integer = 2;
+  //TICON_RED_INDEX: integer = 1;
+  TICON_GREEN_INDEX: integer = 0;
   TRAY_PROGRESS_ICON_COUNT = 24;
 
   PROGRESS_COLOUR = $4352E2;
