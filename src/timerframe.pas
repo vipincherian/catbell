@@ -880,13 +880,13 @@ begin
 
       // Play the sound as per configuration
       if UseDefaultSound then
-        FAudio.Play(FDefaultSound, SoundLooped)
+        FAudio.Play(FDefaultSound, SoundLooped, GlobalUserConfig.Volume)
       else
       begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
         if FCustomSound <> nil then
-          FAudio.Play(FCustomSound, SoundLooped);
+          FAudio.Play(FCustomSound, SoundLooped, GlobalUserConfig.Volume);
       end;
       ReenableEditControls;
       //DebugLn('FAudio.Play');

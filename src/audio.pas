@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, sndfile, mpg123, portaudio, LazLogger, ctypes, Forms,
-  Dialogs, LCLIntf, lcltype, fgl, math;
+  Dialogs, LCLIntf, lcltype, fgl, Math;
 
 const
   READ_NOTLOADED = -1;
@@ -23,8 +23,9 @@ const
 
   MAX_VOLUME = 100;
   DEFAULT_VOLUME = 80;
+  VOLUME_LOG_BASE = 10;
 
-  //SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
+//SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
 
 type
   EAudioNotLoaded = class(Exception);
@@ -69,6 +70,7 @@ type
     Sound: TSound;
     Player: Pointer;
     Looped: boolean;
+    Volume: double;
 
   end;
   PAudioInfo = ^TUserInfo;
@@ -187,7 +189,7 @@ type
 
     class function GetDevices: TAudioDeviceList; static;
     class procedure SetOutputDevice(AValue: TAudioDevice); static;
-    procedure SetVolume(AValue: integer);
+    //procedure SetVolume(AValue: integer);
 
   public
     Loaded: boolean; static;
@@ -196,7 +198,7 @@ type
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
     FOutputDevice: TAudioDevice; static;
-    FVolume: integer;
+    //FVolume: integer;
 
     {Default sounds }
     DefaultSound: TSoundData; static;
@@ -211,12 +213,13 @@ type
     class function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex; static;
     class property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
     class property Devices: TAudioDeviceList read GetDevices;
-    property Volume: integer read FVolume write SetVolume;
+    //property Volume: integer read FVolume write SetVolume;
     class procedure CleanUp; static;
     class procedure SetDefaulDevice; static;
     class procedure LoadDefaultSounds; static;
     class procedure FreeDefaultSounds; static;
-    procedure Play(Sound: TSound; PlayLooped: boolean = False);
+    procedure Play(Sound: TSound; PlayLooped: boolean = False;
+      Volume: integer = DEFAULT_VOLUME);
 
     procedure Abort;
 
@@ -225,7 +228,6 @@ type
     class function LoadSound(Avalue: string): TSound; static;
 
     property Playing: boolean read FAudioPlaying;
-
     class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
 
   end;
@@ -268,9 +270,9 @@ begin
 
   { Apply scaling to amplitude to control volume }
   Data := output;
-  for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
+  for Count := 0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
   begin
-    Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME);
+    Data[Count] := Data[Count] * AudioInfo^.Volume;
   end;
 
 
@@ -288,9 +290,9 @@ begin
 
       { Apply scaling to amplitude to control volume }
       Data := output;
-      for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
+      for Count := 0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
       begin
-        Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME);
+        Data[Count] := Data[Count] * AudioInfo^.Volume;
       end;
 
       if not readSuccess then
@@ -814,11 +816,12 @@ end;
 
 { TAudio }
 
-procedure TAudio.Play(Sound: TSound; PlayLooped: boolean);
+procedure TAudio.Play(Sound: TSound; PlayLooped: boolean; Volume: integer);
 var
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
   DeviceId: integer;
+  AmpScale: double;
 begin
   //EnterCriticalSection(AudioCriticalSection);
 
@@ -869,6 +872,11 @@ begin
     FUserInfo.Sound := Sound;
     FUserInfo.Looped := PlayLooped;
     FUserInfo.Player := Self;
+
+    Assert((Volume > 0) and (Volume <= MAX_VOLUME));
+    AmpScale := Volume / MAX_VOLUME;
+    FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+    Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
 
     //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
@@ -1042,11 +1050,11 @@ begin
   end;
 end;
 
-procedure TAudio.SetVolume(AValue: integer);
+{procedure TAudio.SetVolume(AValue: integer);
 begin
   if FVolume=AValue then Exit;
   FVolume:=Min(AValue, MAX_VOLUME);
-end;
+end;}
 
 constructor TAudio.Create;
 var

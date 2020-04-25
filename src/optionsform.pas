@@ -401,7 +401,7 @@ begin
     //Audio.PlaySine;
     //Audio.PlayTest;
 
-    Audio.Play(FTestSound, True);
+    Audio.Play(FTestSound, True, tbVolume.Position);
 
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;

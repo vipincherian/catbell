@@ -268,7 +268,7 @@ begin
       FDefaultSound := TSndSound.Create;
       FDefaultSound.LoadDefaultSound;
     end;
-    FAudio.Play(FDefaultSound, SoundLooped);
+    FAudio.Play(FDefaultSound, SoundLooped, GlobalUserConfig.Volume);
     ReenableControls;
     Exit;
   end;
@@ -284,7 +284,7 @@ begin
   if SoundToPlay = nil then
     Exit;
 
-  FAudio.Play(SoundToPlay, SoundLooped);
+  FAudio.Play(SoundToPlay, SoundLooped, GlobalUserConfig.Volume);
   ReenableControls;
 end;
 
