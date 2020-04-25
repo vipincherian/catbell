@@ -22,7 +22,7 @@ const
   TableSize = 200;
 
   MAX_VOLUME = 100;
-  DEFAULT_VOLUME = 80;
+  DEFAULT_VOLUME = 90;
   VOLUME_LOG_BASE = 10;
 
 //SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
