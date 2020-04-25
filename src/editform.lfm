@@ -255,6 +255,7 @@ object frmEdit: TfrmEdit
         Caption = 'Test'
         Images = imlEdit
         ImageIndex = 3
+        OnClick = BitBtn1Click
         TabOrder = 5
       end
       object BitBtn2: TBitBtn

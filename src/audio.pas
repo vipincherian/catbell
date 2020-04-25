@@ -119,7 +119,7 @@ type
     procedure SetFileName(AValue: string);
     function GetSource: string; override;
   public
-    constructor Create();
+    constructor Create;
     destructor Destroy; override;
     procedure SeekToBeginning; override;
     function Read(output: pointer; frameCount: longint): boolean; override;
@@ -155,7 +155,7 @@ type
     function GetSource: string; override;
 
   public
-    constructor Create();
+    constructor Create;
     destructor Destroy; override;
     procedure SeekToBeginning; override;
     function Read(output: pointer; frameCount: longint): boolean; override;
@@ -199,7 +199,7 @@ type
 
     OnPlayCompletion: TNotifyEvent;
     Looped: boolean;
-    constructor Create();
+    constructor Create;
     destructor Destroy; override;
     class function GetDefaultDeviceIndex: AudioDeviceIndex; static;
     class procedure GetDefaultDevice(Device: PAudioDevice); static;

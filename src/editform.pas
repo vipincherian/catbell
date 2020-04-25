@@ -67,6 +67,7 @@ type
     procedure bbClearSoundClick(Sender: TObject);
     procedure bbSaveClick(Sender: TObject);
     procedure bbSelectSoundClick(Sender: TObject);
+    procedure BitBtn1Click(Sender: TObject);
     procedure ckbUseDefaultSoundChange(Sender: TObject);
     procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
@@ -83,7 +84,8 @@ type
     FUseDefaultSound: boolean;
     FId: longword;
 
-    //FAudio: TAudio;
+    FAudio: TAudio;
+    FDefaultSound: TSndSound;
     FSoundInfo: TTimerSoundInfo;
 
     FCurrentSound: TSound;
@@ -170,6 +172,9 @@ begin
   FSoundInfo.Duration := 0;
   FSoundInfo.Looped := False;
 
+  FAudio := TAudio.Create;
+  FDefaultSound := nil;
+
 end;
 
 procedure TfrmEdit.bbSaveClick(Sender: TObject);
@@ -179,9 +184,9 @@ begin
   FDuration := dtpDuration.Time;
   FModalAlert := ckbModalAlert.Checked;
   FTrayNotification := ckbTrayNotification.Checked;
-  FUseDefaultSound:=ckbUseDefaultSound.Checked;
+  FUseDefaultSound := ckbUseDefaultSound.Checked;
   FProceed := True;
-  FSoundLooped:=ckbLoop.Checked;
+  FSoundLooped := ckbLoop.Checked;
   Close;
 end;
 
@@ -205,13 +210,44 @@ begin
   end;
 end;
 
+procedure TfrmEdit.BitBtn1Click(Sender: TObject);
+var
+  //DefaultSound: TSndSound = nil;
+  SoundToPlay: TSound = nil;
+begin
+  {If the default sound is being used, play that, and scamper}
+  if UseDefaultSound then
+  begin
+    if FDefaultSound = nil then
+    begin
+      FDefaultSound := TSndSound.Create;
+      FDefaultSound.LoadDefaultSound;
+    end;
+    FAudio.Play(FDefaultSound);
+    Exit;
+  end;
+
+
+  if FNewSound <> nil then
+    SoundToPlay := FNewSound
+  else if FCurrentSound <> nil then
+    SoundToPlay := FCurrentSound
+  else
+    Assert(False);
+
+  if SoundToPlay = nil then
+    Exit;
+
+  FAudio.Play(SoundToPlay);
+end;
+
 procedure TfrmEdit.ckbUseDefaultSoundChange(Sender: TObject);
 var
   DefaultSoundOff: boolean;
 begin
-  DefaultSoundOff:= not ckbUseDefaultSound.Checked;
-  bbSelectSound.Enabled:= DefaultSoundOff;
-  bbClearSound.Enabled:= DefaultSoundOff;
+  DefaultSoundOff := not ckbUseDefaultSound.Checked;
+  bbSelectSound.Enabled := DefaultSoundOff;
+  bbClearSound.Enabled := DefaultSoundOff;
   //ckbLoop.Enabled:=DefaultSoundOff;
 end;
 
@@ -243,6 +279,8 @@ end;
 
 procedure TfrmEdit.FormDestroy(Sender: TObject);
 begin
+  FDefaultSound.Free;
+  FAudio.Free;
   //FSpecs.Free;
   // There can be excpetions to this, but just a check to see if this ever
   // happens
@@ -335,7 +373,7 @@ begin
   else
     FSoundInfo.Looped := AValue;}
 
-  FSoundLooped:=AValue;
+  FSoundLooped := AValue;
   ckbLoop.Checked := FSoundLooped;
 end;
 
@@ -415,8 +453,9 @@ end;
 
 procedure TfrmEdit.SetCurrentSound(AValue: TSound);
 begin
-  if FCurrentSound=AValue then Exit;
-  FCurrentSound:=AValue;
+  if FCurrentSound = AValue then
+    Exit;
+  FCurrentSound := AValue;
 
   if FCurrentSound = nil then
     Exit;
@@ -440,8 +479,9 @@ end;
 
 procedure TfrmEdit.SetNewSound(AValue: TSound);
 begin
-  if FNewSound=AValue then Exit;
-  FNewSound:=AValue;
+  if FNewSound = AValue then
+    Exit;
+  FNewSound := AValue;
 
   if FNewSound = nil then
     Exit;
@@ -465,10 +505,10 @@ end;
 
 procedure TfrmEdit.SetUseDefaultSound(AValue: boolean);
 begin
-  FUseDefaultSound:=AValue;
-  ckbUseDefaultSound.Checked:=AValue;
-  bbClearSound.Enabled:=(not AValue);
-  bbSelectSound.Enabled:=(not AValue);
+  FUseDefaultSound := AValue;
+  ckbUseDefaultSound.Checked := AValue;
+  bbClearSound.Enabled := (not AValue);
+  bbSelectSound.Enabled := (not AValue);
   //ckbLoop.Enabled:=(not AValue);
 
 end;
@@ -506,13 +546,13 @@ begin
   { When we are showing the form to edit the timer, some controls
   are disabled. For example, you cannot change the duration of the timer,
   nor can you change the audio/CurrentSound details }
-  ButtonStatus:=(not Widget.Running);
+  ButtonStatus := (not Widget.Running);
   dtpDuration.Enabled := ButtonStatus;
-  ckbUseDefaultSound.Enabled:=ButtonStatus;
+  ckbUseDefaultSound.Enabled := ButtonStatus;
 
-  bbSelectSound.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
-  bbClearSound.Enabled:=ButtonStatus and (not ckbUseDefaultSound.Checked);
-  ckbLoop.Enabled:=ButtonStatus;// and (not ckbUseDefaultSound.Checked);
+  bbSelectSound.Enabled := ButtonStatus and (not ckbUseDefaultSound.Checked);
+  bbClearSound.Enabled := ButtonStatus and (not ckbUseDefaultSound.Checked);
+  ckbLoop.Enabled := ButtonStatus;// and (not ckbUseDefaultSound.Checked);
 
   Result := ShowAndGetSpecs;
   FId := longword(-1);
