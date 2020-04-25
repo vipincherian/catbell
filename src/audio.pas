@@ -184,10 +184,10 @@ type
   TAudio = class(TObject)
   private
     //FSoundFile: PSNDFILE;
-    FAudioFile: TAudioFile;
+    //FAudioFile: TAudioFile;
 
-    FSndAudioFile: TSndAudioFile;
-    FMpgAudioFile: TMpgAudioFile;
+    //FSndAudioFile: TSndAudioFile;
+    //FMpgAudioFile: TMpgAudioFile;
 
     //FDefAudioFile: TSndAudioFile;
     //FTickAudioFile: TSndAudioFile;
@@ -196,7 +196,7 @@ type
     //FSndAudioF
     //FFileType: integer;
 
-    FFileName: string;
+    //FFileName: string;
     //FAudioFileLoaded: boolean;
     //FAudioLength: double;
 
@@ -211,7 +211,7 @@ type
     Data: PaTestData;
     DataPointer: PPaTestData;
     function GetAudioFileLoaded: boolean;
-    function GetDuration: double;
+    //function GetDuration: double;
     class procedure LoadSoundFromResource(ResourceName: string;
       var Sound: TSoundData); static;
 
@@ -219,13 +219,13 @@ type
     class function GetDevices: TAudioDeviceList; static;
     //procedure SetFileName(AValue: string);
     class procedure SetOutputDevice(AValue: TAudioDevice); static;
-    procedure Play;
-    procedure PlayDefaultSound;
-    procedure PlayTickSound;
-    procedure PlayTest;
-    procedure PlaySine;
-    procedure UnloadAudioFile;
-    procedure LoadFromFile(AValue: string);
+    //procedure Play;
+    //procedure PlayDefaultSound;
+    //procedure PlayTickSound;
+    //procedure PlayTest;
+    //procedure PlaySine;
+    //procedure UnloadAudioFile;
+    //procedure LoadFromFile(AValue: string);
   public
     Loaded: boolean; static;
     UseDefaultDevice: boolean; static;
@@ -256,13 +256,13 @@ type
     procedure Abort;
     //procedure SetDefaultSound;
     procedure FinishedAud({%H-}Datax: PtrInt);
-    property FileName: string read FFileName;
+    //property FileName: string read FFileName;
 
     class function LoadSound(Avalue: string): TAudioFile; static;
-    property Duration: double read GetDuration;
+    //property Duration: double read GetDuration;
     property Playing: boolean read FAudioPlaying;
     //property AudioFile: TAudioFile read FAudioFile;
-    property AudioFileLoaded: boolean read GetAudioFileLoaded;
+    //property AudioFileLoaded: boolean read GetAudioFileLoaded;
     class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
 
   end;
@@ -973,16 +973,16 @@ begin
   end;
 end;
 
-function TAudio.GetDuration: double;
+{function TAudio.GetDuration: double;
 begin
   if not AudioFileLoaded then
   begin
     Result := -1;
     Exit;
   end;
-  Assert(FAudioFile <> nil);
-  Result := FAudioFile.Duration;
-end;
+  //Assert(FAudioFile <> nil);
+  Result := 0;//FAudioFile.Duration;
+end;}
 
 class procedure TAudio.LoadSoundFromResource(ResourceName: string;
   var Sound: TSoundData);
@@ -1013,7 +1013,7 @@ end;
 
 function TAudio.GetAudioFileLoaded: boolean;
 begin
-  Result := (FAudioFile <> nil);
+  Result := false;//(FAudioFile <> nil);
 end;
 
 class function TAudio.GetDevices: TAudioDeviceList; static;
@@ -1184,11 +1184,11 @@ begin
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
   //FSoundFile := nil;
-  FAudioFile := nil;
+  //FAudioFile := nil;
   //FAudioFileLoaded := False;
 
-  FSndAudioFile := TSndAudioFile.Create;
-  FMpgAudioFile := TMpgAudioFile.Create;
+  //FSndAudioFile := TSndAudioFile.Create;
+  //FMpgAudioFile := TMpgAudioFile.Create;
 
   //FDefAudioFile := TSndAudioFile.Create;
   //FDefAudioFile.LoadDefaultSound;
@@ -1196,11 +1196,11 @@ begin
   //FTickAudioFile := TSndAudioFile.Create;
 
 
-  FAudioFile := FSndAudioFile;
+  //FAudioFile := FSndAudioFile;
   //FFileType := READ_NOTLOADED;
 
 
-  FFileName := '';
+  //FFileName := '';
   Looped := False;
   FAudioPlaying := False;
 
@@ -1223,8 +1223,8 @@ begin
   //DebugLn('TAudio.Destroy ');
   //FTickAudioFile.Destroy;
   //FDefAudioFile.Destroy;
-  FMpgAudioFile.Destroy;
-  FSndAudioFile.Destroy;
+  //FMpgAudioFile.Destroy;
+  //FSndAudioFile.Destroy;
   inherited Destroy;
 end;
 
@@ -1336,14 +1336,14 @@ begin
   FreeMem(DefaultSound.Buffer);
 end;
 
-procedure TAudio.Play;
+{procedure TAudio.Play;
 {var
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
   DeviceId: integer;}
 begin
   //EnterCriticalSection(AudioCriticalSection);
-  Play(FAudioFile, Looped);
+  //Play(FAudioFile, Looped);
   {try
     if not TAudio.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
@@ -1427,24 +1427,24 @@ begin
     //LeaveCriticalSection(AudioCriticalSection);
   end; }
 
-end;
+end;}
 
-procedure TAudio.PlayDefaultSound;
+{procedure TAudio.PlayDefaultSound;
 begin
   ;//Play(FDefAudioFile, Looped);
-end;
+end;}
 
-procedure TAudio.PlayTickSound;
+{procedure TAudio.PlayTickSound;
 begin
   ;//Play(FTickAudioFile);
-end;
+end;}
 
-procedure TAudio.PlayTest;
+{procedure TAudio.PlayTest;
 begin
   ;//Play(FDefAudioFile, True);
-end;
+end;}
 
-procedure TAudio.PlaySine;
+{procedure TAudio.PlaySine;
 var
   PaErrCode: PaError;
   OutputParameters: PaStreamParameters;
@@ -1501,7 +1501,7 @@ begin
 
   FAudioPlaying := True;
 
-end;
+end;}
 
 procedure TAudio.Abort;
 var
@@ -1585,20 +1585,20 @@ begin
   LeaveCriticalSection(AudioCriticalSection);
 end;
 
-procedure TAudio.UnloadAudioFile;
+{procedure TAudio.UnloadAudioFile;
 begin
-  FAudioFile := nil;
+  //FAudioFile := nil;
   //FAudioFileLoaded:=false;
   FFileName := '';
-end;
+end;}
 
-procedure TAudio.LoadFromFile(AValue: string);
+{procedure TAudio.LoadFromFile(AValue: string);
 {var
   FSnd: TSndAudioFile = nil;}
 begin
   //FAudioFileLoaded:=false;
-  if AValue <> '' then
-  begin
+  {if AValue <> '' then
+  begin}
     {try
       FSndAudioFile.SetFileName(AValue);
       FAudioFile := FSndAudioFile;
@@ -1612,7 +1612,7 @@ begin
           raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
       end;
     end; }
-    FSndAudioFile.SetFileName(AValue);
+    {FSndAudioFile.SetFileName(AValue);
     if FSndAudioFile.FileName <> '' then
     begin
       Assert(FSndAudioFile <> nil);
@@ -1635,9 +1635,9 @@ begin
 
     raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
 
-  end;
+  end; }
 
-end;
+end;}
 
 class function TAudio.LoadSound(Avalue: string): TAudioFile;
 var
