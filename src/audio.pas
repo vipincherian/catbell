@@ -21,6 +21,9 @@ const
   // Wavetable size. Influences your pitch:
   TableSize = 200;
 
+  MAX_VOLUME = 100;
+  DEFAULT_VOLUME = 80;
+
   //SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
 
 type
@@ -184,7 +187,7 @@ type
 
     class function GetDevices: TAudioDeviceList; static;
     class procedure SetOutputDevice(AValue: TAudioDevice); static;
-    class procedure SetVolume(AValue: double); static;
+    procedure SetVolume(AValue: integer);
 
   public
     Loaded: boolean; static;
@@ -193,7 +196,7 @@ type
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
     FOutputDevice: TAudioDevice; static;
-    FVolume: double; static;
+    FVolume: integer;
 
     {Default sounds }
     DefaultSound: TSoundData; static;
@@ -208,7 +211,7 @@ type
     class function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex; static;
     class property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
     class property Devices: TAudioDeviceList read GetDevices;
-    class property Volume: double read FVolume write SetVolume;
+    property Volume: integer read FVolume write SetVolume;
     class procedure CleanUp; static;
     class procedure SetDefaulDevice; static;
     class procedure LoadDefaultSounds; static;
@@ -229,6 +232,9 @@ type
 
 
 implementation
+
+uses
+  settings;
 
 {This function is called by PortAudio to request for audio data, and is passed
 as a parameter while opening the stream.
@@ -264,7 +270,7 @@ begin
   Data := output;
   for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
   begin
-    Data[Count] := Data[Count] * TAudio.Volume;
+    Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME);
   end;
 
 
@@ -284,7 +290,7 @@ begin
       Data := output;
       for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
       begin
-        Data[Count] := Data[Count] * TAudio.Volume;
+        Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME);
       end;
 
       if not readSuccess then
@@ -1036,10 +1042,10 @@ begin
   end;
 end;
 
-class procedure TAudio.SetVolume(AValue: double);
+procedure TAudio.SetVolume(AValue: integer);
 begin
-  if TAudio.FVolume=AValue then Exit;
-  TAudio.FVolume:=Min(AValue, 1);
+  if FVolume=AValue then Exit;
+  FVolume:=Min(AValue, MAX_VOLUME);
 end;
 
 constructor TAudio.Create;
@@ -1291,7 +1297,6 @@ initialization
   TAudio.DefaultSound.Loaded := False;
   TAudio.DefaultTick.Loaded := False;
   TAudio.FDevices := TAudioDeviceList.Create;
-  TAudio.FVolume:=1;
 
   {$IFNDEF AUDIO_STATIC}
   TAudio.Loaded := Pa_Load(LIB_PORTAUDIO);

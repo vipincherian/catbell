@@ -63,6 +63,8 @@ type
     UseDefaultSound: boolean;
     LoopSound: boolean;
 
+    Volume: integer;
+
     constructor Create();
     destructor Destroy; override;
 
@@ -170,6 +172,9 @@ const
   LOOP_SOUND = 'loop_sound';
   DEF_LOOP_SOUND = False;
 
+  VOLUME_LEVEL = 'volume';
+  DEF_VOLUME_LEVEL = DEFAULT_VOLUME;
+
 
 procedure InitSettings;
 procedure CleanupSettings;
@@ -274,6 +279,7 @@ begin
 
     UseDefaultAudioDevice:=FConf.GetValue(USE_DEFAULT_SOUND, DEF_USE_DEFAULT_AUDIO_DEVICE);
     LoopSound:=FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
+    Volume:=FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
 
   except
     CreateAnew;
@@ -322,6 +328,7 @@ begin
 
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
+  FConf.SetValue(VOLUME_LEVEL, Volume);
 
 end;
 
@@ -377,6 +384,7 @@ begin
 
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
+  FConf.SetValue(VOLUME_LEVEL, Volume);
 
   FConf.Flush;
 end;
@@ -432,6 +440,7 @@ begin
 
   UseDefaultSound:=DEF_USE_DEFAULT_SOUND;
   LoopSound:=DEF_LOOP_SOUND;
+  Volume:=DEF_VOLUME_LEVEL;
 
 end;
 
@@ -464,6 +473,7 @@ begin
 
   UseDefaultSound:=From.UseDefaultSound;
   LoopSound:=From.LoopSound;
+  Volume:=From.Volume;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -540,6 +550,11 @@ begin
     Exit;
   end;
   if LoopSound <> From.LoopSound then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if Volume <> From.Volume then
   begin
     Result := False;
     Exit;

@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
   Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
-  {portaudio, }LazLogger, audio;
+  {portaudio, }LazLogger, audio, Math;
 
 const
   LSVADUIO_INDEX_HOSTAPI: integer = 0;
@@ -116,14 +116,14 @@ type
     FDefaultConfig: TUserConfig;
     FTestSound: TSndSound;
     Audio: TAudio;
-    function GetVolume: double;
+    function GetVolume: integer;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
-    procedure SetVolume(AValue: double);
+    procedure SetVolume(AValue: integer);
   public
     { public declarations }
-    property Volume: double read GetVolume write SetVolume;
+    //property Volume: integer read GetVolume write SetVolume;
   end;
 
 var
@@ -202,6 +202,7 @@ begin
 
     cbUseDefaultSound.Checked := UseDefaultSound;
     cbLoopSound.Checked := LoopSound;
+    tbVolume.Position:=Volume;
 
   end;
 end;
@@ -232,9 +233,9 @@ begin
   end;
 end;
 
-function TfrmOptions.GetVolume: double;
+function TfrmOptions.GetVolume: integer;
 begin
-  Result := (tbVolume.Position / 10);
+  Result := Min(tbVolume.Position, MAX_VOLUME);
 end;
 
 procedure TfrmOptions.GetConfigFromControls(Config: TUserConfig);
@@ -289,13 +290,14 @@ begin
 
     UseDefaultSound := cbUseDefaultSound.Checked;
     LoopSound := cbLoopSound.Checked;
+    Volume := tbVolume.Position;
 
   end;
 end;
 
-procedure TfrmOptions.SetVolume(AValue: double);
+procedure TfrmOptions.SetVolume(AValue: integer);
 begin
-  tbVolume.Position:=Round(AValue * 10);
+  tbVolume.Position:=Min(AValue, MAX_VOLUME);
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);

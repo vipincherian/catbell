@@ -577,7 +577,9 @@ object frmOptions: TfrmOptions
           Height = 25
           Top = 8
           Width = 92
+          Max = 100
           Position = 0
+          TickStyle = tsNone
           TabOrder = 0
         end
       end
