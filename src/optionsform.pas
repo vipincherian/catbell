@@ -68,6 +68,7 @@ type
     GroupBox5: TGroupBox;
     GroupBox6: TGroupBox;
     GroupBox7: TGroupBox;
+    GroupBox8: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
     Label11: TLabel;
@@ -89,6 +90,7 @@ type
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
     TabSheet1: TTabSheet;
+    tbVolume: TTrackBar;
     tsAudio: TTabSheet;
     tsTimers: TTabSheet;
     tsInterface: TTabSheet;
@@ -114,11 +116,14 @@ type
     FDefaultConfig: TUserConfig;
     FTestSound: TSndSound;
     Audio: TAudio;
+    function GetVolume: double;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
+    procedure SetVolume(AValue: double);
   public
     { public declarations }
+    property Volume: double read GetVolume write SetVolume;
   end;
 
 var
@@ -227,6 +232,11 @@ begin
   end;
 end;
 
+function TfrmOptions.GetVolume: double;
+begin
+  Result := (tbVolume.Position / 10);
+end;
+
 procedure TfrmOptions.GetConfigFromControls(Config: TUserConfig);
 var
   Item: TListItem;
@@ -281,6 +291,11 @@ begin
     LoopSound := cbLoopSound.Checked;
 
   end;
+end;
+
+procedure TfrmOptions.SetVolume(AValue: double);
+begin
+  tbVolume.Position:=Round(AValue * 10);
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);

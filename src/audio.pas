@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, sndfile, mpg123, portaudio, LazLogger, ctypes, Forms,
-  Dialogs, LCLIntf, lcltype, fgl;
+  Dialogs, LCLIntf, lcltype, fgl, math;
 
 const
   READ_NOTLOADED = -1;
@@ -184,6 +184,7 @@ type
 
     class function GetDevices: TAudioDeviceList; static;
     class procedure SetOutputDevice(AValue: TAudioDevice); static;
+    class procedure SetVolume(AValue: double); static;
 
   public
     Loaded: boolean; static;
@@ -192,6 +193,7 @@ type
     FDefaultDevice: integer; static;
     AudioCriticalSection: TRTLCriticalSection; static;
     FOutputDevice: TAudioDevice; static;
+    FVolume: double; static;
 
     {Default sounds }
     DefaultSound: TSoundData; static;
@@ -206,6 +208,7 @@ type
     class function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex; static;
     class property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
     class property Devices: TAudioDeviceList read GetDevices;
+    class property Volume: double read FVolume write SetVolume;
     class procedure CleanUp; static;
     class procedure SetDefaulDevice; static;
     class procedure LoadDefaultSounds; static;
@@ -255,13 +258,13 @@ begin
   UsedSound := AudioInfo^.Sound;
 
   readSuccess := False;
-
   readSuccess := UsedSound.Read(output, frameCount);
+
   { Apply scaling to amplitude to control volume }
   Data := output;
   for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
   begin
-    Data[Count] := Data[Count] * 0.1;
+    Data[Count] := Data[Count] * TAudio.Volume;
   end;
 
 
@@ -273,15 +276,15 @@ begin
     begin
 
       UsedSound.SeekToBeginning;
-      readSuccess := False;
 
+      readSuccess := False;
       readSuccess := UsedSound.Read(output, frameCount);
 
       { Apply scaling to amplitude to control volume }
       Data := output;
       for Count:=0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
       begin
-        Data[Count] := Data[Count] * 0.1;
+        Data[Count] := Data[Count] * TAudio.Volume;
       end;
 
       if not readSuccess then
@@ -1033,7 +1036,13 @@ begin
   end;
 end;
 
-constructor TAudio.Create();
+class procedure TAudio.SetVolume(AValue: double);
+begin
+  if TAudio.FVolume=AValue then Exit;
+  TAudio.FVolume:=Min(AValue, 1);
+end;
+
+constructor TAudio.Create;
 var
   i: integer;
 begin
@@ -1282,6 +1291,7 @@ initialization
   TAudio.DefaultSound.Loaded := False;
   TAudio.DefaultTick.Loaded := False;
   TAudio.FDevices := TAudioDeviceList.Create;
+  TAudio.FVolume:=1;
 
   {$IFNDEF AUDIO_STATIC}
   TAudio.Loaded := Pa_Load(LIB_PORTAUDIO);
