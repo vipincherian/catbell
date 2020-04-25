@@ -189,8 +189,8 @@ type
     FSndAudioFile: TSndAudioFile;
     FMpgAudioFile: TMpgAudioFile;
 
-    FDefAudioFile: TSndAudioFile;
-    FTickAudioFile: TSndAudioFile;
+    //FDefAudioFile: TSndAudioFile;
+    //FTickAudioFile: TSndAudioFile;
 
     //FSndDefaultSoundFile: TSndAudioFile;
     //FSndAudioF
@@ -222,7 +222,7 @@ type
     procedure Play;
     procedure PlayDefaultSound;
     procedure PlayTickSound;
-
+    procedure PlayTest;
     procedure PlaySine;
     procedure UnloadAudioFile;
     procedure LoadFromFile(AValue: string);
@@ -252,7 +252,7 @@ type
     class procedure LoadDefaultSounds; static;
     class procedure FreeDefaultSounds; static;
     procedure Play(AudioFile: TAudioFile; PlayLooped: boolean = False);
-    procedure PlayTest;
+
     procedure Abort;
     //procedure SetDefaultSound;
     procedure FinishedAud({%H-}Datax: PtrInt);
@@ -1190,10 +1190,10 @@ begin
   FSndAudioFile := TSndAudioFile.Create;
   FMpgAudioFile := TMpgAudioFile.Create;
 
-  FDefAudioFile := TSndAudioFile.Create;
-  FDefAudioFile.LoadDefaultSound;
+  //FDefAudioFile := TSndAudioFile.Create;
+  //FDefAudioFile.LoadDefaultSound;
 
-  FTickAudioFile := TSndAudioFile.Create;
+  //FTickAudioFile := TSndAudioFile.Create;
 
 
   FAudioFile := FSndAudioFile;
@@ -1221,8 +1221,8 @@ end;
 destructor TAudio.Destroy;
 begin
   //DebugLn('TAudio.Destroy ');
-  FTickAudioFile.Destroy;
-  FDefAudioFile.Destroy;
+  //FTickAudioFile.Destroy;
+  //FDefAudioFile.Destroy;
   FMpgAudioFile.Destroy;
   FSndAudioFile.Destroy;
   inherited Destroy;
@@ -1431,17 +1431,17 @@ end;
 
 procedure TAudio.PlayDefaultSound;
 begin
-  Play(FDefAudioFile, Looped);
+  ;//Play(FDefAudioFile, Looped);
 end;
 
 procedure TAudio.PlayTickSound;
 begin
-  Play(FTickAudioFile);
+  ;//Play(FTickAudioFile);
 end;
 
 procedure TAudio.PlayTest;
 begin
-  Play(FDefAudioFile, True);
+  ;//Play(FDefAudioFile, True);
 end;
 
 procedure TAudio.PlaySine;

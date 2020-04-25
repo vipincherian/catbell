@@ -112,6 +112,7 @@ type
     FLastConfig: TUserConfig;
     FChangedConfig: TUserConfig;
     FDefaultConfig: TUserConfig;
+    FTestSound: TSndAudioFile;
     Audio: TAudio;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
@@ -286,6 +287,8 @@ procedure TfrmOptions.FormCreate(Sender: TObject);
 var
   AudioDevice: TAudioDevice;
 begin
+  FTestSound := nil;
+
   OnShow := @FormShow;
   FLastConfig := TUserConfig.Create;
   FChangedConfig := TUserConfig.Create;
@@ -302,6 +305,10 @@ begin
     edtDefaultHostAPI.Text := AudioDevice.HostAPIName;
     Audio := TAudio.Create;
     bbPlay.Enabled := True;
+
+    FTestSound := TSndAudioFile.Create;
+    FTestSound.LoadDefaultSound;
+
   end
   else
   begin
@@ -314,6 +321,7 @@ end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
 begin
+  FTestSound.Free;
   Audio.Free;
   FLastConfig.Free;
   FChangedConfig.Free;
@@ -351,7 +359,6 @@ end;
 procedure TfrmOptions.bbPlayClick(Sender: TObject);
 var
   Item: TListItem;
-
 begin
   if TAudio.Loaded then
   begin
@@ -369,10 +376,15 @@ begin
           TAudio.FOutputDevice.HostAPIName := Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
         end;
       end;
+
+
     end;
 
     //Audio.PlaySine;
-    Audio.PlayTest;
+    //Audio.PlayTest;
+
+    Audio.Play(FTestSound, True);
+
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;
     bbStop.Enabled := True;
