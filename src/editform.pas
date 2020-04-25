@@ -84,6 +84,7 @@ type
     //FTrayNotification: boolean;
     //FUseDefaultSound: boolean;
     FId: longword;
+    FWidget: Pointer;
 
     FAudio: TAudio;
     FDefaultSound: TSndSound;
@@ -115,14 +116,14 @@ type
     procedure SetNewSound(AValue: TSound);
     procedure SetUseDefaultSound(AValue: boolean);
     function Validate: boolean;
-    // Single place where controls are enabled/disabled
-    procedure ReenableControls;
     procedure AudioPlayed(Sender: TObject);
   public
     //AudioLooped: boolean;
     function ShowAndGetSpecs: boolean;
     function ShowForAdd: boolean;
     function ShowForEdit(Sender: TFrame): boolean;
+    // Single place where controls are enabled/disabled
+    procedure ReenableControls;
 
     property Duration: TTime read GetDuration write SetDuration;
     property Description: string read GetDescription write SetDescription;
@@ -161,6 +162,8 @@ uses
 procedure TfrmEdit.FormCreate(Sender: TObject);
 begin
   FProceed := False;
+  FWidget := nil;
+
   FAudio := TAudio.Create;
   FAudio.OnPlayCompletion := @AudioPlayed;
   FDefaultSound := nil;
@@ -367,19 +370,36 @@ begin
 end;
 
 procedure TfrmEdit.ReenableControls;
+var
+  WidgetRunning, WidgetPlayingSound: boolean;
+  Widget: TfraTimer;
 begin
+  WidgetRunning := False;
+  WidgetPlayingSound := False;
+
+  if FWidget <> nil then
+  begin
+    Widget := TfraTimer(FWidget);
+    WidgetPlayingSound := Widget.IsSoundPlaying;
+    WidgetRunning := Widget.Running;
+  end;
+
   { This controls takes care of enabling/disabling controls at various
   junctures.}
-  ckbUseDefaultSound.Enabled := TAudio.Loaded and (not FAudio.Playing);
-  ckbLoop.Enabled := TAudio.Loaded and (not FAudio.Playing);
 
-  bbSelectSound.Enabled := TAudio.Loaded and (not FAudio.Playing) and
-    (not ckbUseDefaultSound.Checked);
-  bbClearSound.Enabled := (not FAudio.Playing) and
+  dtpDuration.Enabled := (not WidgetRunning);
+
+  ckbUseDefaultSound.Enabled :=
+    (not WidgetPlayingSound) and TAudio.Loaded and (not FAudio.Playing);
+  ckbLoop.Enabled := (not WidgetPlayingSound) and TAudio.Loaded and (not FAudio.Playing);
+
+  bbSelectSound.Enabled := (not WidgetPlayingSound) and TAudio.Loaded and
+    (not FAudio.Playing) and (not ckbUseDefaultSound.Checked);
+  bbClearSound.Enabled := (not WidgetPlayingSound) and (not FAudio.Playing) and
     ((not ckbUseDefaultSound.Checked) or (edtSound.Text <> ''));
 
-  bbTestSound.Enabled := TAudio.Loaded and (not FAudio.Playing) and
-    (ckbUseDefaultSound.Checked or (edtSound.Text <> ''));
+  bbTestSound.Enabled := (not WidgetPlayingSound) and TAudio.Loaded and
+    (not FAudio.Playing) and (ckbUseDefaultSound.Checked or (edtSound.Text <> ''));
   bbStopSound.Enabled := TAudio.Loaded and FAudio.Playing;
 
   bbSave.Enabled := Validate;
@@ -647,19 +667,20 @@ begin
   tsTimer.Show;
   Widget := TfraTimer(Sender);
   Fid := Widget.Id;
+  FWidget := Widget;
   Caption := 'Edit Timer';
 
   ReenableControls;
   { When we are showing the form to edit the timer, some controls
   are disabled. For example, you cannot change the duration of the timer,
   nor can you change the audio/CurrentSound details }
-  ButtonStatus := (not Widget.Running);
+  {ButtonStatus := (not Widget.Running);
   dtpDuration.Enabled := ButtonStatus;
   ckbUseDefaultSound.Enabled := ButtonStatus;
 
   bbSelectSound.Enabled := ButtonStatus and (not ckbUseDefaultSound.Checked);
   bbClearSound.Enabled := ButtonStatus and (not ckbUseDefaultSound.Checked);
-  ckbLoop.Enabled := ButtonStatus;// and (not ckbUseDefaultSound.Checked);
+  ckbLoop.Enabled := ButtonStatus;// and (not ckbUseDefaultSound.Checked);}
 
   Result := ShowAndGetSpecs;
   FId := longword(-1);

@@ -81,10 +81,10 @@ object frmEdit: TfrmEdit
     Height = 191
     Top = 8
     Width = 479
-    ActivePage = tsSound
+    ActivePage = tsTimer
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = imlEdit
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 2
     object tsTimer: TTabSheet
       Caption = 'Timer'

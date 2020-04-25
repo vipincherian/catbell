@@ -165,7 +165,7 @@ type
     procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: longword);
-    procedure ReEnableEditAudioControls;
+    procedure ReenableEditControls;
 
   public
     { public declarations }
@@ -556,13 +556,13 @@ begin
 
 end;
 
-procedure TfraTimer.ReEnableEditAudioControls;
+procedure TfraTimer.ReenableEditControls;
 begin
   { When a timer stops, check if the same timer was being edited?
   If so, a few controls which were disabled can be re-enabled }
   if frmEdit.Showing and (frmEdit.Id = FId) then
   begin
-    with frmEdit do
+    {with frmEdit do
     begin
       dtpDuration.Enabled := True;
       //frmEdit.tsAudio.Enabled:=True;
@@ -572,7 +572,8 @@ begin
       // Looped is enabled irrespective of whether default CurrentSound is
       // used or not.
       ckbLoop.Enabled:=True;
-    end;
+    end;}
+    frmEdit.ReenableControls;
   end;
 end;
 
@@ -606,7 +607,7 @@ begin
       ckbLoop.Enabled:=True;
     end;
   end;}
-  ReEnableEditAudioControls;
+  ReenableEditControls;
 
   //bbEdit.Enabled := True;
 end;
@@ -887,7 +888,7 @@ begin
         if FCustomSound <> nil then
           FAudio.Play(FCustomSound, SoundLooped);
       end;
-
+      ReenableEditControls;
       //DebugLn('FAudio.Play');
     end
     else
@@ -908,7 +909,7 @@ begin
           ckbLoop.Enabled:=True;
         end;
       end; }
-      ReEnableEditAudioControls;
+      ReenableEditControls;
       //bbEdit.Enabled:=True;
     end;
   end;
