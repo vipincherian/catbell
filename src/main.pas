@@ -435,7 +435,7 @@ begin
         DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
         Application.ProcessMessages;
         //TODO: Remove hardcoding
-        if GetTickCount64 > (StartTickCount + 2000) then
+        if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
           break;
       end;
     end;
@@ -1572,7 +1572,7 @@ var
   TimerClock: TfraTimer;
   Count: integer;
   IdList: TIdList;
-  //StartTickCount: longword;
+  StartTickCount: longword;
 begin
   IdList := TIdList.Create;
 
@@ -1589,7 +1589,7 @@ begin
     if TimerClock.Running or TimerClock.IsSoundPlaying then;
       TimerClock.Stop(True);
 
-    //StartTickCount := GetTickCount64;
+    StartTickCount := GetTickCount64;
     { Abort is asynchronous, wait till each timer aborts.
     Also, we do not wait for more than two seconds per timer.
     After that, it is past caring. Tardiness can be tolerated only as much. }
@@ -1597,8 +1597,8 @@ begin
     begin
       DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
       Application.ProcessMessages;
-      //if GetTickCount64 > (StartTickCount + 2000) then
-      //  break;
+      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_LONG_WAIT) then
+        break;
     end;
 
     if TimerClock.Selected then

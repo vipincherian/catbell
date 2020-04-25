@@ -93,6 +93,9 @@ var
   GlobalUserConfig: TUserFileConfig;
 
 const
+  AUDIO_ABORT_SHORT_WAIT = 2000;
+  AUDIO_ABORT_LONG_WAIT = 5000;
+
   TIMER_INIT_MINS = 'timer_init_mins';
   DEF_TIMER_INIT_MINS = 0;
 

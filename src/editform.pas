@@ -221,7 +221,7 @@ begin
       DebugLn('Waiting for');
       Application.ProcessMessages;
       //TODO: Remove hardcoding
-      if GetTickCount64 > (StartTickCount + 2000) then
+      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
         break;
     end;
   end;

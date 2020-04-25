@@ -346,10 +346,27 @@ begin
 end;
 
 procedure TfrmOptions.FormHide(Sender: TObject);
+var
+  StartTickCount: longword;
 begin
   if TAudio.Loaded and Audio.Playing then
   begin
-    Audio.Abort;
+
+    StartTickCount := GetTickCount64;
+    { Wait for FAudio to complete }
+    if Audio.Playing then
+    begin
+      Audio.Abort;
+      while Audio.Playing do
+      begin
+        DebugLn('Waiting for');
+        Application.ProcessMessages;
+        //TODO: Remove hardcoding
+        if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+          break;
+      end;
+    end;
+
     { As there is no audiocompleted completed, it is okay not to wait }
     pgbAudio.Style := pbstNormal;
     bbPlay.Enabled := True;
@@ -410,10 +427,26 @@ begin
 end;
 
 procedure TfrmOptions.bbStopClick(Sender: TObject);
+var
+  StartTickCount: longword;
 begin
   if TAudio.Loaded then;
   begin
-    Audio.Abort;
+    StartTickCount := GetTickCount64;
+    { Wait for FAudio to complete }
+    if Audio.Playing then
+    begin
+      Audio.Abort;
+      while Audio.Playing do
+      begin
+        DebugLn('Waiting for');
+        Application.ProcessMessages;
+        //TODO: Remove hardcoding
+        if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+          break;
+      end;
+    end;
+    //Audio.Abort;
     pgbAudio.Style := pbstNormal;
     bbPlay.Enabled := True;
     bbStop.Enabled := False;
