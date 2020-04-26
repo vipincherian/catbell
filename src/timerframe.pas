@@ -71,6 +71,8 @@ const
   TIMER_CONF_RUNNING = 'running';
   TIMER_CONF_PAUSED = 'paused';
 
+  TIMER_CONF_METRONOME = 'metronome';
+
   //UM_PLAY_AUDIO = LM_USER + 1;
   //UM_FINISHED_AUDIO = LM_USER + 2;
 
@@ -175,6 +177,8 @@ type
 
     SoundInfo: TTimerSoundInfo;
     SoundLooped: boolean;
+
+    Metronome: boolean;
 
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
@@ -305,6 +309,7 @@ begin
   end;
 
   frmEdit.SoundLooped:=SoundLooped;
+  frmEdit.Metronome:=Metronome;
 
   if frmEdit.ShowForEdit(Self) then
   begin
@@ -317,6 +322,7 @@ begin
     //OldCustomSound := FCustomSound;
 
     SoundLooped:=frmEdit.SoundLooped;
+    Metronome:=frmEdit.Metronome;
     if TAudio.Loaded then
     begin
       //frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
@@ -668,6 +674,7 @@ begin
     FDefaultSound := SndFile;
   end;
   FCustomSound := nil;
+  Metronome:=False;
 end;
 
 destructor TfraTimer.Destroy;

@@ -117,7 +117,6 @@ type
     ilMain: TImageList;
     ilMainSmall: TImageList;
     MenuItem1: TMenuItem;
-    MenuItem10: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
@@ -149,7 +148,6 @@ type
     tbDelete: TToolButton;
     tbMoveUP: TToolButton;
     tbMoveDown: TToolButton;
-    ToolButton10: TToolButton;
     ToolButton11: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
@@ -393,6 +391,7 @@ begin
       //Added.Audio := TempAudio;
       Added.CustomSound := frmEdit.NewSound;
       Added.SoundLooped := frmEdit.ckbLoop.Checked;
+      Added.Metronome:=frmEdit.Metronome;
     end
     else
     begin
@@ -1361,6 +1360,8 @@ begin
       NewTimerClock.TrayNotification :=
         Conf.GetValue(TIMER_CONF_TRAYNOTIFICATION, False);
 
+      NewTimerClock.Metronome:=Conf.GetValue(TIMER_CONF_METRONOME, False);
+
       State.Running := Conf.GetValue(TIMER_CONF_RUNNING, False);
       State.Paused := Conf.GetValue(TIMER_CONF_PAUSED, False);
       State.PendingTicks := Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
@@ -1566,6 +1567,8 @@ begin
     Conf.SetValue(TIMER_CONF_ENDTIME, UTF8Decode(FloatToStr(State.EndTime, fs)));
     Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, State.DurationTicks);
 
+
+    Conf.SetValue(TIMER_CONF_METRONOME, TimerClock.Metronome);
     //OrderStrings.Insert(0, IntToStr(Count + 1));
 
     Conf.CloseKey;
@@ -1694,6 +1697,7 @@ end;
 procedure TfrmMain.OnShortTimer(Sender: TObject);
 var
   TimerFrame: TfraTimer;
+  TriggerMetronome: boolean = False;
 begin
   try
     if FActiveTimerFrames.Count = 0 then
@@ -1701,6 +1705,7 @@ begin
     try
       for TimerFrame in FActiveTimerFrames do
       begin
+        TriggerMetronome := (TriggerMetronome or TimerFrame.Metronome);
         TimerFrame.HandleTimerTrigger();
       end;
     except
@@ -1708,7 +1713,8 @@ begin
         DebugLn('Exception in TfrmMain.OnShortTimer: ' + E.ClassName +
           LineEnding + E.Message);
     end;
-    FMetronome.HandleTimerTrigger;
+    if TriggerMetronome then
+      FMetronome.HandleTimerTrigger;
   finally
   end;
 

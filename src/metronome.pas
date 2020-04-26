@@ -5,7 +5,7 @@ unit metronome;
 interface
 
 uses
-  Classes, SysUtils, audio, settings;
+  Classes, SysUtils, Forms, audio, settings, lazlogger;
 
 type
 
@@ -26,6 +26,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure HandleTimerTrigger;
+    procedure Abort;
     property Running: boolean read FRunning write SetRunning;
     property Bpm: integer read FBpm write SetBpm;
   end;
@@ -78,6 +79,22 @@ begin
   begin
     FAudio.Play(FTickSound, False, GlobalUserConfig.Volume);
     FLastPlayedTick := CurrentTick;
+  end;
+end;
+
+procedure TMetronome.Abort;
+var
+  StartTickCount: longword;
+begin
+
+  FAudio.Abort;
+
+  while FAudio.Playing do
+  begin
+    DebugLn('Waiting for frame metronome to stop audio');
+    Application.ProcessMessages;
+    if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+      break;
   end;
 end;
 

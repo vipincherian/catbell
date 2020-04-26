@@ -45,6 +45,7 @@ type
     bbSelectSound: TBitBtn;
     bbTestSound: TBitBtn;
     bbStopSound: TBitBtn;
+    ckbMetronome: TCheckBox;
     ckbUseDefaultSound: TCheckBox;
     ckbLoop: TCheckBox;
     ckbModalAlert: TCheckBox;
@@ -97,11 +98,13 @@ type
 
     function GetDescription: string;
     function GetDuration: TTime;
+    function GetMetronome: boolean;
     function GetModalAlert: boolean;
     function GetSoundDuration: double;
     function GetSoundLooped: boolean;
     function GetTrayNotification: boolean;
     function GetUseDefaultSound: boolean;
+    procedure SetMetronome(AValue: boolean);
     //function GetAudioFileName: string;
     //function GetAudioLooped: boolean;
     //procedure SetAudio(AValue: TAudio);
@@ -140,6 +143,7 @@ type
     //property AudioFileName: string read GetAudioFileName write SetAudioFileName;
     property SoundDuration: double read GetSoundDuration write SetSoundDuration;
     property SoundLooped: boolean read GetSoundLooped write SetSoundLooped;
+    property Metronome: boolean read GetMetronome write SetMetronome;
   end;
 
 
@@ -498,6 +502,11 @@ begin
   Result := dtpDuration.Time;
 end;
 
+function TfrmEdit.GetMetronome: boolean;
+begin
+  Result := ckbMetronome.Checked;
+end;
+
 function TfrmEdit.GetModalAlert: boolean;
 begin
   Result := ckbModalAlert.Checked;
@@ -516,6 +525,11 @@ end;
 function TfrmEdit.GetUseDefaultSound: boolean;
 begin
   Result := ckbUseDefaultSound.Checked;
+end;
+
+procedure TfrmEdit.SetMetronome(AValue: boolean);
+begin
+  ckbMetronome.Checked:=AValue;
 end;
 
 {function TfrmEdit.GetAudioLooped: boolean;
