@@ -51,6 +51,7 @@ type
     cbUseDefaultAudio: TCheckBox;
     cbUseDefaultSound: TCheckBox;
     cbLoopSound: TCheckBox;
+    CheckBox4: TCheckBox;
     ckbQueryExit: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
@@ -69,8 +70,10 @@ type
     GroupBox6: TGroupBox;
     GroupBox7: TGroupBox;
     GroupBox8: TGroupBox;
+    GroupBox9: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
+    Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
@@ -89,6 +92,7 @@ type
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
+    speBpm: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     tbVolume: TTrackBar;

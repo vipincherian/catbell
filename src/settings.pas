@@ -179,6 +179,7 @@ const
   DEF_VOLUME_LEVEL = DEFAULT_VOLUME;
 
 
+
 procedure InitSettings;
 procedure CleanupSettings;
 
