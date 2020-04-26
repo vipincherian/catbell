@@ -429,6 +429,10 @@ object frmMain: TfrmMain
         }
         ImageIndex = 2
       end
+      object MenuItem10: TMenuItem
+        Caption = '&Metronome'
+        Checked = True
+      end
       object MenuItem1: TMenuItem
         Action = aiExport
         Caption = '&Export'

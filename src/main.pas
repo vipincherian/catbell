@@ -117,6 +117,7 @@ type
     ilMain: TImageList;
     ilMainSmall: TImageList;
     MenuItem1: TMenuItem;
+    MenuItem10: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;

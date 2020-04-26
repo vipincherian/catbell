@@ -90,6 +90,7 @@ type
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
     TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
     tbVolume: TTrackBar;
     tsAudio: TTabSheet;
     tsTimers: TTabSheet;
