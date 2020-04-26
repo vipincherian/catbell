@@ -18,7 +18,7 @@ hourglass_flat.svg|16,24_g,256
 notify_progress_auto.svg|24
 pencil.svg|16,24
 wrench.svg|16,24
-sound.svg|16
+sound.svg|16,24
 bell.svg|16
 play_bare.svg|16
 stop_bare.svg|16

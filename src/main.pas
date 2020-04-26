@@ -149,6 +149,8 @@ type
     tbDelete: TToolButton;
     tbMoveUP: TToolButton;
     tbMoveDown: TToolButton;
+    ToolButton10: TToolButton;
+    ToolButton11: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;

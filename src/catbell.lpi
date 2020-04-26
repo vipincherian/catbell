@@ -49,7 +49,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="13">
+    <Units Count="14">
       <Unit0>
         <Filename Value="catbell.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -123,6 +123,10 @@
         <Filename Value="audio.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit12>
+      <Unit13>
+        <Filename Value="metronome.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit13>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

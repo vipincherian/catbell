@@ -130,7 +130,9 @@ type
     function Read(output: pointer; frameCount: longint): boolean; override;
 
     property FileName: string read FFileName write SetFileName;
+    procedure LoadInMemorySound(SoundData: PSoundData);
     procedure LoadDefaultSound;
+    procedure LoadTick;
     property Channels: integer read GetChannels;
     property SampleRate: integer read GetSampleRate;
     property Duration: double read GetAudioLength;
@@ -717,7 +719,7 @@ begin
   Result := FInfo.samplerate;
 end;
 
-constructor TSndSound.Create();
+constructor TSndSound.Create;
 begin
   //inherited create;
   FSoundFile := nil;
@@ -771,13 +773,16 @@ begin
   Result := (readCount = (frameCount * FInfo.channels));
 end;
 
-procedure TSndSound.LoadDefaultSound;
+procedure TSndSound.LoadInMemorySound(SoundData: PSoundData);
 var
   TempSoundFile: PSNDFILE;
 begin
   //EnterCriticalSection(AudioCriticalSection);
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  FVIOUserData.Sound:=SoundData;
+  FVIOUserData.Position:=0;
 
   DebugLn('Before calling sf_open_virtual');
   DebugLnEnter;
@@ -812,6 +817,16 @@ begin
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
   //LeaveCriticalSection(AudioCriticalSection);
 
+end;
+
+procedure TSndSound.LoadDefaultSound;
+begin
+  LoadInMemorySound(@TAudio.DefaultSound);
+end;
+
+procedure TSndSound.LoadTick;
+begin
+  LoadInMemorySound(@TAudio.DefaultTick);
 end;
 
 { TAudio }

@@ -33,7 +33,7 @@ uses
 timeralertform, aboutform, editform, adjustform, audio, lazlogger
   { you can add units after this }
 {$IF defined(windows) }
-  ,windows
+  ,windows, metronome
 {$ENDIF}
 { There is a semicolon here }
 ;
