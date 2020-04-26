@@ -33,7 +33,7 @@ uses
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
-  {portaudio, sndfile,}{ctypes,} audio;
+  {portaudio, sndfile,}{ctypes,} audio, metronome;
 
 const
   FORM_MIN_WIDTH = 600;
@@ -212,6 +212,8 @@ type
     FOrder: TIdList;
     FCounterClockID: TSequence;
 
+    FMetronome: TMetronome;
+
     FShortTimer: TTimer;
 
     { This is an invisible timer frame, the purpose of which
@@ -285,6 +287,8 @@ begin
   {$ENDIF}
 
   TAudio.LoadDefaultSounds;
+
+  FMetronome := TMetronome.Create;
 
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
@@ -551,6 +555,8 @@ begin
   FOrder.Free;
 
   FShortTimer.Free;
+
+  FMetronome.Free;
   //inherited Destroy;
 end;
 
@@ -1702,6 +1708,7 @@ begin
         DebugLn('Exception in TfrmMain.OnShortTimer: ' + E.ClassName +
           LineEnding + E.Message);
     end;
+    FMetronome.HandleTimerTrigger;
   finally
   end;
 
