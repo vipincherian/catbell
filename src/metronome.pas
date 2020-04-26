@@ -17,6 +17,9 @@ type
       FTickSound: TSndSound;
       FRunning: boolean;
       FLastPlayedTick: longword;
+      FBpm: integer;
+      FInterval: integer;
+      procedure SetBpm(AValue: integer);
       procedure SetRunning(AValue: boolean);
 
     public
@@ -24,6 +27,7 @@ type
       destructor Destroy; override;
       procedure HandleTimerTrigger;
       property Running: boolean read FRunning write SetRunning;
+      property Bpm: integer read FBpm write SetBpm;
   end;
 
 implementation
@@ -37,6 +41,13 @@ begin
   FRunning:=AValue;
 end;
 
+procedure TMetronome.SetBpm(AValue: integer);
+begin
+  if FBpm=AValue then Exit;
+  FBpm:=AValue;
+  FInterval:=60000 div FBpm;
+end;
+
 constructor TMetronome.Create;
 begin
   FAudio := TAudio.Create;
@@ -44,6 +55,8 @@ begin
   FTickSound.LoadTick;
 
   FLastPlayedTick:=GetTickCount64;
+
+  Bpm := 100;
 end;
 
 destructor TMetronome.Destroy;
@@ -58,7 +71,7 @@ var
   CurrentTick: longword;
 begin
   CurrentTick := GetTickCount64;
-  if (CurrentTick - FLastPlayedTick) > 1000 then
+  if (CurrentTick - FLastPlayedTick) > FInterval then
   begin
     FAudio.Play(FTickSound, False, GlobalUserConfig.Volume);
     FLastPlayedTick:=CurrentTick;
