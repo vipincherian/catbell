@@ -198,7 +198,7 @@ type
     UseDefaultDevice: boolean; static;
     FDevices: TAudioDeviceList; static;
     FDefaultDevice: integer; static;
-    AudioCriticalSection: TRTLCriticalSection; static;
+    //AudioCriticalSection: TRTLCriticalSection; static;
     FOutputDevice: TAudioDevice; static;
     //FVolume: integer;
 
@@ -259,7 +259,7 @@ var
   Data: pcfloat;
   Count: integer;
 begin
-  EnterCriticalSection(TAudio.AudioCriticalSection);
+  //EnterCriticalSection(TAudio.AudioCriticalSection);
 
   AudioInfo := PAudioinfo(userData);
 
@@ -301,7 +301,7 @@ begin
       begin
         Logger.Debug('readCount zero immediately after seek to beginning');
         Result := cint(paAbort);
-        LeaveCriticalSection(TAudio.AudioCriticalSection);
+        //LeaveCriticalSection(TAudio.AudioCriticalSection);
         Exit;
       end;
     end;
@@ -320,7 +320,7 @@ begin
     end;
   end;
 
-  LeaveCriticalSection(TAudio.AudioCriticalSection);
+  //LeaveCriticalSection(TAudio.AudioCriticalSection);
 end;
 
 {This function is called by PortAudio to signal that the stream has stopped.
@@ -331,14 +331,14 @@ var
   AudioInfo: PAudioInfo;
   {%H-}AudioTemp: TAudio; // Possibly buggy hint, omitting
 begin
-  EnterCriticalSection(TAudio.AudioCriticalSection);
+  //EnterCriticalSection(TAudio.AudioCriticalSection);
 
   AudioInfo := PAudioinfo(userData);
 
   AudioTemp := TAudio(AudioInfo^.Player);
 
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
-  LeaveCriticalSection(TAudio.AudioCriticalSection);
+  //LeaveCriticalSection(TAudio.AudioCriticalSection);
 end;
 
 { This is called when playback is finished.
@@ -964,10 +964,10 @@ var
   DeviceName: string;
   Device: PAudioDevice;
 begin
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
   if not TAudio.Loaded then
   begin
-    LeaveCriticalSection(AudioCriticalSection);
+    //LeaveCriticalSection(AudioCriticalSection);
     raise EAudioNotLoaded.Create('Audio not loaded.');
   end;
 
@@ -1022,7 +1022,7 @@ begin
   Logger.Debug('');
   Result := FDevices;
 
-  LeaveCriticalSection(AudioCriticalSection);
+  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 class procedure TAudio.GetDefaultDevice(Device: PAudioDevice); static;
@@ -1032,7 +1032,7 @@ var
   HostAPIInfo: PPaHostApiInfo;
   DeviceName, HostAPIName: string;
 begin
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
   DevideId := TAudio.GetDefaultDeviceIndex;
   DeviceInfo := Pa_GetDeviceInfo(DevideId);
   if DeviceInfo = nil then
@@ -1053,7 +1053,7 @@ begin
   Device^.DeviceName := DeviceName;
   Device^.HostAPIName := HostAPIName;
 
-  LeaveCriticalSection(AudioCriticalSection);
+  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 class procedure TAudio.SetOutputDevice(AValue: TAudioDevice);
@@ -1105,7 +1105,7 @@ class function TAudio.GetDefaultDeviceIndex: AudioDeviceIndex;
 var
   DeviceId: AudioDeviceIndex;
 begin
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
@@ -1113,11 +1113,11 @@ begin
   if DeviceId = paNoDevice then
   begin
     Logger.Debug('No default device');
-    LeaveCriticalSection(AudioCriticalSection);
+    //LeaveCriticalSection(AudioCriticalSection);
     raise EInvalidDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
   end;
   Result := DeviceId;
-  LeaveCriticalSection(AudioCriticalSection);
+  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 class function TAudio.GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
@@ -1126,7 +1126,7 @@ var
   DeviceInfo: PPaDeviceInfo;
   HostAPIInfo: PPaHostApiInfo;
 begin
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
@@ -1158,12 +1158,12 @@ begin
       if HostAPIInfo^.Name = Device.HostAPIName then
       begin
         Result := CountDevice;
-        LeaveCriticalSection(AudioCriticalSection);
+        //LeaveCriticalSection(AudioCriticalSection);
         Exit;
       end;
     end;
   end;
-  LeaveCriticalSection(AudioCriticalSection);
+  //LeaveCriticalSection(AudioCriticalSection);
   raise EInvalidDevice.Create('No matching device for ' + Device.DeviceName +
     ':' + Device.HostAPIName);
 
@@ -1249,7 +1249,7 @@ begin
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
-  EnterCriticalSection(AudioCriticalSection);
+  //EnterCriticalSection(AudioCriticalSection);
 
   {This check might be redundant. Just to be safe}
   Assert(FStream <> nil);
@@ -1286,7 +1286,7 @@ begin
   FAudioPlaying := False;
   if OnPlayCompletion <> nil then
     OnPlayCompletion(Self);
-  LeaveCriticalSection(AudioCriticalSection);
+  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 class function TAudio.LoadSound(Avalue: string): TSound;
@@ -1413,11 +1413,11 @@ initialization
       {$ENDIF}
     end;
   end;
-  InitCriticalSection(TAudio.AudioCriticalSection);
+  //InitCriticalSection(TAudio.AudioCriticalSection);
 
 
 finalization
-  DoneCriticalsection(TAudio.AudioCriticalSection);
+  //DoneCriticalsection(TAudio.AudioCriticalSection);
   if TAudio.Loaded then
   begin
     Pa_Terminate;
