@@ -344,7 +344,7 @@ end;
 { This is called when playback is finished.
   Remember: ALWAYS USE CDECL or your pointers will be messed up!
   Pointers to this function must be castable to PPaStreamFinishedCallback: }
-procedure StreamFinished(UserData: pointer); cdecl;
+{procedure StreamFinished(UserData: pointer); cdecl;
 var
   LocalDataPointer: PPaTestData;
   {%H-}AudioTemp: TAudio; // buggy hint, omitting
@@ -354,7 +354,7 @@ begin
   AudioTemp := TAudio(LocalDataPointer^.Player);
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
   LeaveCriticalSection(TAudio.AudioCriticalSection);
-end;
+end;}
 
 function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
 var
@@ -1253,7 +1253,7 @@ begin
 
   {This check might be redundant. Just to be safe}
   Assert(FStream <> nil);
-  paErrCode := Pa_IsStreamStopped(FStream);
+  {paErrCode := Pa_IsStreamStopped(FStream);
   if paErrCode = 0 then
   begin
     paErrCode := Pa_StopStream(FStream);
@@ -1267,7 +1267,15 @@ begin
   begin
     Logger.Debug('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
     Logger.Debug('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
+  end;}
+
+  paErrCode := Pa_StopStream(FStream);
+  if (paErrCode <> Int32(paNoError)) then
+  begin
+    Logger.Debug('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
+    Logger.Debug('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
   end;
+
   paErrCode := Pa_CloseStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
   begin

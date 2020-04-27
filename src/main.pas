@@ -273,18 +273,10 @@ implementation
 { TfrmMain }
 
 procedure TfrmMain.FormCreate(Sender: TObject);
-var
-  Test: TEVentLog;
 begin
   { Obtain the application handle, and the taskbar COM object.
   This has to be done at the beginning, as calls are made to progressupdate
   from within FormCreate. This cannot be pushed down }
-
-  Test := TEventLog.Create(nil);
-  Test.LogType:=ltFile;
-  Test.FileName:='out.txt';
-  Test.Debug('Haha');
-  Test.Free;
 
   {$IF defined(windows) }
   AppHandle := TWin32WidgetSet(WidgetSet).{%H-}AppHandle; // Omit the warning
