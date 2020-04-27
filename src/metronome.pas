@@ -77,7 +77,12 @@ begin
   CurrentTick := GetTickCount64;
   if (CurrentTick - FLastPlayedTick) > FInterval then
   begin
-    FAudio.Play(FTickSound, False, GlobalUserConfig.Volume);
+    { This check is not necessary if everything goes well, but in certain cases,
+    for instances when you are debugging, or on days when the hound is
+    heard baying across the moor. this is known to result in isolated
+    instances of messsage display and similar annoyances. }
+    if not FAudio.Playing then
+      FAudio.Play(FTickSound, False, GlobalUserConfig.Volume);
     FLastPlayedTick := CurrentTick;
   end;
 end;
