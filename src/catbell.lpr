@@ -23,20 +23,26 @@ program catbell;
 
 {$mode objfpc}{$H+}
 //{$INTERFACES CORBA}
-uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
-  cthreads,
-  {$ENDIF}{$ENDIF}
+uses {$IFDEF UNIX} {$IFDEF UseCThreads}
+  cthreads, {$ENDIF} {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, SysUtils, Dialogs, datetimectrls, main,
-  sequence, timerframe, settings, optionsform, 
-timeralertform, aboutform, editform, adjustform, audio, lazlogger
-  { you can add units after this }
-{$IF defined(windows) }
-  ,windows, metronome
-{$ENDIF}
-{ There is a semicolon here }
-;
+  Forms,
+  SysUtils,
+  Dialogs,
+  datetimectrls,
+  main,
+  sequence,
+  timerframe,
+  settings,
+  optionsform,
+  timeralertform,
+  aboutform,
+  editform,
+  adjustform,
+  audio,
+  eventlog,
+  metronome { you can add units after this } {$IF defined(windows) }  ,
+  Windows {$ENDIF} { There is a semicolon here };
 
 {$R *.res}
 const
@@ -48,13 +54,23 @@ var
   //DefaultConfig: TDefaultConfig;
   MutexHandle: THandle;
 begin
-  RequireDerivedFormResource:=True;
+  RequireDerivedFormResource := True;
 
   {$if declared(useHeapTrace)}
   setHeapTraceOutput('catbell_trace.log');
   {$endIf}
 
-  DebugLn('Application built on ' + {$INCLUDE %DATE%});
+  Logger := TEventLog.Create(nil);
+  Logger.LogType := ltFile;
+  Logger.FileName := 'catbell.log';
+  //Logger.Set
+  Logger.Info('************************');
+  Logger.Info('Application run starting');
+  Logger.Info('************************');
+  Logger.Info('  Build on -       ' + {$INCLUDE %DATE%});
+  Logger.Info('  Target CPU -     ' + {$INCLUDE %FPCTARGETCPU%});
+  Logger.Info('  Target OS -      ' + {$INCLUDE %FPCTARGETOS%});
+  Logger.Info('  FPC version -    ' + {$INCLUDE %FPCVERSION%});
 
   { Checks to ensure that only one instance of the application runs at a time }
   {$IF defined(windows) }
@@ -89,13 +105,12 @@ begin
   Application.CreateForm(TfrmAdjust, frmAdjust);
   Application.Run;
 
-//  AppController.Destroy;
+  //  AppController.Destroy;
   //FormWidget.Destroy;
   CleanupSettings;
   {$IF defined(windows) }
   if MutexHandle <> 0 then
     CloseHandle(MutexHandle);
   {$ENDIF}
-
+  Logger.Free;
 end.
-

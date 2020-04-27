@@ -29,11 +29,11 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, LazLogger, LMessages,
+  timerframe, fgl, sequence, editform, Math, LMessages,
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
-  {portaudio, sndfile,}{ctypes,} audio, metronome;
+  {portaudio, sndfile,}{ctypes,} audio, metronome, eventlog;
 
 const
   FORM_MIN_WIDTH = 600;
@@ -273,10 +273,18 @@ implementation
 { TfrmMain }
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  Test: TEVentLog;
 begin
   { Obtain the application handle, and the taskbar COM object.
   This has to be done at the beginning, as calls are made to progressupdate
   from within FormCreate. This cannot be pushed down }
+
+  Test := TEventLog.Create(nil);
+  Test.LogType:=ltFile;
+  Test.FileName:='out.txt';
+  Test.Debug('Haha');
+  Test.Free;
 
   {$IF defined(windows) }
   AppHandle := TWin32WidgetSet(WidgetSet).{%H-}AppHandle; // Omit the warning
@@ -438,7 +446,7 @@ begin
       After that, it is past caring. Tardiness can be tolerated only as much. }
       while FTimerFrames.Data[Count].IsSoundPlaying do
       begin
-        DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
+        Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
         Application.ProcessMessages;
         //TODO: Remove hardcoding
         if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
@@ -1014,7 +1022,7 @@ begin
 
   try
     if FActiveTimerFrames.Remove(Sender) = -1 then
-      DebugLn('Unable to remove from active timerframes.');
+      Logger.Debug('Unable to remove from active timerframes.');
 
     FShortTimer.Enabled := (FActiveTimerFrames.Count > 0);
 
@@ -1047,7 +1055,7 @@ begin
     Application.QueueAsyncCall(@ShowModalAlert, 0);
   end;
   UpdateStatusTimerCount;
-  //DebugLn('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
+  //Logger.Debug('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
 
 end;
 
@@ -1066,7 +1074,7 @@ begin
     {$ENDIF}
   except
     on E: Exception do
-      DebugLn('Exception in TfrmMain.TimerPaused: ' + E.ClassName +
+      Logger.Debug('Exception in TfrmMain.TimerPaused: ' + E.ClassName +
         LineEnding + E.Message);
   end;
 
@@ -1171,7 +1179,7 @@ begin
           Result := FTaskBarList.SetOverlayIcon(AppHandle, FOverlayProgressIcons[Index + 1].Handle,
             PWideChar(''));
           if Result <> S_OK then
-            DebugLn('SetOverlayIcon failed ' + IntToStr(Result));
+            Logger.Debug('SetOverlayIcon failed ' + IntToStr(Result));
 
         end;
         {$ENDIF}
@@ -1607,7 +1615,7 @@ begin
     After that, it is past caring. Tardiness can be tolerated only as much. }
     while TimerClock.IsSoundPlaying do
     begin
-      DebugLn('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
+      Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
       Application.ProcessMessages;
       if GetTickCount64 > (StartTickCount + AUDIO_ABORT_LONG_WAIT) then
         break;
@@ -1710,7 +1718,7 @@ begin
       end;
     except
       on E: Exception do
-        DebugLn('Exception in TfrmMain.OnShortTimer: ' + E.ClassName +
+        Logger.Debug('Exception in TfrmMain.OnShortTimer: ' + E.ClassName +
           LineEnding + E.Message);
     end;
     if TriggerMetronome then

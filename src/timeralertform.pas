@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  LCLType, ExtCtrls, Buttons, ComCtrls, LazLogger;
+  LCLType, ExtCtrls, Buttons, ComCtrls, EventLog;
 
 type
 

@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
   Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
-  {portaudio, }LazLogger, audio, Math;
+  {portaudio, }EventLog, audio, Math;
 
 const
   LSVADUIO_INDEX_HOSTAPI: integer = 0;
@@ -364,7 +364,7 @@ begin
       Audio.Abort;
       while Audio.Playing do
       begin
-        DebugLn('Waiting for');
+        Logger.Debug('Waiting for');
         Application.ProcessMessages;
         //TODO: Remove hardcoding
         if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
@@ -444,7 +444,7 @@ begin
       Audio.Abort;
       while Audio.Playing do
       begin
-        DebugLn('Waiting for');
+        Logger.Debug('Waiting for');
         Application.ProcessMessages;
         //TODO: Remove hardcoding
         if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then

@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} LazLogger,
+  ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} EventLog,
   Math, audio;
 
 type
@@ -222,7 +222,7 @@ begin
     FAudio.Abort;
     while FAudio.Playing do
     begin
-      DebugLn('Waiting for');
+      Logger.Debug('Waiting for');
       Application.ProcessMessages;
       //TODO: Remove hardcoding
       if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then

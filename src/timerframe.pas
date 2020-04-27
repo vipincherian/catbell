@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
-  editform, Graphics, Math, LazLogger, adjustform, {sndfile, portaudio,} audio,
+  editform, Graphics, Math, EventLog, adjustform, {sndfile, portaudio,} audio,
   {ctypes,} LMessages, LCLIntf, StrUtils;
 
 const
@@ -532,7 +532,7 @@ var
   Elapsed: longword;
 begin
   Elapsed := Ceil(PendingMilliseconds / 1000);
-  //DebugLn('Elapsed in ms is ' + IntToStr(PendingMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
+  //Logger.Debug('Elapsed in ms is ' + IntToStr(PendingMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
 
   Seconds := Elapsed mod 60;
   Minutes := Elapsed div 60;
@@ -825,7 +825,7 @@ end;
 procedure TfraTimer.Stop(UserInitiated: boolean);
 begin
   { The audio is playing and the user request is to terminate the audio.}
-  DebugLn('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));
+  Logger.Debug('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));
   if TAudio.Loaded and FAudio.Playing then
   begin
     FRunning := False;
@@ -896,7 +896,7 @@ begin
           FAudio.Play(FCustomSound, SoundLooped, GlobalUserConfig.Volume);
       end;
       ReenableEditControls;
-      //DebugLn('FAudio.Play');
+      //Logger.Debug('FAudio.Play');
     end
     else
     begin

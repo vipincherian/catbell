@@ -5,7 +5,7 @@ unit audio;
 interface
 
 uses
-  Classes, SysUtils, sndfile, mpg123, portaudio, LazLogger, ctypes, Forms,
+  Classes, SysUtils, sndfile, mpg123, portaudio, EventLog, ctypes, Forms,
   Dialogs, LCLIntf, lcltype, fgl, Math;
 
 const
@@ -299,7 +299,7 @@ begin
 
       if not readSuccess then
       begin
-        DebugLn('readCount zero immediately after seek to beginning');
+        Logger.Debug('readCount zero immediately after seek to beginning');
         Result := cint(paAbort);
         LeaveCriticalSection(TAudio.AudioCriticalSection);
         Exit;
@@ -360,11 +360,11 @@ function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSndVIOUserData;
 begin
-  DebugLn('Entering sf_vio_get_filelen_impl');
+  Logger.Debug('Entering sf_vio_get_filelen_impl');
   SoundData := PSndVIOUserData(user_data);
   Result := SoundData^.Sound^.Size;
-  DebugLn('Return value is ' + IntToStr(SoundData^.Sound^.Size));
-  DebugLn('Exiting sf_vio_get_filelen_impl');
+  Logger.Debug('Return value is ' + IntToStr(SoundData^.Sound^.Size));
+  Logger.Debug('Exiting sf_vio_get_filelen_impl');
 end;
 
 function sf_vio_seek_impl(offset: sf_count_t; whence: cint;
@@ -372,33 +372,33 @@ function sf_vio_seek_impl(offset: sf_count_t; whence: cint;
 var
   SoundData: PSndVIOUserData;
 begin
-  DebugLn('Entering sf_vio_seek_impl');
-  DebugLnEnter;
+  Logger.Debug('Entering sf_vio_seek_impl');
+  Logger.Debug('');
 
   SoundData := PSndVIOUserData(user_data);
 
-  DebugLn('Offset - ' + IntToStr(offset));
+  Logger.Debug('Offset - ' + IntToStr(offset));
   case whence of
     SEEK_CUR:
     begin
-      DebugLn('SEEK_CUR');
+      Logger.Debug('SEEK_CUR');
       SoundData^.Position := (SoundData^.Position) + offset;
     end;
     SEEK_SET:
     begin
-      DebugLn('SEEK_SET');
+      Logger.Debug('SEEK_SET');
       SoundData^.Position := offset;
     end;
     SEEK_END:
     begin
-      DebugLn('SEEK_END');
+      Logger.Debug('SEEK_END');
       SoundData^.Position := (SoundData^.Position) - offset;
     end;
   end;
   Result := SoundData^.Position;
 
-  DebugLnExit;
-  DebugLn('Exiting sf_vio_seek_impl');
+  Logger.Debug('');
+  Logger.Debug('Exiting sf_vio_seek_impl');
 end;
 
 function sf_vio_read_impl(ptr: pointer; Count: sf_count_t;
@@ -407,16 +407,16 @@ var
   SoundData: PSndVIOUserData;
   Position, ActualCount: sf_count_t;
 begin
-  DebugLn('Entering sf_vio_read_impl');
-  DebugLnEnter;
+  Logger.Debug('Entering sf_vio_read_impl');
+  Logger.Debug('');
 
   SoundData := PSndVIOUserData(user_data);
 
-  DebugLn('Count - ' + IntToStr(Count));
-  DebugLn('Size - ' + IntToStr(SoundData^.Sound^.Size));
+  Logger.Debug('Count - ' + IntToStr(Count));
+  Logger.Debug('Size - ' + IntToStr(SoundData^.Sound^.Size));
 
   Position := SoundData^.Position;
-  DebugLn('Position - ' + IntToStr(SoundData^.Position));
+  Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
   { Check if this fetch will go beyond the total size of the file buffer }
   if Position >= SoundData^.Sound^.Size then
     ActualCount := 0
@@ -429,33 +429,33 @@ begin
   SoundData^.Position := (SoundData^.Position) + ActualCount;
   Result := ActualCount;
 
-  DebugLn('New position - ' + IntToStr(SoundData^.Position));
+  Logger.Debug('New position - ' + IntToStr(SoundData^.Position));
 
-  DebugLnExit;
-  DebugLn('Exiting sf_vio_read_impl');
+  Logger.Debug('');
+  Logger.Debug('Exiting sf_vio_read_impl');
 end;
 
 function sf_vio_write_impl(const {%H-}ptr: pointer; {%H-}Count: sf_count_t;
   {%H-}user_data: pointer): sf_count_t; cdecl;
 begin
-  DebugLn('Entering sf_vio_write_impl');
+  Logger.Debug('Entering sf_vio_write_impl');
   Result := 0;
-  DebugLn('Exiting sf_vio_write_impl');
+  Logger.Debug('Exiting sf_vio_write_impl');
 end;
 
 function sf_vio_tell_impl(user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSndVIOUserData;
 begin
-  DebugLn('Entering sf_vio_tell_impl');
-  DebugLnEnter;
+  Logger.Debug('Entering sf_vio_tell_impl');
+  Logger.Debug('');
 
   SoundData := PSndVIOUserData(user_data);
   Result := SoundData^.Position;
 
-  DebugLn('Position - ' + IntToStr(SoundData^.Position));
-  DebugLnExit;
-  DebugLn('Exiting sf_vio_tell_impl');
+  Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
+  Logger.Debug('');
+  Logger.Debug('Exiting sf_vio_tell_impl');
 end;
 
 { TSound }
@@ -500,20 +500,20 @@ begin
   FError := mpg123_close(FHandle);
   if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_close ' + IntToStr(FError));
+    Logger.Debug('Error after mpg123_close ' + IntToStr(FError));
     //Exit;
   end;
 
   FError := mpg123_open(FHandle, PChar(AValue));
   if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_open ' + IntToStr(FError));
+    Logger.Debug('Error after mpg123_open ' + IntToStr(FError));
     //raise EInvalidAudio.Create('mpg123_open returned error for ' + AValue);
     FFileName := '';
     Exit;
   end;
   FFileName := AValue;
-  DebugLn('MPEG audio file loaded: ' + FFileName);
+  Logger.Debug('MPEG audio file loaded: ' + FFileName);
   FError := mpg123_getformat(FHandle, FRate, FChannelCount, FEncoding);
   if FError <> MPG123_OK then
   begin
@@ -522,33 +522,33 @@ begin
     FFileName := '';
     Exit;
   end;
-  DebugLnEnter;
-  DebugLn('Rate - ' + IntToStr(FRate));
-  DebugLn('Encoding - ' + IntToStr(FEncoding));
+  Logger.Debug('');
+  Logger.Debug('Rate - ' + IntToStr(FRate));
+  Logger.Debug('Encoding - ' + IntToStr(FEncoding));
 
   FError := mpg123_scan(FHandle);
   if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_scan ' + IntToStr(FError));
+    Logger.Debug('Error after mpg123_scan ' + IntToStr(FError));
   end;
 
   FrameLength := mpg123_length(FHandle);
-  DebugLn('FrameLength is ' + IntToStr(FrameLength));
+  Logger.Debug('FrameLength is ' + IntToStr(FrameLength));
   if FrameLength < 0 then
   begin
-    DebugLn('Error after mpg123_scan ' + IntToStr(FrameLength));
+    Logger.Debug('Error after mpg123_scan ' + IntToStr(FrameLength));
   end;
 
   {Dur :=  mpg123_tpf(FHandle);
-  DebugLn('Duration is ' + FloatToStr(Duration));
-  DebugLnExit;
+  Logger.Debug('Duration is ' + FloatToStr(Duration));
+  Logger.Debug('');
 
   if Dur < 0 then
   begin
-    DebugLn('Error after mpg123_tpf ' + FloatToStr(Dur));
+    Logger.Debug('Error after mpg123_tpf ' + FloatToStr(Dur));
   end;}
   Dur := FrameLength / FRate;
-  DebugLn('Duration is ' + FloatToStr(Duration));
+  Logger.Debug('Duration is ' + FloatToStr(Duration));
 
   FAudioLength := Dur;
 end;
@@ -568,11 +568,11 @@ begin
   FHandle := nil;
   FHandle := mpg123_new(nil, FError);
   if FError <> MPG123_OK then
-    DebugLn('Error after mpg123_new ' + IntToStr(FError));
+    Logger.Debug('Error after mpg123_new ' + IntToStr(FError));
 
   FError := mpg123_format_none(FHandle);
   if FError <> MPG123_OK then
-    DebugLn('Error after mpg123_format_none ' + IntToStr(FError));
+    Logger.Debug('Error after mpg123_format_none ' + IntToStr(FError));
 
   //RateCount := 1;
   //X := Addr(Rates);
@@ -582,26 +582,26 @@ begin
   mpg123_rates(Rates, RateCount);
 
   if Rates <> nil then
-    DebugLn('Rates is not nil');
+    Logger.Debug('Rates is not nil');
 
-  //DebugLn('After mpg123_rates. Rate count is ' + IntToStr(Rates[0]));
+  //Logger.Debug('After mpg123_rates. Rate count is ' + IntToStr(Rates[0]));
 
 
   for Count := 0 to RateCount - 1 do
   begin
-    //DebugLn('Handling rate count ' + IntToStr(Rates[Count]));
+    //Logger.Debug('Handling rate count ' + IntToStr(Rates[Count]));
 
     mpg123_format(FHandle, Rates[Count], MPG123_MONO or MPG123_STEREO,
       MPG123_ENC_FLOAT_32);
     if FError <> MPG123_OK then
-      DebugLn('Error after mpg123_format ' + IntToStr(FError));
+      Logger.Debug('Error after mpg123_format ' + IntToStr(FError));
 
   end;
 
   //TODO: Remove the hard coding
   mpg123_format(FHandle, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
   if FError <> MPG123_OK then
-    DebugLn('Error after mpg123_format ' + IntToStr(FError));
+    Logger.Debug('Error after mpg123_format ' + IntToStr(FError));
 
 end;
 
@@ -610,7 +610,7 @@ begin
   FError := mpg123_close(FHandle);
   if FError <> MPG123_OK then
   begin
-    DebugLn('Error after mpg123_close ' + IntToStr(FError));
+    Logger.Debug('Error after mpg123_close ' + IntToStr(FError));
   end;
   if FHandle <> nil then
     mpg123_delete(FHandle);
@@ -635,7 +635,7 @@ begin
   end;
   if FError <> MPG123_OK then
   begin
-    //DebugLn('mpg123_read failed?');
+    //Logger.Debug('mpg123_read failed?');
     Result := False;
     Exit;
   end;
@@ -654,7 +654,7 @@ begin
 
   {if FAudioPlaying then
   begin
-    DebugLn('Cannot call SetFileName when audio is playing');
+    Logger.Debug('Cannot call SetFileName when audio is playing');
     //LeaveCriticalSection(AudioCriticalSection);
     Exit;
   end;}
@@ -671,7 +671,7 @@ begin
   TempSoundFile := sf_open(PChar(AValue), SFM_READ, @FInfo);
   if (TempSoundFile = nil) then
   begin
-    DebugLn('Error in sf_open');
+    Logger.Debug('Error in sf_open');
     //LeaveCriticalSection(AudioCriticalSection);
     //raise EInvalidAudio.Create('sf_open returned nil for ' + AValue);
     FFileName := '';
@@ -683,11 +683,11 @@ begin
 
   FSoundFile := TempSoundFile;
 
-  DebugLn(IntToHex(FInfo.format, 8));
-  DebugLn(IntToStr(FInfo.channels));
-  DebugLn(IntToStr(FInfo.frames));
-  DebugLn(IntToStr(FInfo.samplerate));
-  DebugLn(IntToStr(FInfo.sections));
+  Logger.Debug(IntToHex(FInfo.format, 8));
+  Logger.Debug(IntToStr(FInfo.channels));
+  Logger.Debug(IntToStr(FInfo.frames));
+  Logger.Debug(IntToStr(FInfo.samplerate));
+  Logger.Debug(IntToStr(FInfo.sections));
 
   FFileName := AValue;
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
@@ -748,7 +748,7 @@ procedure TSndSound.SeekToBeginning;
 begin
   if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
   begin
-    DebugLn('Sf_seek returned error');
+    Logger.Debug('Sf_seek returned error');
   end;
 end;
 
@@ -784,35 +784,35 @@ begin
   FVIOUserData.Sound:=SoundData;
   FVIOUserData.Position:=0;
 
-  DebugLn('Before calling sf_open_virtual');
-  DebugLnEnter;
-  DebugLn('Position - ' + IntToStr(FVIOUserData.Position));
-  DebugLn('Size - ' + IntToStr(FVIOUserData.Sound^.Size));
-  DebugLnExit;
+  Logger.Debug('Before calling sf_open_virtual');
+  Logger.Debug('');
+  Logger.Debug('Position - ' + IntToStr(FVIOUserData.Position));
+  Logger.Debug('Size - ' + IntToStr(FVIOUserData.Sound^.Size));
+  Logger.Debug('');
 
   TempSoundFile := sf_open_virtual(@FVirtualIOCallbacks, SFM_READ,
     @FInfo, @FVIOUserData);
   if (TempSoundFile = nil) then
   begin
-    DebugLn('Error in sf_open_virtual');
+    Logger.Debug('Error in sf_open_virtual');
     Exit;
   end;
-  DebugLn('sf_open_virtual successful');
+  Logger.Debug('sf_open_virtual successful');
   if FSoundFile <> nil then
     sf_close(FSoundFile);
 
   FSoundFile := TempSoundFile;
   FFileName := '';
 
-  DebugLn('Default audio loaded.');
-  DebugLnEnter;
+  Logger.Debug('Default audio loaded.');
+  Logger.Debug('');
 
-  DebugLn('Format - ' + IntToHex(FInfo.format, 8));
-  DebugLn('Channels - ' + IntToStr(FInfo.channels));
-  DebugLn('Frames - ' + IntToStr(FInfo.frames));
-  DebugLn('Sample Rate - ' + IntToStr(FInfo.samplerate));
-  DebugLn('Sections - ' + IntToStr(FInfo.sections));
-  DebugLnExit;
+  Logger.Debug('Format - ' + IntToHex(FInfo.format, 8));
+  Logger.Debug('Channels - ' + IntToStr(FInfo.channels));
+  Logger.Debug('Frames - ' + IntToStr(FInfo.frames));
+  Logger.Debug('Sample Rate - ' + IntToStr(FInfo.samplerate));
+  Logger.Debug('Sections - ' + IntToStr(FInfo.sections));
+  Logger.Debug('');
 
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
   //LeaveCriticalSection(AudioCriticalSection);
@@ -853,7 +853,7 @@ begin
 
     {if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
     begin
-      DebugLn('Sf_seek returned error');
+      Logger.Debug('Sf_seek returned error');
     end;}
     Sound.SeekToBeginning;
 
@@ -861,17 +861,17 @@ begin
       (FOutputDevice.DeviceName = '') then
     begin
       DeviceId := DefaultDeviceIndex;
-      DebugLn('TAudio using default device to play audio.');
+      Logger.Debug('TAudio using default device to play audio.');
     end
     else
     begin
       DeviceId := GetDeviceIndex(FOutputDevice);
-      DebugLn('TAudio using device - ' + FOutputDevice.DeviceName +
+      Logger.Debug('TAudio using device - ' + FOutputDevice.DeviceName +
         ' host api - ' + FOutputDevice.HostAPIName);
     end;
     StreamParams.device := DeviceId;
 
-    DebugLn('Audio device is ' + IntToStr(StreamParams.device));
+    Logger.Debug('Audio device is ' + IntToStr(StreamParams.device));
 
     //StreamParams.channelCount := FInfo.channels;
     StreamParams.channelCount := Sound.Channels;
@@ -880,7 +880,7 @@ begin
     Streamparams.suggestedLatency :=
       Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
     StreamParams.hostApiSpecificStreamInfo := nil;
-    //DebugLn('Default device is ' + IntToStr(StreamParams.device));
+    //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
 
     //FUserInfo.SoundFile := FSoundFile;
 
@@ -900,8 +900,8 @@ begin
       PPaStreamCallback(@FeedAudioStream), @FUserInfo);
     if (paErrCode <> Int32(paNoError)) then
     begin
-      DebugLn('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+      Logger.Debug('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
       Exit;
     end;
 
@@ -909,16 +909,16 @@ begin
       PPaStreamFinishedCallback(@AudioStreamFinished));
     if (paErrCode <> Int32(paNoError)) then
     begin
-      DebugLn('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
+      Logger.Debug('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
       Exit;
     end;
 
     PaErrCode := Pa_StartStream(FStream);
     if (paErrCode <> Int32(paNoError)) then
     begin
-      DebugLn('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
+      Logger.Debug('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
       Exit;
     end;
 
@@ -940,7 +940,7 @@ begin
   Size := Stream.Size;
   Assert(Size > 0);
   if Size <= 0 then
-    DebugLn('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
+    Logger.Debug('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
       );
 
   Sound.Buffer := AllocMem(Size);
@@ -949,9 +949,9 @@ begin
   BytesRead := Stream.Read(Sound.Buffer^, Size);
 
   if BytesRead <> Size then
-    DebugLn('BytesRead does not match Size in TAudio.LoadDefaultSounds');
+    Logger.Debug('BytesRead does not match Size in TAudio.LoadDefaultSounds');
 
-  DebugLn('Size of the stream is ' + IntToStr(Size));
+  Logger.Debug('Size of the stream is ' + IntToStr(Size));
   Sound.Loaded := True;
   Stream.Destroy;
 end;
@@ -979,18 +979,18 @@ begin
   NumDevices := Pa_GetDeviceCount();
   if NumDevices < 0 then
   begin
-    DebugLn('Pa_GetDeviceCount failed ');
-    DebugLn('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
+    Logger.Debug('Pa_GetDeviceCount failed ');
+    Logger.Debug('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
   end;
 
-  DebugLn('Enumerating devices:-');
-  DebugLnEnter;
+  Logger.Debug('Enumerating devices:-');
+  Logger.Debug('');
   for Count := 0 to NumDevices - 1 do
   begin
     DeviceInfo := Pa_GetDeviceInfo(Count);
     if DeviceInfo = nil then
     begin
-      DebugLn('Error after GetDeviceInfo for device #' + IntToStr(Count));
+      Logger.Debug('Error after GetDeviceInfo for device #' + IntToStr(Count));
     end
     else
     begin
@@ -1001,7 +1001,7 @@ begin
 
         if HostAPIInfo = nil then
         begin
-          DebugLn('Error in getting HostAPI for devide #' +
+          Logger.Debug('Error in getting HostAPI for devide #' +
             IntToStr(Count) + ' (' + DeviceName + ')');
         end;
         Device := New(PAudioDevice);
@@ -1010,16 +1010,16 @@ begin
         Device^.HostAPIName := HostAPIInfo^.Name;
 
         FDevices.Add(Device);
-        DebugLn('Devide ID - ' + IntToStr(Count));
-        DebugLn('Device name - ' + DeviceInfo^.Name);
-        DebugLn('Host API name - ' + HostAPIInfo^.Name);
-        DebugLn('Device output channels - ' + IntToStr(DeviceInfo^.maxOutputChannels));
+        Logger.Debug('Devide ID - ' + IntToStr(Count));
+        Logger.Debug('Device name - ' + DeviceInfo^.Name);
+        Logger.Debug('Host API name - ' + HostAPIInfo^.Name);
+        Logger.Debug('Device output channels - ' + IntToStr(DeviceInfo^.maxOutputChannels));
       end;
 
     end;
 
   end;
-  DebugLnExit;
+  Logger.Debug('');
   Result := FDevices;
 
   LeaveCriticalSection(AudioCriticalSection);
@@ -1037,7 +1037,7 @@ begin
   DeviceInfo := Pa_GetDeviceInfo(DevideId);
   if DeviceInfo = nil then
   begin
-    DebugLn('Error after GetDeviceInfo for device #' + IntToStr(DevideId));
+    Logger.Debug('Error after GetDeviceInfo for device #' + IntToStr(DevideId));
     Exit;
   end;
 
@@ -1045,7 +1045,7 @@ begin
   HostAPIInfo := Pa_GetHostApiInfo(DeviceInfo^.hostApi);
   if HostAPIInfo = nil then
   begin
-    DebugLn('Could not get HostAPI details');
+    Logger.Debug('Could not get HostAPI details');
     Exit;
   end;
   HostAPIName := StrPas(HostAPIInfo^.Name);
@@ -1112,7 +1112,7 @@ begin
   DeviceId := Pa_GetDefaultOutputDevice();
   if DeviceId = paNoDevice then
   begin
-    DebugLn('No default device');
+    Logger.Debug('No default device');
     LeaveCriticalSection(AudioCriticalSection);
     raise EInvalidDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
   end;
@@ -1133,8 +1133,8 @@ begin
   NumDevices := Pa_GetDeviceCount();
   if NumDevices < 0 then
   begin
-    DebugLn('Pa_GetDeviceCount failed ');
-    DebugLn('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
+    Logger.Debug('Pa_GetDeviceCount failed ');
+    Logger.Debug('Error after Pa_GetDeviceCount ' + IntToStr(NumDevices));
   end;
 
   for CountDevice := 0 to NumDevices - 1 do
@@ -1142,7 +1142,7 @@ begin
     DeviceInfo := Pa_GetDeviceInfo(CountDevice);
     if DeviceInfo = nil then
     begin
-      DebugLn('Error after GetDeviceInfo for device #' + IntToStr(CountDevice));
+      Logger.Debug('Error after GetDeviceInfo for device #' + IntToStr(CountDevice));
       Continue;
     end;
 
@@ -1151,7 +1151,7 @@ begin
       HostAPIInfo := Pa_GetHostApiInfo(DeviceInfo^.hostApi);
       if HostAPIInfo = nil then
       begin
-        DebugLn('Error after Pa_GetHostApiInfo for device #' +
+        Logger.Debug('Error after Pa_GetHostApiInfo for device #' +
           IntToStr(CountDevice) + ' host api #' + IntToStr(DeviceInfo^.hostApi));
         Continue;
       end;
@@ -1175,7 +1175,7 @@ var
 begin
   if not TAudio.Loaded then
   begin
-    DebugLn('TAudio.Loaded is fales in TAudio.Cleanup');
+    Logger.Debug('TAudio.Loaded is fales in TAudio.Cleanup');
     Exit;
   end;
 
@@ -1221,14 +1221,14 @@ begin
 
     if not FAudioPlaying then
     begin
-      DebugLn('Audio not playing. There is nothing to be done in abort');
+      Logger.Debug('Audio not playing. There is nothing to be done in abort');
       Exit;
     end;
     PaErrCode := Pa_AbortStream(FStream);
     if (paErrCode <> Int32(paNoError)) then
     begin
-      DebugLn('Pa_AbortStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_AbortStream ' + IntToHex(PaErrCode, 8));
+      Logger.Debug('Pa_AbortStream failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_AbortStream ' + IntToHex(PaErrCode, 8));
     end;
 
     {There is no need to close the stream. Stopping/aborting the stream
@@ -1259,20 +1259,20 @@ begin
     paErrCode := Pa_StopStream(FStream);
     if (paErrCode <> Int32(paNoError)) then
     begin
-      DebugLn('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
-      DebugLn('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
+      Logger.Debug('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
     end;
   end
   else if PaErrCode <> 1 then
   begin
-    DebugLn('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
+    Logger.Debug('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
+    Logger.Debug('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
   end;
   paErrCode := Pa_CloseStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
   begin
-    DebugLn('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
-    DebugLn('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
+    Logger.Debug('Pa_CloseStream failed ' + Pa_GetErrorText(paErrCode));
+    Logger.Debug('Error after Pa_CloseStream ' + IntToHex(PaErrCode, 8));
   end;
   FStream := nil;
   FAudioPlaying := False;
@@ -1325,7 +1325,7 @@ initialization
   TAudio.Loaded := Pa_Load(LIB_PORTAUDIO);
   if not TAudio.Loaded then
   begin
-    DebugLn('Could not load portaudio');
+    Logger.Debug('Could not load portaudio');
     Exit;
   end;
 
@@ -1336,7 +1336,7 @@ initialization
     TAudio.Loaded := sf_load(LIB_SNDFILE);
     if not TAudio.Loaded then
     begin
-      DebugLn('Could not load sndfile');
+      Logger.Debug('Could not load sndfile');
       Pa_Unload();
       Exit;
     end;
@@ -1347,7 +1347,7 @@ initialization
     TAudio.Loaded := Mp_Load(LIB_MPG123);
     if not TAudio.Loaded then
     begin
-      DebugLn('Could not load mpg123');
+      Logger.Debug('Could not load mpg123');
       sf_Unload;
       Pa_Unload;
       Exit;
@@ -1355,7 +1355,7 @@ initialization
     if mpg123_init() <> MPG123_OK then
     begin
       TAudio.Loaded := False;
-      DebugLn('mpg123_init() failed');
+      Logger.Debug('mpg123_init() failed');
       Mp_Unload;
       sf_Unload;
       Pa_Unload;
@@ -1375,7 +1375,7 @@ initialization
     PaErrCode := Pa_Initialize();
     if PaErrCode <> cint(paNoError) then
     begin
-      DebugLn('Error in Pa_Initialize()');
+      Logger.Debug('Error in Pa_Initialize()');
 
       TAudio.Loaded := False;
 
@@ -1395,7 +1395,7 @@ initialization
     TAudio.FDefaultDevice := Pa_GetDefaultOutputDevice();
     if TAudio.FDefaultDevice = paNoDevice then
     begin
-      DebugLn('No default device');
+      Logger.Debug('No default device');
       TAudio.Loaded := False;
       Pa_Terminate;
       {$IFNDEF AUDIO_STATIC}
