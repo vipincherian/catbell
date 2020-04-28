@@ -260,6 +260,7 @@ var
   Count: integer;
 begin
   //EnterCriticalSection(TAudio.AudioCriticalSection);
+  //Logger.Debug('Inside FeedAudioStream');
 
   AudioInfo := PAudioinfo(userData);
 
@@ -523,8 +524,9 @@ begin
     Exit;
   end;
   Logger.Debug('');
-  Logger.Debug('Rate - ' + IntToStr(FRate));
-  Logger.Debug('Encoding - ' + IntToStr(FEncoding));
+  Logger.Debug('Rate          - ' + IntToStr(FRate));
+  Logger.Debug('Encoding      - ' + IntToStr(FEncoding));
+  Logger.Debug('Channel count - ' + IntToStr(FChannelCount));
 
   FError := mpg123_scan(FHandle);
   if FError <> MPG123_OK then
@@ -548,7 +550,7 @@ begin
     Logger.Debug('Error after mpg123_tpf ' + FloatToStr(Dur));
   end;}
   Dur := FrameLength / FRate;
-  Logger.Debug('Duration is ' + FloatToStr(Duration));
+  Logger.Debug('Duration is ' + FloatToStr(Dur));
 
   FAudioLength := Dur;
 end;
@@ -599,9 +601,9 @@ begin
   end;
 
   //TODO: Remove the hard coding
-  mpg123_format(FHandle, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
-  if FError <> MPG123_OK then
-    Logger.Debug('Error after mpg123_format ' + IntToStr(FError));
+  //mpg123_format(FHandle, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
+  //if FError <> MPG123_OK then
+  //  Logger.Debug('Error after mpg123_format ' + IntToStr(FError));
 
 end;
 
@@ -626,7 +628,9 @@ function TMpgSound.Read(output: pointer; frameCount: longint): boolean;
 var
   done: size_t = 0;
 begin
-  FError := mpg123_read(FHandle, output, frameCount * SizeOf(real), done);
+  // TODO: Is the usage of SizeOf(cfloat) ?
+  FError := mpg123_read(FHandle, output, frameCount * SizeOf(cfloat) *
+    FChannelCount, done);
 
   if done = 0 then
   begin
@@ -781,8 +785,8 @@ begin
   if not TAudio.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
-  FVIOUserData.Sound:=SoundData;
-  FVIOUserData.Position:=0;
+  FVIOUserData.Sound := SoundData;
+  FVIOUserData.Position := 0;
 
   Logger.Debug('Before calling sf_open_virtual');
   Logger.Debug('');
@@ -1013,7 +1017,8 @@ begin
         Logger.Debug('Devide ID - ' + IntToStr(Count));
         Logger.Debug('Device name - ' + DeviceInfo^.Name);
         Logger.Debug('Host API name - ' + HostAPIInfo^.Name);
-        Logger.Debug('Device output channels - ' + IntToStr(DeviceInfo^.maxOutputChannels));
+        Logger.Debug('Device output channels - ' +
+          IntToStr(DeviceInfo^.maxOutputChannels));
       end;
 
     end;
