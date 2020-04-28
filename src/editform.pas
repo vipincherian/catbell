@@ -322,7 +322,22 @@ begin
 end;
 
 procedure TfrmEdit.bbCancelClick(Sender: TObject);
+var
+  StartTickCount: longword;
 begin
+  FAudio.Abort;
+  StartTickCount := GetTickCount64;
+  { Abort is asynchronous, wait till FAudio completes it work.
+  Also, we do not wait for more than two seconds per timer.
+  After that, it is past caring. Tardiness can only be tolerated as much. }
+  while FAudio.Playing do
+  begin
+    Logger.Debug('Waiting for frmEdit to stop audio');
+    Application.ProcessMessages;
+    //TODO: Remove hardcoding
+    if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+      break;
+  end;
   Close;
 end;
 
