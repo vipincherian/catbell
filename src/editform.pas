@@ -611,13 +611,18 @@ begin
   FCurrentSound := AValue;
 
   if FCurrentSound = nil then
-    Exit;
-
-  if FCurrentSound.Source = '' then
   begin
     lblLengthText.Visible := False;
     edtSound.Text := '';
+    lblLenthVal.Visible := False;
+    Exit;
+  end;
 
+  if FCurrentSound.Source = '' then
+  begin
+    Logger.Warning('Unexpcted behaviour. FCurrentSound.Sounce is blank.');
+    lblLengthText.Visible := False;
+    edtSound.Text := '';
     lblLenthVal.Visible := False;
     Exit;
   end
