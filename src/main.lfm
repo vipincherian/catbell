@@ -226,7 +226,7 @@ object frmMain: TfrmMain
           end        
           item
             Alignment = taCenter
-            Text = 'Tray'
+            Text = 'Report'
             Width = 30
             Visible = True
           end        

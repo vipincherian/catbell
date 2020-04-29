@@ -28,7 +28,7 @@ object fraTimer: TfraTimer
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 575
+    Left = 558
     Height = 15
     Top = 11
     Width = 48
@@ -49,7 +49,7 @@ object fraTimer: TfraTimer
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 343
+    Left = 337
     Height = 23
     Top = 7
     Width = 65
@@ -73,7 +73,7 @@ object fraTimer: TfraTimer
     OnChange = dtpSetChange
   end
   object bbPlay: TBitBtn
-    Left = 415
+    Left = 409
     Height = 32
     Hint = 'Start the timer'
     Top = 3
@@ -88,7 +88,7 @@ object fraTimer: TfraTimer
     TabOrder = 3
   end
   object bbPause: TBitBtn
-    Left = 451
+    Left = 445
     Height = 32
     Hint = 'Pause the timer'
     Top = 3
@@ -179,7 +179,7 @@ object fraTimer: TfraTimer
     TabOrder = 4
   end
   object bbStop: TBitBtn
-    Left = 487
+    Left = 481
     Height = 32
     Hint = 'Stop the timer'
     Top = 3
@@ -369,7 +369,7 @@ object fraTimer: TfraTimer
     TabOrder = 7
   end
   object bbAdjust: TBitBtn
-    Left = 524
+    Left = 518
     Height = 32
     Hint = 'Tweak this run of the timer'
     Top = 3
