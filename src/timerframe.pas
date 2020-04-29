@@ -158,6 +158,7 @@ type
     procedure SetDuration(AValue: TDateTime);
     procedure SetDurationEnabled(AValue: boolean);
     procedure SetIsProgressOnIcon(AValue: boolean);
+    procedure SetMetronome(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
     procedure SetPauseButtonEnabled(AValue: boolean);
     procedure SetPlayButtonEnabled(AValue: boolean);
@@ -178,7 +179,7 @@ type
     SoundInfo: TTimerSoundInfo;
     SoundLooped: boolean;
 
-    Metronome: boolean;
+    FMetronome: boolean;
 
     // Callback on progress-on-icon checkbox change only if
     // this variable is true. Used to avoid unending triggering of events.
@@ -235,6 +236,7 @@ type
     property Progress: single read FProgress;
     //property Audio: TAudio read FAudio;// write SetAudio;
     property CustomSound: TSound read FCustomSound write SetCustomSound;
+    property Metronome: boolean read FMetronome write SetMetronome;
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
@@ -476,6 +478,17 @@ end;
 procedure TfraTimer.SetIsProgressOnIcon(AValue: boolean);
 begin
   ckbIconProgress.Checked := AValue;
+end;
+
+procedure TfraTimer.SetMetronome(AValue: boolean);
+begin
+  if FMetronome=AValue then Exit;
+  FMetronome:=AValue;
+  if Running then
+    if FMetronome then
+      frmMain.Metronome.Subscribe
+    else
+      frmMain.Metronome.Unsubscribe;
 end;
 
 procedure TfraTimer.SetModalAlert(AValue: boolean);
@@ -789,6 +802,9 @@ begin
 
   frmMain.TimerStarted(Self);
 
+  if Metronome then
+    frmMain.Metronome.Subscribe;
+
   {if frmEdit.Showing and (frmEdit.Id = FId) then
   begin
     with frmEdit do
@@ -820,6 +836,9 @@ begin
 
   frmMain.TimerPaused(Self);
 
+  if Metronome then
+    frmMain.Metronome.Unsubscribe;
+
 end;
 
 procedure TfraTimer.Stop(UserInitiated: boolean);
@@ -848,6 +867,11 @@ begin
   else
     {The timer run has completed. Stop the timer and play audio if required}
   begin
+
+    // Stop the Metronome if it is running
+    if Metronome and not Paused then
+      frmMain.Metronome.Unsubscribe;
+
     FRunning := False;
     FPaused := False;
     Counter := DEF_COUNTDOWN_CAPTION;
@@ -864,6 +888,7 @@ begin
 
     PauseButtonEnabled := False;
     DurationEnabled := True;
+
 
     if TAudio.Loaded and (UseDefaultSound or (FCustomSound <> nil)) and (not UserInitiated) then
     begin

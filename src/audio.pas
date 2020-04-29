@@ -13,7 +13,7 @@ const
   READ_SND = 0;
 
   SampleRate = 44100;
-  FramesPerBuffer = 64;
+  FramesPerBuffer = 1024;
 
   // How long you want to play the test sine:
   NumSecs = 2;

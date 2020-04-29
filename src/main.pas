@@ -260,6 +260,7 @@ type
     procedure AfterShow({%H-}Data: PtrInt);
     procedure ShowModalAlert({%H-}Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
+    property Metronome: TMetronome read FMetronome;
 
   end;
 
@@ -1077,7 +1078,7 @@ var
   Index: integer;
 begin
   try
-    Sender := TfraTimer(Sender);
+    //Sender := TfraTimer(Sender);
     FShortTimer.Enabled := True;
     Index := FActiveTimerFrames.IndexOf(Sender);
     if Index = -1 then
@@ -1093,6 +1094,7 @@ begin
       FTaskBarList.SetProgressState(AppHandle, TBPF_NORMAL);
     end;
     {$ENDIF}
+
   except
     on E: Exception do
       ShowMessage('Exception in TfrmMain.TimerStarted ' + E.ClassName +
@@ -1697,7 +1699,7 @@ end;
 procedure TfrmMain.OnShortTimer(Sender: TObject);
 var
   TimerFrame: TfraTimer;
-  TriggerMetronome: boolean = False;
+  //TriggerMetronome: boolean = False;
 begin
   try
     if FActiveTimerFrames.Count = 0 then
@@ -1705,7 +1707,7 @@ begin
     try
       for TimerFrame in FActiveTimerFrames do
       begin
-        TriggerMetronome := (TriggerMetronome or TimerFrame.Metronome);
+        //TriggerMetronome := (TriggerMetronome or TimerFrame.Metronome);
         TimerFrame.HandleTimerTrigger();
       end;
     except
@@ -1713,8 +1715,8 @@ begin
         Logger.Debug('Exception in TfrmMain.OnShortTimer: ' + E.ClassName +
           LineEnding + E.Message);
     end;
-    if TriggerMetronome then
-      FMetronome.HandleTimerTrigger;
+    //if TriggerMetronome then
+    //  FMetronome.HandleTimerTrigger;
   finally
   end;
 
