@@ -150,11 +150,15 @@ object frmMain: TfrmMain
       ParentShowHint = False
       ShowHint = True
     end
-    object ToolButton11: TToolButton
+    object tbUnmute: TToolButton
+      Cursor = crHandPoint
       Left = 133
+      Hint = 'Unmute sound'
       Top = 2
-      Caption = 'ToolButton11'
+      Action = alUnmute
       ImageIndex = 11
+      ParentShowHint = False
+      ShowHint = True
     end
   end
   object pnlBorder: TPanel
@@ -563,6 +567,9 @@ object frmMain: TfrmMain
     object aiMoveDown: TAction
       Caption = 'aiMoveDown'
       OnExecute = aiMoveDownExecute
+    end
+    object alUnmute: TAction
+      OnExecute = alUnmuteExecute
     end
   end
   object ilMain: TImageList

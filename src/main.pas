@@ -100,6 +100,7 @@ type
   { TfrmMain }
 
   TfrmMain = class(TForm)
+    alUnmute: TAction;
     aiMoveDown: TAction;
     aiMoveUp: TAction;
     aiDeleteTimer: TAction;
@@ -148,7 +149,7 @@ type
     tbDelete: TToolButton;
     tbMoveUP: TToolButton;
     tbMoveDown: TToolButton;
-    ToolButton11: TToolButton;
+    tbUnmute: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
@@ -157,6 +158,7 @@ type
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
+    procedure alUnmuteExecute(Sender: TObject);
     procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);
     procedure aiMoveDownExecute(Sender: TObject);
@@ -338,6 +340,8 @@ begin
 
   CreateBitmaps;
 
+  tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
+
   stbMain.BeginUpdate;
   if TAudio.Loaded then
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Ok'
@@ -517,6 +521,12 @@ begin
   DeleteSelected;
   SetListButtonsStatus;
   SavetoFile;
+end;
+
+procedure TfrmMain.alUnmuteExecute(Sender: TObject);
+begin
+  GlobalUserConfig.Volume:=DEF_VOLUME_LEVEL;
+  tbUnmute.Enabled := False;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -1234,6 +1244,8 @@ begin
       Temp.TitleEditable := AllowTimerTitleEdit;
     end;
   end;
+
+  tbUnmute.Enabled:=(GlobalUserConfig.Volume = 0);
 
 end;
 

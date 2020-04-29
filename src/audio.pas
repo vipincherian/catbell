@@ -892,7 +892,7 @@ begin
     FUserInfo.Looped := PlayLooped;
     FUserInfo.Player := Self;
 
-    Assert((Volume > 0) and (Volume <= MAX_VOLUME));
+    Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
     AmpScale := Volume / MAX_VOLUME;
     FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
     Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
