@@ -150,6 +150,9 @@
     </Linking>
     <Other>
       <CustomOptions Value="-Sa"/>
+      <OtherDefines Count="1">
+        <Define0 Value="FORCE_AUDIO_NOTLOADED"/>
+      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>

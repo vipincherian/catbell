@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #sizes="16 24 32"
-main_svg="hourglass.svg"
+main_svg="hourglass_flat.svg"
 main_ico="${main_svg%.*}.ico"
 
 
