@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
   Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
-  {portaudio, }EventLog, audio, Math;
+  {portaudio, }EventLog, audio, Math, metronome;
 
 const
   LSVADUIO_INDEX_HOSTAPI: integer = 0;
@@ -51,7 +51,6 @@ type
     cbUseDefaultAudio: TCheckBox;
     cbUseDefaultSound: TCheckBox;
     cbLoopSound: TCheckBox;
-    CheckBox4: TCheckBox;
     ckbQueryExit: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
@@ -89,12 +88,11 @@ type
     pgcOptions: TPageControl;
     rbProgressOnAppIcon: TRadioButton;
     rbProgressOnOverlayIcon: TRadioButton;
+    speBpm: TSpinEdit;
     SpinEdit1: TSpinEdit;
     SpinEdit2: TSpinEdit;
     SpinEdit3: TSpinEdit;
-    speBpm: TSpinEdit;
     TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
     tbVolume: TTrackBar;
     tsAudio: TTabSheet;
     tsTimers: TTabSheet;
@@ -208,6 +206,8 @@ begin
     cbUseDefaultSound.Checked := UseDefaultSound;
     cbLoopSound.Checked := LoopSound;
     tbVolume.Position:=Volume;
+    speBpm.Value:=Bpm;
+
 
   end;
 end;
@@ -296,6 +296,9 @@ begin
     UseDefaultSound := cbUseDefaultSound.Checked;
     LoopSound := cbLoopSound.Checked;
     Volume := tbVolume.Position;
+
+    Bpm := speBpm.Value;
+    frmMain.Metronome.Bpm:=Bpm;
 
   end;
 end;

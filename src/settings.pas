@@ -65,6 +65,8 @@ type
 
     Volume: integer;
 
+    Bpm: integer;
+
     constructor Create();
     destructor Destroy; override;
 
@@ -179,6 +181,9 @@ const
   VOLUME_LEVEL = 'volume';
   DEF_VOLUME_LEVEL = DEFAULT_VOLUME;
 
+  METRONOME_BPM = 'metronome_bpm';
+  DEF_METRONOME_BPM = 100;
+
 
 
 procedure InitSettings;
@@ -285,6 +290,7 @@ begin
     UseDefaultAudioDevice:=FConf.GetValue(USE_DEFAULT_SOUND, DEF_USE_DEFAULT_AUDIO_DEVICE);
     LoopSound:=FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
     Volume:=FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
+    Bpm := FConf.GetValue(METRONOME_BPM, DEF_METRONOME_BPM);
 
   except
     CreateAnew;
@@ -334,6 +340,7 @@ begin
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
   FConf.SetValue(VOLUME_LEVEL, Volume);
+  Fconf.SetValue(METRONOME_BPM, Bpm);
 
 end;
 
@@ -390,6 +397,7 @@ begin
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
   FConf.SetValue(VOLUME_LEVEL, Volume);
+  FConf.SetValue(METRONOME_BPM, Bpm);
 
   FConf.Flush;
 end;
@@ -446,6 +454,7 @@ begin
   UseDefaultSound:=DEF_USE_DEFAULT_SOUND;
   LoopSound:=DEF_LOOP_SOUND;
   Volume:=DEF_VOLUME_LEVEL;
+  Bpm:= DEF_METRONOME_BPM;
 
 end;
 
@@ -479,6 +488,7 @@ begin
   UseDefaultSound:=From.UseDefaultSound;
   LoopSound:=From.LoopSound;
   Volume:=From.Volume;
+  Bpm:=From.Bpm;
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -560,6 +570,11 @@ begin
     Exit;
   end;
   if Volume <> From.Volume then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if Bpm <> From.Bpm then
   begin
     Result := False;
     Exit;

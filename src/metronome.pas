@@ -18,7 +18,7 @@ type
     FRunning: boolean;
     FLastPlayedTick: longword;
     FBpm: integer;
-    FInterval: integer;
+    //FInterval: integer;
     FSubscriptions: integer;
     FBpmTimer: TTimer;
     procedure SetBpm(AValue: integer);
@@ -53,7 +53,8 @@ begin
   if FBpm = AValue then
     Exit;
   FBpm := AValue;
-  FInterval := 60000 div FBpm;
+  //FInterval := 60000 div FBpm;
+  FBpmTimer.Interval := 60000 div FBpm
 end;
 
 constructor TMetronome.Create;
@@ -64,14 +65,16 @@ begin
   FTickSound.LoadTick;
 
   FLastPlayedTick := GetTickCount64;
-  FBpm:=100;
+
 
   FBpmTimer := TTimer.Create(nil);
-  FBpmTimer.Interval := 60000 div FBpm;
+  //FBpmTimer.Interval := 60000 div FBpm;
   FBpmTimer.Enabled := False;
   FBpmTimer.OnTimer := @OnBpmTimer;
 
-  Bpm := 100;
+  Bpm:=GlobalUserConfig.Bpm;
+
+  //Bpm := 100;
   FRunning := False;
 end;
 
@@ -139,6 +142,8 @@ end;
 
 procedure TMetronome.OnBpmTimer(Sender: TObject);
 begin
+  //if Bpm <> GlobalUserConfig.Bpm then
+  //  Bpm := GlobalUserConfig.Bpm;
   if FSubscriptions > 0 then
   begin
     if not FAudio.Playing then
