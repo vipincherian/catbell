@@ -223,6 +223,8 @@ type
     the same functionality.}
     FReference: TfraTimer;
 
+    FReportStale: boolean;
+
     procedure CreateBitmaps;
     function GetStatusMessage: string;
     procedure PostTimerCreation({%H-}AValue: TfraTimer);
@@ -349,6 +351,8 @@ begin
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Error';
   stbMain.EndUpdate;
 
+  FReportStale := False;
+
 end;
 
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
@@ -368,7 +372,7 @@ begin
   end;
   //TempAudio := nil;
 
-  frmEdit.CurrentSound:=nil;
+  frmEdit.CurrentSound := nil;
   if TAudio.Loaded then
   begin
     //TempAudio := TAudio.Create;
@@ -396,7 +400,7 @@ begin
       //Added.Audio := TempAudio;
       Added.CustomSound := frmEdit.NewSound;
       Added.SoundLooped := frmEdit.ckbLoop.Checked;
-      Added.Metronome:=frmEdit.Metronome;
+      Added.Metronome := frmEdit.Metronome;
     end
     else
     begin
@@ -412,9 +416,24 @@ begin
 end;
 
 procedure TfrmMain.aiOptionsExecute(Sender: TObject);
+var
+  OldTaskbarIconType: TTaskbarIconType;
 begin
+  { Take a backup of options that need to be watched for change }
+  OldTaskbarIconType := GlobalUserConfig.TaskbarIconType;
   frmOptions.ShowModal;
   OptionsFormClosed;
+
+  { if taskbar icon type has been changed, then artificially trigger the
+  timer event }
+  if OldTaskbarIconType <> GlobalUserConfig.TaskbarIconType then
+  begin
+    if GlobalUserConfig.TaskbarIconType = TaskbarAppIcon then
+      FTaskBarList.SetOverlayIcon(AppHandle, 0, PWideChar(''));
+    FReportStale := True;
+    if FShortTimer.Enabled then
+      OnShortTimer(Self);
+  end;
 end;
 
 procedure TfrmMain.aiQuitExecute(Sender: TObject);
@@ -525,7 +544,7 @@ end;
 
 procedure TfrmMain.alUnmuteExecute(Sender: TObject);
 begin
-  GlobalUserConfig.Volume:=DEF_VOLUME_LEVEL;
+  GlobalUserConfig.Volume := DEF_VOLUME_LEVEL;
   tbUnmute.Enabled := False;
 end;
 
@@ -1167,7 +1186,7 @@ begin
     if Widget.IsProgressOnIcon then
     begin
       {Redraw icons only if there is a change}
-      if FLastTrayIconIndex <> Index then
+      if (FLastTrayIconIndex <> Index) or FReportStale then
       begin
         tiMain.Icon.Assign(FTrayProgressIcons[Index + 1]);
 
@@ -1180,8 +1199,9 @@ begin
         {$IF defined(windows)}
         if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
         begin
-          Result := FTaskBarList.SetOverlayIcon(AppHandle, FOverlayProgressIcons[Index + 1].Handle,
-            PWideChar(''));
+          // TODO: PWideChar ''? Fix
+          Result := FTaskBarList.SetOverlayIcon(AppHandle,
+            FOverlayProgressIcons[Index + 1].Handle, PWideChar(''));
           if Result <> S_OK then
             Logger.Debug('SetOverlayIcon failed ' + IntToStr(Result));
 
@@ -1194,7 +1214,7 @@ begin
 
       {In Windows, set the progress in task bar}
       {$IF defined(windows) }
-      if FLastTrayPercent <> TaskbarPercent then
+      if (FLastTrayPercent <> TaskbarPercent) or FReportStale then
       begin
         if Widget.Running and (not Widget.Paused) then
           FTaskBarList.SetProgressState(AppHandle, TBPF_Normal)
@@ -1245,7 +1265,7 @@ begin
     end;
   end;
 
-  tbUnmute.Enabled:=(GlobalUserConfig.Volume = 0);
+  tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
 end;
 
@@ -1342,7 +1362,7 @@ begin
           end;
           //NewTimerClock.Audio.Looped :=
           //  Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
-          NewTimerClock.SoundLooped:=Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
+          NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
         except
           on E: EInvalidAudio do
           begin
@@ -1374,7 +1394,7 @@ begin
       NewTimerClock.TrayNotification :=
         Conf.GetValue(TIMER_CONF_TRAYNOTIFICATION, False);
 
-      NewTimerClock.Metronome:=Conf.GetValue(TIMER_CONF_METRONOME, False);
+      NewTimerClock.Metronome := Conf.GetValue(TIMER_CONF_METRONOME, False);
 
       State.Running := Conf.GetValue(TIMER_CONF_RUNNING, False);
       State.Paused := Conf.GetValue(TIMER_CONF_PAUSED, False);
@@ -1613,7 +1633,7 @@ begin
       ShowMessage('Clock is Nil');
 
     if TimerClock.Running or TimerClock.IsSoundPlaying then;
-      TimerClock.Stop(True);
+    TimerClock.Stop(True);
 
     StartTickCount := GetTickCount64;
     { Abort is asynchronous, wait till each timer aborts.
@@ -1737,7 +1757,7 @@ end;
 procedure TfrmMain.AfterShow(Data: PtrInt);
 var
   TimerFrame: TfraTimer;
-  Count: Integer;
+  Count: integer;
 begin
   if FTimerFrames.Count = 0 then
     aiNewTimer.Execute
