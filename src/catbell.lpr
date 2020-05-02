@@ -41,8 +41,12 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   adjustform,
   audio,
   eventlog,
-  metronome { you can add units after this } {$IF defined(windows) }  ,
-  Windows {$ENDIF} { There is a semicolon here };
+  metronome
+  { you can add units after this }
+  {$IF defined(windows) }  ,
+  Windows
+  {$ENDIF}
+  { There is a semicolon here };
 
 {$R *.res}
 const
@@ -54,7 +58,18 @@ var
   //DefaultConfig: TDefaultConfig;
   MutexHandle: THandle;
 begin
-  RequireDerivedFormResource := True;
+  //RequireDerivedFormResource := True;
+
+  { Checks to ensure that only one instance of the application runs at a time }
+  {$IF defined(windows) }
+  MutexHandle := CreateMutex(nil, True, APP_UUID);
+  if GetLastError = ERROR_ALREADY_EXISTS then
+  begin
+    ShowMessage('Another instance of the application is already running. ' +
+      'Cannot run multiple instances.');
+    Exit;
+  end;
+  {$ENDIF}
 
   {$if declared(useHeapTrace)}
   setHeapTraceOutput('catbell_trace.log');
@@ -71,17 +86,6 @@ begin
   Logger.Info('  Target CPU -     ' + {$INCLUDE %FPCTARGETCPU%});
   Logger.Info('  Target OS -      ' + {$INCLUDE %FPCTARGETOS%});
   Logger.Info('  FPC version -    ' + {$INCLUDE %FPCVERSION%});
-
-  { Checks to ensure that only one instance of the application runs at a time }
-  {$IF defined(windows) }
-  MutexHandle := CreateMutex(nil, True, APP_UUID);
-  if GetLastError = ERROR_ALREADY_EXISTS then
-  begin
-    ShowMessage('Another instance of the application is already running. ' +
-      'Cannot run multiple instances.');
-    Exit;
-  end;
-  {$ENDIF}
 
   Application.Initialize;
 
