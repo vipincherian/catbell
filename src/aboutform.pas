@@ -40,7 +40,12 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    ScrollBox1: TScrollBox;
+    StaticText1: TStaticText;
+    Technical: TPageControl;
     Panel1: TPanel;
+    License: TTabSheet;
+    TabSheet2: TTabSheet;
     procedure bbCloseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Image1Click(Sender: TObject);
