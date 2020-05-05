@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, LMessages,
+  timerframe, fgl, sequence, editform, Math,
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}

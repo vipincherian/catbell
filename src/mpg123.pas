@@ -1078,6 +1078,7 @@ begin
             DynLibs.UnloadLibrary(Mp_Handle);
      end;
   Mp_Handle:=DynLibs.NilHandle;
+  Result := True;
 
 end;
 

@@ -88,24 +88,6 @@ begin
   inherited Destroy;
 end;
 
-{procedure TMetronome.HandleTimerTrigger;
-var
-  CurrentTick: longword;
-begin
-  Assert(False);
-  CurrentTick := GetTickCount64;
-  if (CurrentTick - FLastPlayedTick) > FInterval then
-  begin
-    { This check is not necessary if everything goes well, but in certain cases,
-    for instances when you are debugging, or on days when the hound is
-    heard baying across the moor. this is known to result in isolated
-    instances of messsage display and similar annoyances. }
-    if not FAudio.Playing then
-      FAudio.Play(FTickSound, False, GlobalUserConfig.Volume);
-    FLastPlayedTick := CurrentTick;
-  end;
-end;}
-
 procedure TMetronome.Abort;
 var
   StartTickCount: longword;
@@ -113,6 +95,7 @@ begin
 
   FAudio.Abort;
 
+  StartTickCount := GetTickCount64;
   while FAudio.Playing do
   begin
     Logger.Debug('Waiting for frame metronome to stop audio');

@@ -692,7 +692,7 @@ end;
 function TfrmEdit.ShowForEdit(Sender: TFrame): boolean;
 var
   Widget: TfraTimer;
-  ButtonStatus: boolean;
+  //ButtonStatus: boolean;
 begin
   if Sender = nil then
     Exit;

@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, EventLog, adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LMessages, LCLIntf, StrUtils;
+  {ctypes,} LCLIntf, StrUtils;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -395,8 +395,8 @@ begin
 end;}
 
 procedure TfraTimer.SetCustomSound(AValue: TSound);
-var
-  OldCustomSound: TSound;
+//var
+//  OldCustomSound: TSound;
 begin
   if FCustomSound=AValue then Exit;
 
@@ -971,7 +971,7 @@ end;
 procedure TfraTimer.AdjustTimer(Sender: TObject);
 var
   Hours, Mins, Secs: word;
-  NewEndTickCount, NewPendingTickCount, CurrTickCount, Adjustment: longword;
+  NewEndTickCount, CurrTickCount, Adjustment: longword;
   Diff: int64;
   EndTime: TDateTime;
 begin
