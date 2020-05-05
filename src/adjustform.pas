@@ -106,12 +106,16 @@ end;
 procedure TfrmAdjust.FormShow(Sender: TObject);
 begin
   dtpTill.TimeFormat := TTimeFormat(GlobalUserConfig.DefaultTimeFormat);
+  dtpDiff.Time:=GlobalUserConfig.AdjustDiff;
+  //dtpTill.Date:=Now;
   SetTillDateTime;
 end;
 
 procedure TfrmAdjust.SetTillDateTime;
 begin
-  dtpTill.DateTime := IncMinute(Now, MinuteOf(GlobalUserConfig.AdjustDiff));
+  dtpTill.DateTime := IncHour(Now, HourOf(GlobalUserConfig.AdjustCompleteby));
+  dtpTill.DateTime := IncMinute(Now, MinuteOf(GlobalUserConfig.AdjustCompleteby));
+  dtpTill.DateTime := IncSecond(Now, SecondOf(GlobalUserConfig.AdjustCompleteby))
 end;
 
 procedure TfrmAdjust.bbApplyClick(Sender: TObject);
