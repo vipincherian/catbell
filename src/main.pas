@@ -308,7 +308,7 @@ begin
 
   FDbDefault := True;
 
-  ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
+  //ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
   tiMain.Visible := True;
 
   bbDelete.Caption := '';
@@ -341,6 +341,8 @@ begin
   FReference.Anchors := [];
 
   CreateBitmaps;
+
+  tiMain.Icon.Assign(FTrayStoppedBitmap);
 
   tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
