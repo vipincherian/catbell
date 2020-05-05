@@ -684,8 +684,11 @@ var
   Count: integer;
   //ctx: TBGRACanvas2D;
 begin
-  TrayIconSize := GetSystemMetrics(SM_CXSMICON);
-  AppIconSize := GetSystemMetrics(SM_CXICON);
+  //TrayIconSize := GetSystemMetrics(SM_CXSMICON);
+  //AppIconSize := GetSystemMetrics(SM_CXICON);
+
+  TrayIconSize := GlobalUserConfig.TrayIconSize;
+  AppIconSize:=GlobalUserConfig.AppIconSize;
 
   // Read the image in resources to a stream
   Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);

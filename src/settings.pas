@@ -25,7 +25,7 @@ unit settings;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf, audio, EventLog;
+  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf, audio, EventLog, LCLIntf, LCLType;
 
 type
 
@@ -35,7 +35,9 @@ type
   TUserConfig = class(TObject)
   private
     FDefaultPos: TRect;
+    function GetAppIconSize: integer;
     function GetDefaultStartPosition: TRect;
+    function GetTrayIconSize: integer;
   public
     ShowModalAlert: boolean;
     ShowTrayAlert: boolean;
@@ -50,9 +52,9 @@ type
 
     LastWindowState: TWindowState;
     DefaultTimeFormat: integer;
-    AdjustDiffDefault: double;
 
-    AdjustCompletebyDefault: double;
+    AdjustDiff: double;
+    AdjustCompleteby: double;
 
     UseDefaultAudioDevice: boolean;
     AudioDeviceName: string;
@@ -67,11 +69,23 @@ type
 
     Bpm: integer;
 
+    TrayIconSizeOverridden: integer;
+    AppIconSizeOverridden: integer;
+    DefaultTrayIconSize: integer;
+    DefaultAppIconSize: integer;
+
+    OverrideTrayIconSize: boolean;
+    OverrideAppIconSize: boolean;
+
     constructor Create;
     destructor Destroy; override;
 
     procedure CopyFrom(From: TUserConfig);
     function CompareWith(From: TUserConfig): boolean;
+
+    property TrayIconSize: integer read GetTrayIconSize;
+    property AppIconSize: integer read GetAppIconSize;
+
 
   end;
 
@@ -186,6 +200,14 @@ const
   METRONOME_BPM = 'metronome_bpm';
   DEF_METRONOME_BPM = 100;
 
+  TRAY_ICON_SIZE = 'tray_icon_size';
+  APP_ICON_SIZE = 'app_icon_size';
+
+  OVERRIDE_TRAY_ICON_SIZE = 'override_tray_icon_size';
+  DEF_OVERRIDE_TRAY_ICON_SIZE = False;
+  OVERRIDE_APP_ICON_SIZE = 'override_app_icon_size';
+  DEF_OVERRIDE_APP_ICON_SIZE = False;
+
 
 
 procedure InitSettings;
@@ -271,13 +293,13 @@ begin
 
     DefaultTimeFormat := FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
 
-    AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, DEF_ADJ_DIFF);
-    if AdjustDiffDefault <= 0 then
-      AdjustDiffDefault := DEF_ADJ_DIFF;
+    AdjustDiff := FConf.GetValue(ADJ_DIFF, DEF_ADJ_DIFF);
+    if AdjustDiff <= 0 then
+      AdjustDiff := DEF_ADJ_DIFF;
 
-    AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, DEF_ADJ_COMPLETEBY);
-    if AdjustCompletebyDefault <= 0 then
-      AdjustCompletebyDefault := DEF_ADJ_COMPLETEBY;
+    AdjustCompleteby := FConf.GetValue(ADJ_COMPLETEBY, DEF_ADJ_COMPLETEBY);
+    if AdjustCompleteby <= 0 then
+      AdjustCompleteby := DEF_ADJ_COMPLETEBY;
 
     AudioDeviceName := string(FConf.GetValue(AUDIO_DEVICE_NAME,
       UTF8Decode(AudioDeviceName)));
@@ -293,6 +315,12 @@ begin
     LoopSound:=FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
     Volume:=FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
     Bpm := FConf.GetValue(METRONOME_BPM, DEF_METRONOME_BPM);
+
+    TrayIconSizeOverridden:= FConf.GetValue(TRAY_ICON_SIZE, DefaultTrayIconSize);
+    AppIconSizeOverridden := FConf.GetValue(APP_ICON_SIZE, DefaultAppIconSize);
+
+    OverrideTrayIconSize:=FConf.GetValue(OVERRIDE_TRAY_ICON_SIZE, DEF_OVERRIDE_TRAY_ICON_SIZE);
+    OverrideAppIconSize:=FConf.GetValue(OVERRIDE_APP_ICON_SIZE, DEF_OVERRIDE_APP_ICON_SIZE);
 
   except
     CreateAnew;
@@ -330,8 +358,8 @@ begin
 
   FConf.SetValue(TIME_FORMAT, DefaultTimeFormat);
 
-  FConf.SetValue(ADJ_DIFF, AdjustDiffDefault);
-  FConf.SetValue(ADJ_COMPLETEBY, AdjustCompletebyDefault);
+  FConf.SetValue(ADJ_DIFF, AdjustDiff);
+  FConf.SetValue(ADJ_COMPLETEBY, AdjustCompleteby);
 
   FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName));
   FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName));
@@ -343,6 +371,12 @@ begin
   FConf.SetValue(LOOP_SOUND, LoopSound);
   FConf.SetValue(VOLUME_LEVEL, Volume);
   Fconf.SetValue(METRONOME_BPM, Bpm);
+
+  FConf.SetValue(TRAY_ICON_SIZE, TrayIconSizeOverridden);
+  FConf.SetValue(APP_ICON_SIZE, AppIconSizeOverridden);
+
+  FConf.SetValue(OVERRIDE_TRAY_ICON_SIZE, OverrideTrayIconSize);
+  FConf.SetValue(OVERRIDE_APP_ICON_SIZE, OverrideAppIconSize);
 
 end;
 
@@ -401,6 +435,12 @@ begin
   FConf.SetValue(VOLUME_LEVEL, Volume);
   FConf.SetValue(METRONOME_BPM, Bpm);
 
+  FConf.SetValue(TRAY_ICON_SIZE, TrayIconSizeOverridden);
+  FConf.SetValue(APP_ICON_SIZE, AppIconSizeOverridden);
+
+  FConf.SetValue(OVERRIDE_TRAY_ICON_SIZE, OverrideTrayIconSize);
+  FConf.SetValue(OVERRIDE_APP_ICON_SIZE, OverrideAppIconSize);
+
   FConf.Flush;
 end;
 
@@ -427,6 +467,22 @@ begin
 
   Result := Default;
 
+end;
+
+function TUserConfig.GetAppIconSize: integer;
+begin
+  if OverrideAppIconSize then
+    Result:=AppIconSizeOverridden
+  else
+    Result:=DefaultAppIconSize;
+end;
+
+function TUserConfig.GetTrayIconSize: integer;
+begin
+  if OverrideTrayIconSize then
+    Result:=TrayIconSizeOverridden
+  else
+    Result:=DefaultTrayIconSize;
 end;
 
 
@@ -458,8 +514,17 @@ begin
   Volume:=DEF_VOLUME_LEVEL;
   Bpm:= DEF_METRONOME_BPM;
 
-  AdjustCompletebyDefault:=DEF_ADJ_COMPLETEBY;
-  AdjustDiffDefault:=DEF_ADJ_DIFF;
+  AdjustCompleteby:=DEF_ADJ_COMPLETEBY;
+  AdjustDiff:=DEF_ADJ_DIFF;
+
+  DefaultTrayIconSize:=GetSystemMetrics(SM_CXSMICON);
+  DefaultAppIconSize:=GetSystemMetrics(SM_CXICON);
+
+  TrayIconSizeOverridden:=DefaultTrayIconSize;
+  AppIconSizeOverridden:=DefaultAppIconSize;
+
+  OverrideTrayIconSize:=DEF_OVERRIDE_TRAY_ICON_SIZE;
+  OverrideAppIconSize:=DEF_OVERRIDE_APP_ICON_SIZE;
 end;
 
 destructor TUserConfig.Destroy;
@@ -480,8 +545,8 @@ begin
   AllowTimerTitleEdit := From.AllowTimerTitleEdit;
   DefaultTimeFormat := From.DefaultTimeFormat;
 
-  AdjustDiffDefault := From.AdjustDiffDefault;
-  AdjustCompletebyDefault := From.AdjustCompletebyDefault;
+  AdjustDiff := From.AdjustDiff;
+  AdjustCompleteby := From.AdjustCompleteby;
 
   AudioDeviceName := From.AudioDeviceName;
   AudioHostAPIName := From.AudioHostAPIName;
@@ -493,6 +558,13 @@ begin
   LoopSound:=From.LoopSound;
   Volume:=From.Volume;
   Bpm:=From.Bpm;
+
+  TrayIconSizeOverridden:=From.TrayIconSizeOverridden;
+  AppIconSizeOverridden:=From.AppIconSizeOverridden;
+
+  OverrideTrayIconSize:=From.OverrideTrayIconSize;
+  OverrideAppIconSize:=From.OverrideAppIconSize;
+
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
@@ -533,12 +605,12 @@ begin
     Result := False;
     Exit;
   end;
-  if AdjustDiffDefault <> From.AdjustDiffDefault then
+  if AdjustDiff <> From.AdjustDiff then
   begin
     Result := False;
     Exit;
   end;
-  if AdjustCompletebyDefault <> From.AdjustCompletebyDefault then
+  if AdjustCompleteby <> From.AdjustCompleteby then
   begin
     Result := False;
     Exit;
@@ -579,6 +651,26 @@ begin
     Exit;
   end;
   if Bpm <> From.Bpm then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if TrayIconSizeOverridden <> From.TrayIconSizeOverridden then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if AppIconSizeOverridden <> From.AppIconSizeOverridden then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if OverrideTrayIconSize <> From.OverrideTrayIconSize then
+  begin
+    Result := False;
+    Exit;
+  end;
+  if OverrideAppIconSize <> From.OverrideAppIconSize then
   begin
     Result := False;
     Exit;

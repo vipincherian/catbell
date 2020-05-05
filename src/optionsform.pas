@@ -45,9 +45,8 @@ type
     cbAutoProgress: TCheckBox;
     cbModalAlert: TCheckBox;
     cbTrayAlert: TCheckBox;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
+    cbOverrideTrayIconSize: TCheckBox;
+    cbOverrideAppIconSize: TCheckBox;
     cbUseDefaultAudio: TCheckBox;
     cbUseDefaultSound: TCheckBox;
     cbLoopSound: TCheckBox;
@@ -76,9 +75,6 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
@@ -89,9 +85,8 @@ type
     rbProgressOnAppIcon: TRadioButton;
     rbProgressOnOverlayIcon: TRadioButton;
     speBpm: TSpinEdit;
-    SpinEdit1: TSpinEdit;
-    SpinEdit2: TSpinEdit;
-    SpinEdit3: TSpinEdit;
+    speTrayIconSize: TSpinEdit;
+    speAppIconSize: TSpinEdit;
     TabSheet1: TTabSheet;
     tbVolume: TTrackBar;
     tsAudio: TTabSheet;
@@ -103,6 +98,8 @@ type
     procedure bbtnCancelClick(Sender: TObject);
     procedure bbtnDefaultClick(Sender: TObject);
     procedure bbtnSaveClick(Sender: TObject);
+    procedure cbOverrideAppIconSizeChange(Sender: TObject);
+    procedure cbOverrideTrayIconSizeChange(Sender: TObject);
     procedure cbUseDefaultAudioChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -124,6 +121,7 @@ type
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
     procedure SetVolume(AValue: integer);
+    procedure ReenableControls;
   public
     { public declarations }
     //property Volume: integer read GetVolume write SetVolume;
@@ -179,8 +177,8 @@ begin
     the indices. Playing with fire, where it can be afforded. }
     cmbTimeFormat.ItemIndex := DefaultTimeFormat;
 
-    dtpShorten.Time := AdjustDiffDefault;
-    dtpCompleteBy.Time := AdjustCompletebyDefault;
+    dtpShorten.Time := AdjustDiff;
+    dtpCompleteBy.Time := AdjustCompleteby;
 
     cbUseDefaultAudio.Checked := UseDefaultAudioDevice;
 
@@ -205,9 +203,14 @@ begin
 
     cbUseDefaultSound.Checked := UseDefaultSound;
     cbLoopSound.Checked := LoopSound;
-    tbVolume.Position:=Volume;
-    speBpm.Value:=Bpm;
+    tbVolume.Position := Volume;
+    speBpm.Value := Bpm;
 
+    cbOverrideTrayIconSize.Checked := OverrideTrayIconSize;
+    cbOverrideAppIconSize.Checked := OverrideAppIconSize;
+
+    speTrayIconSize.Value := TrayIconSizeOverridden;
+    speAppIconSize.Value := AppIconSizeOverridden;
 
   end;
 end;
@@ -261,9 +264,9 @@ begin
     AutoProgress := cbAutoProgress.Checked;
     DefaultTimeFormat := cmbTimeFormat.ItemIndex;
 
-    AdjustDiffDefault := dtpShorten.Time;
+    AdjustDiff := dtpShorten.Time;
 
-    AdjustCompletebyDefault := dtpCompleteBy.Time;
+    AdjustCompleteby := dtpCompleteBy.Time;
 
     UseDefaultAudioDevice := cbUseDefaultAudio.Checked;
 
@@ -298,14 +301,26 @@ begin
     Volume := tbVolume.Position;
 
     Bpm := speBpm.Value;
-    frmMain.Metronome.Bpm:=Bpm;
+    frmMain.Metronome.Bpm := Bpm;
+
+    OverrideTrayIconSize := cbOverrideTrayIconSize.Checked;
+    OverrideAppIconSize := cbOverrideAppIconSize.Checked;
+
+    TrayIconSizeOverridden := speTrayIconSize.Value;
+    AppIconSizeOverridden := speAppIconSize.Value;
 
   end;
 end;
 
 procedure TfrmOptions.SetVolume(AValue: integer);
 begin
-  tbVolume.Position:=Min(AValue, MAX_VOLUME);
+  tbVolume.Position := Min(AValue, MAX_VOLUME);
+end;
+
+procedure TfrmOptions.ReenableControls;
+begin
+  speTrayIconSize.Enabled := cbOverrideTrayIconSize.Checked;
+  speAppIconSize.Enabled := cbOverrideAppIconSize.Checked;
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
@@ -341,6 +356,7 @@ begin
     edtDefaultHostAPI.Text := '';
     bbPlay.Enabled := False;
   end;
+  ReenableControls;
 
 end;
 
@@ -421,6 +437,7 @@ begin
       end;
 
 
+
     end;
 
     //Audio.PlaySine;
@@ -485,6 +502,16 @@ begin
   GlobalUserConfig.Flush;
 
   Close;
+end;
+
+procedure TfrmOptions.cbOverrideAppIconSizeChange(Sender: TObject);
+begin
+  ReenableControls;
+end;
+
+procedure TfrmOptions.cbOverrideTrayIconSizeChange(Sender: TObject);
+begin
+  ReenableControls;
 end;
 
 procedure TfrmOptions.cbUseDefaultAudioChange(Sender: TObject);
