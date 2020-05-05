@@ -72,7 +72,9 @@ begin
   {$ENDIF}
 
   {$if declared(useHeapTrace)}
+  {$IFOPT D+}
   setHeapTraceOutput('catbell_trace.log');
+  {$ENDIF}
   {$endIf}
 
   Logger := TEventLog.Create(nil);
