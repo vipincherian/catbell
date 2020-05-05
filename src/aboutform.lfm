@@ -52,7 +52,7 @@ object frmAbout: TfrmAbout
   object Image1: TImage
     Left = 8
     Height = 48
-    Top = 8
+    Top = 36
     Width = 48
     Picture.Data = {
       1754506F727461626C654E6574776F726B47726170686963F707000089504E47

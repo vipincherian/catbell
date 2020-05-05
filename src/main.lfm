@@ -263,6 +263,7 @@ object frmMain: TfrmMain
     SimplePanel = False
   end
   object bbDelete: TBitBtn
+    Cursor = crHandPoint
     Left = 613
     Height = 32
     Hint = 'Delete the sected timer(s)'
@@ -277,6 +278,7 @@ object frmMain: TfrmMain
     TabOrder = 3
   end
   object bbMoveUp: TBitBtn
+    Cursor = crHandPoint
     Left = 613
     Height = 32
     Hint = 'Move the selected timer(s) up'
@@ -291,6 +293,7 @@ object frmMain: TfrmMain
     TabOrder = 4
   end
   object bbMoveDown: TBitBtn
+    Cursor = crHandPoint
     Left = 613
     Height = 32
     Hint = 'Move the selected timer(s) down'

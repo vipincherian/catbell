@@ -73,6 +73,7 @@ object fraTimer: TfraTimer
     OnChange = dtpSetChange
   end
   object bbPlay: TBitBtn
+    Cursor = crHandPoint
     Left = 409
     Height = 32
     Hint = 'Start the timer'
@@ -88,6 +89,7 @@ object fraTimer: TfraTimer
     TabOrder = 3
   end
   object bbPause: TBitBtn
+    Cursor = crHandPoint
     Left = 445
     Height = 32
     Hint = 'Pause the timer'
@@ -179,6 +181,7 @@ object fraTimer: TfraTimer
     TabOrder = 4
   end
   object bbStop: TBitBtn
+    Cursor = crHandPoint
     Left = 481
     Height = 32
     Hint = 'Stop the timer'
@@ -270,6 +273,7 @@ object fraTimer: TfraTimer
     TabOrder = 5
   end
   object bbEdit: TBitBtn
+    Cursor = crHandPoint
     Left = 671
     Height = 32
     Hint = 'Edit the timer'
@@ -369,6 +373,7 @@ object fraTimer: TfraTimer
     TabOrder = 7
   end
   object bbAdjust: TBitBtn
+    Cursor = crHandPoint
     Left = 518
     Height = 32
     Hint = 'Tweak this run of the timer'
