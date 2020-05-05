@@ -224,7 +224,6 @@ begin
     begin
       Logger.Debug('Waiting for');
       Application.ProcessMessages;
-      //TODO: Remove hardcoding
       if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
         break;
     end;
@@ -334,7 +333,6 @@ begin
   begin
     Logger.Debug('Waiting for frmEdit to stop audio');
     Application.ProcessMessages;
-    //TODO: Remove hardcoding
     if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
       break;
   end;

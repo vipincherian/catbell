@@ -466,7 +466,6 @@ begin
       begin
         Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
         Application.ProcessMessages;
-        //TODO: Remove hardcoding
         if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
           break;
       end;
@@ -978,8 +977,7 @@ var
   Filled: integer;
   CountTabOrder: integer;
 begin
-  {TODO: Remove the hard coding of the header hight}
-  Filled := 24;
+  Filled := hdrTimers.Height;
   CountTabOrder := 0;
   hdrTimers.Top := 0;
   for Id in FOrder do
@@ -1021,7 +1019,9 @@ begin
     TextMessage := TextMessage + ' +'
   else
     TextMessage := TextMessage + ' -';
+  stbMain.BeginUpdate;
   stbMain.Panels[PANEL_TIMERCOUNT].Text := TextMessage;
+  stbMain.EndUpdate;
 end;
 
 
@@ -1204,7 +1204,7 @@ begin
         {$IF defined(windows)}
         if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
         begin
-          // TODO: PWideChar ''? Fix
+
           Result := FTaskBarList.SetOverlayIcon(AppHandle,
             FOverlayProgressIcons[Index + 1].Handle, PWideChar(''));
           if Result <> S_OK then

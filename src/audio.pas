@@ -600,11 +600,6 @@ begin
 
   end;
 
-  //TODO: Remove the hard coding
-  //mpg123_format(FHandle, 44100, MPG123_MONO or MPG123_STEREO, MPG123_ENC_FLOAT_32);
-  //if FError <> MPG123_OK then
-  //  Logger.Debug('Error after mpg123_format ' + IntToStr(FError));
-
 end;
 
 destructor TMpgSound.Destroy;
@@ -628,7 +623,6 @@ function TMpgSound.Read(output: pointer; frameCount: longint): boolean;
 var
   done: size_t = 0;
 begin
-  // TODO: Is the usage of SizeOf(cfloat) ?
   FError := mpg123_read(FHandle, output, frameCount * SizeOf(cfloat) *
     FChannelCount, done);
 
@@ -1218,7 +1212,6 @@ procedure TAudio.Abort;
 var
   PaErrCode: PaError;
 begin
-  // TODO: Isn't this needed?
   //EnterCriticalSection(AudioCriticalSection);
   try
     if not TAudio.Loaded then

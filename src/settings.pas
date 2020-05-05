@@ -279,9 +279,8 @@ begin
 
     LastWindowState := TWindowState(FConf.GetValue(WINDOW_STATE, DEF_WINDOW_STATE));
 
-    {TODO: Is the defaulting correct here?}
-    ShowModalAlert := FConf.GetValue(SHOW_MODAL_ALERT, ShowModalAlert);
-    ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
+    ShowModalAlert := FConf.GetValue(SHOW_MODAL_ALERT, DEF_SHOW_MODAL_ALERT);
+    ShowTrayAlert := FConf.GetValue(SHOW_TRAY_ALERT, DEF_SHOW_TRAY_ALERT);
 
     AutoProgress := FConf.GetValue(AUTO_PROGRESS, AutoProgress);
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
