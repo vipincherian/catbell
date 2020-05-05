@@ -4,16 +4,16 @@ Copyright (C) 2019 Vipin Cherian
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+tsLicense as published by the Free Software Foundation; either
+version 2 of the tsLicense, or (at your option) any later version.
 
 This library is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+Library General Public tsLicense for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the
+tsLicense along with this library; if not, write to the
 Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 Boston, MA  02110-1301, USA.
 
@@ -27,7 +27,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, Buttons, LCLType;
+  StdCtrls, ComCtrls, Buttons, LCLIntf, LCLType;
 
 type
 
@@ -38,22 +38,19 @@ type
     Image1: TImage;
     Label1: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
     Label4: TLabel;
     lblLicense: TLabel;
+    lsvBuild: TListView;
     Panel2: TPanel;
     ScrollBox1: TScrollBox;
-    Technical: TPageControl;
+    pgAdditional: TPageControl;
     Panel1: TPanel;
-    License: TTabSheet;
-    TabSheet2: TTabSheet;
+    sttUrl: TStaticText;
+    tsLicense: TTabSheet;
+    tsBuild: TTabSheet;
     procedure bbCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure Image1Click(Sender: TObject);
-    procedure Label4Click(Sender: TObject);
-    procedure StaticText1Click(Sender: TObject);
-    procedure StaticText3Click(Sender: TObject);
+    procedure sttUrlClick(Sender: TObject);
   private
     { private declarations }
     //Buffer: Pointer;
@@ -70,20 +67,6 @@ implementation
 
 { TfrmAbout }
 
-procedure TfrmAbout.Image1Click(Sender: TObject);
-begin
-
-end;
-
-procedure TfrmAbout.Label4Click(Sender: TObject);
-begin
-
-end;
-
-procedure TfrmAbout.FormDestroy(Sender: TObject);
-begin
-
-end;
 
 procedure TfrmAbout.bbCloseClick(Sender: TObject);
 begin
@@ -95,27 +78,58 @@ var
   Stream: TResourceStream;
   LicenseText: string;
   Buffer: Pointer;
+  Item: TListItem;
 begin
   //memLicense.Text:='hello';
   Stream := TResourceStream.Create(hinstance, 'GPL2', RT_RCDATA);
   Buffer := AllocMem(Stream.Size + 1);
   Stream.ReadBuffer(Buffer^, Stream.Size);
   LicenseText := PAnsiChar(Buffer);
-  lblLicense.Caption:=LicenseText;
+  lblLicense.Caption := LicenseText;
   Freemem(Buffer);
   //LicenseText := Stream.ReadAnsiString;
   Stream.Free;
+  lsvBuild.BeginUpdate;
+
+  Item := lsvBuild.Items.Add;
+  Item.Caption := 'Target OS';
+  Item.SubItems.Add(
+{$include %FPCTargetOS%}
+    );
+
+  Item := lsvBuild.Items.Add;
+  Item.Caption := 'Target CPU';
+  Item.SubItems.Add(
+{$include %FPCTargetCPU%}
+    );
+
+  Item := lsvBuild.Items.Add;
+  Item.Caption := 'Compiler(FPC) Version';
+  Item.SubItems.Add(
+{$include %FPCVersion%}
+    );
+
+  Item := lsvBuild.Items.Add;
+  Item.Caption := 'Build date';
+  Item.SubItems.Add(
+{$include %DATE%}
+    );
+
+  Item := lsvBuild.Items.Add;
+  Item.Caption := 'Build time';
+  Item.SubItems.Add(
+{$include %TIME%}
+    );
+
+  lsvBuild.EndUpdate;
+
+  pgAdditional.ActivePage := tsLicense;
+
 end;
 
-procedure TfrmAbout.StaticText1Click(Sender: TObject);
+procedure TfrmAbout.sttUrlClick(Sender: TObject);
 begin
-
-end;
-
-procedure TfrmAbout.StaticText3Click(Sender: TObject);
-begin
-
+  OpenUrl(sttUrl.Caption);
 end;
 
 end.
-
