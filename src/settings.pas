@@ -67,7 +67,7 @@ type
 
     Bpm: integer;
 
-    constructor Create();
+    constructor Create;
     destructor Destroy; override;
 
     procedure CopyFrom(From: TUserConfig);
@@ -153,7 +153,9 @@ const
   DEF_TIME_FORMAT = tf12;
 
   ADJ_DIFF = 'adjust_diff';
+  DEF_ADJ_DIFF = DEF_TIMER_DURATION;
   ADJ_COMPLETEBY = 'adust_completeby';
+  DEF_ADJ_COMPLETEBY = DEF_TIMER_DURATION;
 
   USE_DEFAULT_AUDIO_DEVICE = 'audio_device_default';
   DEF_USE_DEFAULT_AUDIO_DEVICE = True;
@@ -269,13 +271,13 @@ begin
 
     DefaultTimeFormat := FConf.GetValue(TIME_FORMAT, DefaultTimeFormat);
 
-    AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, DEF_TIMER_DURATION);
+    AdjustDiffDefault := FConf.GetValue(ADJ_DIFF, DEF_ADJ_DIFF);
     if AdjustDiffDefault <= 0 then
-      AdjustDiffDefault := DEF_TIMER_DURATION;
+      AdjustDiffDefault := DEF_ADJ_DIFF;
 
-    AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, DEF_TIMER_DURATION);
+    AdjustCompletebyDefault := FConf.GetValue(ADJ_COMPLETEBY, DEF_ADJ_COMPLETEBY);
     if AdjustCompletebyDefault <= 0 then
-      AdjustCompletebyDefault := DEF_TIMER_DURATION;
+      AdjustCompletebyDefault := DEF_ADJ_COMPLETEBY;
 
     AudioDeviceName := string(FConf.GetValue(AUDIO_DEVICE_NAME,
       UTF8Decode(AudioDeviceName)));
@@ -456,6 +458,8 @@ begin
   Volume:=DEF_VOLUME_LEVEL;
   Bpm:= DEF_METRONOME_BPM;
 
+  AdjustCompletebyDefault:=DEF_ADJ_COMPLETEBY;
+  AdjustDiffDefault:=DEF_ADJ_DIFF;
 end;
 
 destructor TUserConfig.Destroy;

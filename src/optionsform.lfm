@@ -55,10 +55,10 @@ object frmOptions: TfrmOptions
     Height = 352
     Top = 8
     Width = 523
-    ActivePage = tsAudio
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 3
+    TabIndex = 1
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
@@ -263,8 +263,8 @@ object frmOptions: TfrmOptions
           Left = 40
           Height = 19
           Top = 128
-          Width = 91
-          Caption = 'Overlay icons'
+          Width = 177
+          Caption = 'Overlay icons (Windows only)'
           TabOrder = 4
         end
       end
