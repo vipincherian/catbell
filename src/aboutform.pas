@@ -27,7 +27,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, Buttons;
+  StdCtrls, ComCtrls, Buttons, LCLType;
 
 type
 
@@ -40,13 +40,15 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    lblLicense: TLabel;
+    Panel2: TPanel;
     ScrollBox1: TScrollBox;
-    StaticText1: TStaticText;
     Technical: TPageControl;
     Panel1: TPanel;
     License: TTabSheet;
     TabSheet2: TTabSheet;
     procedure bbCloseClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Image1Click(Sender: TObject);
     procedure Label4Click(Sender: TObject);
@@ -54,6 +56,7 @@ type
     procedure StaticText3Click(Sender: TObject);
   private
     { private declarations }
+    //Buffer: Pointer;
   public
     { public declarations }
   end;
@@ -85,6 +88,23 @@ end;
 procedure TfrmAbout.bbCloseClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfrmAbout.FormCreate(Sender: TObject);
+var
+  Stream: TResourceStream;
+  LicenseText: string;
+  Buffer: Pointer;
+begin
+  //memLicense.Text:='hello';
+  Stream := TResourceStream.Create(hinstance, 'GPL2', RT_RCDATA);
+  Buffer := AllocMem(Stream.Size + 1);
+  Stream.ReadBuffer(Buffer^, Stream.Size);
+  LicenseText := PAnsiChar(Buffer);
+  lblLicense.Caption:=LicenseText;
+  Freemem(Buffer);
+  //LicenseText := Stream.ReadAnsiString;
+  Stream.Free;
 end;
 
 procedure TfrmAbout.StaticText1Click(Sender: TObject);

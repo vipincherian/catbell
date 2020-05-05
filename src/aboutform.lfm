@@ -47,6 +47,7 @@ object frmAbout: TfrmAbout
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.0.6.0'
   object Image1: TImage
@@ -155,9 +156,11 @@ object frmAbout: TfrmAbout
       Left = 16
       Height = 15
       Top = 56
-      Width = 112
+      Width = 117
       Caption = '© Vipin Cherian 2019'
+      Font.Style = [fsBold]
       ParentColor = False
+      ParentFont = False
       OnClick = Label4Click
     end
     object Label3: TLabel
@@ -194,23 +197,35 @@ object frmAbout: TfrmAbout
       ClientHeight = 124
       ClientWidth = 381
       object ScrollBox1: TScrollBox
-        Left = 8
+        Left = 0
         Height = 112
         Top = 8
-        Width = 366
-        HorzScrollBar.Page = 345
-        VertScrollBar.Page = 91
-        Anchors = [akTop, akLeft, akRight, akBottom]
-        ClientHeight = 91
-        ClientWidth = 345
+        Width = 376
+        HorzScrollBar.Page = 30
+        VertScrollBar.Page = 17
+        ClientHeight = 108
+        ClientWidth = 372
         TabOrder = 0
-        object StaticText1: TStaticText
-          Left = 8
-          Height = 1712
-          Top = 8
-          Width = 432
-          Caption = '                    GNU GENERAL PUBLIC LICENSE'#13#10'                       Version 2, June 1991'#13#10#13#10' Copyright (C) 1989, 1991 Free Software Foundation, Inc.,'#13#10' 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA'#13#10' Everyone is permitted to copy and distribute verbatim copies'#13#10' of this license document, but changing it is not allowed.'#13#10#13#10'                            Preamble'#13#10#13#10'  The licenses for most software are designed to take away your'#13#10'freedom to share and change it.  By contrast, the GNU General Public'#13#10'License is intended to guarantee your freedom to share and change free'#13#10'software--to make sure the software is free for all its users.  This'#13#10'General Public License applies to most of the Free Software'#13#10'Foundation''s software and to any other program whose authors commit to'#13#10'using it.  (Some other Free Software Foundation software is covered by'#13#10'the GNU Lesser General Public License instead.)  You can apply it to'#13#10'your programs, too.'#13#10#13#10'  When we speak of free software, we are referring to freedom, not'#13#10'price.  Our General Public Licenses are designed to make sure that you'#13#10'have the freedom to distribute copies of free software (and charge for'#13#10'this service if you wish), that you receive source code or can get it'#13#10'if you want it, that you can change the software or use pieces of it'#13#10'in new free programs; and that you know you can do these things.'#13#10#13#10'  To protect your rights, we need to make restrictions that forbid'#13#10'anyone to deny you these rights or to ask you to surrender the rights.'#13#10'These restrictions translate to certain responsibilities for you if you'#13#10'distribute copies of the software, or if you modify it.'#13#10#13#10'  For example, if you distribute copies of such a program, whether'#13#10'gratis or for a fee, you must give the recipients all the rights that'#13#10'you have.  You must make sure that they, too, receive or can get the'#13#10'source code.  And you must show them these terms so they know their'#13#10'rights.'#13#10#13#10'  We protect your rights with two steps: (1) copyright the software, and'#13#10'(2) offer you this license which gives you legal permission to copy,'#13#10'distribute and/or modify the software.'#13#10#13#10'  Also, for each author''s protection and ours, we want to make certain'#13#10'that everyone understands that there is no warranty for this free'#13#10'software.  If the software is modified by someone else and passed on, we'#13#10'want its recipients to know that what they have is not the original, so'#13#10'that any problems introduced by others will not reflect on the original'#13#10'authors'' reputations.'#13#10#13#10'  Finally, any free program is threatened constantly by software'#13#10'patents.  We wish to avoid the danger that redistributors of a free'#13#10'program will individually obtain patent licenses, in effect making the'#13#10'program proprietary.  To prevent this, we have made it clear that any'#13#10'patent must be licensed for everyone''s free use or not licensed at all.'#13#10#13#10'  The precise terms and conditions for copying, distribution and'#13#10'modification follow.'#13#10#13#10'                    GNU GENERAL PUBLIC LICENSE'#13#10'   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION'#13#10#13#10'  0. This License applies to any program or other work which contains'#13#10'a notice placed by the copyright holder saying it may be distributed'#13#10'under the terms of this General Public License.  The "Program", below,'#13#10'refers to any such program or work, and a "work based on the Program"'#13#10'means either the Program or any derivative work under copyright law:'#13#10'that is to say, a work containing the Program or a portion of it,'#13#10'either verbatim or with modifications and/or translated into another'#13#10'language.  (Hereinafter, translation is included without limitation in'#13#10'the term "modification".)  Each licensee is addressed as "you".'#13#10#13#10'Activities other than copying, distribution and modification are not'#13#10'covered by this License; they are outside its scope.  The act of'#13#10'running the Program is not restricted, and the output from the Program'#13#10'is covered only if its contents constitute a work based on the'#13#10'Program (independent of having been made by running the Program).'#13#10'Whether that is true depends on what the Program does.'#13#10#13#10
+        object Panel2: TPanel
+          Left = 0
+          Height = 108
+          Top = 0
+          Width = 372
+          Align = alClient
+          Caption = 'Panel2'
+          ClientHeight = 108
+          ClientWidth = 372
           TabOrder = 0
+          object lblLicense: TLabel
+            Left = 1
+            Height = 106
+            Top = 1
+            Width = 370
+            Align = alClient
+            Caption = 'Label'
+            ParentColor = False
+            ParentFont = False
+          end
         end
       end
     end
