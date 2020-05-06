@@ -92,6 +92,9 @@ const
   PANEL_AUDIO = 1;
   PANEL_MESSAGE = 2;
 
+  II_MUTED = 12;
+  II_NOTMUTED = 11;
+
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
   TTimerFrameList = specialize TFPGList<TfraTimer>;
