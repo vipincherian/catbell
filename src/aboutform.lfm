@@ -186,16 +186,16 @@ object frmAbout: TfrmAbout
     Kind = bkClose
     ModalResult = 11
     OnClick = bbCloseClick
-    TabOrder = 1
+    TabOrder = 2
   end
   object pgAdditional: TPageControl
     Left = 16
     Height = 152
     Top = 128
     Width = 389
-    ActivePage = tsLicense
-    TabIndex = 0
-    TabOrder = 2
+    ActivePage = tsBuild
+    TabIndex = 1
+    TabOrder = 1
     object tsLicense: TTabSheet
       Caption = 'License'
       ClientHeight = 124
@@ -247,12 +247,12 @@ object frmAbout: TfrmAbout
           item
             AutoSize = True
             Caption = 'Key'
-            Width = 10
+            Width = 34
           end        
           item
             AutoSize = True
             Caption = 'Data'
-            Width = 10
+            Width = 39
           end>
         ReadOnly = True
         ShowColumnHeaders = False

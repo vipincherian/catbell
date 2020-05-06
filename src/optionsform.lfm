@@ -55,10 +55,10 @@ object frmOptions: TfrmOptions
     Height = 352
     Top = 8
     Width = 523
-    ActivePage = tsInterface
+    ActivePage = tsAudio
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 2
+    TabIndex = 3
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
@@ -360,7 +360,7 @@ object frmOptions: TfrmOptions
         Caption = 'Override icon sizes'
         ClientHeight = 76
         ClientWidth = 479
-        TabOrder = 1
+        TabOrder = 2
         object cbOverrideTrayIconSize: TCheckBox
           Left = 16
           Height = 19
@@ -410,7 +410,7 @@ object frmOptions: TfrmOptions
         Caption = 'Metronome (Tick sound)'
         ClientHeight = 44
         ClientWidth = 476
-        TabOrder = 2
+        TabOrder = 1
         object speBpm: TSpinEdit
           Left = 136
           Height = 23
@@ -473,7 +473,7 @@ object frmOptions: TfrmOptions
             end>
           ColumnClick = False
           ReadOnly = True
-          TabOrder = 0
+          TabOrder = 3
           ViewStyle = vsReport
           OnDblClick = lsvAudioDevicesDblClick
           OnItemChecked = lsvAudioDevicesItemChecked
@@ -485,7 +485,7 @@ object frmOptions: TfrmOptions
           Width = 79
           Caption = 'Use default'
           OnChange = cbUseDefaultAudioChange
-          TabOrder = 1
+          TabOrder = 0
         end
         object edtDefaultDeviceName: TEdit
           Left = 120
@@ -494,7 +494,7 @@ object frmOptions: TfrmOptions
           Width = 168
           Anchors = [akTop, akLeft, akRight]
           ReadOnly = True
-          TabOrder = 2
+          TabOrder = 1
           Text = 'edtDefaultDeviceName'
         end
         object edtDefaultHostAPI: TEdit
@@ -504,7 +504,7 @@ object frmOptions: TfrmOptions
           Width = 168
           Anchors = [akTop, akRight]
           ReadOnly = True
-          TabOrder = 3
+          TabOrder = 2
           Text = 'edtDefaultHostAPI'
         end
       end
@@ -517,7 +517,7 @@ object frmOptions: TfrmOptions
         Caption = 'Test'
         ClientHeight = 44
         ClientWidth = 295
-        TabOrder = 1
+        TabOrder = 2
         object bbPlay: TBitBtn
           Left = 120
           Height = 30
@@ -528,7 +528,7 @@ object frmOptions: TfrmOptions
           Images = ilOptions
           ImageIndex = 5
           OnClick = bbPlayClick
-          TabOrder = 0
+          TabOrder = 1
         end
         object bbStop: TBitBtn
           Left = 205
@@ -540,7 +540,7 @@ object frmOptions: TfrmOptions
           Images = ilOptions
           ImageIndex = 6
           OnClick = bbStopClick
-          TabOrder = 1
+          TabOrder = 2
         end
         object pgbAudio: TProgressBar
           Left = 16
@@ -549,7 +549,7 @@ object frmOptions: TfrmOptions
           Width = 88
           Anchors = [akTop, akLeft, akRight]
           Enabled = False
-          TabOrder = 2
+          TabOrder = 0
         end
       end
       object GroupBox8: TGroupBox
@@ -560,7 +560,7 @@ object frmOptions: TfrmOptions
         Caption = 'Volume'
         ClientHeight = 45
         ClientWidth = 164
-        TabOrder = 2
+        TabOrder = 1
         object tbVolume: TTrackBar
           Left = 32
           Height = 25
