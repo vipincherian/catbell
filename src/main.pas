@@ -31,7 +31,7 @@ uses
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
   timerframe, fgl, sequence, editform, Math,
   {$IF defined(windows) }
-  ShlObj, comobj, Win32Int, InterfaceBase,
+  ShlObj, comobj, Win32Int, InterfaceBase, StdCtrls,
   {$ENDIF}
   {portaudio, sndfile,}{ctypes,} audio, metronome, eventlog;
 
@@ -120,6 +120,8 @@ type
     hdrTimers: THeaderControl;
     ilMain: TImageList;
     ilMainSmall: TImageList;
+    Image1: TImage;
+    lblVolume: TLabel;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem5: TMenuItem;
@@ -161,6 +163,7 @@ type
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
+    tbVolume: TTrackBar;
     procedure alUnmuteExecute(Sender: TObject);
     procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);
@@ -183,6 +186,7 @@ type
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
     procedure sbxClocksResize(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
+    procedure tbVolumeChange(Sender: TObject);
 
     procedure tiMainClick(Sender: TObject);
     procedure tiMainDblClick(Sender: TObject);
@@ -357,6 +361,8 @@ begin
   stbMain.EndUpdate;
 
   FReportStale := False;
+  tbVolume.Position:=GlobalUserConfig.Volume;
+  //tbVolume.Position:=0;
 
 end;
 
@@ -654,6 +660,12 @@ end;
 procedure TfrmMain.tbProgressAutoClick(Sender: TObject);
 begin
   GlobalUserConfig.AutoProgress := tbProgressAuto.Down;
+end;
+
+procedure TfrmMain.tbVolumeChange(Sender: TObject);
+begin
+  lblVolume.Caption:=IntToStr(tbVolume.Position) + '%';
+  GlobalUserConfig.Volume:=tbVolume.Position;
 end;
 
 procedure TfrmMain.tiMainClick(Sender: TObject);

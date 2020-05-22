@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 347
   Height = 336
   Top = 174
-  Width = 654
+  Width = 652
   HorzScrollBar.Page = 152
   HorzScrollBar.Range = 152
   VertScrollBar.Page = 152
@@ -10,7 +10,7 @@ object frmMain: TfrmMain
   ActiveControl = pnlBorder
   Caption = 'Catbell'
   ClientHeight = 316
-  ClientWidth = 654
+  ClientWidth = 652
   Menu = mmMain
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
@@ -24,7 +24,7 @@ object frmMain: TfrmMain
     Left = 0
     Height = 34
     Top = 0
-    Width = 654
+    Width = 652
     ButtonHeight = 30
     ButtonWidth = 31
     Caption = 'tlbMain'
@@ -165,19 +165,19 @@ object frmMain: TfrmMain
     Left = 8
     Height = 248
     Top = 40
-    Width = 592
+    Width = 590
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlBorder'
     ClientHeight = 248
-    ClientWidth = 592
+    ClientWidth = 590
     TabOrder = 1
     object pnlClocks: TPanel
       Left = 1
       Height = 246
       Top = 1
-      Width = 590
+      Width = 588
       Align = alClient
       BevelOuter = bvNone
       Caption = 'pnlClocks'
@@ -188,13 +188,13 @@ object frmMain: TfrmMain
       Left = 1
       Height = 246
       Top = 1
-      Width = 590
+      Width = 588
       HorzScrollBar.Page = 170
       VertScrollBar.Page = 24
       Align = alClient
       BorderStyle = bsNone
       ClientHeight = 246
-      ClientWidth = 590
+      ClientWidth = 588
       TabOrder = 1
       OnMouseUp = sbxClocksMouseUp
       OnResize = sbxClocksResize
@@ -202,7 +202,7 @@ object frmMain: TfrmMain
         Left = 0
         Height = 24
         Top = 0
-        Width = 590
+        Width = 588
         DragReorder = False
         Sections = <        
           item
@@ -249,7 +249,7 @@ object frmMain: TfrmMain
     Left = 0
     Height = 23
     Top = 293
-    Width = 654
+    Width = 652
     Panels = <    
       item
         Width = 100
@@ -264,7 +264,7 @@ object frmMain: TfrmMain
   end
   object bbDelete: TBitBtn
     Cursor = crHandPoint
-    Left = 613
+    Left = 611
     Height = 32
     Hint = 'Delete the sected timer(s)'
     Top = 178
@@ -279,7 +279,7 @@ object frmMain: TfrmMain
   end
   object bbMoveUp: TBitBtn
     Cursor = crHandPoint
-    Left = 613
+    Left = 611
     Height = 32
     Hint = 'Move the selected timer(s) up'
     Top = 218
@@ -294,7 +294,7 @@ object frmMain: TfrmMain
   end
   object bbMoveDown: TBitBtn
     Cursor = crHandPoint
-    Left = 613
+    Left = 611
     Height = 32
     Hint = 'Move the selected timer(s) down'
     Top = 258
@@ -306,6 +306,78 @@ object frmMain: TfrmMain
     ParentShowHint = False
     ShowHint = True
     TabOrder = 5
+  end
+  object tbVolume: TTrackBar
+    Left = 615
+    Height = 88
+    Top = 64
+    Width = 25
+    Max = 100
+    OnChange = tbVolumeChange
+    Orientation = trVertical
+    Position = 10
+    Reversed = True
+    TickStyle = tsNone
+    Anchors = [akTop, akRight, akBottom]
+    TabOrder = 6
+  end
+  object Image1: TImage
+    Left = 615
+    Height = 24
+    Top = 40
+    Width = 24
+    Anchors = [akTop, akRight]
+    Picture.Data = {
+      1754506F727461626C654E6574776F726B477261706869639104000089504E47
+      0D0A1A0A0000000D4948445200000018000000180806000000E0773DF8000000
+      0473424954080808087C0864880000000970485973000001E0000001E00105EA
+      9F490000001974455874536F667477617265007777772E696E6B73636170652E
+      6F72679BEE3C1A0000040E494441544889A5946B4C5B6518C7FFEF39A7074E6F
+      144ACBB58C1A5881CCC0D231034C3967659D9B5FF042AC9744134D2466C490C1
+      B62C06256646B3846C5EC0C4198D9AA9DB17E2BCA5023DDD4D122084050643E4
+      2A35502EDDA040E1F41C3F6C236603D6D97F72BE9CE7F93FBF37EFF3BC0F8D87
+      504545056B369B5D56AB553F3A3A3A1189877A1880DFEFAFD2E63DF12D9B927D
+      591084FC483C4C24494EA7D31C0A858E2225B72AD6B607B46F0021DF6011809E
+      A8000E87C3180E876B57E232AA972C8FB1419986110400A0280AB99BC7F33C43
+      08394208F9A1ADADEDAFFB003CCF1B24495A37701CC749925449748935FAED45
+      DC4C4C0A82B7825B9DE5D0334F694EB477AED4949696EEF77ABD1DEB004110DE
+      CCA2954FF5AC0A00A08182151AB89EB31731A936D0EA386026B069659EE7B500
+      CA7715C4E2C56775F1C7DE9BBD4808BF5314C50100A064594E7A8EA3F096F6F6
+      B78351B0830134392560F489208C6AAB9303C0C9E242AEB4EEC3D9C9BE8155D4
+      1D4E88D5AAE9EFEC76BB0AD8748AC8C6BFEF91D3E9D4242552AFD51F31C255AE
+      4B3BF9C99C9F65095E71E90AB45AEDEB5B0022D5EA05394C964F34CC28AFBAF4
+      B0A43386CFBFB98983656AE834F41B5101288ACA72F21AE1837712F5573A4393
+      7F742EC355AE575D6E5FF6290A41F16E2E5F1004DBFF06C8B23CD9D51D9A4A36
+      33104AD4E9BFB62C2A45BB38C88A12EE1D0821CBAA822CCB79D15CD1F23F7EE9
+      D4B5EB213C9ACB626C5C5A641820C9C4C44FF925249B6900C86400C0B4B3101A
+      530200C0BA16C61AA5C25E9B69BDD25C3287A5E5100020C594005F4C0097DA6F
+      C70CC602C864099CBA9780E5C1713F9278630E0C711C80B6A89ACC592DBAEA47
+      321371AD6F1AB6ED711A5956303E190C984D5A4CFB8320848C44D3E4B4C7F7A4
+      9AE7E68368FE79E4EF27F76593BE7E1F188A605B86118343732084F447B4EC36
+      922CCB43E79B872EB678260A0E382C6979392938FE6ECBDA0167661A4508DC2D
+      E33D1E8FE74654EF201CA60FD234893D54594C2EFCD28BC1A140E065573E2E5D
+      1D466061F53360D377A0440470BBDDC189C9E097A71AAFA0E98B5E5FFDF112D3
+      DAAA848F9ABABB019C010086A2A8A9B3FD7F227E240600A0868210C3E0169584
+      746B362856FD204ECD4FBF8DD91A1BCA784BBA016FD7B7851682D20BA2284A00
+      C0783C9E4685E7CFDEB7AE47BFAA34A45A6B734BF6C76ACD964DAB8BA2B8C8F3
+      7C73778F8F6FF8B823303472739F288A37EEC6993B49F7EEE37900750E0775FA
+      EAB9A65A9DB5A03AA3B08C4D88D36E08595858683CF375BF86A6E9EF45511CFE
+      6F6CCB296A6D6D9D0570CCC9B20DBDC3DD47E36DBBAB929E7E4905008490F546
+      757575AD01787FA31A118DA9DBED9E067058A0A8B1C1AE6DA7E7A7264008E978
+      A011912EFE3BB2DBED2A9D4EF7BCA228535EAFF7F7483CFF023F68726ABACD0E
+      000000000049454E44AE426082
+    }
+  end
+  object lblVolume: TLabel
+    Left = 604
+    Height = 15
+    Top = 152
+    Width = 39
+    Alignment = taRightJustify
+    Anchors = [akRight, akBottom]
+    AutoSize = False
+    Caption = 'lblVolume'
+    ParentColor = False
   end
   object mmMain: TMainMenu
     Images = ilMainSmall
@@ -1733,8 +1805,8 @@ object frmMain: TfrmMain
   end
   object pmTray: TPopupMenu
     Images = ilMainSmall
-    left = 608
-    top = 89
+    left = 544
+    top = 216
     object pmiShowWindow: TMenuItem
       Caption = 'Show window'
       ImageIndex = 0
@@ -1787,8 +1859,8 @@ object frmMain: TfrmMain
   end
   object pmMain: TPopupMenu
     Images = ilMainSmall
-    left = 617
-    top = 149
+    left = 488
+    top = 216
     object MenuItem6: TMenuItem
       Action = aiNewTimer
       Caption = 'Add timer'

@@ -275,7 +275,7 @@ begin
   Data := output;
   for Count := 0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
   begin
-    Data[Count] := Data[Count] * AudioInfo^.Volume;
+    Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME); //AudioInfo^.Volume;
   end;
 
 
@@ -295,7 +295,7 @@ begin
       Data := output;
       for Count := 0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
       begin
-        Data[Count] := Data[Count] * AudioInfo^.Volume;
+        Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME); //AudioInfo^.Volume;
       end;
 
       if not readSuccess then
