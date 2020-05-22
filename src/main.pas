@@ -1291,6 +1291,7 @@ begin
     end;
   end;
 
+  tbVolume.Position:=GlobalUserConfig.Volume;
   //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
 end;
