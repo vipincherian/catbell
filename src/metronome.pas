@@ -130,7 +130,7 @@ begin
   if FSubscriptions > 0 then
   begin
     if not FAudio.Playing then
-      FAudio.Play(FTickSound, False, GlobalUserConfig.Volume);
+      FAudio.Play(FTickSound, GlobalUserConfig.Volume, False);
   end;
 end;
 

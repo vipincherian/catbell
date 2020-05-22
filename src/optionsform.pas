@@ -75,6 +75,7 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
+    lblVolume: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
@@ -108,6 +109,7 @@ type
     procedure lsvAudioDevicesDblClick(Sender: TObject);
     procedure lsvAudioDevicesItemChecked(Sender: TObject; Item: TListItem);
     procedure pgcOptionsChange(Sender: TObject);
+    procedure tbVolumeChange(Sender: TObject);
     procedure tsAudioShow(Sender: TObject);
   private
     { private declarations }
@@ -116,6 +118,7 @@ type
     FDefaultConfig: TUserConfig;
     FTestSound: TSndSound;
     Audio: TAudio;
+    FVolume: integer;
     function GetVolume: integer;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
@@ -142,6 +145,12 @@ uses
 procedure TfrmOptions.pgcOptionsChange(Sender: TObject);
 begin
 
+end;
+
+procedure TfrmOptions.tbVolumeChange(Sender: TObject);
+begin
+  lblVolume.Caption := IntToStr(tbVolume.Position) + '%';
+  FVolume := tbVolume.Position;
 end;
 
 procedure TfrmOptions.tsAudioShow(Sender: TObject);
@@ -337,6 +346,9 @@ begin
   pgcOptions.ActivePage := tsTimers;
   Audio := nil;
   bbStop.Enabled := False;
+
+  FVolume:=GlobalUserConfig.Volume;
+
   if TAudio.Loaded then
   begin
     RefreshAudioDevices;
@@ -442,7 +454,7 @@ begin
     //Audio.PlaySine;
     //Audio.PlayTest;
 
-    Audio.Play(FTestSound, True, tbVolume.Position);
+    Audio.Play(FTestSound, FVolume, True);
 
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;

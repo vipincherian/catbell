@@ -70,7 +70,7 @@ type
     Sound: TSound;
     Player: Pointer;
     Looped: boolean;
-    Volume: double;
+    Volume: ^integer;
 
   end;
   PAudioInfo = ^TUserInfo;
@@ -220,8 +220,7 @@ type
     class procedure SetDefaulDevice; static;
     class procedure LoadDefaultSounds; static;
     class procedure FreeDefaultSounds; static;
-    procedure Play(Sound: TSound; PlayLooped: boolean = False;
-      Volume: integer = DEFAULT_VOLUME);
+    procedure Play(Sound: TSound; var Volume: integer; PlayLooped: boolean = False);
 
     procedure Abort;
 
@@ -258,6 +257,8 @@ var
   UsedSound: TSound;
   Data: pcfloat;
   Count: integer;
+  Volume: integer;
+  AmpScale: double;
 begin
   //EnterCriticalSection(TAudio.AudioCriticalSection);
   //Logger.Debug('Inside FeedAudioStream');
@@ -271,11 +272,19 @@ begin
   readSuccess := False;
   readSuccess := UsedSound.Read(output, frameCount);
 
+  // Decode and fix volume
+  Volume := AudioInfo^.Volume^;
+
+  Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
+  AmpScale := Volume / MAX_VOLUME;
+  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+  Assert((AmpScale >= 0) and (AmpScale <= 1));
+
   { Apply scaling to amplitude to control volume }
   Data := output;
   for Count := 0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
   begin
-    Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME); //AudioInfo^.Volume;
+    Data[Count] := Data[Count] * AmpScale; //AudioInfo^.Volume;
   end;
 
 
@@ -295,7 +304,7 @@ begin
       Data := output;
       for Count := 0 to (AudioInfo^.Sound.Channels * frameCount) - 1 do
       begin
-        Data[Count] := Data[Count] * (GlobalUserConfig.Volume / MAX_VOLUME); //AudioInfo^.Volume;
+        Data[Count] := Data[Count] * AmpScale; //AudioInfo^.Volume;
       end;
 
       if not readSuccess then
@@ -829,7 +838,7 @@ end;
 
 { TAudio }
 
-procedure TAudio.Play(Sound: TSound; PlayLooped: boolean; Volume: integer);
+procedure TAudio.Play(Sound: TSound; var Volume: integer; PlayLooped: boolean);
 var
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
@@ -886,10 +895,11 @@ begin
     FUserInfo.Looped := PlayLooped;
     FUserInfo.Player := Self;
 
-    Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
-    AmpScale := Volume / MAX_VOLUME;
-    FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
-    Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
+    //Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
+    //AmpScale := Volume / MAX_VOLUME;
+    //FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+    //Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
+    FUserInfo.Volume:=@Volume;
 
     //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 

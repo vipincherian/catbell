@@ -562,14 +562,25 @@ object frmOptions: TfrmOptions
         ClientWidth = 164
         TabOrder = 1
         object tbVolume: TTrackBar
-          Left = 32
+          Left = 48
           Height = 25
           Top = 8
-          Width = 92
+          Width = 108
           Max = 100
+          OnChange = tbVolumeChange
           Position = 0
           TickStyle = tsNone
           TabOrder = 0
+        end
+        object lblVolume: TLabel
+          Left = 8
+          Height = 15
+          Top = 8
+          Width = 37
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'lblVolume'
+          ParentColor = False
         end
       end
     end
