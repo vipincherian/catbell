@@ -120,7 +120,8 @@ type
     hdrTimers: THeaderControl;
     ilMain: TImageList;
     ilMainSmall: TImageList;
-    Image1: TImage;
+    imgVolumeOn: TImage;
+    imgVolumeOff: TImage;
     lblVolume: TLabel;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
@@ -361,7 +362,11 @@ begin
   stbMain.EndUpdate;
 
   FReportStale := False;
+
   tbVolume.Position:=GlobalUserConfig.Volume;
+  imgVolumeOff.Left:=imgVolumeOn.Left;
+  imgVolumeOff.Top:=imgVolumeOn.Top;
+
   //tbVolume.Position:=0;
 
 end;
@@ -666,6 +671,8 @@ procedure TfrmMain.tbVolumeChange(Sender: TObject);
 begin
   lblVolume.Caption:=IntToStr(tbVolume.Position) + '%';
   GlobalUserConfig.Volume:=tbVolume.Position;
+  imgVolumeOn.Visible := (tbVolume.Position > 0);
+  imgVolumeOff.Visible:= (not imgVolumeOn.Visible);
 end;
 
 procedure TfrmMain.tiMainClick(Sender: TObject);
