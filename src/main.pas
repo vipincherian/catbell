@@ -155,7 +155,6 @@ type
     tbDelete: TToolButton;
     tbMoveUP: TToolButton;
     tbMoveDown: TToolButton;
-    tbUnmute: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
@@ -352,7 +351,7 @@ begin
 
   tiMain.Icon.Assign(FTrayStoppedBitmap);
 
-  tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
+  //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
   stbMain.BeginUpdate;
   if TAudio.Loaded then
@@ -560,7 +559,7 @@ end;
 procedure TfrmMain.alUnmuteExecute(Sender: TObject);
 begin
   GlobalUserConfig.Volume := DEF_VOLUME_LEVEL;
-  tbUnmute.Enabled := False;
+  //tbUnmute.Enabled := False;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -1292,7 +1291,7 @@ begin
     end;
   end;
 
-  tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
+  //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
 end;
 

@@ -80,7 +80,7 @@ object frmMain: TfrmMain
       ShowHint = True
     end
     object ToolButton3: TToolButton
-      Left = 296
+      Left = 265
       Height = 30
       Top = 2
       Caption = 'ToolButton3'
@@ -88,7 +88,7 @@ object frmMain: TfrmMain
     end
     object ToolButton6: TToolButton
       Cursor = crHandPoint
-      Left = 304
+      Left = 273
       Hint = 'Help documentation'
       Top = 2
       Caption = 'ToolButton6'
@@ -98,7 +98,7 @@ object frmMain: TfrmMain
     end
     object ToolButton7: TToolButton
       Cursor = crHandPoint
-      Left = 335
+      Left = 304
       Hint = 'About'
       Top = 2
       Action = aiAbout
@@ -107,7 +107,7 @@ object frmMain: TfrmMain
       ShowHint = True
     end
     object tbDelete: TToolButton
-      Left = 203
+      Left = 172
       Hint = 'Delete the selected timer(s)'
       Top = 2
       Action = aiDeleteTimer
@@ -117,7 +117,7 @@ object frmMain: TfrmMain
     end
     object ToolButton8: TToolButton
       Cursor = crHandPoint
-      Left = 164
+      Left = 133
       Hint = 'Export timer configuration'
       Top = 2
       Action = aiExport
@@ -126,14 +126,14 @@ object frmMain: TfrmMain
       ShowHint = True
     end
     object ToolButton9: TToolButton
-      Left = 195
+      Left = 164
       Height = 30
       Top = 2
       Caption = 'ToolButton9'
       Style = tbsSeparator
     end
     object tbMoveUP: TToolButton
-      Left = 234
+      Left = 203
       Hint = 'Move the selected timer(s) up'
       Top = 2
       Action = aiMoveUp
@@ -142,21 +142,11 @@ object frmMain: TfrmMain
       ShowHint = True
     end
     object tbMoveDown: TToolButton
-      Left = 265
+      Left = 234
       Hint = 'Move the selected timer(s) down'
       Top = 2
       Action = aiMoveDown
       ImageIndex = 9
-      ParentShowHint = False
-      ShowHint = True
-    end
-    object tbUnmute: TToolButton
-      Cursor = crHandPoint
-      Left = 133
-      Hint = 'Unmute sound'
-      Top = 2
-      Action = alUnmute
-      ImageIndex = 12
       ParentShowHint = False
       ShowHint = True
     end
