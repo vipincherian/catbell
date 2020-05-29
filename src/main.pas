@@ -29,9 +29,9 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math,
+  timerframe, fgl, sequence, editform, Math, StdCtrls,
   {$IF defined(windows) }
-  ShlObj, comobj, Win32Int, InterfaceBase, StdCtrls,
+  ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
   {portaudio, sndfile,}{ctypes,} audio, metronome, eventlog;
 
@@ -117,6 +117,7 @@ type
     bbDelete: TBitBtn;
     bbMoveUp: TBitBtn;
     bbMoveDown: TBitBtn;
+    evlMain: TEventLog;
     hdrTimers: THeaderControl;
     ilMain: TImageList;
     ilMainSmall: TImageList;
@@ -431,16 +432,21 @@ begin
 end;
 
 procedure TfrmMain.aiOptionsExecute(Sender: TObject);
+{$IF defined(windows) }
 var
   OldTaskbarIconType: TTaskbarIconType;
+{$ENDIF}
 begin
   { Take a backup of options that need to be watched for change }
+  {$IF defined(windows) }
   OldTaskbarIconType := GlobalUserConfig.TaskbarIconType;
+  {$ENDIF}
   frmOptions.ShowModal;
   OptionsFormClosed;
 
   { if taskbar icon type has been changed, then artificially trigger the
   timer event }
+  {$IF defined(windows) }
   if OldTaskbarIconType <> GlobalUserConfig.TaskbarIconType then
   begin
     if GlobalUserConfig.TaskbarIconType = TaskbarAppIcon then
@@ -449,6 +455,7 @@ begin
     if FShortTimer.Enabled then
       OnShortTimer(Self);
   end;
+  {$ENDIF}
 end;
 
 procedure TfrmMain.aiQuitExecute(Sender: TObject);
@@ -1161,8 +1168,8 @@ end;
 procedure TfrmMain.ProgressUpdate(Widget: TfraTimer; Progress: single);
 var
   Index: integer;
-  TaskbarPercent: integer;
   {$IF defined(windows)}
+  TaskbarPercent: integer;
   Result: HRESULT;
   {$ENDIF}
 begin
@@ -1202,7 +1209,9 @@ begin
   else
   begin
     Index := Floor(Progress * 24.0);
+    {$IF defined(windows) }
     TaskbarPercent := Ceil(Progress * 100);
+    {$ENDIF}
 
     if Index >= 24 then
       Index := 23;

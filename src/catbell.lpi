@@ -12,9 +12,9 @@
       <Resources Count="5">
         <Resource_0 FileName="../res/controls/256_progress_base.png" Type="RCDATA" ResourceName="256_PROGRESS_BASE"/>
         <Resource_1 FileName="../res/controls/256_hourglass_flat.png" Type="RCDATA" ResourceName="256_HOURGLASS_FLAT"/>
-        <Resource_2 FileName="..\res\audio\default_sound.ogg" Type="RCDATA" ResourceName="DEFAULT_SOUND"/>
-        <Resource_3 FileName="..\res\audio\tick.ogg" Type="RCDATA" ResourceName="TICK"/>
-        <Resource_4 FileName="..\doc\gpl-2.0.txt" Type="RCDATA" ResourceName="GPL2"/>
+        <Resource_2 FileName="../res/audio/default_sound.ogg" Type="RCDATA" ResourceName="DEFAULT_SOUND"/>
+        <Resource_3 FileName="../res/audio/tick.ogg" Type="RCDATA" ResourceName="TICK"/>
+        <Resource_4 FileName="../doc/gpl-2.0.txt" Type="RCDATA" ResourceName="GPL2"/>
       </Resources>
     </General>
     <i18n>
@@ -39,16 +39,19 @@
         </Mode0>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="BGRABitmapPack"/>
+        <PackageName Value="FCL"/>
       </Item1>
       <Item2>
-        <PackageName Value="DateTimeCtrls"/>
+        <PackageName Value="BGRABitmapPack"/>
       </Item2>
       <Item3>
-        <PackageName Value="LCL"/>
+        <PackageName Value="DateTimeCtrls"/>
       </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
     </RequiredPackages>
     <Units Count="14">
       <Unit0>

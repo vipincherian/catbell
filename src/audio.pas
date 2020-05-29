@@ -843,7 +843,7 @@ var
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
   DeviceId: integer;
-  AmpScale: double;
+  //AmpScale: double;
 begin
   //EnterCriticalSection(AudioCriticalSection);
 
@@ -899,7 +899,7 @@ begin
     //AmpScale := Volume / MAX_VOLUME;
     //FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
     //Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
-    FUserInfo.Volume:=@Volume;
+    FUserInfo.Volume := @Volume;
 
     //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
@@ -1341,7 +1341,7 @@ initialization
   TAudio.Loaded := Pa_Load(LIB_PORTAUDIO);
   if not TAudio.Loaded then
   begin
-    Logger.Debug('Could not load portaudio');
+    //Logger.Debug('Could not load portaudio');
     Exit;
   end;
 
@@ -1352,7 +1352,7 @@ initialization
     TAudio.Loaded := sf_load(LIB_SNDFILE);
     if not TAudio.Loaded then
     begin
-      Logger.Debug('Could not load sndfile');
+      //Logger.Debug('Could not load sndfile');
       Pa_Unload();
       Exit;
     end;
@@ -1363,7 +1363,7 @@ initialization
     TAudio.Loaded := Mp_Load(LIB_MPG123);
     if not TAudio.Loaded then
     begin
-      Logger.Debug('Could not load mpg123');
+      //Logger.Debug('Could not load mpg123');
       sf_Unload;
       Pa_Unload;
       Exit;
@@ -1371,7 +1371,7 @@ initialization
     if mpg123_init() <> MPG123_OK then
     begin
       TAudio.Loaded := False;
-      Logger.Debug('mpg123_init() failed');
+      //Logger.Debug('mpg123_init() failed');
       Mp_Unload;
       sf_Unload;
       Pa_Unload;

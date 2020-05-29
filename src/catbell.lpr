@@ -49,14 +49,21 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   { There is a semicolon here };
 
 {$R *.res}
-const
-  APP_UUID = '8e746524-2d28-11ea-978f-2e728ce88125';
 
+{$IF defined(windows) }
+const
+
+  APP_UUID = '8e746524-2d28-11ea-978f-2e728ce88125';
+{$ENDIF}
+
+{$IF defined(windows) }
 var
   //AppController: TController;
   //FormWidget: TMainForm;
   //DefaultConfig: TDefaultConfig;
+
   MutexHandle: THandle;
+{$ENDIF}
 begin
   //RequireDerivedFormResource := True;
 
@@ -76,8 +83,8 @@ begin
   setHeapTraceOutput('catbell_trace.log');
   {$ENDIF}
   {$endIf}
-
   Logger := TEventLog.Create(nil);
+  //Logger := frmMain.evlMain;
   Logger.LogType := ltFile;
   Logger.FileName := 'catbell.log';
   //Logger.Set
@@ -89,14 +96,15 @@ begin
   Logger.Info('  Target OS -      ' + {$INCLUDE %FPCTARGETOS%});
   Logger.Info('  FPC version -    ' + {$INCLUDE %FPCVERSION%});
 
-  Application.Initialize;
 
+  Application.Initialize;
   InitSettings;
 
   //FormWidget := TMainFormWidget.Create();
   //AppController := TController.Create();
 
   Application.CreateForm(TfrmMain, frmMain);
+
   frmMain.ProcessCommandline;
 
   //MainFormWidget.FormView.Form := TMainWindow(Application.MainForm);

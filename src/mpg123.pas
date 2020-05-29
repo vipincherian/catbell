@@ -36,7 +36,8 @@ const
   {$IF defined(windows) }
   LIB_MPG123 = 'libmpg123-0.dll';
   {$ELSEIF Defined(unix)}
-  LIB_MPG123 = 'libmpg123-0.so';
+  ///usr/lib/x86_64-linux-gnu/libmpg123.so.0
+  LIB_MPG123 = 'libmpg123.so.0';
   {$ENDIF}
 
 { Added later}
