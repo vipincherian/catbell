@@ -309,7 +309,7 @@ begin
 
       if not readSuccess then
       begin
-        Logger.Debug('readCount zero immediately after seek to beginning');
+        //Logger.Debug('readCount zero immediately after seek to beginning');
         Result := cint(paAbort);
         //LeaveCriticalSection(TAudio.AudioCriticalSection);
         Exit;
@@ -370,11 +370,11 @@ function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSndVIOUserData;
 begin
-  Logger.Debug('Entering sf_vio_get_filelen_impl');
+  //Logger.Debug('Entering sf_vio_get_filelen_impl');
   SoundData := PSndVIOUserData(user_data);
   Result := SoundData^.Sound^.Size;
-  Logger.Debug('Return value is ' + IntToStr(SoundData^.Sound^.Size));
-  Logger.Debug('Exiting sf_vio_get_filelen_impl');
+  //Logger.Debug('Return value is ' + IntToStr(SoundData^.Sound^.Size));
+  //Logger.Debug('Exiting sf_vio_get_filelen_impl');
 end;
 
 function sf_vio_seek_impl(offset: sf_count_t; whence: cint;
@@ -382,33 +382,33 @@ function sf_vio_seek_impl(offset: sf_count_t; whence: cint;
 var
   SoundData: PSndVIOUserData;
 begin
-  Logger.Debug('Entering sf_vio_seek_impl');
-  Logger.Debug('');
+  //Logger.Debug('Entering sf_vio_seek_impl');
+  //Logger.Debug('');
 
   SoundData := PSndVIOUserData(user_data);
 
-  Logger.Debug('Offset - ' + IntToStr(offset));
+  //Logger.Debug('Offset - ' + IntToStr(offset));
   case whence of
     SEEK_CUR:
     begin
-      Logger.Debug('SEEK_CUR');
+      //Logger.Debug('SEEK_CUR');
       SoundData^.Position := (SoundData^.Position) + offset;
     end;
     SEEK_SET:
     begin
-      Logger.Debug('SEEK_SET');
+      //Logger.Debug('SEEK_SET');
       SoundData^.Position := offset;
     end;
     SEEK_END:
     begin
-      Logger.Debug('SEEK_END');
+      //Logger.Debug('SEEK_END');
       SoundData^.Position := (SoundData^.Position) - offset;
     end;
   end;
   Result := SoundData^.Position;
 
-  Logger.Debug('');
-  Logger.Debug('Exiting sf_vio_seek_impl');
+  //Logger.Debug('');
+  //Logger.Debug('Exiting sf_vio_seek_impl');
 end;
 
 function sf_vio_read_impl(ptr: pointer; Count: sf_count_t;
@@ -417,21 +417,21 @@ var
   SoundData: PSndVIOUserData;
   Position, ActualCount: sf_count_t;
 begin
-  Logger.Debug('Entering sf_vio_read_impl');
-  Logger.Debug('');
+  //Logger.Debug('Entering sf_vio_read_impl');
+  //Logger.Debug('');
 
   SoundData := PSndVIOUserData(user_data);
 
-  Logger.Debug('Count - ' + IntToStr(Count));
-  Logger.Debug('Size - ' + IntToStr(SoundData^.Sound^.Size));
+  //Logger.Debug('Count - ' + IntToStr(Count));
+  //Logger.Debug('Size - ' + IntToStr(SoundData^.Sound^.Size));
 
   Position := SoundData^.Position;
-  Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
+  //Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
   { Check if this fetch will go beyond the total size of the file buffer }
   if Position >= SoundData^.Sound^.Size then
     ActualCount := 0
-  else if Position > (SoundData^.Sound^.Size - Count) then
-    ActualCount := (SoundData^.Sound^.Size) - Position
+  else if Position >= (SoundData^.Sound^.Size - Count) then
+    ActualCount := (SoundData^.Sound^.Size) - Position - 1
   else
     ActualCount := Count;
 
@@ -439,33 +439,33 @@ begin
   SoundData^.Position := (SoundData^.Position) + ActualCount;
   Result := ActualCount;
 
-  Logger.Debug('New position - ' + IntToStr(SoundData^.Position));
+  //Logger.Debug('New position - ' + IntToStr(SoundData^.Position));
 
-  Logger.Debug('');
-  Logger.Debug('Exiting sf_vio_read_impl');
+  //Logger.Debug('');
+  //Logger.Debug('Exiting sf_vio_read_impl');
 end;
 
 function sf_vio_write_impl(const {%H-}ptr: pointer; {%H-}Count: sf_count_t;
   {%H-}user_data: pointer): sf_count_t; cdecl;
 begin
-  Logger.Debug('Entering sf_vio_write_impl');
+  //Logger.Debug('Entering sf_vio_write_impl');
   Result := 0;
-  Logger.Debug('Exiting sf_vio_write_impl');
+  //Logger.Debug('Exiting sf_vio_write_impl');
 end;
 
 function sf_vio_tell_impl(user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSndVIOUserData;
 begin
-  Logger.Debug('Entering sf_vio_tell_impl');
-  Logger.Debug('');
+  //Logger.Debug('Entering sf_vio_tell_impl');
+  //Logger.Debug('');
 
   SoundData := PSndVIOUserData(user_data);
   Result := SoundData^.Position;
 
-  Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
-  Logger.Debug('');
-  Logger.Debug('Exiting sf_vio_tell_impl');
+  //Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
+  //Logger.Debug('');
+  //Logger.Debug('Exiting sf_vio_tell_impl');
 end;
 
 { TSound }
