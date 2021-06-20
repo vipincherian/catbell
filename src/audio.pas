@@ -217,6 +217,8 @@ type
     {Default sounds }
     FDefaultSound: TSoundData;
     FDefaultTick: TSoundData;
+    FDevices: TAudioDeviceList;
+    FDefaultDevice: integer;
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
     class procedure LoadSoundFromResource(ResourceName: string;
@@ -228,13 +230,8 @@ type
   public
 
     UseDefaultDevice: boolean;
-    FDevices: TAudioDeviceList;
-    FDefaultDevice: integer;
     //AudioCriticalSection: TRTLCriticalSection; static;
-
     //FVolume: integer;
-
-
     function GetDefaultDeviceIndex: AudioDeviceIndex;
     procedure GetDefaultDevice(Device: PAudioDevice);
     function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
