@@ -117,7 +117,7 @@ type
     FChangedConfig: TUserConfig;
     FDefaultConfig: TUserConfig;
     FTestSound: TSndSound;
-    Audio: TAudio;
+    FAudioPlayer: TAudioPlayer;
     FVolume: integer;
     function GetVolume: integer;
     procedure RefreshAudioDevices;
@@ -157,10 +157,10 @@ procedure TfrmOptions.tsAudioShow(Sender: TObject);
 var
   AudioDevice: TAudioDevice;
 begin
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
     RefreshAudioDevices;
-    TAudio.GetDefaultDevice(@AudioDevice);
+    AudioSystem.GetDefaultDevice(@AudioDevice);
     edtDefaultDeviceName.Text := AudioDevice.DeviceName;
     edtDefaultHostAPI.Text := AudioDevice.HostAPIName;
   end;
@@ -191,7 +191,7 @@ begin
 
     cbUseDefaultAudio.Checked := UseDefaultAudioDevice;
 
-    if TAudio.Loaded then
+    if AudioSystem.Loaded then
     begin
       if (GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME) or
         (GlobalUserConfig.AudioHostAPIName <> DEF_AUDIO_HOSTAPI_NAME) then
@@ -230,13 +230,13 @@ var
   Device: PAudioDevice;
   Itm: TListItem;
 begin
-  tsAudio.Enabled := TAudio.Loaded;
+  tsAudio.Enabled := AudioSystem.Loaded;
 
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
     lsvAudioDevices.Items.Clear;
 
-    Devices := TAudio.Devices;
+    Devices := AudioSystem.Devices;
     lsvAudioDevices.Items.BeginUpdate;
     for Device in Devices do
     begin
@@ -279,7 +279,7 @@ begin
 
     UseDefaultAudioDevice := cbUseDefaultAudio.Checked;
 
-    { Find which audio device has been checked }
+    { Find which FAudioPlayer device has been checked }
     DeviceChecked := False;
     for Item in lsvAudioDevices.Items do
     begin
@@ -295,7 +295,7 @@ begin
     { If no item was checked, put the default device}
     if not DeviceChecked then
     begin
-      TAudio.GetDefaultDevice(@Device);
+      AudioSystem.GetDefaultDevice(@Device);
       AudioDeviceName := Device.DeviceName;
       AudioHostAPIName := Device.HostAPIName;
     end;
@@ -344,18 +344,18 @@ begin
   FDefaultConfig := TUserConfig.Create;
   SetControlsAs(GlobalUserConfig);
   pgcOptions.ActivePage := tsTimers;
-  Audio := nil;
+  FAudioPlayer := nil;
   bbStop.Enabled := False;
 
   FVolume:=GlobalUserConfig.Volume;
 
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
     RefreshAudioDevices;
-    TAudio.GetDefaultDevice(@AudioDevice);
+    AudioSystem.GetDefaultDevice(@AudioDevice);
     edtDefaultDeviceName.Text := AudioDevice.DeviceName;
     edtDefaultHostAPI.Text := AudioDevice.HostAPIName;
-    Audio := TAudio.Create;
+    FAudioPlayer := TAudioPlayer.Create;
     bbPlay.Enabled := True;
 
     FTestSound := TSndSound.Create;
@@ -375,7 +375,7 @@ end;
 procedure TfrmOptions.FormDestroy(Sender: TObject);
 begin
   FTestSound.Free;
-  Audio.Free;
+  FAudioPlayer.Free;
   FLastConfig.Free;
   FChangedConfig.Free;
   FDefaultConfig.Free;
@@ -385,15 +385,15 @@ procedure TfrmOptions.FormHide(Sender: TObject);
 var
   StartTickCount: longword;
 begin
-  if TAudio.Loaded and Audio.Playing then
+  if AudioSystem.Loaded and FAudioPlayer.Playing then
   begin
 
     StartTickCount := GetTickCount64;
     { Wait for FAudio to complete }
-    if Audio.Playing then
+    if FAudioPlayer.Playing then
     begin
-      Audio.Abort;
-      while Audio.Playing do
+      FAudioPlayer.Abort;
+      while FAudioPlayer.Playing do
       begin
         Logger.Debug('Waiting for');
         Application.ProcessMessages;
@@ -429,21 +429,23 @@ end;
 procedure TfrmOptions.bbPlayClick(Sender: TObject);
 var
   Item: TListItem;
+  Device: TAudioDevice;
 begin
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
-    TAudio.UseDefaultDevice := cbUseDefaultAudio.Checked;
+    AudioSystem.UseDefaultDevice := cbUseDefaultAudio.Checked;
 
-    if not TAudio.UseDefaultDevice then
+    if not AudioSystem.UseDefaultDevice then
     begin
-      TAudio.SetDefaulDevice; // In case no items are checked
+      AudioSystem.SetDefaulDevice; // In case no items are checked
       for Item in lsvAudioDevices.Items do
       begin
         if Item.Checked then
         begin
           // TODO: FOutpuDevice should be renamed?
-          TAudio.FOutputDevice.DeviceName := Item.Caption;
-          TAudio.FOutputDevice.HostAPIName := Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
+          Device.DeviceName := Item.Caption;
+          Device.HostAPIName := Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
+          AudioSystem.OutputDevice:=Device;
         end;
       end;
 
@@ -451,10 +453,10 @@ begin
 
     end;
 
-    //Audio.PlaySine;
-    //Audio.PlayTest;
+    //FAudioPlayer.PlaySine;
+    //FAudioPlayer.PlayTest;
 
-    Audio.Play(FTestSound, FVolume, True);
+    FAudioPlayer.Play(FTestSound, FVolume, True);
 
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;
@@ -466,14 +468,14 @@ procedure TfrmOptions.bbStopClick(Sender: TObject);
 var
   StartTickCount: longword;
 begin
-  if TAudio.Loaded then;
+  if AudioSystem.Loaded then;
   begin
     StartTickCount := GetTickCount64;
     { Wait for FAudio to complete }
-    if Audio.Playing then
+    if FAudioPlayer.Playing then
     begin
-      Audio.Abort;
-      while Audio.Playing do
+      FAudioPlayer.Abort;
+      while FAudioPlayer.Playing do
       begin
         Logger.Debug('Waiting for');
         Application.ProcessMessages;
@@ -481,7 +483,7 @@ begin
           break;
       end;
     end;
-    //Audio.Abort;
+    //FAudioPlayer.Abort;
     pgbAudio.Style := pbstNormal;
     bbPlay.Enabled := True;
     bbStop.Enabled := False;
@@ -506,7 +508,7 @@ end;
 
 procedure TfrmOptions.bbtnSaveClick(Sender: TObject);
 {var
-  Audio: TAudio;}
+  Audio: TAudioPlayer;}
 begin
   GetConfigFromControls(GlobalUserConfig);
   GlobalUserConfig.Flush;

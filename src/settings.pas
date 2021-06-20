@@ -413,9 +413,9 @@ begin
   FConf.SetValue(ADJ_DIFF, DEF_TIMER_DURATION);
   FConf.SetValue(ADJ_COMPLETEBY, DEF_TIMER_DURATION);
 
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
-    TAudio.GetDefaultDevice(@AudioDevice);
+    AudioSystem.GetDefaultDevice(@AudioDevice);
     FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDevice.DeviceName));
     FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioDevice.HostAPIName));
     FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, DEF_USE_DEFAULT_AUDIO_DEVICE);

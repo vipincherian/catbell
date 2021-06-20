@@ -300,7 +300,7 @@ begin
   FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
   {$ENDIF}
 
-  TAudio.LoadDefaultSounds;
+  AudioSystem.LoadDefaultSounds;
 
   FMetronome := TMetronome.Create;
 
@@ -358,7 +358,7 @@ begin
   //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
   stbMain.BeginUpdate;
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Ok'
   else
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Error';
@@ -379,7 +379,7 @@ end;
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
 var
   Added: TfraTimer;
-  //TempAudio: TAudio;
+  //TempAudio: TAudioPlayer;
 begin
   with GlobalUserConfig do
   begin
@@ -394,9 +394,9 @@ begin
   //TempAudio := nil;
 
   frmEdit.CurrentSound := nil;
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
-    //TempAudio := TAudio.Create;
+    //TempAudio := TAudioPlayer.Create;
     //frmEdit.Audio := TempAudio;
 
   end
@@ -416,7 +416,7 @@ begin
     Added.ModalAlert := frmEdit.ModalAlert;
     Added.TrayNotification := frmEdit.TrayNotification;
 
-    if TAudio.Loaded then
+    if AudioSystem.Loaded then
     begin
       //Added.Audio := TempAudio;
       Added.CustomSound := frmEdit.NewSound;
@@ -475,7 +475,7 @@ var
   StartTickCount: longword;
 begin
   { if any audio is playing, stop }
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
     StatusMessage := 'Stopping sounds being played if any...';
     Cursor := crHourglass;
@@ -1396,7 +1396,7 @@ begin
       NewTimerClock.UseDefaultSound :=
         Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
 
-      if TAudio.Loaded then
+      if AudioSystem.Loaded then
       begin
         try
           //NewTimerClock.Audio.FileName :=
@@ -1407,7 +1407,7 @@ begin
           else
           begin
             //NewTimerClock.Audio.LoadFromFile(AudioFileName);
-            NewTimerclock.CustomSound := TAudio.LoadSound(AudioFileName);
+            NewTimerclock.CustomSound := TAudioPlayer.LoadSound(AudioFileName);
           end;
           //NewTimerClock.Audio.Looped :=
           //  Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
@@ -1599,7 +1599,7 @@ begin
       UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
 
     Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.IsProgressOnIcon);
-    if TAudio.Loaded then
+    if AudioSystem.Loaded then
     begin
       if TimerClock.CustomSound <> nil then
       begin

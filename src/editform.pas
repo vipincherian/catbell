@@ -87,7 +87,7 @@ type
     FId: longword;
     FWidget: Pointer;
 
-    FAudio: TAudio;
+    FAudioPlayer: TAudioPlayer;
     FDefaultSound: TSndSound;
     FSoundInfo: TTimerSoundInfo;
 
@@ -107,7 +107,7 @@ type
     procedure SetMetronome(AValue: boolean);
     //function GetAudioFileName: string;
     //function GetAudioLooped: boolean;
-    //procedure SetAudio(AValue: TAudio);
+    //procedure SetAudio(AValue: TAudioPlayer);
     procedure SetSoundDuration(AValue: double);
     //procedure SetAudioFileName(AValue: string);
     procedure SetSoundLooped(AValue: boolean);
@@ -137,7 +137,7 @@ type
     property UseDefaultSound: boolean read GetUseDefaultSound write SetUseDefaultSound;
     property Id: longword read FId;
 
-    //property Audio: TAudio read FAudio write SetAudio;
+    //property Audio: TAudioPlayer read FAudioPlayer write SetAudio;
     property CurrentSound: TSound read FCurrentSound write SetCurrentSound;
     property NewSound: TSound read FNewSound write SetNewSound;
     //property AudioFileName: string read GetAudioFileName write SetAudioFileName;
@@ -168,8 +168,8 @@ begin
   FProceed := False;
   FWidget := nil;
 
-  FAudio := TAudio.Create;
-  FAudio.OnPlayCompletion := @AudioPlayed;
+  FAudioPlayer := TAudioPlayer.Create;
+  FAudioPlayer.OnPlayCompletion := @AudioPlayed;
   FDefaultSound := nil;
 
   with GlobalUserConfig do
@@ -188,7 +188,7 @@ begin
   //bbStopSound.Enabled := False;
   ;
 
-  {if not TAudio.Loaded then
+  {if not TAudioPlayer.Loaded then
   begin
     bbSelectSound.Enabled := False;
   end;}
@@ -216,11 +216,11 @@ begin
   //FSoundLooped := ckbLoop.Checked;
 
   StartTickCount := GetTickCount64;
-  { Wait for FAudio to complete }
-  if FAudio.Playing then
+  { Wait for FAudioPlayer to complete }
+  if FAudioPlayer.Playing then
   begin
-    FAudio.Abort;
-    while FAudio.Playing do
+    FAudioPlayer.Abort;
+    while FAudioPlayer.Playing do
     begin
       Logger.Debug('Waiting for');
       Application.ProcessMessages;
@@ -243,7 +243,7 @@ begin
   if odgAudio.Execute then
   begin
     FileName := odgAudio.FileName;
-    TempSound := TAudio.LoadSound(FileName);
+    TempSound := TAudioPlayer.LoadSound(FileName);
     if TempSound <> nil then
     begin
       NewSound.Free;
@@ -255,7 +255,7 @@ end;
 
 procedure TfrmEdit.bbStopSoundClick(Sender: TObject);
 begin
-  FAudio.Abort;
+  FAudioPlayer.Abort;
 end;
 
 procedure TfrmEdit.bbTestSoundClick(Sender: TObject);
@@ -271,7 +271,7 @@ begin
       FDefaultSound := TSndSound.Create;
       FDefaultSound.LoadDefaultSound;
     end;
-    FAudio.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped);
+    FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped);
     ReenableControls;
     Exit;
   end;
@@ -287,7 +287,7 @@ begin
   if SoundToPlay = nil then
     Exit;
 
-  FAudio.Play(SoundToPlay, GlobalUserConfig.Volume, SoundLooped);
+  FAudioPlayer.Play(SoundToPlay, GlobalUserConfig.Volume, SoundLooped);
   ReenableControls;
 end;
 
@@ -324,12 +324,12 @@ procedure TfrmEdit.bbCancelClick(Sender: TObject);
 var
   StartTickCount: longword;
 begin
-  FAudio.Abort;
+  FAudioPlayer.Abort;
   StartTickCount := GetTickCount64;
-  { Abort is asynchronous, wait till FAudio completes it work.
+  { Abort is asynchronous, wait till FAudioPlayer completes it work.
   Also, we do not wait for more than two seconds per timer.
   After that, it is past caring. Tardiness can only be tolerated as much. }
-  while FAudio.Playing do
+  while FAudioPlayer.Playing do
   begin
     Logger.Debug('Waiting for frmEdit to stop audio');
     Application.ProcessMessages;
@@ -349,7 +349,7 @@ end;
 procedure TfrmEdit.FormDestroy(Sender: TObject);
 begin
   FDefaultSound.Free;
-  FAudio.Free;
+  FAudioPlayer.Free;
   //FSpecs.Free;
   // There can be excpetions to this, but just a check to see if this ever
   // happens
@@ -407,17 +407,17 @@ begin
   dtpDuration.Enabled := (not WidgetRunning);
 
   ckbUseDefaultSound.Enabled :=
-    (not WidgetPlayingSound) and TAudio.Loaded and (not FAudio.Playing);
-  ckbLoop.Enabled := (not WidgetPlayingSound) and TAudio.Loaded and (not FAudio.Playing);
+    (not WidgetPlayingSound) and AudioSystem.Loaded and (not FAudioPlayer.Playing);
+  ckbLoop.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and (not FAudioPlayer.Playing);
 
-  bbSelectSound.Enabled := (not WidgetPlayingSound) and TAudio.Loaded and
-    (not FAudio.Playing) and (not ckbUseDefaultSound.Checked);
-  bbClearSound.Enabled := (not WidgetPlayingSound) and (not FAudio.Playing) and
+  bbSelectSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
+    (not FAudioPlayer.Playing) and (not ckbUseDefaultSound.Checked);
+  bbClearSound.Enabled := (not WidgetPlayingSound) and (not FAudioPlayer.Playing) and
     ((not ckbUseDefaultSound.Checked) or (edtSound.Text <> ''));
 
-  bbTestSound.Enabled := (not WidgetPlayingSound) and TAudio.Loaded and
-    (not FAudio.Playing) and (ckbUseDefaultSound.Checked or (edtSound.Text <> ''));
-  bbStopSound.Enabled := TAudio.Loaded and FAudio.Playing;
+  bbTestSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
+    (not FAudioPlayer.Playing) and (ckbUseDefaultSound.Checked or (edtSound.Text <> ''));
+  bbStopSound.Enabled := AudioSystem.Loaded and FAudioPlayer.Playing;
 
   bbSave.Enabled := Validate;
 end;
@@ -437,7 +437,7 @@ end;
 
 {procedure TfrmEdit.SetAudioFileName(AValue: string);
 begin
-  if TAudio.Loaded then
+  if TAudioPlayer.Loaded then
   begin
     //Audio.FileName := AValue;
     try
@@ -479,7 +479,7 @@ end;}
 
 procedure TfrmEdit.SetSoundLooped(AValue: boolean);
 begin
-  {if TAudio.Loaded then
+  {if TAudioPlayer.Loaded then
     Audio.Looped := AValue
   else
     FSoundInfo.Looped := AValue;}
@@ -490,7 +490,7 @@ end;
 
 {function TfrmEdit.GetAudioFileName: string;
 begin
-  if TAudio.Loaded then
+  if TAudioPlayer.Loaded then
     Result := Audio.FileName
   else
     Result := FAudioInfo.FileName;
@@ -498,7 +498,7 @@ end;}
 
 function TfrmEdit.GetSoundDuration: double;
 begin
-  {if TAudio.Loaded then
+  {if TAudioPlayer.Loaded then
     Result := Audio.Duration
   else
     Result := FSoundInfo.Duration;}
@@ -547,13 +547,13 @@ end;
 
 {function TfrmEdit.GetAudioLooped: boolean;
 begin
-  if TAudio.Loaded then
+  if TAudioPlayer.Loaded then
     Result := Audio.Looped
   else
     Result := FAudioInfo.Looped;
 end;}
 
-{procedure TfrmEdit.SetAudio(AValue: TAudio);
+{procedure TfrmEdit.SetAudio(AValue: TAudioPlayer);
 begin
   FAudio := AValue;
   if FAudio = nil then
@@ -577,7 +577,7 @@ end;}
 
 procedure TfrmEdit.SetSoundDuration(AValue: double);
 begin
-  if not TAudio.Loaded then
+  if not AudioSystem.Loaded then
   begin
     FSoundInfo.Duration := AValue;
     lblLenthVal.Caption := FloatToStr(RoundTo(FSoundInfo.Duration, -2));

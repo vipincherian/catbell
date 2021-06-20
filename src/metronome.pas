@@ -13,7 +13,7 @@ type
 
   TMetronome = class(TObject)
   private
-    FAudio: TAudio;
+    FAudioPlayer: TAudioPlayer;
     FTickSound: TSndSound;
     FRunning: boolean;
     FLastPlayedTick: longword;
@@ -60,7 +60,7 @@ end;
 constructor TMetronome.Create;
 begin
   FSubscriptions:=0;
-  FAudio := TAudio.Create;
+  FAudioPlayer := TAudioPlayer.Create;
   FTickSound := TSndSound.Create;
   FTickSound.LoadTick;
 
@@ -81,10 +81,10 @@ end;
 destructor TMetronome.Destroy;
 begin
   FBpmTimer.Free;
-  if FAudio.Playing then
+  if FAudioPlayer.Playing then
     Abort;
   FTickSound.Free;
-  FAudio.Free;
+  FAudioPlayer.Free;
   inherited Destroy;
 end;
 
@@ -93,10 +93,10 @@ var
   StartTickCount: longword;
 begin
 
-  FAudio.Abort;
+  FAudioPlayer.Abort;
 
   StartTickCount := GetTickCount64;
-  while FAudio.Playing do
+  while FAudioPlayer.Playing do
   begin
     Logger.Debug('Waiting for frame metronome to stop audio');
     Application.ProcessMessages;
@@ -129,8 +129,8 @@ begin
   //  Bpm := GlobalUserConfig.Bpm;
   if FSubscriptions > 0 then
   begin
-    if not FAudio.Playing then
-      FAudio.Play(FTickSound, GlobalUserConfig.Volume, False);
+    if not FAudioPlayer.Playing then
+      FAudioPlayer.Play(FTickSound, GlobalUserConfig.Volume, False);
   end;
 end;
 

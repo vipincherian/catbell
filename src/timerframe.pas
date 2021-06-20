@@ -137,11 +137,11 @@ type
     FRunning: boolean;
     FProgress: single;
 
-    FAudio: TAudio;
+    FAudioPlayer: TAudioPlayer;
     FDefaultSound: TSound;
     FCustomSound: TSound;
 
-    //procedure SetAudio(AValue: TAudio);
+    //procedure SetAudio(AValue: TAudioPlayer);
     function GetIsSoundPlaying: boolean;
     procedure SetCustomSound(AValue: TSound);
     procedure SetId(AValue: longword);
@@ -234,7 +234,7 @@ type
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
-    //property Audio: TAudio read FAudio;// write SetAudio;
+    //property Audio: TAudioPlayer read FAudioPlayer;// write SetAudio;
     property CustomSound: TSound read FCustomSound write SetCustomSound;
     property Metronome: boolean read FMetronome write SetMetronome;
     //property PendingTickCount: longword read FPendingTickCount;
@@ -299,7 +299,7 @@ begin
   frmEdit.ModalAlert := FModalAlert;
   frmEdit.UseDefaultSound:=UseDefaultSound;
 
-  if TAudio.Loaded then
+  if AudioSystem.Loaded then
   begin
     frmEdit.CurrentSound := FCustomSound;
   end
@@ -325,7 +325,7 @@ begin
 
     SoundLooped:=frmEdit.SoundLooped;
     Metronome:=frmEdit.Metronome;
-    if TAudio.Loaded then
+    if AudioSystem.Loaded then
     begin
       //frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
       //NewCustomSound := frmEdit.NewSound;
@@ -388,7 +388,7 @@ begin
   Name := Name + IntToStr(AValue);
 end;
 
-{procedure TfraTimer.SetAudio(AValue: TAudio);
+{procedure TfraTimer.SetAudio(AValue: TAudioPlayer);
 begin
   FAudio.Free;
   FAudio := AValue
@@ -411,7 +411,7 @@ end;
 
 function TfraTimer.GetIsSoundPlaying: boolean;
 begin
-  Result := FAudio.Playing;
+  Result := FAudioPlayer.Playing;
 end;
 
 function TfraTimer.GetCaption: string;
@@ -676,11 +676,11 @@ begin
 
   CallbackOnProgressOnIconChange := True;
 
-  FAudio := Nil;
-  if TAudio.Loaded then
+  FAudioPlayer := Nil;
+  if AudioSystem.Loaded then
   begin
-    FAudio := TAudio.Create;
-    FAudio.OnPlayCompletion:=@AudioPlayed;
+    FAudioPlayer := TAudioPlayer.Create;
+    FAudioPlayer.OnPlayCompletion:=@AudioPlayed;
 
     SndFile := TSndSound.Create;
     SndFile.LoadDefaultSound;
@@ -692,7 +692,7 @@ end;
 
 destructor TfraTimer.Destroy;
 begin
-  FAudio.Free;
+  FAudioPlayer.Free;
   FDefaultSound.Free;
   FCustomSound.Free;
   Parent := nil;
@@ -842,10 +842,12 @@ begin
 end;
 
 procedure TfraTimer.Stop(UserInitiated: boolean);
+var
+  Device: TAudioDevice;
 begin
   { The audio is playing and the user request is to terminate the audio.}
   Logger.Debug('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));
-  if TAudio.Loaded and FAudio.Playing then
+  if AudioSystem.Loaded and FAudioPlayer.Playing then
   begin
     FRunning := False;
     FPaused := False;
@@ -860,7 +862,7 @@ begin
     {There is no need to close the stream. Stopping/aborting the stream
     will trigger the callback for stream stoppage. The stream will be closed
     in that callback function}
-    FAudio.Abort;
+    FAudioPlayer.Abort;
 
     Exit;
   end
@@ -890,35 +892,36 @@ begin
     DurationEnabled := True;
 
 
-    if TAudio.Loaded and (UseDefaultSound or (FCustomSound <> nil)) and (not UserInitiated) then
+    if AudioSystem.Loaded and (UseDefaultSound or (FCustomSound <> nil)) and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
 
-      TAudio.UseDefaultDevice:=GlobalUserConfig.UseDefaultAudioDevice;
+      AudioSystem.UseDefaultDevice:=GlobalUserConfig.UseDefaultAudioDevice;
 
-      if not TAudio.UseDefaultDevice then
+      if not AudioSystem.UseDefaultDevice then
       begin
         if (GlobalUserConfig.AudioDeviceName = '') or
           (GlobalUserConfig.AudioHostAPIName = '') then
-          TAudio.SetDefaulDevice
+          AudioSystem.SetDefaulDevice
         else
         begin
-          TAudio.FOutputDevice.DeviceName:=GlobalUserConfig.AudioDeviceName;
-          TAudio.FOutputDevice.HostAPIName:=GlobalUserConfig.AudioHostAPIName;
+          Device.DeviceName:=GlobalUserConfig.AudioDeviceName;
+          Device.HostAPIName:=GlobalUserConfig.AudioHostAPIName;
+          AudioSystem.OutputDevice:=Device;
         end;
 
       end;
 
       // Play the sound as per configuration
       if UseDefaultSound then
-        FAudio.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
+        FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
       else
       begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
         if FCustomSound <> nil then
-          FAudio.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
+          FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
       end;
       ReenableEditControls;
       //Logger.Debug('FAudio.Play');
@@ -1171,7 +1174,7 @@ end;
 
 procedure TfraTimer.AbortSound;
 begin
-  FAudio.Abort;
+  FAudioPlayer.Abort;
 end;
 
 

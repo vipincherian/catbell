@@ -175,8 +175,8 @@ type
     property Source: string read GetSource;
   end;
 
-  { TAudio }
-  TAudio = class(TObject)
+  { TAudioPlayer }
+  TAudioPlayer = class(TObject)
   private
 
     FUserInfo: TUserInfo;
@@ -186,40 +186,17 @@ type
 
     Data: PaTestData;
     DataPointer: PPaTestData;
-    class procedure LoadSoundFromResource(ResourceName: string;
-      var Sound: TSoundData); static;
 
-    class function GetDevices: TAudioDeviceList; static;
-    class procedure SetOutputDevice(AValue: TAudioDevice); static;
     //procedure SetVolume(AValue: integer);
 
   public
-    Loaded: boolean; static;
-    UseDefaultDevice: boolean; static;
-    FDevices: TAudioDeviceList; static;
-    FDefaultDevice: integer; static;
-    //AudioCriticalSection: TRTLCriticalSection; static;
-    FOutputDevice: TAudioDevice; static;
-    //FVolume: integer;
 
-    {Default sounds }
-    DefaultSound: TSoundData; static;
-    DefaultTick: TSoundData; static;
 
     OnPlayCompletion: TNotifyEvent;
     Looped: boolean;
     constructor Create;
     destructor Destroy; override;
-    class function GetDefaultDeviceIndex: AudioDeviceIndex; static;
-    class procedure GetDefaultDevice(Device: PAudioDevice); static;
-    class function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex; static;
-    class property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
-    class property Devices: TAudioDeviceList read GetDevices;
-    //property Volume: integer read FVolume write SetVolume;
-    class procedure CleanUp; static;
-    class procedure SetDefaulDevice; static;
-    class procedure LoadDefaultSounds; static;
-    class procedure FreeDefaultSounds; static;
+
     procedure Play(Sound: TSound; var Volume: integer; PlayLooped: boolean = False);
 
     procedure Abort;
@@ -229,15 +206,57 @@ type
     class function LoadSound(Avalue: string): TSound; static;
 
     property Playing: boolean read FAudioPlaying;
-    class property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
+
 
   end;
 
+  TAudioSystem = class(TObject)
+  private
+    FLoaded: boolean;
+    FOutputDevice: TAudioDevice;
+    {Default sounds }
+    FDefaultSound: TSoundData;
+    FDefaultTick: TSoundData;
+    {%H-}constructor Create;
+    {%H-}destructor {%H-}Destroy; override;
+    class procedure LoadSoundFromResource(ResourceName: string;
+      var Sound: TSoundData);
+
+    function GetDevices: TAudioDeviceList;
+    procedure SetOutputDevice(AValue: TAudioDevice);
+    procedure CleanUp;
+  public
+
+    UseDefaultDevice: boolean;
+    FDevices: TAudioDeviceList;
+    FDefaultDevice: integer;
+    //AudioCriticalSection: TRTLCriticalSection; static;
+
+    //FVolume: integer;
+
+
+    function GetDefaultDeviceIndex: AudioDeviceIndex;
+    procedure GetDefaultDevice(Device: PAudioDevice);
+    function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
+    property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
+    property Devices: TAudioDeviceList read GetDevices;
+    //property Volume: integer read FVolume write SetVolume;
+
+    procedure SetDefaulDevice;
+    procedure LoadDefaultSounds;
+    procedure FreeDefaultSounds;
+    property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
+    property Loaded: boolean read FLoaded;
+  end;
+
+var
+  PaErrCode: PaError;
+  AudioSystem: TAudioSystem = nil;
 
 implementation
 
 //uses
-  //log;
+//log;
 
 {This function is called by PortAudio to request for audio data, and is passed
 as a parameter while opening the stream.
@@ -260,7 +279,7 @@ var
   Volume: integer;
   AmpScale: double;
 begin
-  //EnterCriticalSection(TAudio.AudioCriticalSection);
+  //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
   //Logger.Debug('Inside FeedAudioStream');
 
   AudioInfo := PAudioinfo(userData);
@@ -311,7 +330,7 @@ begin
       begin
         //Logger.Debug('readCount zero immediately after seek to beginning');
         Result := cint(paAbort);
-        //LeaveCriticalSection(TAudio.AudioCriticalSection);
+        //LeaveCriticalSection(TAudioPlayer.AudioCriticalSection);
         Exit;
       end;
     end;
@@ -330,7 +349,7 @@ begin
     end;
   end;
 
-  //LeaveCriticalSection(TAudio.AudioCriticalSection);
+  //LeaveCriticalSection(TAudioPlayer.AudioCriticalSection);
 end;
 
 {This function is called by PortAudio to signal that the stream has stopped.
@@ -339,16 +358,16 @@ handle.}
 procedure AudioStreamFinished(UserData: pointer); cdecl;
 var
   AudioInfo: PAudioInfo;
-  {%H-}AudioTemp: TAudio; // Possibly buggy hint, omitting
+  {%H-}AudioTemp: TAudioPlayer; // Possibly buggy hint, omitting
 begin
-  //EnterCriticalSection(TAudio.AudioCriticalSection);
+  //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
 
   AudioInfo := PAudioinfo(userData);
 
-  AudioTemp := TAudio(AudioInfo^.Player);
+  AudioTemp := TAudioPlayer(AudioInfo^.Player);
 
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
-  //LeaveCriticalSection(TAudio.AudioCriticalSection);
+  //LeaveCriticalSection(TAudioPlayer.AudioCriticalSection);
 end;
 
 { This is called when playback is finished.
@@ -357,13 +376,13 @@ end;
 {procedure StreamFinished(UserData: pointer); cdecl;
 var
   LocalDataPointer: PPaTestData;
-  {%H-}AudioTemp: TAudio; // buggy hint, omitting
+  {%H-}AudioTemp: TAudioPlayer; // buggy hint, omitting
 begin
-  EnterCriticalSection(TAudio.AudioCriticalSection);
+  EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
   LocalDataPointer := PPaTestData(UserData);
-  AudioTemp := TAudio(LocalDataPointer^.Player);
+  AudioTemp := TAudioPlayer(LocalDataPointer^.Player);
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
-  LeaveCriticalSection(TAudio.AudioCriticalSection);
+  LeaveCriticalSection(TAudioPlayer.AudioCriticalSection);
 end;}
 
 function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
@@ -466,6 +485,120 @@ begin
   //Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
   //Logger.Debug('');
   //Logger.Debug('Exiting sf_vio_tell_impl');
+end;
+
+{ TAudioSystem }
+
+constructor TAudioSystem.Create;
+begin
+  FLoaded := False;
+  FDefaultSound.Loaded := False;
+  FDefaultTick.Loaded := False;
+  FDevices := TAudioDeviceList.Create;
+
+  {$IFNDEF AUDIO_STATIC}
+  FLoaded := Pa_Load(LIB_PORTAUDIO);
+  if not FLoaded then
+  begin
+    //Logger.Debug('Could not load portaudio');
+    Exit;
+  end;
+
+  { Load sndfile library only if portaudio was loaded successfully }
+
+  if FLoaded then
+  begin
+    FLoaded := sf_load(LIB_SNDFILE);
+    if not FLoaded then
+    begin
+      //Logger.Debug('Could not load sndfile');
+      Pa_Unload();
+      Exit;
+    end;
+  end;
+
+  if FLoaded then
+  begin
+    FLoaded := Mp_Load(LIB_MPG123);
+    if not FLoaded then
+    begin
+      //Logger.Debug('Could not load mpg123');
+      sf_Unload;
+      Pa_Unload;
+      Exit;
+    end;
+    if mpg123_init() <> MPG123_OK then
+    begin
+      FLoaded := False;
+      //Logger.Debug('mpg123_init() failed');
+      Mp_Unload;
+      sf_Unload;
+      Pa_Unload;
+      Exit;
+    end;
+  end;
+
+  //FAudioWorking:=Status;
+
+  {$ENDIF}
+
+  { If everything has gone alright so far, attempt to initialise
+  PortAudio }
+
+  if FLoaded then
+  begin
+    PaErrCode := Pa_Initialize();
+    if PaErrCode <> cint(paNoError) then
+    begin
+      Logger.Debug('Error in Pa_Initialize()');
+
+      FLoaded := False;
+
+      { If portaudio cannot be initialised, then audio will not work.
+      Unload libraries }
+      {$IFNDEF AUDIO_STATIC}
+      Mp_Unload;
+      sf_Unload;
+      Pa_Unload;
+
+      {$ENDIF}
+    end;
+  end;
+
+  if FLoaded then
+  begin
+    FDefaultDevice := Pa_GetDefaultOutputDevice();
+    if FDefaultDevice = paNoDevice then
+    begin
+      Logger.Debug('No default device');
+      FLoaded := False;
+      Pa_Terminate;
+      {$IFNDEF AUDIO_STATIC}
+      Mp_Unload;
+      sf_Unload;
+      Pa_Unload;
+      {$ENDIF}
+    end;
+  end;
+  //InitCriticalSection(TAudioPlayer.AudioCriticalSection);
+end;
+
+destructor TAudioSystem.Destroy;
+begin
+  if FLoaded then
+  begin
+    Pa_Terminate;
+    mpg123_exit;
+    {$IFNDEF AUDIO_STATIC}
+    Mp_Unload;
+    Sf_Unload;
+    Pa_Unload;
+    {$ENDIF}
+  end;
+  CleanUp;
+  FDevices.Free;
+
+  inherited Destroy;
 end;
 
 { TSound }
@@ -656,7 +789,7 @@ var
   TempSoundFile: PSNDFILE;
 begin
   //EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.Loaded then
+  if not AudioSystem.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   {if FAudioPlaying then
@@ -739,7 +872,7 @@ begin
     Write := @sf_vio_write_impl;
   end;
 
-  FVIOUserData.Sound := @TAudio.DefaultSound;
+  FVIOUserData.Sound := @AudioSystem.FDefaultSound;
   FVIOUserData.Position := 0;
 
 end;
@@ -785,7 +918,7 @@ var
   TempSoundFile: PSNDFILE;
 begin
   //EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.Loaded then
+  if not AudioSystem.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   FVIOUserData.Sound := SoundData;
@@ -828,17 +961,17 @@ end;
 
 procedure TSndSound.LoadDefaultSound;
 begin
-  LoadInMemorySound(@TAudio.DefaultSound);
+  LoadInMemorySound(@AudioSystem.FDefaultSound);
 end;
 
 procedure TSndSound.LoadTick;
 begin
-  LoadInMemorySound(@TAudio.DefaultTick);
+  LoadInMemorySound(@AudioSystem.FDefaultTick);
 end;
 
-{ TAudio }
+{ TAudioPlayer }
 
-procedure TAudio.Play(Sound: TSound; var Volume: integer; PlayLooped: boolean);
+procedure TAudioPlayer.Play(Sound: TSound; var Volume: integer; PlayLooped: boolean);
 var
   PaErrCode: PaError;
   StreamParams: PaStreamParameters;
@@ -848,7 +981,7 @@ begin
   //EnterCriticalSection(AudioCriticalSection);
 
   try
-    if not TAudio.Loaded then
+    if not AudioSystem.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
 
     if FAudioPlaying then
@@ -864,17 +997,17 @@ begin
     end;}
     Sound.SeekToBeginning;
 
-    if UseDefaultDevice or (FOutputDevice.HostAPIName = '') or
-      (FOutputDevice.DeviceName = '') then
+    if AudioSystem.UseDefaultDevice or (AudioSystem.OutputDevice.HostAPIName = '') or
+      (AudioSystem.OutputDevice.DeviceName = '') then
     begin
-      DeviceId := DefaultDeviceIndex;
+      DeviceId := AudioSystem.DefaultDeviceIndex;
       Logger.Info('TAudio using default device to play audio.');
     end
     else
     begin
-      DeviceId := GetDeviceIndex(FOutputDevice);
-      Logger.Info('TAudio using device - ' + FOutputDevice.DeviceName +
-        ' host api - ' + FOutputDevice.HostAPIName);
+      DeviceId := AudioSystem.GetDeviceIndex(AudioSystem.OutputDevice);
+      Logger.Info('TAudio using device - ' + AudioSystem.OutputDevice.DeviceName +
+        ' host api - ' + AudioSystem.OutputDevice.HostAPIName);
     end;
     StreamParams.device := DeviceId;
 
@@ -937,7 +1070,7 @@ begin
   end;
 end;
 
-class procedure TAudio.LoadSoundFromResource(ResourceName: string;
+class procedure TAudioSystem.LoadSoundFromResource(ResourceName: string;
   var Sound: TSoundData);
 var
   BytesRead: integer;
@@ -964,7 +1097,7 @@ begin
   Stream.Destroy;
 end;
 
-class function TAudio.GetDevices: TAudioDeviceList; static;
+function TAudioSystem.GetDevices: TAudioDeviceList;
 var
   NumDevices, Count: integer;
   DeviceInfo: PPaDeviceInfo;
@@ -973,17 +1106,17 @@ var
   Device: PAudioDevice;
 begin
   //EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.Loaded then
+  if not AudioSystem.Loaded then
   begin
     //LeaveCriticalSection(AudioCriticalSection);
     raise EAudioNotLoaded.Create('Audio not loaded.');
   end;
 
-  for Device in TAudio.FDevices do
+  for Device in FDevices do
   begin
     Dispose(Device);
   end;
-  TAudio.FDevices.Clear;
+  FDevices.Clear;
   NumDevices := Pa_GetDeviceCount();
   if NumDevices < 0 then
   begin
@@ -1034,7 +1167,7 @@ begin
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class procedure TAudio.GetDefaultDevice(Device: PAudioDevice); static;
+procedure TAudioSystem.GetDefaultDevice(Device: PAudioDevice);
 var
   DevideId: integer;
   DeviceInfo: PPaDeviceInfo;
@@ -1042,7 +1175,7 @@ var
   DeviceName, HostAPIName: string;
 begin
   //EnterCriticalSection(AudioCriticalSection);
-  DevideId := TAudio.GetDefaultDeviceIndex;
+  DevideId := GetDefaultDeviceIndex;
   DeviceInfo := Pa_GetDeviceInfo(DevideId);
   if DeviceInfo = nil then
   begin
@@ -1065,7 +1198,7 @@ begin
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class procedure TAudio.SetOutputDevice(AValue: TAudioDevice);
+procedure TAudioSystem.SetOutputDevice(AValue: TAudioDevice);
 begin
   try
     FOutputDevice.DeviceName := AValue.DeviceName;
@@ -1074,18 +1207,18 @@ begin
   end;
 end;
 
-{procedure TAudio.SetVolume(AValue: integer);
+{procedure TAudioPlayer.SetVolume(AValue: integer);
 begin
   if FVolume=AValue then Exit;
   FVolume:=Min(AValue, MAX_VOLUME);
 end;}
 
-constructor TAudio.Create;
+constructor TAudioPlayer.Create;
 var
   i: integer;
 begin
 
-  if not TAudio.Loaded then
+  if not AudioSystem.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   Looped := False;
@@ -1105,17 +1238,17 @@ begin
 
 end;
 
-destructor TAudio.Destroy;
+destructor TAudioPlayer.Destroy;
 begin
   inherited Destroy;
 end;
 
-class function TAudio.GetDefaultDeviceIndex: AudioDeviceIndex;
+function TAudioSystem.GetDefaultDeviceIndex: AudioDeviceIndex;
 var
   DeviceId: AudioDeviceIndex;
 begin
   //EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.Loaded then
+  if not FLoaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   DeviceId := Pa_GetDefaultOutputDevice();
@@ -1129,14 +1262,14 @@ begin
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class function TAudio.GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
+function TAudioSystem.GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
 var
   NumDevices, CountDevice: integer;
   DeviceInfo: PPaDeviceInfo;
   HostAPIInfo: PPaHostApiInfo;
 begin
   //EnterCriticalSection(AudioCriticalSection);
-  if not TAudio.Loaded then
+  if not FLoaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   NumDevices := Pa_GetDeviceCount();
@@ -1178,53 +1311,54 @@ begin
 
 end;
 
-class procedure TAudio.CleanUp;
+procedure TAudioSystem.CleanUp;
 var
   Device: PAudioDevice;
 begin
-  if not TAudio.Loaded then
+  if not FLoaded then
   begin
     Logger.Debug('TAudio.Loaded is fales in TAudio.Cleanup');
     Exit;
   end;
 
-  for Device in TAudio.FDevices do
+  for Device in FDevices do
   begin
     Dispose(Device);
   end;
-  TAudio.FDevices.Clear;
+  FDevices.Clear;
 
-  FreeMem(TAudio.DefaultSound.Buffer);
-  FreeMem(TAudio.DefaultTick.Buffer);
+  FreeMem(FDefaultSound.Buffer);
+  FreeMem(FDefaultTick.Buffer);
 end;
 
-class procedure TAudio.SetDefaulDevice;
+{ TODO : Is this implementation ?}
+procedure TAudioSystem.SetDefaulDevice;
 begin
-  TAudio.GetDefaultDevice(@FOutputDevice);
+  GetDefaultDevice(@FOutputDevice);
 end;
 
-class procedure TAudio.LoadDefaultSounds;
+procedure TAudioSystem.LoadDefaultSounds;
 begin
-  if not TAudio.Loaded then
+  if not FLoaded then
   begin
     Exit;
   end;
-  LoadSoundFromResource('DEFAULT_SOUND', TAudio.DefaultSound);
-  LoadSoundFromResource('TICK', TAudio.DefaultTick);
+  LoadSoundFromResource('DEFAULT_SOUND', FDefaultSound);
+  LoadSoundFromResource('TICK', FDefaultTick);
 end;
 
-class procedure TAudio.FreeDefaultSounds;
+procedure TAudioSystem.FreeDefaultSounds;
 begin
-  FreeMem(DefaultSound.Buffer);
+  FreeMem(FDefaultSound.Buffer);
 end;
 
-procedure TAudio.Abort;
+procedure TAudioPlayer.Abort;
 var
   PaErrCode: PaError;
 begin
   //EnterCriticalSection(AudioCriticalSection);
   try
-    if not TAudio.Loaded then
+    if not AudioSystem.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
 
     if not FAudioPlaying then
@@ -1250,11 +1384,11 @@ begin
 
 end;
 
-procedure TAudio.FinishedAud(Datax: PtrInt);
+procedure TAudioPlayer.FinishedAud(Datax: PtrInt);
 var
   PaErrCode: PaError;
 begin
-  if not TAudio.Loaded then
+  if not AudioSystem.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   //EnterCriticalSection(AudioCriticalSection);
@@ -1297,7 +1431,7 @@ begin
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class function TAudio.LoadSound(Avalue: string): TSound;
+class function TAudioPlayer.LoadSound(Avalue: string): TSound;
 var
   SndSound: TSndSound;
   MpgSound: TMpgSound;
@@ -1327,115 +1461,16 @@ begin
   raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
 end;
 
-var
-  PaErrCode: PaError;
+
 
 
 initialization
-  TAudio.Loaded := False;
-  TAudio.DefaultSound.Loaded := False;
-  TAudio.DefaultTick.Loaded := False;
-  TAudio.FDevices := TAudioDeviceList.Create;
 
-  {$IFNDEF AUDIO_STATIC}
-  TAudio.Loaded := Pa_Load(LIB_PORTAUDIO);
-  if not TAudio.Loaded then
-  begin
-    //Logger.Debug('Could not load portaudio');
-    Exit;
-  end;
-
-  { Load sndfile library only if portaudio was loaded successfully }
-
-  if TAudio.Loaded then
-  begin
-    TAudio.Loaded := sf_load(LIB_SNDFILE);
-    if not TAudio.Loaded then
-    begin
-      //Logger.Debug('Could not load sndfile');
-      Pa_Unload();
-      Exit;
-    end;
-  end;
-
-  if TAudio.Loaded then
-  begin
-    TAudio.Loaded := Mp_Load(LIB_MPG123);
-    if not TAudio.Loaded then
-    begin
-      //Logger.Debug('Could not load mpg123');
-      sf_Unload;
-      Pa_Unload;
-      Exit;
-    end;
-    if mpg123_init() <> MPG123_OK then
-    begin
-      TAudio.Loaded := False;
-      //Logger.Debug('mpg123_init() failed');
-      Mp_Unload;
-      sf_Unload;
-      Pa_Unload;
-      Exit;
-    end;
-  end;
-
-  //FAudioWorking:=Status;
-
-  {$ENDIF}
-
-  { If everything has gone alright so far, attempt to initialise
-  PortAudio }
-
-  if TAudio.Loaded then
-  begin
-    PaErrCode := Pa_Initialize();
-    if PaErrCode <> cint(paNoError) then
-    begin
-      Logger.Debug('Error in Pa_Initialize()');
-
-      TAudio.Loaded := False;
-
-      { If portaudio cannot be initialised, then audio will not work.
-      Unload libraries }
-      {$IFNDEF AUDIO_STATIC}
-      Mp_Unload;
-      sf_Unload;
-      Pa_Unload;
-
-      {$ENDIF}
-    end;
-  end;
-
-  if TAudio.Loaded then
-  begin
-    TAudio.FDefaultDevice := Pa_GetDefaultOutputDevice();
-    if TAudio.FDefaultDevice = paNoDevice then
-    begin
-      Logger.Debug('No default device');
-      TAudio.Loaded := False;
-      Pa_Terminate;
-      {$IFNDEF AUDIO_STATIC}
-      Mp_Unload;
-      sf_Unload;
-      Pa_Unload;
-      {$ENDIF}
-    end;
-  end;
-  //InitCriticalSection(TAudio.AudioCriticalSection);
+  AudioSystem := TAudioSystem.Create;
 
 
 finalization
-  //DoneCriticalsection(TAudio.AudioCriticalSection);
-  if TAudio.Loaded then
-  begin
-    Pa_Terminate;
-    mpg123_exit;
-    {$IFNDEF AUDIO_STATIC}
-    Mp_Unload;
-    Sf_Unload;
-    Pa_Unload;
-    {$ENDIF}
-  end;
-  TAudio.CleanUp;
-  TAudio.FDevices.Free;
+  //DoneCriticalsection(TAudioPlayer.AudioCriticalSection);
+
+  AudioSystem.Free;
 end.
