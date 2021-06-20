@@ -709,6 +709,7 @@ begin
   { If an attempt was made to start another instance of this application,
   bring the main form to the front }
   Application.BringToFront;
+  Logger.Info('Attempt to start another instance. Brought window to front.');
 end;
 
 

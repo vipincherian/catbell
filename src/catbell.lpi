@@ -12,9 +12,9 @@
       <Resources Count="5">
         <Resource_0 FileName="../res/controls/256_progress_base.png" Type="RCDATA" ResourceName="256_PROGRESS_BASE"/>
         <Resource_1 FileName="../res/controls/256_hourglass_flat.png" Type="RCDATA" ResourceName="256_HOURGLASS_FLAT"/>
-        <Resource_2 FileName="../res/audio/default_sound.ogg" Type="RCDATA" ResourceName="DEFAULT_SOUND"/>
-        <Resource_3 FileName="../res/audio/tick.ogg" Type="RCDATA" ResourceName="TICK"/>
-        <Resource_4 FileName="../doc/gpl-2.0.txt" Type="RCDATA" ResourceName="GPL2"/>
+        <Resource_2 FileName="../res/audio/tick.ogg" Type="RCDATA" ResourceName="TICK"/>
+        <Resource_3 FileName="../doc/gpl-2.0.txt" Type="RCDATA" ResourceName="GPL2"/>
+        <Resource_4 FileName="../res/audio/default_sound.ogg" Type="RCDATA" ResourceName="DEFAULT_SOUND"/>
       </Resources>
     </General>
     <i18n>

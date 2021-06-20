@@ -820,11 +820,11 @@ begin
 
   FSoundFile := TempSoundFile;
 
-  Logger.Debug(IntToHex(FInfo.format, 8));
-  Logger.Debug(IntToStr(FInfo.channels));
-  Logger.Debug(IntToStr(FInfo.frames));
-  Logger.Debug(IntToStr(FInfo.samplerate));
-  Logger.Debug(IntToStr(FInfo.sections));
+  Logger.Debug('sf_open - format - ' + IntToHex(FInfo.format, 8));
+  Logger.Debug('sf_open - channels - ' + IntToStr(FInfo.channels));
+  Logger.Debug('sf_open - frames - ' + IntToStr(FInfo.frames));
+  Logger.Debug('sf_open - samplerate - ' + IntToStr(FInfo.samplerate));
+  Logger.Debug('sf_open - sections - ' + IntToStr(FInfo.sections));
 
   FFileName := AValue;
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
@@ -885,7 +885,7 @@ procedure TSndSound.SeekToBeginning;
 begin
   if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
   begin
-    Logger.Debug('Sf_seek returned error');
+    Logger.Error('Sf_seek returned error');
   end;
 end;
 
@@ -941,14 +941,12 @@ begin
   FSoundFile := TempSoundFile;
   FFileName := '';
 
-  Logger.Debug('Default audio loaded.');
-  Logger.Debug('');
+  Logger.Debug('sf_open_virtual - format - ' + IntToHex(FInfo.format, 8));
+  Logger.Debug('sf_open_virtual - channels - ' + IntToStr(FInfo.channels));
+  Logger.Debug('sf_open_virtual - frames - ' + IntToStr(FInfo.frames));
+  Logger.Debug('sf_open_virtual - samplerate - ' + IntToStr(FInfo.samplerate));
+  Logger.Debug('sf_open_virtual - sections - ' + IntToStr(FInfo.sections));
 
-  Logger.Debug('Format - ' + IntToHex(FInfo.format, 8));
-  Logger.Debug('Channels - ' + IntToStr(FInfo.channels));
-  Logger.Debug('Frames - ' + IntToStr(FInfo.frames));
-  Logger.Debug('Sample Rate - ' + IntToStr(FInfo.samplerate));
-  Logger.Debug('Sections - ' + IntToStr(FInfo.sections));
   Logger.Debug('');
 
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
@@ -958,11 +956,13 @@ end;
 
 procedure TSndSound.LoadDefaultSound;
 begin
+  Logger.Debug('Loading default sound');
   LoadInMemorySound(@AudioSystem.FDefaultSound);
 end;
 
 procedure TSndSound.LoadTick;
 begin
+  Logger.Debug('Loading default tick');
   LoadInMemorySound(@AudioSystem.FDefaultTick);
 end;
 
@@ -1074,11 +1074,12 @@ var
   Size: integer;
   Stream: TResourceStream;
 begin
+  Logger.Debug('Loading sound from resource - ' + ResourceName);
   Stream := TResourceStream.Create(hinstance, ResourceName, RT_RCDATA);
   Size := Stream.Size;
   Assert(Size > 0);
   if Size <= 0 then
-    Logger.Debug('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
+    Logger.Warning('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
       );
 
   Sound.Buffer := AllocMem(Size);
@@ -1087,7 +1088,7 @@ begin
   BytesRead := Stream.Read(Sound.Buffer^, Size);
 
   if BytesRead <> Size then
-    Logger.Debug('BytesRead does not match Size in TAudio.LoadDefaultSounds');
+    Logger.Warning('BytesRead does not match Size in TAudio.LoadDefaultSounds');
 
   Logger.Info('Size of the stream is ' + IntToStr(Size));
   Sound.Loaded := True;
@@ -1433,6 +1434,7 @@ var
   SndSound: TSndSound;
   MpgSound: TMpgSound;
 begin
+  Logger.Debug('Load sound from ' + Avalue);
   SndSound := TSndSound.Create;
   SndSound.SetFileName(AValue);
   if SndSound.FileName <> '' then
