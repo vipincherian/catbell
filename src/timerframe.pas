@@ -1113,6 +1113,8 @@ begin
 end;
 
 procedure TfraTimer.SaveState(var SaveTo: TTimerState);
+var
+  CurrTickCount, DiffTicks: longword;
 begin
   with SaveTo do
   begin
@@ -1120,7 +1122,11 @@ begin
     Paused := FPaused;
     PendingTicks:=FPendingTickCount;
     // FPendingTickCount is reliable only if the timer is paused
-    EndTime:=IncMilliSecond(LocalTimeToUniversal(Now), FEndTickCount - GetTickCount64);
+    CurrTickCount:=GetTickCount64;
+    DiffTicks:=0;
+    if FEndTickCount > CurrTickCount then
+      DiffTicks:=FEndTickCount - CurrTickCount;
+    EndTime:=IncMilliSecond(LocalTimeToUniversal(Now), DiffTicks);
     DurationTicks:=FOrigTickDuration;
   end;
 end;

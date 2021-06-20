@@ -2,6 +2,7 @@
 /src/backup
 /src/catbell
 **/*.exe
+**/*.dbg
 /src/*.res
 /src/catbell.lps
 **/*.dll
