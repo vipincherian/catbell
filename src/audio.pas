@@ -907,7 +907,7 @@ begin
 
   // If read count matches what was requested, then all the stream has
   // not completed
-  Result := (readCount = (frameCount * FInfo.channels));
+  Result := (readCount > 0);
 end;
 
 procedure TSndSound.LoadInMemorySound(SoundData: PSoundData);
