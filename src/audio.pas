@@ -418,7 +418,7 @@ begin
     SEEK_END:
     begin
       //Logger.Debug('SEEK_END');
-      SoundData^.Position := (SoundData^.Position) - offset;
+      SoundData^.Position := (SoundData^.Sound^.Size) - 1 - offset;
     end;
   end;
   Result := SoundData^.Position;
@@ -447,7 +447,7 @@ begin
   if Position >= SoundData^.Sound^.Size then
     ActualCount := 0
   else if Position >= (SoundData^.Sound^.Size - Count) then
-    ActualCount := (SoundData^.Sound^.Size) - Position - 1
+    ActualCount := (SoundData^.Sound^.Size) - Position
   else
     ActualCount := Count;
 
@@ -1077,6 +1077,7 @@ begin
   Logger.Debug('Loading sound from resource - ' + ResourceName);
   Stream := TResourceStream.Create(hinstance, ResourceName, RT_RCDATA);
   Size := Stream.Size;
+  Logger.Debug('Stream.Size - ' + IntToStr(Stream.Size));
   Assert(Size > 0);
   if Size <= 0 then
     Logger.Warning('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
@@ -1090,7 +1091,7 @@ begin
   if BytesRead <> Size then
     Logger.Warning('BytesRead does not match Size in TAudio.LoadDefaultSounds');
 
-  Logger.Info('Size of the stream is ' + IntToStr(Size));
+  //Logger.Info('Size of the stream is ' + IntToStr(Size));
   Sound.Loaded := True;
   Stream.Destroy;
 end;
