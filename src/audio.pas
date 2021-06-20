@@ -868,12 +868,12 @@ begin
       (FOutputDevice.DeviceName = '') then
     begin
       DeviceId := DefaultDeviceIndex;
-      Logger.Debug('TAudio using default device to play audio.');
+      Logger.Info('TAudio using default device to play audio.');
     end
     else
     begin
       DeviceId := GetDeviceIndex(FOutputDevice);
-      Logger.Debug('TAudio using device - ' + FOutputDevice.DeviceName +
+      Logger.Info('TAudio using device - ' + FOutputDevice.DeviceName +
         ' host api - ' + FOutputDevice.HostAPIName);
     end;
     StreamParams.device := DeviceId;

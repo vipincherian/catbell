@@ -372,6 +372,8 @@ begin
 
   //tbVolume.Position:=0;
 
+  Logger.Subscribe(@SetStatusMessage);
+
 end;
 
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
@@ -1463,10 +1465,10 @@ begin
     Reorder;
 
     if ErrorText = '' then
-      StatusMessage := 'Saved timers loaded.'
+      Logger.Info('Saved timers loaded.')
     else
     begin
-      StatusMessage := 'Saved timers loaded (with errors).';
+      Logger.Info('Saved timers loaded (with errors).');
       ShowMessage(ErrorText);
     end;
     UpdateStatusTimerCount;
@@ -1834,5 +1836,6 @@ begin
   else
     frmAlert.ShowOnTop;
 end;
+
 
 end.
