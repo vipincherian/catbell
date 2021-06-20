@@ -2028,4 +2028,10 @@ object frmMain: TfrmMain
     left = 382
     top = 74
   end
+  object uqiMain: TUniqueInstance
+    Enabled = True
+    OnOtherInstance = uqiMainOtherInstance
+    left = 606
+    top = 175
+  end
 end

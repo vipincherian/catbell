@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, StdCtrls,
+  timerframe, fgl, sequence, editform, Math, StdCtrls, UniqueInstance,
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
@@ -165,6 +165,7 @@ type
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
     tbVolume: TTrackBar;
+    uqiMain: TUniqueInstance;
     procedure alUnmuteExecute(Sender: TObject);
     procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);
@@ -193,6 +194,8 @@ type
     procedure tiMainDblClick(Sender: TObject);
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
+    procedure uqiMainOtherInstance(Sender: TObject;
+      ParamCount: Integer; const Parameters: array of String);
 
   private
     { private declarations }
@@ -696,6 +699,14 @@ procedure TfrmMain.tiMainMouseUp(Sender: TObject; Button: TMouseButton;
 begin
   if Button = mbRight then
     pmTray.PopUp;
+end;
+
+procedure TfrmMain.uqiMainOtherInstance(Sender: TObject;
+  ParamCount: Integer; const Parameters: array of String);
+begin
+  { If an attempt was made to start another instance of this application,
+  bring the main form to the front }
+  Application.BringToFront;
 end;
 
 

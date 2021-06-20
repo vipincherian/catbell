@@ -41,42 +41,12 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   adjustform,
   audio,
   eventlog,
-  metronome
-  { you can add units after this }
-  {$IF defined(windows) }  ,
-  Windows
-  {$ENDIF}
-  { There is a semicolon here };
+  metronome;
 
 {$R *.res}
 
-{$IF defined(windows) }
-const
-
-  APP_UUID = '8e746524-2d28-11ea-978f-2e728ce88125';
-{$ENDIF}
-
-{$IF defined(windows) }
-var
-  //AppController: TController;
-  //FormWidget: TMainForm;
-  //DefaultConfig: TDefaultConfig;
-
-  MutexHandle: THandle;
-{$ENDIF}
 begin
   //RequireDerivedFormResource := True;
-
-  { Checks to ensure that only one instance of the application runs at a time }
-  {$IF defined(windows) }
-  MutexHandle := CreateMutex(nil, True, APP_UUID);
-  if GetLastError = ERROR_ALREADY_EXISTS then
-  begin
-    ShowMessage('Another instance of the application is already running. ' +
-      'Cannot run multiple instances.');
-    Exit;
-  end;
-  {$ENDIF}
 
   {$if declared(useHeapTrace)}
   {$IFOPT D+}
@@ -122,9 +92,6 @@ begin
   //  AppController.Destroy;
   //FormWidget.Destroy;
   CleanupSettings;
-  {$IF defined(windows) }
-  if MutexHandle <> 0 then
-    CloseHandle(MutexHandle);
-  {$ENDIF}
+
   Logger.Free;
 end.
