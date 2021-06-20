@@ -81,48 +81,48 @@ object frmEdit: TfrmEdit
     Height = 191
     Top = 8
     Width = 479
-    ActivePage = tsTimer
+    ActivePage = tsSound
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = imlEdit
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object tsTimer: TTabSheet
       Caption = 'Timer'
-      ClientHeight = 163
-      ClientWidth = 471
+      ClientHeight = 157
+      ClientWidth = 473
       ImageIndex = 0
       object edtDescription: TEdit
         Left = 112
-        Height = 23
+        Height = 25
         Top = 8
-        Width = 351
+        Width = 353
         Anchors = [akTop, akLeft, akRight]
         OnChange = edtDescriptionChange
         TabOrder = 0
       end
       object Label1: TLabel
         Left = 31
-        Height = 15
+        Height = 14
         Top = 8
-        Width = 66
+        Width = 64
         Alignment = taRightJustify
         Caption = 'Description :'
         ParentColor = False
       end
       object Label2: TLabel
         Left = 47
-        Height = 15
+        Height = 14
         Top = 40
-        Width = 52
+        Width = 51
         Alignment = taRightJustify
         Caption = 'Duration :'
         ParentColor = False
       end
       object dtpDuration: TDateTimePicker
         Left = 112
-        Height = 23
+        Height = 22
         Top = 40
-        Width = 65
+        Width = 63
         CenturyFrom = 1941
         MaxDate = 2958465
         MinDate = -53780
@@ -143,37 +143,37 @@ object frmEdit: TfrmEdit
       end
       object Label4: TLabel
         Left = 11
-        Height = 15
+        Height = 14
         Top = 96
-        Width = 86
+        Width = 81
         Alignment = taRightJustify
         Caption = 'On completion :'
         ParentColor = False
       end
       object ckbModalAlert: TCheckBox
         Left = 112
-        Height = 19
+        Height = 21
         Top = 96
-        Width = 112
+        Width = 111
         Caption = 'Show modal alert'
         TabOrder = 2
       end
       object ckbTrayNotification: TCheckBox
         Left = 112
-        Height = 19
+        Height = 21
         Top = 120
-        Width = 113
+        Width = 110
         Caption = 'Show notification'
         TabOrder = 3
       end
     end
     object tsSound: TTabSheet
       Caption = 'Sound'
-      ClientHeight = 163
-      ClientWidth = 471
+      ClientHeight = 157
+      ClientWidth = 473
       ImageIndex = 1
       object bbClearSound: TBitBtn
-        Left = 112
+        Left = 114
         Height = 30
         Top = 67
         Width = 75
@@ -185,7 +185,7 @@ object frmEdit: TfrmEdit
         TabOrder = 3
       end
       object bbSelectSound: TBitBtn
-        Left = 382
+        Left = 384
         Height = 30
         Top = 67
         Width = 75
@@ -198,33 +198,33 @@ object frmEdit: TfrmEdit
       end
       object edtSound: TEdit
         Left = 112
-        Height = 23
+        Height = 25
         Top = 35
-        Width = 345
+        Width = 347
         Anchors = [akTop, akLeft, akRight]
         ReadOnly = True
         TabOrder = 2
       end
       object Label3: TLabel
         Left = 40
-        Height = 15
+        Height = 14
         Top = 35
-        Width = 57
+        Width = 54
         Alignment = taRightJustify
         Caption = 'Audio file :'
         ParentColor = False
       end
       object lblLengthText: TLabel
         Left = 192
-        Height = 15
+        Height = 14
         Top = 72
-        Width = 97
+        Width = 93
         Caption = 'Length (seconds) :'
         ParentColor = False
       end
       object lblLenthVal: TLabel
         Left = 296
-        Height = 15
+        Height = 14
         Top = 72
         Width = 5
         Caption = '?'
@@ -232,17 +232,17 @@ object frmEdit: TfrmEdit
       end
       object ckbLoop: TCheckBox
         Left = 296
-        Height = 19
+        Height = 21
         Top = 8
-        Width = 82
+        Width = 81
         Caption = 'Play in loop'
         TabOrder = 1
       end
       object ckbUseDefaultSound: TCheckBox
         Left = 112
-        Height = 19
+        Height = 21
         Top = 8
-        Width = 115
+        Width = 117
         Caption = 'Use default sound'
         OnChange = ckbUseDefaultSoundChange
         TabOrder = 0
@@ -271,7 +271,7 @@ object frmEdit: TfrmEdit
       end
       object ckbMetronome: TCheckBox
         Left = 112
-        Height = 19
+        Height = 21
         Top = 136
         Width = 170
         Caption = 'Ticking sound while running'

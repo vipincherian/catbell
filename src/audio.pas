@@ -1365,11 +1365,12 @@ begin
       Logger.Debug('Audio not playing. There is nothing to be done in abort');
       Exit;
     end;
-    PaErrCode := Pa_AbortStream(FStream);
+    {Pa_AbortStream throws an exception in Linux, using  }
+    PaErrCode := Pa_StopStream(FStream);
     if (paErrCode <> Int32(paNoError)) then
     begin
-      Logger.Debug('Pa_AbortStream failed ' + Pa_GetErrorText(paErrCode));
-      Logger.Debug('Error after Pa_AbortStream ' + IntToHex(PaErrCode, 8));
+      Logger.Debug('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
     end;
 
     {There is no need to close the stream. Stopping/aborting the stream
