@@ -27,8 +27,8 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
-  editform, Graphics, Math, EventLog, adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LCLIntf, StrUtils;
+  editform, Graphics, Math, {EventLog,} adjustform, {sndfile, portaudio,} audio,
+  {ctypes,} LCLIntf, StrUtils, log;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;

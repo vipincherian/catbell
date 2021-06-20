@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
   Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
-  {portaudio, }EventLog, audio, Math, metronome;
+  {portaudio, } {EventLog,} audio, Math, metronome, log;
 
 const
   LSVADUIO_INDEX_HOSTAPI: integer = 0;

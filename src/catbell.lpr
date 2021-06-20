@@ -41,7 +41,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   adjustform,
   audio,
   eventlog,
-  metronome;
+  metronome, log;
 
 {$R *.res}
 
@@ -53,11 +53,7 @@ begin
   setHeapTraceOutput('catbell_trace.log');
   {$ENDIF}
   {$endIf}
-  Logger := TEventLog.Create(nil);
-  //Logger := frmMain.evlMain;
-  Logger.LogType := ltFile;
-  Logger.FileName := 'catbell.log';
-  //Logger.Set
+
   Logger.Info('************************');
   Logger.Info('Application run starting');
   Logger.Info('************************');
@@ -70,16 +66,9 @@ begin
   Application.Initialize;
   InitSettings;
 
-  //FormWidget := TMainFormWidget.Create();
-  //AppController := TController.Create();
-
   Application.CreateForm(TfrmMain, frmMain);
 
   frmMain.ProcessCommandline;
-
-  //MainFormWidget.FormView.Form := TMainWindow(Application.MainForm);
-  //FormWidget.Form := TMainForm(Application.MainForm);
-  //AppController.FormWidget := MainForm;
 
   Application.CreateForm(TfrmOptions, frmOptions);
   Application.CreateForm(TfrmAlert, frmAlert);
@@ -89,9 +78,6 @@ begin
   Application.CreateForm(TfrmAdjust, frmAdjust);
   Application.Run;
 
-  //  AppController.Destroy;
-  //FormWidget.Destroy;
   CleanupSettings;
 
-  Logger.Free;
 end.

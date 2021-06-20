@@ -25,7 +25,7 @@ unit settings;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf, audio, EventLog, LCLIntf, LCLType;
+  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf, audio, {EventLog,} LCLIntf, LCLType;
 
 type
 
@@ -107,7 +107,7 @@ type
 var
   //GlobalDefault: TDefaultConfig;
   GlobalUserConfig: TUserFileConfig;
-  Logger: TEventLog;
+  //Logger: TEventLog;
 
 const
   AUDIO_ABORT_SHORT_WAIT = 2000;

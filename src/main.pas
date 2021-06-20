@@ -33,7 +33,7 @@ uses
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
-  {portaudio, sndfile,}{ctypes,} audio, metronome, eventlog;
+  {portaudio, sndfile,}{ctypes,} audio, metronome, log;
 
 const
   FORM_MIN_WIDTH = 600;
@@ -117,7 +117,7 @@ type
     bbDelete: TBitBtn;
     bbMoveUp: TBitBtn;
     bbMoveDown: TBitBtn;
-    evlMain: TEventLog;
+    //evlMain: TEventLog;
     hdrTimers: THeaderControl;
     ilMain: TImageList;
     ilMainSmall: TImageList;
@@ -195,7 +195,7 @@ type
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
     procedure uqiMainOtherInstance(Sender: TObject;
-      ParamCount: Integer; const Parameters: array of String);
+      {%H-}ParamCount: Integer; const {%H-}Parameters: array of String);
 
   private
     { private declarations }

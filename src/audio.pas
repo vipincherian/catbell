@@ -5,8 +5,8 @@ unit audio;
 interface
 
 uses
-  Classes, SysUtils, sndfile, mpg123, portaudio, EventLog, ctypes, Forms,
-  Dialogs, LCLIntf, lcltype, fgl, Math;
+  Classes, SysUtils, sndfile, mpg123, portaudio, {EventLog,} ctypes, Forms,
+  Dialogs, LCLIntf, lcltype, fgl, Math, log;
 
 const
   READ_NOTLOADED = -1;
@@ -236,8 +236,8 @@ type
 
 implementation
 
-uses
-  settings;
+//uses
+  //log;
 
 {This function is called by PortAudio to request for audio data, and is passed
 as a parameter while opening the stream.
@@ -959,7 +959,7 @@ begin
   if BytesRead <> Size then
     Logger.Debug('BytesRead does not match Size in TAudio.LoadDefaultSounds');
 
-  Logger.Debug('Size of the stream is ' + IntToStr(Size));
+  Logger.Info('Size of the stream is ' + IntToStr(Size));
   Sound.Loaded := True;
   Stream.Destroy;
 end;

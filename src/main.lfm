@@ -2016,18 +2016,6 @@ object frmMain: TfrmMain
       ImageIndex = 1
     end
   end
-  object evlMain: TEventLog
-    AppendContent = False
-    LogType = ltSystem
-    Active = False
-    RaiseExceptionOnError = False
-    DefaultEventType = etCustom
-    CustomLogType = 0
-    EventIDOffset = 0
-    Paused = False
-    left = 382
-    top = 74
-  end
   object uqiMain: TUniqueInstance
     Enabled = True
     OnOtherInstance = uqiMainOtherInstance
