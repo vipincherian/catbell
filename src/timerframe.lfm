@@ -12,26 +12,26 @@ object fraTimer: TfraTimer
   object imgTimer: TImage
     Left = 32
     Height = 24
-    Top = 5
+    Top = 9
     Width = 24
     OnClick = imgTimerClick
     ParentShowHint = False
   end
   object edtTitle: TEdit
     Left = 65
-    Height = 23
-    Top = 7
-    Width = 263
+    Height = 25
+    Top = 9
+    Width = 255
     Anchors = [akTop, akLeft, akRight]
     ReadOnly = True
     TabOrder = 1
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 558
-    Height = 15
-    Top = 11
-    Width = 48
+    Left = 568
+    Height = 14
+    Top = 14
+    Width = 42
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
     Caption = '00:00:00'
@@ -43,16 +43,16 @@ object fraTimer: TfraTimer
   end
   object cbSelect: TCheckBox
     Left = 8
-    Height = 19
-    Top = 9
-    Width = 20
+    Height = 21
+    Top = 11
+    Width = 21
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 337
-    Height = 23
-    Top = 7
-    Width = 65
+    Left = 328
+    Height = 22
+    Top = 10
+    Width = 63
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -74,11 +74,11 @@ object fraTimer: TfraTimer
   end
   object bbPlay: TBitBtn
     Cursor = crHandPoint
-    Left = 409
-    Height = 32
+    Left = 400
+    Height = 36
     Hint = 'Start the timer'
     Top = 3
-    Width = 32
+    Width = 36
     Action = aiPlay
     Anchors = [akTop, akRight]
     Images = ilTimer
@@ -90,11 +90,11 @@ object fraTimer: TfraTimer
   end
   object bbPause: TBitBtn
     Cursor = crHandPoint
-    Left = 445
-    Height = 32
+    Left = 440
+    Height = 36
     Hint = 'Pause the timer'
     Top = 3
-    Width = 32
+    Width = 36
     Action = aiPause
     Anchors = [akTop, akRight]
     Enabled = False
@@ -182,11 +182,11 @@ object fraTimer: TfraTimer
   end
   object bbStop: TBitBtn
     Cursor = crHandPoint
-    Left = 481
-    Height = 32
+    Left = 480
+    Height = 36
     Hint = 'Stop the timer'
     Top = 3
-    Width = 32
+    Width = 36
     Action = aiStop
     Anchors = [akTop, akRight]
     Enabled = False
@@ -274,11 +274,11 @@ object fraTimer: TfraTimer
   end
   object bbEdit: TBitBtn
     Cursor = crHandPoint
-    Left = 671
-    Height = 32
+    Left = 665
+    Height = 36
     Hint = 'Edit the timer'
-    Top = 5
-    Width = 32
+    Top = 3
+    Width = 36
     Action = aiEdit
     Anchors = [akTop, akRight]
     Glyph.Data = {
@@ -364,21 +364,21 @@ object fraTimer: TfraTimer
     TabOrder = 8
   end
   object ckbIconProgress: TCheckBox
-    Left = 634
-    Height = 19
-    Top = 9
-    Width = 20
+    Left = 633
+    Height = 21
+    Top = 11
+    Width = 21
     Anchors = [akTop, akRight]
     OnChange = ckbIconProgressChange
     TabOrder = 7
   end
   object bbAdjust: TBitBtn
     Cursor = crHandPoint
-    Left = 518
-    Height = 32
+    Left = 520
+    Height = 36
     Hint = 'Tweak this run of the timer'
     Top = 3
-    Width = 32
+    Width = 36
     Action = aiAdjust
     Anchors = [akTop, akRight]
     Glyph.Data = {
