@@ -86,15 +86,9 @@ type
     destructor Destroy; override;
 
     procedure Play(Sound: TSound; var Volume: integer; PlayLooped: boolean = False);
-
     procedure Abort;
-
     procedure FinishedAud({%H-}Datax: PtrInt);
-
-
-
     property Playing: boolean read FAudioPlaying;
-
 
   end;
 
@@ -109,8 +103,7 @@ type
     FDefaultDevice: integer;
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
-    procedure LoadSoundFromResource(ResourceName: string;
-      var Sound: TSoundData);
+    procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
 
     function GetDevices: TAudioDeviceList;
     procedure SetOutputDevice(AValue: TAudioDevice);
@@ -862,7 +855,7 @@ var
 begin
   Logger.Debug('Load sound from ' + Avalue);
   SndSound := TSndSound.Create;
-  SndSound.FileName:=Avalue;
+  SndSound.FileName := Avalue;
   if SndSound.FileName <> '' then
   begin
     Assert(SndSound <> nil);
@@ -873,7 +866,8 @@ begin
   SndSound.Free;
 
   MpgSound := TMpgSound.Create;
-  MpgSound.FileName:=Avalue;
+  MpgSound.FileName := Avalue;
+
   if MpgSound.FileName <> '' then
   begin
     Assert(MpgSound <> nil);

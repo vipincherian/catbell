@@ -6,121 +6,125 @@ interface
 
 uses
   Classes, SysUtils, portaudio, sndfile, mpg123, log, ctypes;
+
 type
   { TSound }
 
-   TSound = class(TObject)
-   private
-     function GetChannels: integer; virtual; abstract;
-     function GetSampleRate: integer; virtual; abstract;
-     function GetAudioLength: double; virtual; abstract;
-     function GetSampleFormat: PaSampleFormat; virtual; abstract;
-     function GetSource: string; virtual; abstract;
-   public
-     constructor Create;
-     destructor Destroy; override;
+  TSound = class(TObject)
+  private
+    function GetChannels: integer; virtual; abstract;
+    function GetSampleRate: integer; virtual; abstract;
+    function GetAudioLength: double; virtual; abstract;
+    function GetSampleFormat: PaSampleFormat; virtual; abstract;
+    function GetSource: string; virtual; abstract;
+  public
+    constructor Create;
+    destructor Destroy; override;
 
-     property Channels: integer read GetChannels;
-     property SampleRate: integer read GetSampleRate;
-     property Duration: double read GetAudioLength;
-     property SampleFormat: PaSampleFormat read GetSampleFormat;
-     property Source: string read GetSource;
-     // Seek to begin
-     procedure SeekToBeginning; virtual; abstract;
-     // Read to buffer
-     function Read(output: pointer; frameCount: longint): boolean; virtual; abstract;
-   end;
+    property Channels: integer read GetChannels;
+    property SampleRate: integer read GetSampleRate;
+    property Duration: double read GetAudioLength;
+    property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property Source: string read GetSource;
+    // Seek to begin
+    procedure SeekToBeginning; virtual; abstract;
+    // Read to buffer
+    function Read(output: pointer; frameCount: longint): boolean; virtual; abstract;
+  end;
 
 
 
-   {The record to hold sound data }
-   TSoundData = record
-     Buffer: PAnsiChar;
-     Size: integer;
-     Loaded: boolean;
-   end;
-   PSoundData = ^TSoundData;
+  {The record to hold sound data }
+  TSoundData = record
+    Buffer: PAnsiChar;
+    Size: integer;
+    Loaded: boolean;
+  end;
+  PSoundData = ^TSoundData;
 
-   { The record passed to sndfile virtual file io callbacks }
-   TSndVIOUserData = record
-     Sound: PSoundData;
-     Position: sf_count_t;
-   end;
-   PSndVIOUserData = ^TSndVIOUserData;
+  { The record passed to sndfile virtual file io callbacks }
+  TSndVIOUserData = record
+    Sound: PSoundData;
+    Position: sf_count_t;
+  end;
+  PSndVIOUserData = ^TSndVIOUserData;
 
-   {TSndSound}
-   {Implementation of SndFile}
-   TSndSound = class(TSound)
-   private
-     FSoundFile: PSNDFILE;
+  {TSndSound}
+  {Implementation of SndFile}
+  TSndSound = class(TSound)
+  private
+    FSoundFile: PSNDFILE;
 
-     FFileName: string;
-     FAudioLength: double;
+    FFileName: string;
+    FAudioLength: double;
 
-     FInfo: SF_INFO;
+    FInfo: SF_INFO;
 
-     FVirtualIOCallbacks: SF_VIRTUAL_IO;
-     FVIOUserData: TSndVIOUserData;
+    FVirtualIOCallbacks: SF_VIRTUAL_IO;
+    FVIOUserData: TSndVIOUserData;
 
-     function GetAudioLength: double; override;
-     function GetChannels: integer; override;
-     function GetSampleFormat: PaSampleFormat; override;
-     function GetSampleRate: integer; override;
-     procedure SetFileName(AValue: string);
-     function GetSource: string; override;
-   public
-     constructor Create;
-     destructor Destroy; override;
-     procedure SeekToBeginning; override;
-     function Read(output: pointer; frameCount: longint): boolean; override;
+    function GetAudioLength: double; override;
+    function GetChannels: integer; override;
+    function GetSampleFormat: PaSampleFormat; override;
+    function GetSampleRate: integer; override;
+    procedure SetFileName(AValue: string);
+    function GetSource: string; override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SeekToBeginning; override;
+    function Read(output: pointer; frameCount: longint): boolean; override;
 
-     property FileName: string read FFileName write SetFileName;
-     procedure LoadInMemorySound(SoundData: PSoundData);
-     procedure LoadDefaultSound;
-     procedure LoadTick;
-     property Channels: integer read GetChannels;
-     property SampleRate: integer read GetSampleRate;
-     property Duration: double read GetAudioLength;
-     property SampleFormat: PaSampleFormat read GetSampleFormat;
-     property Source: string read GetSource;
-   end;
+    property FileName: string read FFileName write SetFileName;
+    procedure LoadInMemorySound(SoundData: PSoundData);
+    procedure LoadDefaultSound;
+    procedure LoadTick;
+    property Channels: integer read GetChannels;
+    property SampleRate: integer read GetSampleRate;
+    property Duration: double read GetAudioLength;
+    property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property Source: string read GetSource;
+  end;
 
-   {TMpgSound}
-   {Implementation of Mpg123 for MP3}
-   TMpgSound = class(TSound)
-   private
-     FHandle: Tmpg123_handle;
-     FError: integer;
+  {TMpgSound}
+  {Implementation of Mpg123 for MP3}
+  TMpgSound = class(TSound)
+  private
+    FHandle: Tmpg123_handle;
+    FError: integer;
 
-     FFileName: string;
-     FAudioLength: double;
+    FFileName: string;
+    FAudioLength: double;
 
-     FRate: cardinal;
-     FChannelCount: integer;
-     FEncoding: integer;
+    FRate: cardinal;
+    FChannelCount: integer;
+    FEncoding: integer;
 
-     function GetAudioLength: double; override;
-     function GetChannels: integer; override;
-     function GetSampleFormat: PaSampleFormat; override;
-     function GetSampleRate: integer; override;
-     procedure SetFileName(AValue: string);
-     function GetSource: string; override;
+    function GetAudioLength: double; override;
+    function GetChannels: integer; override;
+    function GetSampleFormat: PaSampleFormat; override;
+    function GetSampleRate: integer; override;
+    procedure SetFileName(AValue: string);
+    function GetSource: string; override;
 
-   public
-     constructor Create;
-     destructor Destroy; override;
-     procedure SeekToBeginning; override;
-     function Read(output: pointer; frameCount: longint): boolean; override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SeekToBeginning; override;
+    function Read(output: pointer; frameCount: longint): boolean; override;
 
-     property FileName: string read FFileName write SetFileName;
-     property Channels: integer read GetChannels;
-     property SampleRate: integer read GetSampleRate;
-     property Duration: double read GetAudioLength;
-     property SampleFormat: PaSampleFormat read GetSampleFormat;
-     property Source: string read GetSource;
-   end;
+    property FileName: string read FFileName write SetFileName;
+    property Channels: integer read GetChannels;
+    property SampleRate: integer read GetSampleRate;
+    property Duration: double read GetAudioLength;
+    property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property Source: string read GetSource;
+  end;
+
 implementation
+
 uses audio;
+
 function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSndVIOUserData;
@@ -412,7 +416,7 @@ var
 begin
   //EnterCriticalSection(AudioCriticalSection);
   //if not AudioSystem.Loaded then
-    //raise EAudioNotLoaded.Create('Audio not loaded.');
+  //raise EAudioNotLoaded.Create('Audio not loaded.');
 
   {if FAudioPlaying then
   begin
@@ -541,7 +545,7 @@ var
 begin
   //EnterCriticalSection(AudioCriticalSection);
   //if not AudioSystem.Loaded then
-    //raise EAudioNotLoaded.Create('Audio not loaded.');
+  //raise EAudioNotLoaded.Create('Audio not loaded.');
 
   FVIOUserData.Sound := SoundData;
   FVIOUserData.Position := 0;
@@ -592,4 +596,3 @@ begin
 end;
 
 end.
-
