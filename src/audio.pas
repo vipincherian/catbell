@@ -203,7 +203,7 @@ type
 
     procedure FinishedAud({%H-}Datax: PtrInt);
 
-    class function LoadSound(Avalue: string): TSound; static;
+
 
     property Playing: boolean read FAudioPlaying;
 
@@ -221,7 +221,7 @@ type
     FDefaultDevice: integer;
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
-    class procedure LoadSoundFromResource(ResourceName: string;
+    procedure LoadSoundFromResource(ResourceName: string;
       var Sound: TSoundData);
 
     function GetDevices: TAudioDeviceList;
@@ -244,6 +244,7 @@ type
     procedure FreeDefaultSounds;
     property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
     property Loaded: boolean read FLoaded;
+    function LoadSound(Avalue: string): TSound;
   end;
 
 var
@@ -1067,7 +1068,7 @@ begin
   end;
 end;
 
-class procedure TAudioSystem.LoadSoundFromResource(ResourceName: string;
+procedure TAudioSystem.LoadSoundFromResource(ResourceName: string;
   var Sound: TSoundData);
 var
   BytesRead: integer;
@@ -1431,7 +1432,7 @@ begin
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
-class function TAudioPlayer.LoadSound(Avalue: string): TSound;
+function TAudioSystem.LoadSound(Avalue: string): TSound;
 var
   SndSound: TSndSound;
   MpgSound: TMpgSound;

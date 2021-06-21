@@ -237,8 +237,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 19
-    Top = 297
+    Height = 23
+    Top = 293
     Width = 652
     Panels = <    
       item
@@ -2019,7 +2019,7 @@ object frmMain: TfrmMain
   object uqiMain: TUniqueInstance
     Enabled = True
     OnOtherInstance = uqiMainOtherInstance
-    left = 606
-    top = 175
+    left = 432
+    top = 216
   end
 end

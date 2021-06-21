@@ -243,7 +243,7 @@ begin
   if odgAudio.Execute then
   begin
     FileName := odgAudio.FileName;
-    TempSound := TAudioPlayer.LoadSound(FileName);
+    TempSound := AudioSystem.LoadSound(FileName);
     if TempSound <> nil then
     begin
       NewSound.Free;

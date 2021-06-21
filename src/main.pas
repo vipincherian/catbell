@@ -1408,7 +1408,7 @@ begin
           else
           begin
             //NewTimerClock.Audio.LoadFromFile(AudioFileName);
-            NewTimerclock.CustomSound := TAudioPlayer.LoadSound(AudioFileName);
+            NewTimerclock.CustomSound := AudioSystem.LoadSound(AudioFileName);
           end;
           //NewTimerClock.Audio.Looped :=
           //  Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
