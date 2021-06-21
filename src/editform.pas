@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
   ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} {EventLog,}
-  Math, audio, log;
+  Math, audio, log, sound;
 
 type
   TTimerSoundInfo = record

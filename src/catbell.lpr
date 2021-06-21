@@ -41,7 +41,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   adjustform,
   audio,
   eventlog,
-  metronome, log;
+  metronome, log, sound;
 
 {$R *.res}
 

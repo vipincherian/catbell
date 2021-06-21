@@ -5,7 +5,7 @@ unit metronome;
 interface
 
 uses
-  Classes, SysUtils, Forms, audio, settings, {EventLog,} ExtCtrls, log;
+  Classes, SysUtils, Forms, audio, settings, {EventLog,} ExtCtrls, log, sound;
 
 type
 

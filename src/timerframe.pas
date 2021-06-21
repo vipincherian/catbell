@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, {EventLog,} adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LCLIntf, StrUtils, log;
+  {ctypes,} LCLIntf, StrUtils, log, sound;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
