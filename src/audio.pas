@@ -105,7 +105,7 @@ type
     FDefaultDevice: integer;
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
-    procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
+
 
     function GetDevices: TAudioDeviceList;
     procedure SetOutputDevice(AValue: TAudioDevice);
@@ -152,8 +152,13 @@ type
   TSoundPool = class(TObject)
   private
     FEntries: TSoundPoolList;
+    FDefaultSoundIndex, FTickIndex: integer;
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
+    function LoadDefaultSound(const ResourceID: string): integer;
+  public
+    procedure LoadAllDefaultSounds;
+    procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
   end;
 
 var
@@ -163,8 +168,8 @@ var
 
 implementation
 
-//uses
-//log;
+uses
+  settings;
 
 {This function is called by PortAudio to request for audio data, and is passed
 as a parameter while opening the stream.
@@ -197,7 +202,7 @@ begin
   UsedSound := AudioInfo^.Sound;
 
   readSuccess := False;
-  readSuccess := (UsedSound.Read(output, frameCount) >0);
+  readSuccess := (UsedSound.Read(output, frameCount) > 0);
 
   // Decode and fix volume
   Volume := AudioInfo^.Volume^;
@@ -281,21 +286,162 @@ end;
 { TSoundPool }
 
 constructor TSoundPool.Create;
-var
-  SndFile: TSndSound;
 begin
   FEntries := TSoundPoolList.Create;
-  if AudioSystem.Loaded then
-  begin
-    SndFile := TSndSound.Create;
-    SndFile.LoadDefaultSound;
-  end;
+  //LoadAllDefaultSounds;
+
 end;
 
 destructor TSoundPool.Destroy;
+var
+  SoundPoolEntry: PSoundPoolEntry;
 begin
+  for SoundPoolEntry in FEntries do
+  begin
+    FreeMem(SoundPoolEntry^.Original^.Buffer);
+    Dispose(SoundPoolEntry^.Original);
+    FreeMem(SoundPoolEntry^.Raw^.Buffer);
+    Dispose(SoundPoolEntry^.Raw);
+    FreeMem(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
+    Dispose(SoundPoolEntry^.RawVolumeAdjusted);
+    Dispose(SoundPoolEntry);
+  end;
   FEntries.Free;
   inherited Destroy;
+end;
+
+function TSoundPool.LoadDefaultSound(const ResourceID: string): integer;
+var
+  SoundPoolEntry: PSoundPoolEntry;
+  SndFile: TSndSound;
+  Size: integer;
+  Read: integer;
+  VolumeBuffer: PFloat;
+  RawBuffer: PFloat;
+  Count: integer;
+  Volume: integer;
+  AmpScale: double;
+begin
+
+  try
+
+    SoundPoolEntry := New(PSoundPoolEntry);
+
+    { Create the record to hold file contents }
+    SoundPoolEntry^.Original := New(PSoundData);
+
+    LoadSoundFromResource(ReSourceID, SoundPoolEntry^.Original^);
+
+    SndFile := TSndSound.Create;
+    SndFile.LoadInMemorySound(SoundPoolEntry^.Original);
+
+    Logger.Debug('Channels in SndFile - ' + IntToStr(SndFile.Channels));
+
+    { Create the record to hold raw sound }
+    SoundPoolEntry^.Raw := New(PRawSoundData);
+    SoundPoolEntry^.Raw^.Buffer :=
+      AllocMem(SndFile.FrameLength * SndFile.Channels * SizeOf(float));
+    SoundPoolEntry^.Raw^.Size :=
+      (SndFile.FrameLength * SndFile.Channels * SizeOf(float));
+
+    { Create the record to hold raw volume adjusted sound }
+    SoundPoolEntry^.RawVolumeAdjusted := New(PRawSoundData);
+    SoundPoolEntry^.RawVolumeAdjusted^.Buffer := AllocMem(SoundPoolEntry^.Raw^.Size);
+    SoundPoolEntry^.RawVolumeAdjusted^.Size := SoundPoolEntry^.Raw^.Size;
+
+    //SoundPoolEntry^.Original^
+    { Read raw data and keep it raedy for use }
+    Size := 0;
+    Read := 0;
+    repeat
+      begin
+      { SndFile.Read returns the number of floats read. This already takes the
+      number of channels to account, so no need to multiply }
+        Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer +
+          (Size * SizeOf(float)), 10);
+
+        //Read := SndFile.Read(@Buffer[0], 10);
+        //Logger.Debug('Read bytes - ' + IntToStr(Read));
+        Size += Read;
+      end;
+    until (Size >= SndFile.FrameLength * SndFile.Channels);
+
+    { Fill the volume adjusted raw data too. This is used for playing }
+
+    RawBuffer := PFloat(SoundPoolEntry^.Raw^.Buffer);
+    VolumeBuffer := PFloat(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
+
+    Volume := GlobalUserConfig.Volume;
+    Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
+    AmpScale := Volume / MAX_VOLUME;
+    AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+    Assert((AmpScale >= 0) and (AmpScale <= 1));
+
+    { Apply scaling to amplitude to control volume }
+    for Count := 0 to (SndFile.FrameLength * SndFile.Channels) - 1 do
+    begin
+      VolumeBuffer[Count] := RawBuffer[Count] * AmpScale; //AudioInfo^.Volume;
+    end;
+
+    //FreeMem(Buffer);
+    Logger.Debug('Size of default sound - ' + IntToStr(Size));
+  except
+    on E: Exception do
+    begin
+      Logger.Error('Could not load default sound with resource ID - ' + ResourceID);
+      Logger.Error(E.Message);
+      SndFile.Free;
+      Result := -1;
+      Exit;
+    end;
+  end;
+  Result := FEntries.Add(SoundPoolEntry);
+  SndFile.Free;
+end;
+
+procedure TSoundPool.LoadAllDefaultSounds;
+var
+  ResourceID: string;
+begin
+  if AudioSystem.Loaded then
+  begin
+    FDefaultSoundIndex := LoadDefaultSound('DEFAULT_SOUND');
+    FTickIndex := LoadDefaultSound('TICK');
+    if (FDefaultSoundIndex < 0) or (FTickIndex <0) then
+    begin
+      Logger.Error('Could not load one of the default sounds');
+      ShowMessage('Fatal Error - Could not load one of the default sounds');
+      Application.Terminate;
+    end;
+  end;
+end;
+
+procedure TSoundPool.LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
+var
+  BytesRead: integer;
+  Size: integer;
+  Stream: TResourceStream;
+begin
+  Logger.Debug('Loading sound from resource - ' + ResourceName);
+  Stream := TResourceStream.Create(hinstance, ResourceName, RT_RCDATA);
+  Size := Stream.Size;
+  Logger.Debug('Stream.Size - ' + IntToStr(Stream.Size));
+  Assert(Size > 0);
+  if Size <= 0 then
+    Logger.Warning('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
+      );
+
+  Sound.Buffer := AllocMem(Size);
+  Sound.Size := Size;
+  BytesRead := 0;
+  BytesRead := Stream.Read(Sound.Buffer^, Size);
+
+  if BytesRead <> Size then
+    Logger.Warning('BytesRead does not match Size in TAudio.LoadDefaultSounds');
+
+  //Logger.Info('Size of the stream is ' + IntToStr(Size));
+  //Sound.Loaded := True;
+  Stream.Free;
 end;
 
 { This is called when playback is finished.
@@ -531,34 +677,6 @@ begin
   end;
 end;
 
-procedure TAudioSystem.LoadSoundFromResource(ResourceName: string;
-  var Sound: TSoundData);
-var
-  BytesRead: integer;
-  Size: integer;
-  Stream: TResourceStream;
-begin
-  Logger.Debug('Loading sound from resource - ' + ResourceName);
-  Stream := TResourceStream.Create(hinstance, ResourceName, RT_RCDATA);
-  Size := Stream.Size;
-  Logger.Debug('Stream.Size - ' + IntToStr(Stream.Size));
-  Assert(Size > 0);
-  if Size <= 0 then
-    Logger.Warning('Stream.Size is ' + IntToStr(Size) + ' at TAudio.LoadDefaultSounds'
-      );
-
-  Sound.Buffer := AllocMem(Size);
-  Sound.Size := Size;
-  BytesRead := 0;
-  BytesRead := Stream.Read(Sound.Buffer^, Size);
-
-  if BytesRead <> Size then
-    Logger.Warning('BytesRead does not match Size in TAudio.LoadDefaultSounds');
-
-  //Logger.Info('Size of the stream is ' + IntToStr(Size));
-  //Sound.Loaded := True;
-  Stream.Free;
-end;
 
 function TAudioSystem.GetDevices: TAudioDeviceList;
 var
@@ -806,8 +924,8 @@ begin
   begin
     Exit;
   end;
-  LoadSoundFromResource('DEFAULT_SOUND', FDefaultSound);
-  LoadSoundFromResource('TICK', FDefaultTick);
+  SoundPool.LoadSoundFromResource('DEFAULT_SOUND', FDefaultSound);
+  SoundPool.LoadSoundFromResource('TICK', FDefaultTick);
 end;
 
 procedure TAudioSystem.FreeDefaultSounds;
@@ -941,6 +1059,6 @@ initialization
 
 finalization
   //DoneCriticalsection(TAudioPlayer.AudioCriticalSection);
-
+  SoundPool.Free;
   AudioSystem.Free;
 end.

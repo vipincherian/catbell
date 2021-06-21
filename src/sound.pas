@@ -17,6 +17,7 @@ type
     function GetAudioLength: double; virtual; abstract;
     function GetSampleFormat: PaSampleFormat; virtual; abstract;
     function GetSource: string; virtual; abstract;
+    function GetFrameLength: integer; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
@@ -26,6 +27,7 @@ type
     property Duration: double read GetAudioLength;
     property SampleFormat: PaSampleFormat read GetSampleFormat;
     property Source: string read GetSource;
+    property FrameLength: integer read GetFrameLength;
     // Seek to begin
     procedure SeekToBeginning; virtual; abstract;
     // Read to buffer
@@ -41,6 +43,7 @@ type
     //Loaded: boolean;
   end;
   PSoundData = ^TSoundData;
+
 
   { The record passed to sndfile virtual file io callbacks }
   TSeekableSoundData = record
@@ -61,12 +64,13 @@ type
     FInfo: SF_INFO;
 
     FVirtualIOCallbacks: SF_VIRTUAL_IO;
-    FVIOUserData: TSeekableSoundData;
+    FSeekableSoundData: TSeekableSoundData;
 
     function GetAudioLength: double; override;
     function GetChannels: integer; override;
     function GetSampleFormat: PaSampleFormat; override;
     function GetSampleRate: integer; override;
+    function GetFrameLength: integer; override;
     procedure SetFileName(AValue: string);
     function GetSource: string; override;
   public
@@ -83,6 +87,7 @@ type
     property SampleRate: integer read GetSampleRate;
     property Duration: double read GetAudioLength;
     property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property FrameLength: integer read GetFrameLength;
     property Source: string read GetSource;
   end;
 
@@ -99,11 +104,13 @@ type
     FRate: cardinal;
     FChannelCount: integer;
     FEncoding: integer;
+    FFrameLength: integer;
 
     function GetAudioLength: double; override;
     function GetChannels: integer; override;
     function GetSampleFormat: PaSampleFormat; override;
     function GetSampleRate: integer; override;
+    function GetFrameLength: integer; override;
     procedure SetFileName(AValue: string);
     function GetSource: string; override;
 
@@ -118,6 +125,7 @@ type
     property SampleRate: integer read GetSampleRate;
     property Duration: double read GetAudioLength;
     property SampleFormat: PaSampleFormat read GetSampleFormat;
+    property FrameLength: integer read GetFrameLength;
     property Source: string read GetSource;
   end;
 
@@ -253,7 +261,7 @@ end;
 
 function TMpgSound.GetSampleFormat: PaSampleFormat;
 begin
-  Result := paFloat32;
+  Result := paFloat32;                { TODO : Is this defaulting correct? }
 end;
 
 function TMpgSound.GetSampleRate: integer;
@@ -261,10 +269,15 @@ begin
   Result := FRate;
 end;
 
+function TMpgSound.GetFrameLength: integer;
+begin
+  Result := FFrameLength;
+end;
+
 procedure TMpgSound.SetFileName(AValue: string);
 var
   Dur: double;
-  FrameLength: coff_t;
+  //TotalFrameLength: coff_t;
 begin
   FError := mpg123_close(FHandle);
   if FError <> MPG123_OK then
@@ -302,11 +315,11 @@ begin
     Logger.Debug('Error after mpg123_scan ' + IntToStr(FError));
   end;
 
-  FrameLength := mpg123_length(FHandle);
-  Logger.Debug('FrameLength is ' + IntToStr(FrameLength));
-  if FrameLength < 0 then
+  FFrameLength := mpg123_length(FHandle);
+  Logger.Debug('FrameLength is ' + IntToStr(FFrameLength));
+  if FFrameLength < 0 then
   begin
-    Logger.Debug('Error after mpg123_scan ' + IntToStr(FrameLength));
+    Logger.Debug('Error after mpg123_scan ' + IntToStr(FFrameLength));
   end;
 
   {Dur :=  mpg123_tpf(FHandle);
@@ -317,7 +330,7 @@ begin
   begin
     Logger.Debug('Error after mpg123_tpf ' + FloatToStr(Dur));
   end;}
-  Dur := FrameLength / FRate;
+  Dur := FFrameLength / FRate;
   Logger.Debug('Duration is ' + FloatToStr(Dur));
 
   FAudioLength := Dur;
@@ -328,13 +341,14 @@ begin
   Result := FFileName;
 end;
 
-constructor TMpgSound.Create();
+constructor TMpgSound.Create;
 var
   Rates: plong = nil;
   RateCount: size_t = 0;
   //X, Y: Pointer;
   Count: integer;
 begin
+  FFrameLength := 0;
   FHandle := nil;
   FHandle := mpg123_new(nil, FError);
   if FError <> MPG123_OK then
@@ -457,6 +471,8 @@ begin
 
   FFileName := AValue;
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
+
+
   //LeaveCriticalSection(AudioCriticalSection);
 end;
 
@@ -485,6 +501,11 @@ begin
   Result := FInfo.samplerate;
 end;
 
+function TSndSound.GetFrameLength: integer;
+begin
+  Result := FInfo.frames;
+end;
+
 constructor TSndSound.Create;
 begin
   //inherited create;
@@ -498,8 +519,8 @@ begin
     Write := @sf_vio_write_impl;
   end;
 
-  FVIOUserData.Sound := @AudioSystem.DefaultSound;
-  FVIOUserData.Position := 0;
+  FSeekableSoundData.Sound := @AudioSystem.DefaultSound;
+  FSeekableSoundData.Position := 0;
 
 end;
 
@@ -547,17 +568,17 @@ begin
   //if not AudioSystem.Loaded then
   //raise EAudioNotLoaded.Create('Audio not loaded.');
 
-  FVIOUserData.Sound := SoundData;
-  FVIOUserData.Position := 0;
+  FSeekableSoundData.Sound := SoundData;
+  FSeekableSoundData.Position := 0;
 
   Logger.Debug('Before calling sf_open_virtual');
   Logger.Debug('');
-  Logger.Debug('Position - ' + IntToStr(FVIOUserData.Position));
-  Logger.Debug('Size - ' + IntToStr(FVIOUserData.Sound^.Size));
+  Logger.Debug('Position - ' + IntToStr(FSeekableSoundData.Position));
+  Logger.Debug('Size - ' + IntToStr(FSeekableSoundData.Sound^.Size));
   Logger.Debug('');
 
   TempSoundFile := sf_open_virtual(@FVirtualIOCallbacks, SFM_READ,
-    @FInfo, @FVIOUserData);
+    @FInfo, @FSeekableSoundData);
   if (TempSoundFile = nil) then
   begin
     Logger.Debug('Error in sf_open_virtual');

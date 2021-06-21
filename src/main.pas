@@ -300,7 +300,9 @@ begin
   FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
   {$ENDIF}
 
+    { TODO : Merge these calls - SoundPool should load default audio too. }
   AudioSystem.LoadDefaultSounds;
+  SoundPool.LoadAllDefaultSounds;
 
   FMetronome := TMetronome.Create;
 
