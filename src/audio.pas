@@ -59,9 +59,10 @@ type
     Player: Pointer;
     Looped: boolean;
     Volume: ^integer;
-
   end;
   PAudioInfo = ^TUserInfo;
+
+  //PSoundData = ^TSoundData;
 
   { TAudioPlayer }
   TAudioPlayer = class(TObject)
@@ -92,6 +93,7 @@ type
 
   end;
 
+  { TAudioSystem }
   TAudioSystem = class(TObject)
   private
     FLoaded: boolean;
@@ -130,9 +132,34 @@ type
     property DefaultTick: TSoundData read FDefaultTick;
   end;
 
+  TRawSoundData = TSoundData;
+  PRawSoundData = PSoundData;
+  TSeekableRawSoundData = TSeekableSoundData;
+  PSeekableRawSoundData = PSeekableSoundData;
+
+  TSoundPoolEntry = record
+    Original: PSoundData;
+    Raw: PRawSoundData;
+    RawVolumeAdjusted: PRawSoundData;
+  end;
+  PSoundPoolEntry = ^TSoundPoolEntry;
+
+  TSoundPoolList = specialize TFPGList<PSoundPoolEntry>;
+
+
+
+  { TSoundPool }
+  TSoundPool = class(TObject)
+  private
+    FEntries: TSoundPoolList;
+    {%H-}constructor Create;
+    {%H-}destructor {%H-}Destroy; override;
+  end;
+
 var
   PaErrCode: PaError;
   AudioSystem: TAudioSystem = nil;
+  SoundPool: TSoundPool = nil;
 
 implementation
 
@@ -251,6 +278,26 @@ begin
   //LeaveCriticalSection(TAudioPlayer.AudioCriticalSection);
 end;
 
+{ TSoundPool }
+
+constructor TSoundPool.Create;
+var
+  SndFile: TSndSound;
+begin
+  FEntries := TSoundPoolList.Create;
+  if AudioSystem.Loaded then
+  begin
+    SndFile := TSndSound.Create;
+    SndFile.LoadDefaultSound;
+  end;
+end;
+
+destructor TSoundPool.Destroy;
+begin
+  FEntries.Free;
+  inherited Destroy;
+end;
+
 { This is called when playback is finished.
   Remember: ALWAYS USE CDECL or your pointers will be messed up!
   Pointers to this function must be castable to PPaStreamFinishedCallback: }
@@ -272,8 +319,8 @@ end;}
 constructor TAudioSystem.Create;
 begin
   FLoaded := False;
-  FDefaultSound.Loaded := False;
-  FDefaultTick.Loaded := False;
+  //FDefaultSound.Loaded := False;
+  //FDefaultTick.Loaded := False;
   FDevices := TAudioDeviceList.Create;
 
   {$IFNDEF AUDIO_STATIC}
@@ -509,8 +556,8 @@ begin
     Logger.Warning('BytesRead does not match Size in TAudio.LoadDefaultSounds');
 
   //Logger.Info('Size of the stream is ' + IntToStr(Size));
-  Sound.Loaded := True;
-  Stream.Destroy;
+  //Sound.Loaded := True;
+  Stream.Free;
 end;
 
 function TAudioSystem.GetDevices: TAudioDeviceList;
@@ -886,6 +933,10 @@ end;
 initialization
 
   AudioSystem := TAudioSystem.Create;
+  if AudioSystem.Loaded then
+  begin
+    SoundPool := TSoundPool.Create;
+  end;
 
 
 finalization

@@ -38,16 +38,16 @@ type
   TSoundData = record
     Buffer: PAnsiChar;
     Size: integer;
-    Loaded: boolean;
+    //Loaded: boolean;
   end;
   PSoundData = ^TSoundData;
 
   { The record passed to sndfile virtual file io callbacks }
-  TSndVIOUserData = record
+  TSeekableSoundData = record
     Sound: PSoundData;
     Position: sf_count_t;
   end;
-  PSndVIOUserData = ^TSndVIOUserData;
+  PSeekableSoundData = ^TSeekableSoundData;
 
   {TSndSound}
   {Implementation of SndFile}
@@ -61,7 +61,7 @@ type
     FInfo: SF_INFO;
 
     FVirtualIOCallbacks: SF_VIRTUAL_IO;
-    FVIOUserData: TSndVIOUserData;
+    FVIOUserData: TSeekableSoundData;
 
     function GetAudioLength: double; override;
     function GetChannels: integer; override;
@@ -127,10 +127,10 @@ uses audio;
 
 function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
 var
-  SoundData: PSndVIOUserData;
+  SoundData: PSeekableSoundData;
 begin
   //Logger.Debug('Entering sf_vio_get_filelen_impl');
-  SoundData := PSndVIOUserData(user_data);
+  SoundData := PSeekableSoundData(user_data);
   Result := SoundData^.Sound^.Size;
   //Logger.Debug('Return value is ' + IntToStr(SoundData^.Sound^.Size));
   //Logger.Debug('Exiting sf_vio_get_filelen_impl');
@@ -139,12 +139,12 @@ end;
 function sf_vio_seek_impl(offset: sf_count_t; whence: cint;
   user_data: pointer): sf_count_t; cdecl;
 var
-  SoundData: PSndVIOUserData;
+  SoundData: PSeekableSoundData;
 begin
   //Logger.Debug('Entering sf_vio_seek_impl');
   //Logger.Debug('');
 
-  SoundData := PSndVIOUserData(user_data);
+  SoundData := PSeekableSoundData(user_data);
 
   //Logger.Debug('Offset - ' + IntToStr(offset));
   case whence of
@@ -173,13 +173,13 @@ end;
 function sf_vio_read_impl(ptr: pointer; Count: sf_count_t;
   user_data: pointer): sf_count_t; cdecl;
 var
-  SoundData: PSndVIOUserData;
+  SoundData: PSeekableSoundData;
   Position, ActualCount: sf_count_t;
 begin
   //Logger.Debug('Entering sf_vio_read_impl');
   //Logger.Debug('');
 
-  SoundData := PSndVIOUserData(user_data);
+  SoundData := PSeekableSoundData(user_data);
 
   //Logger.Debug('Count - ' + IntToStr(Count));
   //Logger.Debug('Size - ' + IntToStr(SoundData^.Sound^.Size));
@@ -214,12 +214,12 @@ end;
 
 function sf_vio_tell_impl(user_data: pointer): sf_count_t; cdecl;
 var
-  SoundData: PSndVIOUserData;
+  SoundData: PSeekableSoundData;
 begin
   //Logger.Debug('Entering sf_vio_tell_impl');
   //Logger.Debug('');
 
-  SoundData := PSndVIOUserData(user_data);
+  SoundData := PSeekableSoundData(user_data);
   Result := SoundData^.Position;
 
   //Logger.Debug('Position - ' + IntToStr(SoundData^.Position));
