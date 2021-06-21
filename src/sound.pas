@@ -48,6 +48,7 @@ type
   { The record passed to sndfile virtual file io callbacks }
   TSeekableSoundData = record
     Sound: PSoundData;
+    //Channels: integer;
     Position: sf_count_t;
   end;
   PSeekableSoundData = ^TSeekableSoundData;
@@ -600,6 +601,7 @@ begin
   Logger.Debug('');
 
   FAudioLength := (FInfo.frames) / (FInfo.samplerate);
+
   //LeaveCriticalSection(AudioCriticalSection);
 
 end;

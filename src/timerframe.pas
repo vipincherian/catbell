@@ -912,10 +912,14 @@ begin
         end;
 
       end;
-
+      ReenableEditControls;
       // Play the sound as per configuration
       if UseDefaultSound then
-        FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
+      begin
+        //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
+        Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));
+        FAudioPlayer.Play(SoundPool.RawDefaultSound)
+      end
       else
       begin
         // If UseDefaultSound is false, then audio is loaded.
@@ -923,7 +927,7 @@ begin
         if FCustomSound <> nil then
           FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
       end;
-      ReenableEditControls;
+
       //Logger.Debug('FAudio.Play');
     end
     else
