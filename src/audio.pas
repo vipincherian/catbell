@@ -197,7 +197,7 @@ begin
   UsedSound := AudioInfo^.Sound;
 
   readSuccess := False;
-  readSuccess := UsedSound.Read(output, frameCount);
+  readSuccess := (UsedSound.Read(output, frameCount) >0);
 
   // Decode and fix volume
   Volume := AudioInfo^.Volume^;
@@ -225,7 +225,7 @@ begin
       UsedSound.SeekToBeginning;
 
       readSuccess := False;
-      readSuccess := UsedSound.Read(output, frameCount);
+      readSuccess := (UsedSound.Read(output, frameCount) > 0);
 
       { Apply scaling to amplitude to control volume }
       Data := output;

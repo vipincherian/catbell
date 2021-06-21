@@ -29,7 +29,7 @@ type
     // Seek to begin
     procedure SeekToBeginning; virtual; abstract;
     // Read to buffer
-    function Read(output: pointer; frameCount: longint): boolean; virtual; abstract;
+    function Read(output: pointer; frameCount: longint): integer; virtual; abstract;
   end;
 
 
@@ -73,7 +73,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure SeekToBeginning; override;
-    function Read(output: pointer; frameCount: longint): boolean; override;
+    function Read(output: pointer; frameCount: longint): integer; override;
 
     property FileName: string read FFileName write SetFileName;
     procedure LoadInMemorySound(SoundData: PSoundData);
@@ -111,7 +111,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure SeekToBeginning; override;
-    function Read(output: pointer; frameCount: longint): boolean; override;
+    function Read(output: pointer; frameCount: longint): integer; override;
 
     property FileName: string read FFileName write SetFileName;
     property Channels: integer read GetChannels;
@@ -387,25 +387,25 @@ begin
   FError := mpg123_seek(FHandle, 0, SEEK_SET);
 end;
 
-function TMpgSound.Read(output: pointer; frameCount: longint): boolean;
+function TMpgSound.Read(output: pointer; frameCount: longint): integer;
 var
-  done: size_t = 0;
+  Done: size_t = 0;
 begin
   FError := mpg123_read(FHandle, output, frameCount * SizeOf(cfloat) *
     FChannelCount, done);
 
   if done = 0 then
   begin
-    Result := False;
+    Result := 0;
     Exit;
   end;
   if FError <> MPG123_OK then
   begin
     //Logger.Debug('mpg123_read failed?');
-    Result := False;
+    Result := 0;
     Exit;
   end;
-  Result := True;
+  Result := Done;
 end;
 
 { TSndSound }
@@ -518,7 +518,7 @@ begin
   end;
 end;
 
-function TSndSound.Read(output: pointer; frameCount: longint): boolean;
+function TSndSound.Read(output: pointer; frameCount: longint): integer;
 var
   readCount: cint;
   {Data: pcfloat;
@@ -536,7 +536,7 @@ begin
 
   // If read count matches what was requested, then all the stream has
   // not completed
-  Result := (readCount > 0);
+  Result := readCount;
 end;
 
 procedure TSndSound.LoadInMemorySound(SoundData: PSoundData);
