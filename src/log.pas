@@ -198,5 +198,6 @@ initialization
   Logger := TLogger.Create;
 
 finalization
-  Logger.Free;
+  //Logger.Free;
+  FreeAndNil(Logger);
 end.

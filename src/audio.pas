@@ -1269,6 +1269,8 @@ initialization
 
 finalization
   //DoneCriticalsection(TAudioPlayer.AudioCriticalSection);
-  SoundPool.Free;
-  AudioSystem.Free;
+  //SoundPool.Free;
+  FreeAndNil(SoundPool);
+  //AudioSystem.Free;
+  FreeAndNil(AudioSystem);
 end.
