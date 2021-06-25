@@ -33,10 +33,23 @@ type
   EInvalidAudio = class(Exception);
   AudioDeviceIndex = PaDeviceIndex;
 
-  TRawSoundData = TSoundData;
-  PRawSoundData = PSoundData;
-  TSeekableRawSoundData = TSeekableSoundData;
-  PSeekableRawSoundData = PSeekableSoundData;
+  TRawSoundData = record
+    Buffer: PAnsiChar;
+    Size: integer;
+    ChannelCount: integer;
+    SampleFormat: PaSampleFormat;
+    //Loaded: boolean;
+  end;
+  PRawSoundData = ^TRawSoundData;
+  //TSeekableRawSoundData = TSeekableSoundData;
+  //PSeekableRawSoundData = PSeekableSoundData;
+
+  TSeekableRawSoundData = record
+    RawSound: PRawSoundData;
+    //Channels: integer;
+    Position: sf_count_t;
+  end;
+  PSeekableRawSoundData = ^TSeekableRawSoundData;
 
   TAudioDevice = record
     HostAPIName: string;
@@ -299,31 +312,31 @@ begin
   AudioInfo := PRawUserinfo(userData);
 
   //Assert(AudioInfo <> nil);
-  //Assert(AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.Sound^.Size);
+  //Assert(AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size);
   //Assert(AudioInfo^.Sound^. <> nil);
   //AudioInfo^.Sound.;
 
-  BytesRead := Min(AudioInfo^.RawSeekable.Sound^.Size -
+  BytesRead := Min(AudioInfo^.RawSeekable.RawSound^.Size -
     AudioInfo^.RawSeekable.Position + 1, frameCount *
     { TODO : Remove the hardcoding of channel count }2 * sizeof(cfloat));
 
   //Logger.Debug('frameCount - ' + IntToStr(frameCount));
   //Logger.Debug('BytesRead - ' + IntToStr(BytesRead));
   //Logger.Debug('AudioInfo^.RawSeekable.Position - ' + IntToStr(AudioInfo^.RawSeekable.Position));
-  //Logger.Debug('AudioInfo^.RawSeekable.Sound^.Size - ' + IntToStr(AudioInfo^.RawSeekable.Sound^.Size));
+  //Logger.Debug('AudioInfo^.RawSeekable.Sound^.Size - ' + IntToStr(AudioInfo^.RawSeekable.RawSound^.Size));
   //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
-  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.Sound^.Buffer)[0], 16)
-  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.Sound^.Buffer)[1], 16)
+  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
+  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
   //    );
-  Move((AudioInfo^.RawSeekable.Sound^.Buffer + AudioInfo^.RawSeekable.Position)^, output^,
+  Move((AudioInfo^.RawSeekable.RawSound^.Buffer + AudioInfo^.RawSeekable.Position)^, output^,
     BytesRead);
   //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
-  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.Sound^.Buffer)[0], 16)
-  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.Sound^.Buffer)[1], 16)
+  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
+  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
   //    );
   AudioInfo^.RawSeekable.Position += BytesRead;
 
-  if (AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.Sound^.Size) then
+  if (AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size) then
   begin
     Result := cint(paContinue);
   end
@@ -464,6 +477,9 @@ begin
         Size += Read;
       end;
     until (Size >= SndFile.FrameLength * SndFile.Channels);
+
+    SoundPoolEntry^.Raw^.ChannelCount:=SndFile.Channels;
+    SoundPoolEntry^.Raw^.SampleFormat:=SndFile.SampleFormat;
 
     Logger.Debug('Soundpool - SoundPoolEntry^.RawVolumeAdjusted^.Buffer - '
       + IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[0], 16)
@@ -728,6 +744,7 @@ begin
     StreamParams.sampleFormat := Sound.SampleFormat;
 
     Streamparams.suggestedLatency :=
+       //0.5;
       Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
     StreamParams.hostApiSpecificStreamInfo := nil;
     //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
@@ -747,7 +764,10 @@ begin
     //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
     PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams,
-      Sound.SampleRate, paFramesPerBufferUnspecified, paClipOff,
+      Sound.SampleRate,
+      paFramesPerBufferUnspecified,
+      //2024,
+      paClipOff,
       PPaStreamCallback(@FeedAudioStream), @FUserInfo);
     if (paErrCode <> Int32(paNoError)) then
     begin
@@ -802,7 +822,8 @@ begin
     Logger.Debug('Sf_seek returned error');
   end;}
   FSeekableSoundData.Position:=0;
-  FSeekableSoundData.Sound:=RawSound;
+  FSeekableSoundData.RawSound:=RawSound;
+
 
   if AudioSystem.UseDefaultDevice or (AudioSystem.OutputDevice.HostAPIName = '') or
     (AudioSystem.OutputDevice.DeviceName = '') then
@@ -821,8 +842,8 @@ begin
   Logger.Debug('Audio device is ' + IntToStr(StreamParams.device));
 
   //StreamParams.channelCount := FInfo.channels;
-  StreamParams.channelCount := 2;{ TODO : Remove hard-coding }
-  StreamParams.sampleFormat := paFloat32;//Sound.SampleFormat;
+  StreamParams.channelCount := RawSound^.ChannelCount;
+  StreamParams.sampleFormat := RawSound^.SampleFormat;
 
   Streamparams.suggestedLatency :=
     (Pa_GetDeviceInfo(StreamParams.device)^.defaultHighOutputLatency);
@@ -846,10 +867,10 @@ begin
   Logger.Debug('');
   Logger.Debug('Before Play');
   Logger.Debug('');
-  Logger.Debug('Play - FSeekableSoundData.Sound^.Buffer - ' +  IntToStr(FSeekableSoundData.Sound^.Size));
+  Logger.Debug('Play - FSeekableSoundData.Sound^.Buffer - ' +  IntToStr(FSeekableSoundData.RawSound^.Size));
   Logger.Debug('Play - FSeekableSoundData.Sound^.Buffer - '
-    + IntToHex(PQWord(FSeekableSoundData.Sound^.Buffer)[0], 16)
-    + ' ' + IntToHex(PQWord(FSeekableSoundData.Sound^.Buffer)[1], 16)
+    + IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[0], 16)
+    + ' ' + IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[1], 16)
     );
 
 
@@ -1141,6 +1162,7 @@ end;
 procedure TAudioSystem.FreeDefaultSounds;
 begin
   FreeMem(FDefaultSound.Buffer);
+  FreeMem(FDefaultTick.Buffer);
 end;
 
 procedure TAudioPlayer.Abort;

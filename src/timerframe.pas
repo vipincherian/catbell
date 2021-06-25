@@ -917,7 +917,7 @@ begin
       if UseDefaultSound then
       begin
         //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
-        Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));
+        //Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));
         FAudioPlayer.Play(SoundPool.RawDefaultSound)
       end
       else

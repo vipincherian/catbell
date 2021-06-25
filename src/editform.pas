@@ -695,7 +695,10 @@ var
   //ButtonStatus: boolean;
 begin
   if Sender = nil then
+  begin
+    Result := False;
     Exit;
+  end;
   tsTimer.Show;
   Widget := TfraTimer(Sender);
   Fid := Widget.Id;
