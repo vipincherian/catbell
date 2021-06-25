@@ -162,7 +162,7 @@ type
   TSoundPoolEntry = record
     Original: PSoundData;
     Raw: PRawSoundData;
-    RawVolumeAdjusted: PRawSoundData;
+    //RawVolumeAdjusted: PRawSoundData;
   end;
   PSoundPoolEntry = ^TSoundPoolEntry;
 
@@ -178,6 +178,7 @@ type
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
     function GetRawDefaultSound: PRawSoundData;
+    procedure RefillRawSound(const Index: integer);
     function LoadDefaultSound(const ResourceID: string): integer;
   public
     procedure LoadAllDefaultSounds;
@@ -328,7 +329,8 @@ begin
   //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
   //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
   //    );
-  Move((AudioInfo^.RawSeekable.RawSound^.Buffer + AudioInfo^.RawSeekable.Position)^, output^,
+  Move((AudioInfo^.RawSeekable.RawSound^.Buffer +
+    AudioInfo^.RawSeekable.Position)^, output^,
     BytesRead);
   //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
   //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
@@ -400,8 +402,8 @@ begin
     Dispose(SoundPoolEntry^.Original);
     FreeMem(SoundPoolEntry^.Raw^.Buffer);
     Dispose(SoundPoolEntry^.Raw);
-    FreeMem(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
-    Dispose(SoundPoolEntry^.RawVolumeAdjusted);
+    //FreeMem(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
+    //Dispose(SoundPoolEntry^.RawVolumeAdjusted);
     Dispose(SoundPoolEntry);
   end;
   FEntries.Free;
@@ -410,112 +412,143 @@ end;
 
 function TSoundPool.GetRawDefaultSound: PRawSoundData;
 var
-  Buffer: PSeekableRawSoundData;
+  //Buffer: PSeekableRawSoundData;
   SoundPoolEntry: PSoundPoolEntry;
 begin
+  { TODO : Change to a single line. }
   SoundPoolEntry := FEntries.Items[FDefaultSoundIndex];
-  Result:=SoundPoolEntry^.Raw;
+  Result := SoundPoolEntry^.Raw;
 end;
 
-function TSoundPool.LoadDefaultSound(const ResourceID: string): integer;
+procedure TSoundPool.RefillRawSound(const Index: integer);
 var
   SoundPoolEntry: PSoundPoolEntry;
   SndFile: TSndSound;
   Size: integer;
   Read: integer;
-  VolumeBuffer: PCFloat;
+  //VolumeBuffer: PCFloat;
   RawBuffer: PCFloat;
   Count: integer;
   Volume: integer;
   AmpScale: double;
 begin
+  SoundPoolEntry := FEntries.Items[Index];
+
+  SndFile := TSndSound.Create;
+  SndFile.LoadInMemorySound(SoundPoolEntry^.Original);
+
+  Logger.Debug('Soundpool - loading default sound');
+  Logger.Debug('Soundpool - SndFile.Channels - ' + IntToStr(SndFile.Channels));
+  Logger.Debug('Soundpool - SndFile.FrameLength - ' + IntToStr(SndFile.FrameLength));
+  Logger.Debug('Soundpool - SizeOf(cfloat) - ' + IntToStr(SizeOf(cfloat)));
+  Logger.Debug('Soundpool - SoundPoolEntry^.Original^.Size - ' +
+    IntToStr(SoundPoolEntry^.Original^.Size));
+
+  { Create the record to hold raw sound }
+
+
+  if SoundPoolEntry^.Raw <> nil then
+  begin
+    FreeMem(SoundPoolEntry^.Raw^.Buffer);
+    Dispose(SoundPoolEntry^.Raw);
+  end;
+
+  SoundPoolEntry^.Raw := New(PRawSoundData);
+  SoundPoolEntry^.Raw^.Buffer :=
+    AllocMem(SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
+  SoundPoolEntry^.Raw^.Size :=
+    (SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
+
+  { Create the record to hold raw volume adjusted sound }
+  //SoundPoolEntry^.RawVolumeAdjusted := New(PRawSoundData);
+  //SoundPoolEntry^.RawVolumeAdjusted^.Buffer := AllocMem(SoundPoolEntry^.Raw^.Size);
+  //SoundPoolEntry^.RawVolumeAdjusted^.Size := SoundPoolEntry^.Raw^.Size;
+  //Logger.Debug('Soundpool - SoundPoolEntry^.RawVolumeAdjusted^.Size - ' + IntTostr(SoundPoolEntry^.RawVolumeAdjusted^.Size));
+
+  //SoundPoolEntry^.Original^
+  { Read raw data and keep it raedy for use }
+  Size := 0;
+  Read := 0;
+  repeat
+    begin
+        { SndFile.Read returns the number of floats read. This already takes the
+        number of channels to account, so no need to multiply }
+      Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer +
+        (Size * SizeOf(cfloat)), 10000);
+
+      //Read := SndFile.Read(@Buffer[0], 10);
+      Logger.Debug('Read bytes - ' + IntToStr(Read));
+      Size += Read;
+    end;
+  until (Size >= SndFile.FrameLength * SndFile.Channels);
+
+  SoundPoolEntry^.Raw^.ChannelCount := SndFile.Channels;
+  SoundPoolEntry^.Raw^.SampleFormat := SndFile.SampleFormat;
+
+  Logger.Debug('Soundpool - SoundPoolEntry^.RawVolumeAdjusted^.Buffer - ' +
+    IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[0], 16) + ' ' +
+    IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[1], 16)
+    );
+  { Fill the volume adjusted raw data too. This is used for playing }
+
+  RawBuffer := PCFloat(SoundPoolEntry^.Raw^.Buffer);
+  //VolumeBuffer := PCFloat(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
+
+  Volume := GlobalUserConfig.Volume;
+  Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
+  AmpScale := Volume / MAX_VOLUME;
+  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+  Assert((AmpScale >= 0) and (AmpScale <= 1));
+
+  { Apply scaling to amplitude to control volume }
+  for Count := 0 to (SndFile.FrameLength * SndFile.Channels) - 1 do
+  begin
+    RawBuffer[Count] := RawBuffer[Count] * AmpScale; //AudioInfo^.Volume;
+  end;
+
+  //FreeMem(Buffer);
+  Logger.Debug('Size of default sound - ' + IntToStr(Size));
+  SndFile.Free;
+end;
+
+function TSoundPool.LoadDefaultSound(const ResourceID: string): integer;
+var
+  SoundPoolEntry: PSoundPoolEntry;
+  //SndFile: TSndSound;
+  //Size: integer;
+  //Read: integer;
+  //VolumeBuffer: PCFloat;
+  //RawBuffer: PCFloat;
+  //Count: integer;
+  //Volume: integer;
+  //AmpScale: double;
+  Index: integer = -1;
+begin
 
   try
-
     SoundPoolEntry := New(PSoundPoolEntry);
 
     { Create the record to hold file contents }
     SoundPoolEntry^.Original := New(PSoundData);
-
     LoadSoundFromResource(ReSourceID, SoundPoolEntry^.Original^);
 
-    SndFile := TSndSound.Create;
-    SndFile.LoadInMemorySound(SoundPoolEntry^.Original);
+    SoundPoolEntry^.Raw := nil;
+    Index := FEntries.Add(SoundPoolEntry);
+    Result := Index;
 
-    Logger.Debug('Soundpool - loading default sound');
-    Logger.Debug('Soundpool - SndFile.Channels - ' + IntToStr(SndFile.Channels));
-    Logger.Debug('Soundpool - SndFile.FrameLength - ' + IntToStr(SndFile.FrameLength));
-    Logger.Debug('Soundpool - SizeOf(cfloat) - ' + IntToStr(SizeOf(cfloat)));
-    Logger.Debug('Soundpool - SoundPoolEntry^.Original^.Size - ' + IntTostr(SoundPoolEntry^.Original^.Size));
+    RefillRawSound(Index);
 
-    { Create the record to hold raw sound }
-    SoundPoolEntry^.Raw := New(PRawSoundData);
-    SoundPoolEntry^.Raw^.Buffer :=
-      AllocMem(SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
-    SoundPoolEntry^.Raw^.Size :=
-      (SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
-
-    { Create the record to hold raw volume adjusted sound }
-    SoundPoolEntry^.RawVolumeAdjusted := New(PRawSoundData);
-    SoundPoolEntry^.RawVolumeAdjusted^.Buffer := AllocMem(SoundPoolEntry^.Raw^.Size);
-    SoundPoolEntry^.RawVolumeAdjusted^.Size := SoundPoolEntry^.Raw^.Size;
-    Logger.Debug('Soundpool - SoundPoolEntry^.RawVolumeAdjusted^.Size - ' + IntTostr(SoundPoolEntry^.RawVolumeAdjusted^.Size));
-
-    //SoundPoolEntry^.Original^
-    { Read raw data and keep it raedy for use }
-    Size := 0;
-    Read := 0;
-    repeat
-      begin
-      { SndFile.Read returns the number of floats read. This already takes the
-      number of channels to account, so no need to multiply }
-        Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer +
-          (Size * SizeOf(cfloat)), 10000);
-
-        //Read := SndFile.Read(@Buffer[0], 10);
-        Logger.Debug('Read bytes - ' + IntToStr(Read));
-        Size += Read;
-      end;
-    until (Size >= SndFile.FrameLength * SndFile.Channels);
-
-    SoundPoolEntry^.Raw^.ChannelCount:=SndFile.Channels;
-    SoundPoolEntry^.Raw^.SampleFormat:=SndFile.SampleFormat;
-
-    Logger.Debug('Soundpool - SoundPoolEntry^.RawVolumeAdjusted^.Buffer - '
-      + IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[0], 16)
-      + ' ' + IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[1], 16)
-      );
-    { Fill the volume adjusted raw data too. This is used for playing }
-
-    RawBuffer := PCFloat(SoundPoolEntry^.Raw^.Buffer);
-    VolumeBuffer := PCFloat(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
-
-    Volume := GlobalUserConfig.Volume;
-    Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
-    AmpScale := Volume / MAX_VOLUME;
-    AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
-    Assert((AmpScale >= 0) and (AmpScale <= 1));
-
-    { Apply scaling to amplitude to control volume }
-    for Count := 0 to (SndFile.FrameLength * SndFile.Channels) - 1 do
-    begin
-      VolumeBuffer[Count] := RawBuffer[Count];// * AmpScale; //AudioInfo^.Volume;
-    end;
-
-    //FreeMem(Buffer);
-    Logger.Debug('Size of default sound - ' + IntToStr(Size));
   except
     on E: Exception do
     begin
-      Logger.Error('Could not load default sound with resource ID - ' + ResourceID);
+      Logger.Error('Could not fill raw sound for resource ID - ' + ResourceID);
       Logger.Error(E.Message);
-      SndFile.Free;
       Result := -1;
       Exit;
     end;
   end;
-  Result := FEntries.Add(SoundPoolEntry);
-  SndFile.Free;
+
+
 end;
 
 procedure TSoundPool.LoadAllDefaultSounds;
@@ -744,7 +777,7 @@ begin
     StreamParams.sampleFormat := Sound.SampleFormat;
 
     Streamparams.suggestedLatency :=
-       //0.5;
+      //0.5;
       Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
     StreamParams.hostApiSpecificStreamInfo := nil;
     //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
@@ -764,11 +797,9 @@ begin
     //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
     PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams,
-      Sound.SampleRate,
-      paFramesPerBufferUnspecified,
+      Sound.SampleRate, paFramesPerBufferUnspecified,
       //2024,
-      paClipOff,
-      PPaStreamCallback(@FeedAudioStream), @FUserInfo);
+      paClipOff, PPaStreamCallback(@FeedAudioStream), @FUserInfo);
     if (paErrCode <> Int32(paNoError)) then
     begin
       Logger.Debug('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
@@ -821,8 +852,8 @@ begin
   begin
     Logger.Debug('Sf_seek returned error');
   end;}
-  FSeekableSoundData.Position:=0;
-  FSeekableSoundData.RawSound:=RawSound;
+  FSeekableSoundData.Position := 0;
+  FSeekableSoundData.RawSound := RawSound;
 
 
   if AudioSystem.UseDefaultDevice or (AudioSystem.OutputDevice.HostAPIName = '') or
@@ -867,15 +898,16 @@ begin
   Logger.Debug('');
   Logger.Debug('Before Play');
   Logger.Debug('');
-  Logger.Debug('Play - FSeekableSoundData.Sound^.Buffer - ' +  IntToStr(FSeekableSoundData.RawSound^.Size));
-  Logger.Debug('Play - FSeekableSoundData.Sound^.Buffer - '
-    + IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[0], 16)
-    + ' ' + IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[1], 16)
+  Logger.Debug('Play - FSeekableSoundData.Sound^.Buffer - ' +
+    IntToStr(FSeekableSoundData.RawSound^.Size));
+  Logger.Debug('Play - FSeekableSoundData.Sound^.Buffer - ' +
+    IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[0], 16) +
+    ' ' + IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[1], 16)
     );
 
 
-  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams,
-    44100, paFramesPerBufferUnspecified, paClipOff or paDitherOff,
+  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, 44100,
+    paFramesPerBufferUnspecified, paClipOff or paDitherOff,
     PPaStreamCallback(@FeedAudioStreamBuffered), @FRawUserInfo);
   if (paErrCode <> Int32(paNoError)) then
   begin
@@ -893,7 +925,8 @@ begin
     Exit;
   end;
 
-  Logger.Debug('Play - pa_GetStreamInfo(FStream)^.outputLatency - ' + FloatToStr(pa_GetStreamInfo(FStream)^.outputLatency));
+  Logger.Debug('Play - pa_GetStreamInfo(FStream)^.outputLatency - ' +
+    FloatToStr(pa_GetStreamInfo(FStream)^.outputLatency));
 
   PaErrCode := Pa_StartStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
@@ -903,7 +936,8 @@ begin
     Exit;
   end;
 
-  Logger.Debug('Play - pa_GetStreamInfo(FStream)^.outputLatency - ' + FloatToStr(pa_GetStreamInfo(FStream)^.outputLatency));
+  Logger.Debug('Play - pa_GetStreamInfo(FStream)^.outputLatency - ' +
+    FloatToStr(pa_GetStreamInfo(FStream)^.outputLatency));
 
   FAudioPlaying := True;
 end;
