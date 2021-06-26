@@ -27,14 +27,14 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
   ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} {EventLog,}
-  Math, audio, log, sound;
+  Math, audio, log{, sound};
 
 type
-  TTimerSoundInfo = record
+  {TTimerSoundInfo = record
     FileName: string;
     Duration: double;
     Looped: boolean;
-  end;
+  end; }
 
   { TfrmEdit }
 
@@ -51,17 +51,20 @@ type
     ckbModalAlert: TCheckBox;
     ckbTrayNotification: TCheckBox;
     dtpDuration: TDateTimePicker;
-    edtSound: TEdit;
     edtDescription: TEdit;
     imlEdit: TImageList;
     Label1: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
     Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
     lblLengthText: TLabel;
     lblLenthVal: TLabel;
     odgAudio: TOpenDialog;
     pgEditTimer: TPageControl;
+    rbSoundCustom: TRadioButton;
+    rbSoundDefault: TRadioButton;
+    rbSoundNone: TRadioButton;
     tsTimer: TTabSheet;
     tsSound: TTabSheet;
     procedure bbCancelClick(Sender: TObject);
@@ -88,11 +91,11 @@ type
     FWidget: Pointer;
 
     FAudioPlayer: TAudioPlayer;
-    FDefaultSound: TSndSound;
-    FSoundInfo: TTimerSoundInfo;
+    //FDefaultSound: TSndSound;
+    //FSoundInfo: TTimerSoundInfo;
 
-    FCurrentSound: TSound;
-    FNewSound: TSound;
+    //FCurrentSound: TSound;
+    //FNewSound: TSound;
 
     //FSoundLooped: boolean;
 
@@ -115,8 +118,8 @@ type
     procedure SetDuration(AValue: TTime);
     procedure SetFTrayNotification(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
-    procedure SetCurrentSound(AValue: TSound);
-    procedure SetNewSound(AValue: TSound);
+    //procedure SetCurrentSound(AValue: TSound);
+    //procedure SetNewSound(AValue: TSound);
     procedure SetUseDefaultSound(AValue: boolean);
     function Validate: boolean;
     procedure AudioPlayed(Sender: TObject);
@@ -138,8 +141,8 @@ type
     property Id: longword read FId;
 
     //property Audio: TAudioPlayer read FAudioPlayer write SetAudio;
-    property CurrentSound: TSound read FCurrentSound write SetCurrentSound;
-    property NewSound: TSound read FNewSound write SetNewSound;
+    //property CurrentSound: TSound read FCurrentSound write SetCurrentSound;
+    //property NewSound: TSound read FNewSound write SetNewSound;
     //property AudioFileName: string read GetAudioFileName write SetAudioFileName;
     property SoundDuration: double read GetSoundDuration write SetSoundDuration;
     property SoundLooped: boolean read GetSoundLooped write SetSoundLooped;
@@ -170,7 +173,7 @@ begin
 
   FAudioPlayer := TAudioPlayer.Create;
   FAudioPlayer.OnPlayCompletion := @AudioPlayed;
-  FDefaultSound := nil;
+  //FDefaultSound := nil;
 
   with GlobalUserConfig do
   begin
@@ -193,9 +196,9 @@ begin
     bbSelectSound.Enabled := False;
   end;}
 
-  FSoundInfo.FileName := '';
-  FSoundInfo.Duration := 0;
-  FSoundInfo.Looped := False;
+  //FSoundInfo.FileName := '';
+  //FSoundInfo.Duration := 0;
+  //FSoundInfo.Looped := False;
 
 
   ReenableControls;
@@ -235,20 +238,21 @@ end;
 procedure TfrmEdit.bbSelectSoundClick(Sender: TObject);
 var
   FileName: string;
-  TempSound: TSound = nil;
+  //TempSound: TSound = nil;
 begin
   odgAudio.InitialDir := '.';
   odgAudio.Options := [ofFileMustExist];
 
   if odgAudio.Execute then
   begin
-    FileName := odgAudio.FileName;
-    TempSound := AudioSystem.LoadSound(FileName);
-    if TempSound <> nil then
-    begin
-      NewSound.Free;
-      NewSound := TempSound;
-    end;
+    //FileName := odgAudio.FileName;
+    //TempSound := AudioSystem.LoadSound(FileName);
+    //if TempSound <> nil then
+    //begin
+    //  NewSound.Free;
+    //  NewSound := TempSound;
+    //end;
+    ;
   end;
   ReenableControls;
 end;
@@ -259,35 +263,38 @@ begin
 end;
 
 procedure TfrmEdit.bbTestSoundClick(Sender: TObject);
-var
+//var
   //DefaultSound: TSndSound = nil;
-  SoundToPlay: TSound = nil;
+  //SoundToPlay: TSound = nil;
 begin
   {If the default sound is being used, play that, and scamper}
   if UseDefaultSound then
   begin
-    if FDefaultSound = nil then
-    begin
-      FDefaultSound := TSndSound.Create;
-      FDefaultSound.LoadDefaultSound;
-    end;
-    FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped);
+    //if FDefaultSound = nil then
+    //begin
+    //  FDefaultSound := TSndSound.Create;
+    //  FDefaultSound.LoadDefaultSound;
+    //end;
+    //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped);
+    { TODO : Play looped is missing }
+    FAudioPlayer.Play(SoundPool.RawDefaultSound);
     ReenableControls;
     Exit;
   end;
 
 
-  if FNewSound <> nil then
-    SoundToPlay := FNewSound
-  else if FCurrentSound <> nil then
-    SoundToPlay := FCurrentSound
-  else
-    Assert(False);
+  //if FNewSound <> nil then
+  //  SoundToPlay := FNewSound
+  //else if FCurrentSound <> nil then
+  //  SoundToPlay := FCurrentSound
+  //else
+  //  Assert(False);
 
-  if SoundToPlay = nil then
-    Exit;
+  //if SoundToPlay = nil then
+  //  Exit;
 
-  FAudioPlayer.Play(SoundToPlay, GlobalUserConfig.Volume, SoundLooped);
+  //FAudioPlayer.Play(SoundToPlay, GlobalUserConfig.Volume, SoundLooped);
+   FAudioPlayer.Play(SoundPool.RawDefaultSound);
   ReenableControls;
 end;
 
@@ -342,25 +349,26 @@ end;
 procedure TfrmEdit.bbClearSoundClick(Sender: TObject);
 begin
   //AudioFileName := '';
-  edtSound.Text := '';
+  //edtSound.Text := '';
   ReenableControls;
 end;
 
 procedure TfrmEdit.FormDestroy(Sender: TObject);
 begin
-  FDefaultSound.Free;
+  //FDefaultSound.Free;
   FAudioPlayer.Free;
   //FSpecs.Free;
   // There can be excpetions to this, but just a check to see if this ever
   // happens
-  Assert(FNewSound = nil);
-  FNewSound.Free;
+  //Assert(FNewSound = nil);
+  //FNewSound.Free;
 end;
 
 procedure TfrmEdit.FormShow(Sender: TObject);
 begin
 
 end;
+
 
 function TfrmEdit.Validate: boolean;
 var
@@ -413,10 +421,10 @@ begin
   bbSelectSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
     (not FAudioPlayer.Playing) and (not ckbUseDefaultSound.Checked);
   bbClearSound.Enabled := (not WidgetPlayingSound) and (not FAudioPlayer.Playing) and
-    ((not ckbUseDefaultSound.Checked) or (edtSound.Text <> ''));
+    ((not ckbUseDefaultSound.Checked));
 
   bbTestSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
-    (not FAudioPlayer.Playing) and (ckbUseDefaultSound.Checked or (edtSound.Text <> ''));
+    (not FAudioPlayer.Playing) and (ckbUseDefaultSound.Checked);
   bbStopSound.Enabled := AudioSystem.Loaded and FAudioPlayer.Playing;
 
   bbSave.Enabled := Validate;
@@ -579,8 +587,8 @@ procedure TfrmEdit.SetSoundDuration(AValue: double);
 begin
   if not AudioSystem.Loaded then
   begin
-    FSoundInfo.Duration := AValue;
-    lblLenthVal.Caption := FloatToStr(RoundTo(FSoundInfo.Duration, -2));
+    //FSoundInfo.Duration := AValue;
+    ;//lblLenthVal.Caption := FloatToStr(RoundTo(FSoundInfo.Duration, -2));
   end;
 end;
 
@@ -602,62 +610,63 @@ begin
   ckbModalAlert.Checked := AValue;
 end;
 
-procedure TfrmEdit.SetCurrentSound(AValue: TSound);
-begin
-  if FCurrentSound = AValue then
-    Exit;
-  FCurrentSound := AValue;
+//procedure TfrmEdit.SetCurrentSound(AValue: TSound);
+//begin
+  //if FCurrentSound = AValue then
+  //  Exit;
+  //FCurrentSound := AValue;
+  //
+  //if FCurrentSound = nil then
+  //begin
+  //  lblLengthText.Visible := False;
+  //  //edtSound.Text := '';
+  //  lblLenthVal.Visible := False;
+  //  Exit;
+  //end;
 
-  if FCurrentSound = nil then
-  begin
-    lblLengthText.Visible := False;
-    edtSound.Text := '';
-    lblLenthVal.Visible := False;
-    Exit;
-  end;
+  //if FCurrentSound.Source = '' then
+  //begin
+  //  Logger.Warning('Unexpcted behaviour. FCurrentSound.Sounce is blank.');
+  //  lblLengthText.Visible := False;
+  //  //edtSound.Text := '';
+  //  lblLenthVal.Visible := False;
+  //  Exit;
+  //end
+  //else
+  //begin
+  //  lblLengthText.Visible := True;
+  //  //edtSound.Text := FCurrentSound.Source;
+  //  lblLenthVal.Caption := FloatToStr(RoundTo(FCurrentSound.Duration, -2));
+  //  lblLenthVal.Visible := True;
+  //end;
+//end;
 
-  if FCurrentSound.Source = '' then
-  begin
-    Logger.Warning('Unexpcted behaviour. FCurrentSound.Sounce is blank.');
-    lblLengthText.Visible := False;
-    edtSound.Text := '';
-    lblLenthVal.Visible := False;
-    Exit;
-  end
-  else
-  begin
-    lblLengthText.Visible := True;
-    edtSound.Text := FCurrentSound.Source;
-    lblLenthVal.Caption := FloatToStr(RoundTo(FCurrentSound.Duration, -2));
-    lblLenthVal.Visible := True;
-  end;
-end;
-
-procedure TfrmEdit.SetNewSound(AValue: TSound);
-begin
-  if FNewSound = AValue then
-    Exit;
-  FNewSound := AValue;
-
-  if FNewSound = nil then
-    Exit;
-
-  if FNewSound.Source = '' then
-  begin
-    lblLengthText.Visible := False;
-    edtSound.Text := '';
-
-    lblLenthVal.Visible := False;
-    Exit;
-  end
-  else
-  begin
-    lblLengthText.Visible := True;
-    edtSound.Text := FNewSound.Source;
-    lblLenthVal.Caption := FloatToStr(RoundTo(FNewSound.Duration, -2));
-    lblLenthVal.Visible := True;
-  end;
-end;
+//procedure TfrmEdit.SetNewSound(AValue: TSound);
+//begin
+  //if FNewSound = AValue then
+  //  Exit;
+  //FNewSound := AValue;
+  //
+  //if FNewSound = nil then
+  //  Exit;
+  //
+  //if FNewSound.Source = '' then
+  //begin
+  //  lblLengthText.Visible := False;
+  //  //edtSound.Text := '';
+  //
+  //  lblLenthVal.Visible := False;
+  //  Exit;
+  //end
+  //else
+  //begin
+  //  lblLengthText.Visible := True;
+  //  //edtSound.Text := FNewSound.Source;
+  //  lblLenthVal.Caption := FloatToStr(RoundTo(FNewSound.Duration, -2));
+  //  lblLenthVal.Visible := True;
+  //end;
+  //;
+//end;
 
 procedure TfrmEdit.SetUseDefaultSound(AValue: boolean);
 begin

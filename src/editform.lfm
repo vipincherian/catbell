@@ -79,7 +79,7 @@ object frmEdit: TfrmEdit
   object pgEditTimer: TPageControl
     Left = 16
     Height = 191
-    Top = 8
+    Top = 11
     Width = 479
     ActivePage = tsSound
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -173,75 +173,57 @@ object frmEdit: TfrmEdit
       ClientWidth = 473
       ImageIndex = 1
       object bbClearSound: TBitBtn
-        Left = 114
+        Left = 384
         Height = 30
-        Top = 67
+        Top = 8
         Width = 75
         Anchors = [akTop, akRight]
         Caption = 'Clear'
         Images = imlEdit
         ImageIndex = 2
         OnClick = bbClearSoundClick
-        TabOrder = 3
+        TabOrder = 2
       end
       object bbSelectSound: TBitBtn
-        Left = 384
+        Left = 266
         Height = 30
-        Top = 67
-        Width = 75
+        Top = 8
+        Width = 110
         Anchors = [akTop, akRight]
-        Caption = 'Select'
+        Caption = 'Load file'
         Images = imlEdit
         ImageIndex = 1
         OnClick = bbSelectSoundClick
-        TabOrder = 4
-      end
-      object edtSound: TEdit
-        Left = 112
-        Height = 25
-        Top = 35
-        Width = 347
-        Anchors = [akTop, akLeft, akRight]
-        ReadOnly = True
-        TabOrder = 2
-      end
-      object Label3: TLabel
-        Left = 40
-        Height = 14
-        Top = 35
-        Width = 54
-        Alignment = taRightJustify
-        Caption = 'Audio file :'
-        ParentColor = False
+        TabOrder = 3
       end
       object lblLengthText: TLabel
-        Left = 192
+        Left = 176
         Height = 14
-        Top = 72
+        Top = 120
         Width = 93
         Caption = 'Length (seconds) :'
         ParentColor = False
       end
       object lblLenthVal: TLabel
-        Left = 296
+        Left = 280
         Height = 14
-        Top = 72
+        Top = 120
         Width = 5
         Caption = '?'
         ParentColor = False
       end
       object ckbLoop: TCheckBox
-        Left = 296
+        Left = 56
         Height = 21
-        Top = 8
+        Top = 88
         Width = 81
         Caption = 'Play in loop'
         TabOrder = 1
       end
       object ckbUseDefaultSound: TCheckBox
-        Left = 112
+        Left = 24
         Height = 21
-        Top = 8
+        Top = 120
         Width = 117
         Caption = 'Use default sound'
         OnChange = ckbUseDefaultSoundChange
@@ -250,32 +232,73 @@ object frmEdit: TfrmEdit
       object bbTestSound: TBitBtn
         Left = 296
         Height = 30
-        Top = 104
+        Top = 118
         Width = 75
         Caption = 'Test'
         Images = imlEdit
         ImageIndex = 3
         OnClick = bbTestSoundClick
-        TabOrder = 5
+        TabOrder = 4
       end
       object bbStopSound: TBitBtn
         Left = 382
         Height = 30
-        Top = 104
+        Top = 118
         Width = 75
         Caption = 'Stop'
         Images = imlEdit
         ImageIndex = 4
         OnClick = bbStopSoundClick
-        TabOrder = 6
+        TabOrder = 5
       end
       object ckbMetronome: TCheckBox
-        Left = 112
+        Left = 8
         Height = 21
         Top = 136
         Width = 170
         Caption = 'Ticking sound while running'
+        TabOrder = 6
+      end
+      object rbSoundNone: TRadioButton
+        Left = 56
+        Height = 21
+        Top = 56
+        Width = 50
+        Caption = 'None'
+        Checked = True
         TabOrder = 7
+      end
+      object rbSoundCustom: TRadioButton
+        Left = 56
+        Height = 21
+        Top = 32
+        Width = 62
+        Caption = 'Custom'
+        TabOrder = 8
+      end
+      object rbSoundDefault: TRadioButton
+        Left = 56
+        Height = 21
+        Top = 8
+        Width = 61
+        Caption = 'Default'
+        TabOrder = 9
+      end
+      object Label5: TLabel
+        Left = 16
+        Height = 14
+        Top = 8
+        Width = 33
+        Caption = 'Alarm:'
+        ParentColor = False
+      end
+      object Label6: TLabel
+        Left = 176
+        Height = 14
+        Top = 8
+        Width = 74
+        Caption = 'Custom alarm:'
+        ParentColor = False
       end
     end
   end
@@ -284,8 +307,8 @@ object frmEdit: TfrmEdit
     left = 472
   end
   object imlEdit: TImageList
-    left = 322
-    top = 23
+    left = 360
+    top = 8
     Bitmap = {
       4C69050000001000000010000000414141374042498C4042498C4042498C4042
       498C4042498C4042498C4042498C4042498C4042498C4042498C4042498C4042

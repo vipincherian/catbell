@@ -395,7 +395,7 @@ begin
   end;
   //TempAudio := nil;
 
-  frmEdit.CurrentSound := nil;
+  //frmEdit.CurrentSound := nil;
   if AudioSystem.Loaded then
   begin
     //TempAudio := TAudioPlayer.Create;
@@ -421,15 +421,15 @@ begin
     if AudioSystem.Loaded then
     begin
       //Added.Audio := TempAudio;
-      Added.CustomSound := frmEdit.NewSound;
+      //Added.CustomSound := frmEdit.NewSound;
       Added.SoundLooped := frmEdit.ckbLoop.Checked;
       Added.Metronome := frmEdit.Metronome;
     end
     else
     begin
-      Added.SoundInfo.FileName := frmEdit.edtSound.Text;
-      Added.SoundInfo.Duration := 0;
-      Added.SoundInfo.Looped := frmEdit.ckbLoop.Checked;
+      //Added.SoundInfo.FileName := frmEdit.edtSound.Text;
+      //Added.SoundInfo.Duration := 0;
+      //Added.SoundInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
     PostTimerCreation(Added);
     SavetoFile;
@@ -1354,7 +1354,6 @@ begin
   Conf.Formatted := True;
   SaveClocks(Conf);
   Conf.Filename := FDbFileName;
-
   Conf.Free;
 end;
 
@@ -1406,11 +1405,11 @@ begin
           //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
           AudioFileName := string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
           if AudioFileName = '' then
-            NewTimerclock.CustomSound := nil
+            //NewTimerclock.CustomSound := nil
           else
           begin
             //NewTimerClock.Audio.LoadFromFile(AudioFileName);
-            NewTimerclock.CustomSound := AudioSystem.LoadSound(AudioFileName);
+            //NewTimerclock.CustomSound := AudioSystem.LoadSound(AudioFileName);
           end;
           //NewTimerClock.Audio.Looped :=
           //  Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
@@ -1433,14 +1432,15 @@ begin
       end
       else
       begin
-        NewTimerclock.SoundInfo.FileName :=
-          string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
-        NewTimerClock.SoundInfo.Duration :=
-          StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH), '0')), fs);
-        NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
+        //NewTimerclock.SoundInfo.FileName :=
+        //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
+        //NewTimerClock.SoundInfo.Duration :=
+        //  StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH), '0')), fs);
+        //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
+        ;
       end;
 
-      NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
+      //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
@@ -1602,7 +1602,7 @@ begin
       UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
 
     Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.IsProgressOnIcon);
-    if AudioSystem.Loaded then
+    {if AudioSystem.Loaded then
     begin
       if TimerClock.CustomSound <> nil then
       begin
@@ -1624,13 +1624,13 @@ begin
     end
     else
     begin
-      Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
-        UTF8Decode(TimerClock.SoundInfo.FileName));
-      Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
-        UTF8Decode(FloatToStr(TimerClock.SoundInfo.Duration, fs)));
-      Conf.SetValue(TIMER_CONF_SOUNDLOOP,
-        TimerClock.SoundInfo.Looped);
-    end;
+      //Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
+      //  UTF8Decode(TimerClock.SoundInfo.FileName));
+      //Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
+      //  UTF8Decode(FloatToStr(TimerClock.SoundInfo.Duration, fs)));
+      //Conf.SetValue(TIMER_CONF_SOUNDLOOP,
+      //  TimerClock.SoundInfo.Looped);
+    end;}
 
 
     Conf.SetValue(TIMER_CONF_MODALALERT,

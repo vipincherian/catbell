@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, {EventLog,} adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LCLIntf, StrUtils, log, sound;
+  {ctypes,} LCLIntf, StrUtils, log{, sound};
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -138,12 +138,12 @@ type
     FProgress: single;
 
     FAudioPlayer: TAudioPlayer;
-    FDefaultSound: TSound;
-    FCustomSound: TSound;
+    //FDefaultSound: TSound;
+    //FCustomSound: TSound;
 
     //procedure SetAudio(AValue: TAudioPlayer);
     function GetIsSoundPlaying: boolean;
-    procedure SetCustomSound(AValue: TSound);
+    //procedure SetCustomSound(AValue: TSound);
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
@@ -176,7 +176,7 @@ type
     LastProgressIconIndex: integer;
     UseDefaultSound: boolean;
 
-    SoundInfo: TTimerSoundInfo;
+    //SoundInfo: TTimerSoundInfo;
     SoundLooped: boolean;
 
     FMetronome: boolean;
@@ -235,7 +235,7 @@ type
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
     //property Audio: TAudioPlayer read FAudioPlayer;// write SetAudio;
-    property CustomSound: TSound read FCustomSound write SetCustomSound;
+    //property CustomSound: TSound read FCustomSound write SetCustomSound;
     property Metronome: boolean read FMetronome write SetMetronome;
     //property PendingTickCount: longword read FPendingTickCount;
 
@@ -299,16 +299,16 @@ begin
   frmEdit.ModalAlert := FModalAlert;
   frmEdit.UseDefaultSound:=UseDefaultSound;
 
-  if AudioSystem.Loaded then
+  {if AudioSystem.Loaded then
   begin
     frmEdit.CurrentSound := FCustomSound;
   end
   else
   begin
     frmEdit.CurrentSound := Nil;
-    frmEdit.edtSound.Text:= SoundInfo.FileName;
-    frmEdit.SoundDuration:= SoundInfo.Duration;
-  end;
+    //frmEdit.edtSound.Text:= SoundInfo.FileName;
+    //frmEdit.SoundDuration:= SoundInfo.Duration;
+  end;}
 
   frmEdit.SoundLooped:=SoundLooped;
   frmEdit.Metronome:=Metronome;
@@ -325,27 +325,27 @@ begin
 
     SoundLooped:=frmEdit.SoundLooped;
     Metronome:=frmEdit.Metronome;
-    if AudioSystem.Loaded then
+    {if AudioSystem.Loaded then
     begin
       //frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
       //NewCustomSound := frmEdit.NewSound;
-      if frmEdit.NewSound <> nil then
+      {if frmEdit.NewSound <> nil then
       begin
-        FCustomSound.Free;
+        //FCustomSound.Free;
         //OldCustomSound := nil;
-        FCustomSound := frmEdit.NewSound;
+        //FCustomSound := frmEdit.NewSound;
         { Now what we have taken over the responsibility of the new sound
         created, we will set it to nil for frmEdit }
         frmEdit.NewSound := nil;
-      end;
+      end;}
 
     end
     else
     begin
-      SoundInfo.FileName := frmEdit.edtSound.Text;
-      SoundInfo.Duration := frmEdit.SoundDuration;
-      SoundInfo.Looped := frmEdit.ckbLoop.Checked;
-    end;
+      //SoundInfo.FileName := frmEdit.edtSound.Text;
+      //SoundInfo.Duration := frmEdit.SoundDuration;
+      ;//SoundInfo.Looped := frmEdit.ckbLoop.Checked;
+    end; }
     frmMain.SavetoFile;
   end;
 end;
@@ -394,20 +394,20 @@ begin
   FAudio := AValue
 end;}
 
-procedure TfraTimer.SetCustomSound(AValue: TSound);
+//procedure TfraTimer.SetCustomSound(AValue: TSound);
 //var
 //  OldCustomSound: TSound;
-begin
-  if FCustomSound=AValue then Exit;
+//begin
+  //if FCustomSound=AValue then Exit;
 
   //OldCustomSound := FCustomSound;
   //FCustomSound:=AValue;
 
   //OldCustomSound.Free;
-  FCustomSound.Free;
-  FCustomSound:= AValue;
+  //FCustomSound.Free;
+  //FCustomSound:= AValue;
 
-end;
+//end;
 
 function TfraTimer.GetIsSoundPlaying: boolean;
 begin
@@ -637,8 +637,8 @@ begin
 end;
 
 constructor TfraTimer.Create(AOwner: TComponent);
-var
-  SndFile: TSndSound;
+//var
+//  SndFile: TSndSound;
 begin
   inherited Create(AOwner);
   InitCriticalSection(AudioCriticalSection);
@@ -682,19 +682,19 @@ begin
     FAudioPlayer := TAudioPlayer.Create;
     FAudioPlayer.OnPlayCompletion:=@AudioPlayed;
 
-    SndFile := TSndSound.Create;
-    SndFile.LoadDefaultSound;
-    FDefaultSound := SndFile;
+    //SndFile := TSndSound.Create;
+    //SndFile.LoadDefaultSound;
+    //FDefaultSound := SndFile;
   end;
-  FCustomSound := nil;
+  //FCustomSound := nil;
   Metronome:=False;
 end;
 
 destructor TfraTimer.Destroy;
 begin
   FAudioPlayer.Free;
-  FDefaultSound.Free;
-  FCustomSound.Free;
+  //FDefaultSound.Free;
+  //FCustomSound.Free;
   Parent := nil;
 
   //DoneCriticalsection(AudioCriticalSection);
@@ -892,7 +892,7 @@ begin
     DurationEnabled := True;
 
 
-    if AudioSystem.Loaded and (UseDefaultSound or (FCustomSound <> nil)) and (not UserInitiated) then
+    if AudioSystem.Loaded and (UseDefaultSound) and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
@@ -924,8 +924,9 @@ begin
       begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
-        if FCustomSound <> nil then
-          FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
+        //if FCustomSound <> nil then
+          //FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
+        FAudioPlayer.Play(SoundPool.RawDefaultSound);{ TODO : Implementation for custom sound missing }
       end;
 
       //Logger.Debug('FAudio.Play');

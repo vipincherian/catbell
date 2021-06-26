@@ -237,8 +237,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 23
-    Top = 293
+    Height = 19
+    Top = 297
     Width = 652
     Panels = <    
       item
