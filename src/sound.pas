@@ -529,17 +529,17 @@ begin
   Result := SoundData^.Position;
 end;
 
-procedure MpgPtrCleanImp(DataSource: Pointer); cdecl;
+procedure MpgPtrCleanImp({%H-}DataSource: Pointer); cdecl;
 begin
   ;
 end;
 
 function TMpgSound.LoadInMemorySound(SoundData: PSoundData): boolean;
-var
-  Rates: plong = nil;
-  RateCount: size_t = 0;
+//var
+  //Rates: plong = nil;
+  //RateCount: size_t = 0;
   //X, Y: Pointer;
-  Count: integer;
+  //Count: integer;
 begin
   Result := False;
   Logger.Debug('Entering LoadInMemory ' + string(

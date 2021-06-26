@@ -9,14 +9,14 @@ uses
   Dialogs, LCLIntf, lcltype, fgl, Math, log, sound;
 
 const
-  READ_NOTLOADED = -1;
-  READ_SND = 0;
+  //READ_NOTLOADED = -1;
+  //READ_SND = 0;
 
-  SampleRate = 44100;
-  FramesPerBuffer = 1024;
+  //SampleRate = 44100;
+  //FramesPerBuffer = 1024;
 
   // How long you want to play the test sine:
-  NumSecs = 2;
+  //NumSecs = 2;
 
   // Wavetable size. Influences your pitch:
   TableSize = 200;
@@ -59,14 +59,14 @@ type
   { A type which holds a wavetable, two integers keeping track of
     at which offset in the wavetable each channel is currently
     playing (= phase), and a message: }
-  PaTestData = record
+  {PaTestData = record
     Sine: array[0..TableSize] of CFloat;
     LeftPhase: CInt32;
     RightPhase: CInt32;
     AMessage: PChar;
     Player: Pointer;
   end;
-  PPaTestData = ^PaTestData;
+  PPaTestData = ^PaTestData;}
 
   PAudioDevice = ^TAudioDevice;
   TAudioDeviceList = specialize TFPGList<PAudioDevice>;
@@ -99,8 +99,8 @@ type
 
     FAudioPlaying: boolean;
 
-    Data: PaTestData;
-    DataPointer: PPaTestData;
+    //Data: PaTestData;
+    //DataPointer: PPaTestData;
 
     //procedure SetVolume(AValue: integer);
 
@@ -1110,14 +1110,14 @@ begin
   OnPlayCompletion := nil;
 
   { Fill a Sine wavetable (Float Data -1 .. +1) }
-  for i := 0 to TableSize - 1 do
-    Data.Sine[i] := CFloat((Sin((CFloat(i) / CFloat(TableSize)) * Pi * 2)));
+  //for i := 0 to TableSize - 1 do
+    //Data.Sine[i] := CFloat((Sin((CFloat(i) / CFloat(TableSize)) * Pi * 2)));
 
-  Data.LeftPhase := 0;
-  Data.RightPhase := 0;
-  Data.AMessage := 'No Message'#0;
+  //Data.LeftPhase := 0;
+  //Data.RightPhase := 0;
+  //Data.AMessage := 'No Message'#0;
 
-  DataPointer := @Data;
+  //DataPointer := @Data;
 
 end;
 
