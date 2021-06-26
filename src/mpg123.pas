@@ -1170,6 +1170,7 @@ end;
       mpg123_getpar:=      Tmpg123_getpar( GetProcAddress(Mp_Handle, 'mpg123_getpar'));
       mpg123_replace_buffer:= Tmpg123_replace_buffer( GetProcAddress(Mp_Handle, 'mpg123_replace_buffer'));
       mpg123_outblock:=    Tmpg123_outblock( GetProcAddress(Mp_Handle, 'mpg123_outblock'));
+      mpg123_encsize:=    Tmpg123_encsize( GetProcAddress(Mp_Handle, 'mpg123_encsize'));
       // FixMe:
       //mpg123_replace_reader := GetProcAddress(hlib,'mpg123_replace_reader');
     end;

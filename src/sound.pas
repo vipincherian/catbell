@@ -187,6 +187,8 @@ begin
       //Logger.Debug('SEEK_END');
       SoundData^.Position := (SoundData^.Sound^.Size) - 1 - offset;
     end;
+    else
+      ;
   end;
   Result := SoundData^.Position;
 
@@ -280,7 +282,7 @@ end;
 
 constructor TSound.Create;
 begin
-  //inherited Create;
+  ;//inherited Create;
 end;
 
 destructor TSound.Destroy;
@@ -297,8 +299,8 @@ end;
 
 function TMpgSound.GetChannels: integer;
 begin
-  //Result := FChannelCount;
-  Result := 2;
+  Result := FChannelCount;
+  //Result := 2;
 end;
 
 function TMpgSound.GetSampleFormat: PaSampleFormat;
@@ -447,7 +449,7 @@ function TMpgSound.Read(output: pointer; frameCount: longint): integer;
 var
   Done: size_t = 0;
 begin
-  FError := mpg123_read(FHandle, output, {frameCount}2 * SizeOf(cfloat) *
+  FError := mpg123_read(FHandle, output, frameCount * SizeOf(cfloat) *
     FChannelCount, done);
 
   if done = 0 then
@@ -456,7 +458,8 @@ begin
     Result := 0;
     Exit;
   end;
-  if FError <> MPG123_OK then
+
+  if (FError <> MPG123_OK) and (FError <> MPG123_DONE) then
   begin
     Logger.Debug('TMpgSound.Read - mpg123_read failed?' + IntToStr(FError));
     Result := 0;
@@ -498,7 +501,7 @@ begin
   SoundData := PSeekableSoundData(DataSource);
   //Logger.Debug('MpgPtrReadImpl - SoundData position - ' + IntToStr(SoundData^.Position));
   //Logger.Debug('MpgPtrReadImpl - SoundData sound size - ' +
-    //IntToStr(SoundData^.Sound^.Size));
+  //IntToStr(SoundData^.Sound^.Size));
   //Logger.Debug('MpgPtrSeekImpl - Offset - ' + IntToStr(offset));
   //Logger.Debug('MpgPtrSeekImpl - Whence - ' + IntToStr(Whence));
   case whence of
@@ -520,6 +523,8 @@ begin
       else
         SoundData^.Position := (SoundData^.Sound^.Size) - 1 - offset;
     end;
+    else
+      ;
   end;
   Result := SoundData^.Position;
 end;
@@ -530,6 +535,11 @@ begin
 end;
 
 function TMpgSound.LoadInMemorySound(SoundData: PSoundData): boolean;
+var
+  Rates: plong = nil;
+  RateCount: size_t = 0;
+  //X, Y: Pointer;
+  Count: integer;
 begin
   Result := False;
   Logger.Debug('Entering LoadInMemory ' + string(
@@ -562,6 +572,50 @@ begin
     //Exit;
   end;
 
+  {FError := mpg123_format_none(FHandle);
+  if FError <> MPG123_OK then
+  begin
+    Logger.Warning('Error after mpg123_format_none ' + IntToStr(FError) +
+      ' at ' + string(
+{$INCLUDE %FILE%}
+      ) + ':' + string(
+{$INCLUDE %LINE%}
+      ));
+    //Exit;
+  end;}
+
+  {mpg123_rates(Rates, RateCount);
+
+  if Rates <> nil then
+    Logger.Debug('Rates is not nil');
+
+  //Logger.Debug('After mpg123_rates. Rate count is ' + IntToStr(Rates[0]));
+
+
+  for Count := 0 to RateCount - 1 do
+  begin
+    //Logger.Debug('Handling rate count ' + IntToStr(Rates[Count]));
+
+    mpg123_format(FHandle, Rates[Count], MPG123_MONO or MPG123_STEREO,
+      MPG123_ENC_FLOAT_32);
+    if FError <> MPG123_OK then
+      Logger.Debug('Error after mpg123_format ' + IntToStr(FError));
+
+  end;}
+
+  {FError := mpg123_format(FHandle, 44100, MPG123_MONO or MPG123_STEREO,
+    MPG123_ENC_FLOAT_32);
+  if FError <> MPG123_OK then
+  begin
+    Logger.Warning('Error after mpg123_format ' + IntToStr(FError) +
+      ' at ' + string(
+{$INCLUDE %FILE%}
+      ) + ':' + string(
+{$INCLUDE %LINE%}
+      ));
+    //Exit;
+  end;}
+
   FSeekableSoundData.Sound := SoundData;
   FSeekableSoundData.Position := 0;
 
@@ -593,7 +647,8 @@ begin
   Logger.Debug('');
   Logger.Debug('Loaded succefully from memory');
   Logger.Debug('Rate          - ' + IntToStr(FRate));
-  Logger.Debug('Encoding      - ' + IntToStr(FEncoding));
+  Logger.Debug('Encoding      - ' + IntToHex(FEncoding, 8));
+  Logger.Debug('Encoding size - ' + IntToStr(mpg123_encsize(FEncoding)));
   Logger.Debug('Channel count - ' + IntToStr(FChannelCount));
 
   FError := mpg123_scan(FHandle);
@@ -755,7 +810,7 @@ begin
 
   // If read count matches what was requested, then all the stream has
   // not completed
-  Result := readCount;
+  Result := readCount * SizeOf(cfloat);
 end;
 
 function TSndSound.LoadInMemorySound(SoundData: PSoundData): boolean;

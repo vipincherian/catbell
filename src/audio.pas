@@ -319,7 +319,7 @@ begin
 
   BytesRead := Min(AudioInfo^.RawSeekable.RawSound^.Size -
     AudioInfo^.RawSeekable.Position + 1, frameCount *
-    { TODO : Remove the hardcoding of channel count }2 * sizeof(cfloat));
+    AudioInfo^.RawSeekable.RawSound^.ChannelCount * sizeof(cfloat));
 
   //Logger.Debug('frameCount - ' + IntToStr(frameCount));
   //Logger.Debug('BytesRead - ' + IntToStr(BytesRead));
@@ -438,6 +438,12 @@ begin
   //SndFile := TSndSound.Create;
   //SndFile.LoadInMemorySound(SoundPoolEntry^.Original);
   SndFile := TSoundFactory.CreateSound(SoundPoolEntry^.Original);
+  if SndFile = nil then
+  begin
+    ShowMessage('Fatal error: sound factory could not create sound. Index - ' +
+      IntToStr(Index));
+    Halt;//Application.Terminate;
+  end;
 
   Logger.Debug('Soundpool - loading default sound');
   Logger.Debug('Soundpool - SndFile.Channels - ' + IntToStr(SndFile.Channels));
@@ -469,6 +475,9 @@ begin
 
   //SoundPoolEntry^.Original^
   { Read raw data and keep it raedy for use }
+  Logger.Debug('Starting refill loop');
+  Logger.Debug('Total allocated bytes - ' + IntToStr(SndFile.FrameLength *
+    SndFile.Channels * SizeOf(cfloat)));
   Size := 0;
   Read := 0;
   repeat
@@ -476,18 +485,22 @@ begin
         { SndFile.Read returns the number of floats read. This already takes the
         number of channels to account, so no need to multiply }
       Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer +
-        (Size * SizeOf(cfloat)), 10000);
+        (Size {* SizeOf(cfloat)}), 4096); { TODO : Remove hardcoding of the number }
 
       //Read := SndFile.Read(@Buffer[0], 10);
-      Logger.Debug('SoundPoolEntry^.Raw^.Buffer - ' +
+      {Logger.Debug('SoundPoolEntry^.Raw^.Buffer - ' +
         IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer + (Size * SizeOf(cfloat)))
         [0], 16) + ' ' + IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer +
-        (Size * SizeOf(cfloat)))[1], 16)
-        );
-      Logger.Debug('Read bytes - ' + IntToStr(Read));
+        (Size {* SizeOf(cfloat)}))[1], 16)
+        );}
+      //Logger.Debug('Read bytes - ' + IntToStr(Read));
       Size += Read;
+      if Read = 0 then
+        Break;
     end;
-  until (Size >= SndFile.FrameLength * SndFile.Channels);
+  until (Size >= (SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat)));
+
+  Logger.Debug('Total read bytes - ' + IntToStr(Size));
 
   SoundPoolEntry^.Raw^.ChannelCount := SndFile.Channels;
   SoundPoolEntry^.Raw^.SampleFormat := SndFile.SampleFormat;
@@ -782,6 +795,13 @@ begin
     StreamParams.channelCount := Sound.Channels;
     StreamParams.sampleFormat := Sound.SampleFormat;
 
+    Logger.Debug('Oldplay - StreamParams.channelCount ' +
+      IntToStr(StreamParams.channelCount));
+    Logger.Debug('Oldplay - StreamParams.sampleFormat ' +
+      IntToStr(StreamParams.sampleFormat));
+    //Sound.SampleRate
+    Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate));
+
     Streamparams.suggestedLatency :=
       //0.5;
       Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
@@ -881,7 +901,12 @@ begin
   //StreamParams.channelCount := FInfo.channels;
   StreamParams.channelCount := RawSound^.ChannelCount;
   StreamParams.sampleFormat := RawSound^.SampleFormat;
-
+  Logger.Debug('Newplay - StreamParams.channelCount ' +
+    IntToStr(StreamParams.channelCount));
+  Logger.Debug('Newplay - StreamParams.sampleFormat ' +
+    IntToStr(StreamParams.sampleFormat));
+  //Sound.SampleRate
+  //Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate);
   { TODO : Change to low latency }
   Streamparams.suggestedLatency :=
     (Pa_GetDeviceInfo(StreamParams.device)^.defaultHighOutputLatency);
