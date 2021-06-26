@@ -423,7 +423,7 @@ end;
 procedure TSoundPool.RefillRawSound(const Index: integer);
 var
   SoundPoolEntry: PSoundPoolEntry;
-  SndFile: TSndSound;
+  SndFile: TSound = nil;
   Size: integer;
   Read: integer;
   //VolumeBuffer: PCFloat;
@@ -432,10 +432,12 @@ var
   Volume: integer;
   AmpScale: double;
 begin
+  Logger.Debug('Enteringe RefillRawSound');
   SoundPoolEntry := FEntries.Items[Index];
 
-  SndFile := TSndSound.Create;
-  SndFile.LoadInMemorySound(SoundPoolEntry^.Original);
+  //SndFile := TSndSound.Create;
+  //SndFile.LoadInMemorySound(SoundPoolEntry^.Original);
+  SndFile := TSoundFactory.CreateSound(SoundPoolEntry^.Original);
 
   Logger.Debug('Soundpool - loading default sound');
   Logger.Debug('Soundpool - SndFile.Channels - ' + IntToStr(SndFile.Channels));
@@ -477,6 +479,11 @@ begin
         (Size * SizeOf(cfloat)), 10000);
 
       //Read := SndFile.Read(@Buffer[0], 10);
+      Logger.Debug('SoundPoolEntry^.Raw^.Buffer - ' +
+        IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer + (Size * SizeOf(cfloat)))
+        [0], 16) + ' ' + IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer +
+        (Size * SizeOf(cfloat)))[1], 16)
+        );
       Logger.Debug('Read bytes - ' + IntToStr(Read));
       Size += Read;
     end;
@@ -548,12 +555,11 @@ begin
     end;
   end;
 
-
 end;
 
 procedure TSoundPool.LoadAllDefaultSounds;
-var
-  ResourceID: string;
+//var
+//ResourceID: string;
 begin
   if AudioSystem.Loaded then
   begin
@@ -827,7 +833,7 @@ begin
     FAudioPlaying := True;
 
   finally
-    //LeaveCriticalSection(AudioCriticalSection);
+    ;//LeaveCriticalSection(AudioCriticalSection);
   end;
 end;
 
@@ -876,6 +882,7 @@ begin
   StreamParams.channelCount := RawSound^.ChannelCount;
   StreamParams.sampleFormat := RawSound^.SampleFormat;
 
+  { TODO : Change to low latency }
   Streamparams.suggestedLatency :=
     (Pa_GetDeviceInfo(StreamParams.device)^.defaultHighOutputLatency);
   StreamParams.hostApiSpecificStreamInfo := nil;
@@ -904,6 +911,10 @@ begin
     IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[0], 16) +
     ' ' + IntToHex(PQWord(FSeekableSoundData.RawSound^.Buffer)[1], 16)
     );
+
+  Logger.Debug('Calling Pa_OpenStream');
+  Logger.Debug('StreamParams.channelCount - ' + IntToStr(StreamParams.channelCount));
+
 
 
   PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, 44100,
@@ -1050,6 +1061,7 @@ begin
     FOutputDevice.DeviceName := AValue.DeviceName;
     FOutputDevice.HostAPIName := AValue.HostAPIName;
   finally
+    ;
   end;
 end;
 
@@ -1226,7 +1238,7 @@ begin
     in that callback function}
 
   finally
-    //FAudioPlaying := False;
+    ;//FAudioPlaying := False;
     //LeaveCriticalSection(AudioCriticalSection);
   end;
 

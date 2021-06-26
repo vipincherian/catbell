@@ -317,6 +317,7 @@ type
   {$if defined(cpu64)}
     cuint64 = qword;
   size_t  = cuint64;
+  off_t = int64;
 {$else}
 cuint32 = LongWord;
  size_t  = cuint32;
@@ -408,10 +409,16 @@ type Tmpg123_open = function( mh: Tmpg123_handle; path: PChar): Integer; cdecl;
 (** Use an already opened file descriptor as the bitstream input
  *  mpg123_close() will _not_ close the file descriptor. *)
 type Tmpg123_open_fd = function( mh: Tmpg123_handle; fd: Integer) : Integer; cdecl;
+type
+  TPtrRead   = Function(DataSource: Pointer; Buffer: Pointer; Size: size_t): off_t; cdecl;
+  TPtrSeek   = Function(DataSource: Pointer; Offset: off_t; Whence: cint): off_t; cdecl;
+  TPtrClean  = procedure(DataSource: Pointer); cdecl;
+type Tmpg123_replace_reader_handle = Function(mh: Tmpg123_handle; r_read: TPtrRead; r_lseek: TPtrSeek; cleanup: TPtrClean): Integer; cdecl;
 
 //FixMe: implement it :    (** ??? *)
 //function mpg123_open_handle( mh : Tpmpg123_handle; var iohandle:???) : integer; cdecl;  external mpg123Lib;
 //00446 EXPORT int mpg123_open_handle(mpg123_handle *mh, void *iohandle);
+type  Tmpg123_open_handle = Function(mh: Tmpg123_handle; iohandle: Pointer): Integer; cdecl;
 
 (** Open a new bitstream and prepare for direct feeding
  *  This works together with mpg123_decode(); you are responsible for reading and feeding the input bitstream. *)
@@ -985,6 +992,8 @@ var
 var
   mpg123_open		     : Tmpg123_open;
   mpg123_open_fd	     : Tmpg123_open_fd;
+  mpg123_open_handle         : Tmpg123_open_handle;
+  mpg123_replace_reader_handle : Tmpg123_replace_reader_handle;
   mpg123_open_feed	     : Tmpg123_open_feed;
   mpg123_close		     : Tmpg123_close;
   mpg123_read		     : Tmpg123_read;
@@ -1115,6 +1124,8 @@ end;
       mpg123_getformat:=   Tmpg123_getformat( GetProcAddress(Mp_Handle, 'mpg123_getformat'));
       mpg123_open:=        Tmpg123_open( GetProcAddress(Mp_Handle, 'mpg123_open'));
       mpg123_open_fd:=     Tmpg123_open_fd( GetProcAddress(Mp_Handle, 'mpg123_open_fd'));
+      mpg123_open_handle:=     Tmpg123_open_handle( GetProcAddress(Mp_Handle, 'mpg123_open_handle'));
+      mpg123_replace_reader_handle:= Tmpg123_replace_reader_handle( GetProcAddress(Mp_Handle, 'mpg123_replace_reader_handle'));
       mpg123_open_feed:=   Tmpg123_open_feed( GetProcAddress(Mp_Handle, 'mpg123_open_feed'));
       mpg123_close:=       Tmpg123_close( GetProcAddress(Mp_Handle, 'mpg123_close'));
       mpg123_read:=        Tmpg123_read( GetProcAddress(Mp_Handle, 'mpg123_read'));
