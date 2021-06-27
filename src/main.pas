@@ -1435,8 +1435,6 @@ begin
             ));
         end;
       end;
-
-
       NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
 
 
@@ -1652,6 +1650,7 @@ begin
     end
     else
       Logger.Warning('Error while saving clocks');
+    Conf.SetValue(TIMER_CONF_SOUNDLOOP, TimerClock.SoundLooped);
 
     State.Paused := False;
 
