@@ -1,6 +1,6 @@
 unit metronome;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+}{$Q+}{$R+}
 
 interface
 

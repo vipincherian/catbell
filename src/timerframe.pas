@@ -20,7 +20,7 @@ Boston, MA  02110-1301, USA.
 }
 unit timerframe;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+}{$Q+}{$R+}
 
 interface
 
@@ -138,6 +138,7 @@ type
     FProgress: single;
 
     FAudioPlayer: TAudioPlayer;
+    FSoundIndex: integer;
     //FDefaultSound: TSound;
     //FCustomSound: TSound;
 
@@ -162,6 +163,7 @@ type
     procedure SetModalAlert(AValue: boolean);
     procedure SetPauseButtonEnabled(AValue: boolean);
     procedure SetPlayButtonEnabled(AValue: boolean);
+    procedure SetSoundIndex(AValue: integer);
 
     procedure SetStopButtonEnabled(AValue: boolean);
     function GetId: longword;
@@ -174,7 +176,7 @@ type
     { public declarations }
 
     LastProgressIconIndex: integer;
-    UseDefaultSound: boolean;
+    //UseDefaultSound: boolean;
 
     //SoundInfo: TTimerSoundInfo;
     SoundLooped: boolean;
@@ -237,6 +239,7 @@ type
     //property Audio: TAudioPlayer read FAudioPlayer;// write SetAudio;
     //property CustomSound: TSound read FCustomSound write SetCustomSound;
     property Metronome: boolean read FMetronome write SetMetronome;
+    property SoundIndex: integer read FSoundIndex write SetSoundIndex;
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
@@ -297,7 +300,8 @@ begin
   frmEdit.Duration := dtpSet.Time;
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
-  frmEdit.UseDefaultSound:=UseDefaultSound;
+  //frmEdit.UseDefaultSound:=UseDefaultSound;
+  frmEdit.SoundIndex:=SoundPool.DefaultSoundIndex;
 
   {if AudioSystem.Loaded then
   begin
@@ -318,7 +322,7 @@ begin
     Caption := frmEdit.Description;
     dtpSet.Time := frmEdit.Duration;
     FTrayNotification := frmEdit.TrayNotification;
-    UseDefaultSound:=frmEdit.UseDefaultSound;
+    SoundIndex:=frmEdit.SoundIndex;
     FModalAlert := frmEdit.ModalAlert;
 
     //OldCustomSound := FCustomSound;
@@ -414,6 +418,7 @@ begin
   Result := FAudioPlayer.Playing;
 end;
 
+
 function TfraTimer.GetCaption: string;
 begin
   Result := edtTitle.Text;
@@ -506,6 +511,11 @@ end;
 procedure TfraTimer.SetPlayButtonEnabled(AValue: boolean);
 begin
   bbPlay.Enabled := AValue;
+end;
+
+procedure TfraTimer.SetSoundIndex(AValue: integer);
+begin
+
 end;
 
 procedure TfraTimer.SetStopButtonEnabled(AValue: boolean);
@@ -655,7 +665,8 @@ begin
 
   cbSelect.OnChange := @ClockSelected;
 
-  UseDefaultSound:=True;
+  //UseDefaultSound:=True;
+  FSoundIndex := SoundPool.DefaultSoundIndex;
 
   FRunning := False;
   FPaused := False;
@@ -892,7 +903,7 @@ begin
     DurationEnabled := True;
 
 
-    if AudioSystem.Loaded and (UseDefaultSound) and (not UserInitiated) then
+    if AudioSystem.Loaded and (FSoundIndex >=SoundPool.DefaultSoundIndex) and (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
@@ -914,7 +925,7 @@ begin
       end;
       ReenableEditControls;
       // Play the sound as per configuration
-      if UseDefaultSound then
+      if FSoundIndex = SoundPool.DefaultSoundIndex then
       begin
         //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
         //Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));

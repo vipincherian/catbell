@@ -1,6 +1,6 @@
 unit audio;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+}{$Q+}{$R+}
 
 interface
 
@@ -24,6 +24,8 @@ const
   MAX_VOLUME = 100;
   DEFAULT_VOLUME = 90;
   VOLUME_LOG_BASE = 10;
+
+  INVALID_SOUNDPOOL_INDEX = -1;
 
 //SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
 
@@ -177,13 +179,18 @@ type
     FDefaultSoundIndex, FTickIndex: integer;
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
+    function GetCustomSoundRangeStart: integer;
     function GetRawDefaultSound: PRawSoundData;
     procedure RefillRawSound(const Index: integer);
     function LoadDefaultSound(const ResourceID: string): integer;
+    procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
   public
     procedure LoadAllDefaultSounds;
-    procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
+
     property RawDefaultSound: PRawSoundData read GetRawDefaultSound;
+    property DefaultSoundIndex: integer read FDefaultSoundIndex;
+    property CustomSoundRangeStart: integer read GetCustomSoundRangeStart;
+    function LoadSoundFromFile(const FileName: string): integer;
 
   end;
 
@@ -410,6 +417,11 @@ begin
   inherited Destroy;
 end;
 
+function TSoundPool.GetCustomSoundRangeStart: integer;
+begin
+  Result := FTickIndex + 1;
+end;
+
 function TSoundPool.GetRawDefaultSound: PRawSoundData;
 var
   //Buffer: PSeekableRawSoundData;
@@ -613,6 +625,11 @@ begin
   //Logger.Info('Size of the stream is ' + IntToStr(Size));
   //Sound.Loaded := True;
   Stream.Free;
+end;
+
+function TSoundPool.LoadSoundFromFile(const FileName: string): integer;
+begin
+  Result := FTickIndex+1;
 end;
 
 { This is called when playback is finished.

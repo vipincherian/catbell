@@ -20,7 +20,7 @@ Boston, MA  02110-1301, USA.
 }
 unit settings;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+}{$Q+}{$R+}
 
 interface
 

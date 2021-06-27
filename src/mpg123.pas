@@ -1,4 +1,5 @@
 unit mpg123;
+{$mode objfpc}{$H+}{$Q+}{$R+}
 
 /////// This is the dynamical loader for mpg123 library.
 
@@ -24,7 +25,7 @@ interface
 
   {$PACKENUM 4}    (* use 4-byte enums *)
   {$PACKRECORDS C} (* C/C++-compatible record packing *)
-  {$MODE objfpc}
+  //{$MODE objfpc}
 
 {$LONGSTRINGS ON}   (* remember: in Lazarus this is not default ! *)
 {** LONGSTRINGS is equivalent to H+}

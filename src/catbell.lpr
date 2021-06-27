@@ -21,7 +21,7 @@ Boston, MA  02110-1301, USA.
 
 program catbell;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+}{$Q+}{$R+}
 //{$INTERFACES CORBA}
 uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   cthreads, {$ENDIF} {$ENDIF}

@@ -20,7 +20,7 @@ Boston, MA  02110-1301, USA.
 }
 unit main;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+}{$Q+}{$R+}
 
 interface
 
@@ -1395,8 +1395,9 @@ begin
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
-      NewTimerClock.UseDefaultSound :=
-        Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
+      //NewTimerClock.UseDefaultSound :=
+      //  Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
+      NewTimerClock.SoundIndex:=SoundPool.DefaultSoundIndex;{ TODO : Read from settings }
 
       if AudioSystem.Loaded then
       begin
@@ -1638,7 +1639,7 @@ begin
     Conf.SetValue(TIMER_CONF_TRAYNOTIFICATION,
       TimerClock.TrayNotification);
     Conf.SetValue(TIMER_CONF_USEDEFSOUND,
-      TimerClock.UseDefaultSound);
+      True);
 
     State.Paused := False;
 
