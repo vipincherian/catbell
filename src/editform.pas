@@ -76,6 +76,7 @@ type
     procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
     procedure edtDescriptionChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -235,20 +236,20 @@ begin
   FProceed := True;
   //FSoundLooped := ckbLoop.Checked;
 
-  StartTickCount := GetTickCount64;
-  { Wait for FAudioPlayer to complete }
-  if FAudioPlayer.Playing then
-  begin
-    FAudioPlayer.Abort;
-    while FAudioPlayer.Playing do
-    begin
-      Logger.Debug('Waiting for');
-      Application.ProcessMessages;
-      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
-        break;
-    end;
-  end;
-
+  //StartTickCount := GetTickCount64;
+  //{ Wait for FAudioPlayer to complete }
+  //if FAudioPlayer.Playing then
+  //begin
+  //  FAudioPlayer.Abort;
+  //  while FAudioPlayer.Playing do
+  //  begin
+  //    Logger.Debug('Waiting for');
+  //    Application.ProcessMessages;
+  //    if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+  //      break;
+  //  end;
+  //end;
+  //
   Close;
 end;
 
@@ -324,6 +325,33 @@ procedure TfrmEdit.edtDescriptionChange(Sender: TObject);
 begin
   //bbSave.Enabled := Validate;
   ReenableControls;
+end;
+
+procedure TfrmEdit.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+  StartTickCount: longword;
+begin
+  //FDescription := edtDescription.Text;
+
+  //FDuration := dtpDuration.Time;
+  //FModalAlert := ckbModalAlert.Checked;
+  //FTrayNotification := ckbTrayNotification.Checked;
+  //FUseDefaultSound := ckbUseDefaultSound.Checked;
+  //FSoundLooped := ckbLoop.Checked;
+
+  StartTickCount := GetTickCount64;
+  { Wait for FAudioPlayer to complete }
+  if FAudioPlayer.Playing then
+  begin
+    FAudioPlayer.Abort;
+    while FAudioPlayer.Playing do
+    begin
+      Logger.Debug('Waiting for');
+      Application.ProcessMessages;
+      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+        break;
+    end;
+  end;
 end;
 
 procedure TfrmEdit.bbCancelClick(Sender: TObject);

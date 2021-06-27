@@ -303,6 +303,15 @@ begin
   { Log statements in this callback will invariably result in a crash }
 
   AudioInfo := PRawUserinfo(userData);
+
+  Result := cint(paContinue);
+
+  {In case one round had completed in last callback, skip one callback cycle.
+  This is to reduce popping sounds, which were encountered when data was filled
+  without any gap. Maybe, everyone needs a break.}
+  if AudioInfo^.RawSeekable.Position >= AudioInfo^.RawSeekable.RawSound^.Size then
+    AudioInfo^.RawSeekable.Position := 0;
+
   FrameCountBytes := frameCount * AudioInfo^.RawSeekable.RawSound^.ChannelCount *
     sizeof(cfloat);
 
@@ -331,18 +340,14 @@ begin
   //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
   //    );
 
+  { When BytesToRead is less tham FrameCountBytes, we have not filled the
+  entire buffer. This was attempted, but filling buffers without any gap
+  whatsoever, although conscientious and meticulous, only results in
+  pops in-between.
+  Let the dough rest, for best results.}
+
   AudioInfo^.RawSeekable.Position += BytesToRead;
 
-  if BytesToRead < FrameCountBytes then
-  begin
-    BytesCompleted := BytesToRead;
-    BytesToRead := FrameCountBytes - BytesToRead;
-    Move(AudioInfo^.RawSeekable.RawSound^.Buffer^, (output + BytesCompleted)^,
-      BytesToRead);
-    AudioInfo^.RawSeekable.Position := BytesToRead + 1;
-  end;
-
-  Result := cint(paContinue);
 end;
 
 {This function is called by PortAudio to signal that the stream has stopped.
