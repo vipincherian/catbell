@@ -293,7 +293,9 @@ object frmEdit: TfrmEdit
               Width = 181
             end>
           ReadOnly = True
+          ShowColumnHeaders = False
           TabOrder = 2
+          ViewStyle = vsReport
         end
       end
     end

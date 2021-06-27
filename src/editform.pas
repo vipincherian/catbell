@@ -611,11 +611,16 @@ begin
 
   if FLoadedSoundIndex > INVALID_SOUNDPOOL_INDEX then
   begin
+    { TODO : Autosize columns }
     Details := SoundPool.RawSoundDetails[FLoadedSoundIndex]^;
     lsvSoundDetails.Items.BeginUpdate;
     lsvSoundDetails.Clear;
+    //lsvSoundDetails.Column[0].Width:=LVSCW_AUTOSIZE;
     Item := lsvSoundDetails.Items.Add;
     Item.Caption:='Source';
+    Item.SubItems.Add(ExtractFileName(Details.Source));
+    Item := lsvSoundDetails.Items.Add;
+    Item.Caption:='Full Path';
     Item.SubItems.Add(Details.Source);
     lsvSoundDetails.Items.EndUpdate;
   end;
