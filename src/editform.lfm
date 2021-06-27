@@ -206,6 +206,7 @@ object frmEdit: TfrmEdit
           Top = 8
           Width = 100
           ItemHeight = 0
+          ItemIndex = 0
           Items.Strings = (
             'Default'
             'None'

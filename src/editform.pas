@@ -112,6 +112,7 @@ type
     function GetSoundLooped: boolean;
     function GetTrayNotification: boolean;
     function GetUseDefaultSound: boolean;
+    procedure SetLoadedSoundIndex(AValue: integer);
     procedure SetMetronome(AValue: boolean);
     //function GetAudioFileName: string;
     //function GetAudioLooped: boolean;
@@ -146,6 +147,7 @@ type
       write SetFTrayNotification;
     //property UseDefaultSound: boolean read GetUseDefaultSound write SetUseDefaultSound;
     property SoundIndex: integer read FSoundIndex write SetSoundIndex;
+    property LoadedSoundIndex: integer read FLoadedSoundIndex write SetLoadedSoundIndex;
     property Id: longword read FId;
 
     //property Audio: TAudioPlayer read FAudioPlayer write SetAudio;
@@ -597,6 +599,13 @@ end;
 function TfrmEdit.GetUseDefaultSound: boolean;
 begin
   Result := (cmbSoundType.ItemIndex = SOUND_DEFAULT);
+end;
+
+procedure TfrmEdit.SetLoadedSoundIndex(AValue: integer);
+begin
+  Assert((FLoadedSoundIndex = INVALID_SOUNDPOOL_INDEX) or
+    (FLoadedSoundIndex >= SoundPool.CustomSoundRangeStart));
+  FLoadedSoundIndex := AValue;
 end;
 
 procedure TfrmEdit.SetMetronome(AValue: boolean);

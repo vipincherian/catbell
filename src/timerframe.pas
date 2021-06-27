@@ -139,6 +139,7 @@ type
 
     FAudioPlayer: TAudioPlayer;
     FSoundIndex: integer;
+    FLoadedSoundIndex: integer;
     //FDefaultSound: TSound;
     //FCustomSound: TSound;
 
@@ -301,7 +302,8 @@ begin
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
   //frmEdit.UseDefaultSound:=UseDefaultSound;
-  frmEdit.SoundIndex:=SoundPool.DefaultSoundIndex;
+  frmEdit.SoundIndex:=FSoundIndex;
+  frmEdit.LoadedSoundIndex:=FLoadedSoundIndex;
 
   {if AudioSystem.Loaded then
   begin
@@ -322,7 +324,8 @@ begin
     Caption := frmEdit.Description;
     dtpSet.Time := frmEdit.Duration;
     FTrayNotification := frmEdit.TrayNotification;
-    SoundIndex:=frmEdit.SoundIndex;
+    FSoundIndex:=frmEdit.SoundIndex;
+    FLoadedSoundIndex:=frmEdit.LoadedSoundIndex;
     FModalAlert := frmEdit.ModalAlert;
 
     //OldCustomSound := FCustomSound;
@@ -515,7 +518,7 @@ end;
 
 procedure TfraTimer.SetSoundIndex(AValue: integer);
 begin
-
+  FSoundIndex := AValue;
 end;
 
 procedure TfraTimer.SetStopButtonEnabled(AValue: boolean);
@@ -667,6 +670,7 @@ begin
 
   //UseDefaultSound:=True;
   FSoundIndex := SoundPool.DefaultSoundIndex;
+  FLoadedSoundIndex:=INVALID_SOUNDPOOL_INDEX;
 
   FRunning := False;
   FPaused := False;
@@ -937,7 +941,7 @@ begin
         // This is alredy checked. No need to check ...
         //if FCustomSound <> nil then
           //FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
-        FAudioPlayer.Play(SoundPool.RawDefaultSound);{ TODO : Implementation for custom sound missing }
+        FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);{ TODO : Implementation for custom sound missing }
       end;
 
       //Logger.Debug('FAudio.Play');
