@@ -450,9 +450,6 @@ begin
           AudioSystem.OutputDevice := Device;
         end;
       end;
-
-
-
     end;
 
     //FAudioPlayer.PlaySine;

@@ -1021,7 +1021,7 @@ begin
   //Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate);
   { TODO : Change to low latency }
   Streamparams.suggestedLatency :=
-    (Pa_GetDeviceInfo(StreamParams.device)^.defaultHighOutputLatency);
+    (Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency);
   StreamParams.hostApiSpecificStreamInfo := nil;
   //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
 

@@ -274,6 +274,7 @@ end;
 procedure TfrmEdit.bbTestSoundClick(Sender: TObject);
 begin
   {If the default sound is being used, play that, and scamper}
+  FAudioPlayer.Looped:=ckbLoop.Checked;
   if (FSoundIndex >= SoundPool.DefaultSoundIndex) then
     FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
   ReenableControls;
