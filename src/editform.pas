@@ -272,31 +272,10 @@ begin
 end;
 
 procedure TfrmEdit.bbTestSoundClick(Sender: TObject);
-//var
-  //Raw: PRawSoundData;
-  //DefaultSound: TSndSound = nil;
-  //SoundToPlay: TSound = nil;
 begin
   {If the default sound is being used, play that, and scamper}
   if (FSoundIndex >= SoundPool.DefaultSoundIndex) then
-  //begin
     FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
-    //Raw := SoundPool.RawSound[FLoadedSoundIndex];
-    //if Raw <> nil then
-    //  FAudioPlayer.Play(Raw)
-    //else
-    //begin
-    //  Logger.Error('TfrmEdit.bbTestSoundClick failed.' +
-    //    'Sound pool returned nil for index' + IntToStr(FLoadedSoundIndex) +
-    //    ' at ' + string(
-    //{$INCLUDE %FILE%}
-    //    ) + ':' + string(
-    //{$INCLUDE %LINE%}
-    //    ));
-    //end;
-  //end;
-
-
   ReenableControls;
 end;
 

@@ -197,7 +197,8 @@ type
     procedure LoadAllDefaultSounds;
     property RawDefaultSound: PRawSoundData read GetRawDefaultSound;
     property RawSound[Index: integer]: PRawSoundData read GetRawSound;
-    property RawSoundDetails[Index: integer]: PSoundPoolEntryDetails read GetSoundPoolEntryDetails;
+    property RawSoundDetails[Index: integer]: PSoundPoolEntryDetails
+      read GetSoundPoolEntryDetails;
     property DefaultSoundIndex: integer read FDefaultSoundIndex;
     property CustomSoundRangeStart: integer read GetCustomSoundRangeStart;
     function LoadSoundFromFile(const FileName: string): integer;
@@ -459,8 +460,7 @@ begin
   end;
 end;
 
-function TSoundPool.GetSoundPoolEntryDetails(Index: integer
-  ): PSoundPoolEntryDetails;
+function TSoundPool.GetSoundPoolEntryDetails(Index: integer): PSoundPoolEntryDetails;
 begin
   Result := nil;
   if (Index >= FDefaultSoundIndex) and (Index < FEntries.Count) then
@@ -588,7 +588,7 @@ begin
   Logger.Debug('Size of default sound - ' + IntToStr(Size));
 
   // Set
-  SoundPoolEntry^.Details.Duration:=SndFile.Duration;
+  SoundPoolEntry^.Details.Duration := SndFile.Duration;
 
   SndFile.Free;
   Result := True;
@@ -683,7 +683,9 @@ var
   Stream: TFileStream = nil;
   Sound: PSoundData = nil;
   SoundPoolEntry: PSoundPoolEntry = nil;
+  Temp: PSoundPoolEntry = nil;
   Index: integer = INVALID_SOUNDPOOL_INDEX;
+  Count: integer;
 begin
   Result := INVALID_SOUNDPOOL_INDEX;
   try
@@ -708,10 +710,25 @@ begin
 
 
   try
-    { Create the record to hold file contents }
+    {Check if sound exists in pool}
+    for Count := GetCustomSoundRangeStart to FEntries.Count - 1 do
+    begin
+      Temp := FEntries.Items[Count];
+      if (Temp^.Original^.Size <> Sound^.Size) then
+        Break;
+      if not CompareMem(Sound^.Buffer, Temp^.Original^.Buffer, Sound^.Size) then
+        Break;
+      if Sound <> nil then
+        FreeMem(Sound^.Buffer);
+      Dispose(Sound);
+      Result := Count;
+      Exit;
+    end;
+
     SoundPoolEntry := New(PSoundPoolEntry);
     SoundPoolEntry^.Original := Sound;
     SoundPoolEntry^.Raw := nil;
+
     Index := FEntries.Add(SoundPoolEntry);
     Result := Index;
   except
