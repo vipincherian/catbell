@@ -4,10 +4,11 @@ Catbell developer handbook
 # Tools used #
 
 The following are the tools used for developing the application.
+
 For application development:-
   *  Lazarus IDE
+  
 For creating graphical elements used in the user interface:-
-
   * Inkscape
   * Imagemagick
   * Shell
@@ -40,10 +41,8 @@ Assertions
 Assertions are used liberally to intercept runtime anomalous behaviour. These checks run during development testing in builds with debug info, but would not be part of the release build.
 Compiler options -> Custom options -> -Sa
 
-# Sound #
-In Linux I had to creat a .asoundrc file in the home directory with the following content:-
-`pcm.!default "plughw:0,0"`
-
+# Notes #
+Occasionally, when quality of sound ouput became too bad in Linux, had to reset PulseAudio and Alsa.
 
 # Source control #
 

@@ -206,7 +206,7 @@ type
   end;
 
 var
-  PaErrCode: PaError;
+  //PaErrCode: PaError;
   AudioSystem: TAudioSystem = nil;
   SoundPool: TSoundPool = nil;
 
@@ -779,6 +779,8 @@ end;}
 { TAudioSystem }
 
 constructor TAudioSystem.Create;
+var
+  PaErrCode: PaError;
 begin
   FLoaded := False;
   //FDefaultSound.Loaded := False;
