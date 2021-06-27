@@ -78,8 +78,8 @@ const
 
   TIMER_CONF_METRONOME = 'metronome';
 
-  //UM_PLAY_AUDIO = LM_USER + 1;
-  //UM_FINISHED_AUDIO = LM_USER + 2;
+//UM_PLAY_AUDIO = LM_USER + 1;
+//UM_FINISHED_AUDIO = LM_USER + 2;
 
 //BUFFER_SIZE = 1024;
 
@@ -278,7 +278,7 @@ end;
 
 procedure TfraTimer.bbAdjustClick(Sender: TObject);
 begin
-
+;
 end;
 
 procedure TfraTimer.ckbIconProgressChange(Sender: TObject);
@@ -309,8 +309,8 @@ begin
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
   //frmEdit.UseDefaultSound:=UseDefaultSound;
-  frmEdit.SoundIndex:=FSoundIndex;
-  frmEdit.LoadedSoundIndex:=FLoadedSoundIndex;
+  frmEdit.SoundIndex := FSoundIndex;
+  frmEdit.LoadedSoundIndex := FLoadedSoundIndex;
 
   {if AudioSystem.Loaded then
   begin
@@ -323,22 +323,22 @@ begin
     //frmEdit.SoundDuration:= SoundInfo.Duration;
   end;}
 
-  frmEdit.SoundLooped:=SoundLooped;
-  frmEdit.Metronome:=Metronome;
+  frmEdit.SoundLooped := SoundLooped;
+  frmEdit.Metronome := Metronome;
 
   if frmEdit.ShowForEdit(Self) then
   begin
     Caption := frmEdit.Description;
     dtpSet.Time := frmEdit.Duration;
     FTrayNotification := frmEdit.TrayNotification;
-    FSoundIndex:=frmEdit.SoundIndex;
-    FLoadedSoundIndex:=frmEdit.LoadedSoundIndex;
+    FSoundIndex := frmEdit.SoundIndex;
+    FLoadedSoundIndex := frmEdit.LoadedSoundIndex;
     FModalAlert := frmEdit.ModalAlert;
 
     //OldCustomSound := FCustomSound;
 
-    SoundLooped:=frmEdit.SoundLooped;
-    Metronome:=frmEdit.Metronome;
+    SoundLooped := frmEdit.SoundLooped;
+    Metronome := frmEdit.Metronome;
     {if AudioSystem.Loaded then
     begin
       //frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
@@ -388,7 +388,7 @@ end;
 
 procedure TfraTimer.imgTimerClick(Sender: TObject);
 begin
-
+;
 end;
 
 procedure TfraTimer.SetId(AValue: longword);
@@ -412,14 +412,14 @@ end;}
 //var
 //  OldCustomSound: TSound;
 //begin
-  //if FCustomSound=AValue then Exit;
+//if FCustomSound=AValue then Exit;
 
-  //OldCustomSound := FCustomSound;
-  //FCustomSound:=AValue;
+//OldCustomSound := FCustomSound;
+//FCustomSound:=AValue;
 
-  //OldCustomSound.Free;
-  //FCustomSound.Free;
-  //FCustomSound:= AValue;
+//OldCustomSound.Free;
+//FCustomSound.Free;
+//FCustomSound:= AValue;
 
 //end;
 
@@ -497,14 +497,16 @@ end;
 
 procedure TfraTimer.SetLoadedSoundIndex(AValue: integer);
 begin
-  if FLoadedSoundIndex=AValue then Exit;
-  FLoadedSoundIndex:=AValue;
+  if FLoadedSoundIndex = AValue then
+    Exit;
+  FLoadedSoundIndex := AValue;
 end;
 
 procedure TfraTimer.SetMetronome(AValue: boolean);
 begin
-  if FMetronome=AValue then Exit;
-  FMetronome:=AValue;
+  if FMetronome = AValue then
+    Exit;
+  FMetronome := AValue;
   if Running then
     if FMetronome then
       frmMain.Metronome.Subscribe
@@ -663,8 +665,8 @@ begin
 end;
 
 constructor TfraTimer.Create(AOwner: TComponent);
-//var
-//  SndFile: TSndSound;
+  //var
+  //  SndFile: TSndSound;
 begin
   inherited Create(AOwner);
   InitCriticalSection(AudioCriticalSection);
@@ -683,7 +685,7 @@ begin
 
   //UseDefaultSound:=True;
   FSoundIndex := SoundPool.DefaultSoundIndex;
-  FLoadedSoundIndex:=INVALID_SOUNDPOOL_INDEX;
+  FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
 
   FRunning := False;
   FPaused := False;
@@ -704,18 +706,18 @@ begin
 
   CallbackOnProgressOnIconChange := True;
 
-  FAudioPlayer := Nil;
+  FAudioPlayer := nil;
   if AudioSystem.Loaded then
   begin
     FAudioPlayer := TAudioPlayer.Create;
-    FAudioPlayer.OnPlayCompletion:=@AudioPlayed;
+    FAudioPlayer.OnPlayCompletion := @AudioPlayed;
 
     //SndFile := TSndSound.Create;
     //SndFile.LoadDefaultSound;
     //FDefaultSound := SndFile;
   end;
   //FCustomSound := nil;
-  Metronome:=False;
+  Metronome := False;
 end;
 
 destructor TfraTimer.Destroy;
@@ -874,7 +876,7 @@ var
   Device: TAudioDevice;
 begin
   { The audio is playing and the user request is to terminate the audio.}
-  Logger.Debug('Entering Stop. UserInitiated - ' + IfThen(UserInitiated,'True','False'));
+  Logger.Debug('Entering Stop. UserInitiated - ' + IfThen(UserInitiated, 'True', 'False'));
   if AudioSystem.Loaded and FAudioPlayer.Playing then
   begin
     FRunning := False;
@@ -920,12 +922,13 @@ begin
     DurationEnabled := True;
 
 
-    if AudioSystem.Loaded and (FSoundIndex >=SoundPool.DefaultSoundIndex) and (not UserInitiated) then
+    if AudioSystem.Loaded and (FSoundIndex >= SoundPool.DefaultSoundIndex) and
+      (not UserInitiated) then
     begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
 
-      AudioSystem.UseDefaultDevice:=GlobalUserConfig.UseDefaultAudioDevice;
+      AudioSystem.UseDefaultDevice := GlobalUserConfig.UseDefaultAudioDevice;
 
       if not AudioSystem.UseDefaultDevice then
       begin
@@ -934,9 +937,9 @@ begin
           AudioSystem.SetDefaulDevice
         else
         begin
-          Device.DeviceName:=GlobalUserConfig.AudioDeviceName;
-          Device.HostAPIName:=GlobalUserConfig.AudioHostAPIName;
-          AudioSystem.OutputDevice:=Device;
+          Device.DeviceName := GlobalUserConfig.AudioDeviceName;
+          Device.HostAPIName := GlobalUserConfig.AudioHostAPIName;
+          AudioSystem.OutputDevice := Device;
         end;
 
       end;
@@ -946,15 +949,17 @@ begin
       begin
         //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
         //Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));
-      //  FAudioPlayer.Play(SoundPool.RawDefaultSound)
-      //end
-      //else
-      //begin
+        //  FAudioPlayer.Play(SoundPool.RawDefaultSound)
+        //end
+        //else
+        //begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
         //if FCustomSound <> nil then
-          //FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
-        FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);{ TODO : Implementation for custom sound missing }
+        //FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
+        FAudioPlayer.Looped := SoundLooped;
+        FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
+        { TODO : Implementation for custom sound missing }
       end;
 
       //Logger.Debug('FAudio.Play');
@@ -1141,7 +1146,8 @@ begin
       end;
       HandleTimerTrigger();
       frmAdjust.Close;
-    end;
+    end
+    else;
   end;
 end;
 
@@ -1153,14 +1159,14 @@ begin
   begin
     Running := FRunning;
     Paused := FPaused;
-    PendingTicks:=FPendingTickCount;
+    PendingTicks := FPendingTickCount;
     // FPendingTickCount is reliable only if the timer is paused
-    CurrTickCount:=GetTickCount64;
-    DiffTicks:=0;
+    CurrTickCount := GetTickCount64;
+    DiffTicks := 0;
     if FEndTickCount > CurrTickCount then
-      DiffTicks:=FEndTickCount - CurrTickCount;
-    EndTime:=IncMilliSecond(LocalTimeToUniversal(Now), DiffTicks);
-    DurationTicks:=FOrigTickDuration;
+      DiffTicks := FEndTickCount - CurrTickCount;
+    EndTime := IncMilliSecond(LocalTimeToUniversal(Now), DiffTicks);
+    DurationTicks := FOrigTickDuration;
   end;
 end;
 
@@ -1179,15 +1185,15 @@ begin
       begin
         FRunning := Running;
         FPaused := Paused;
-        FPendingTickCount:=PendingTicks;
-        FOrigTickDuration:=DurationTicks;
+        FPendingTickCount := PendingTicks;
+        FOrigTickDuration := DurationTicks;
       end;
       //UpdateProgress(FPendingTickCount);
     end
     else
     begin
       // Now moves as the processer executes. Save it in a variable.
-      TimeNow:=LocalTimeToUniversal(Now);
+      TimeNow := LocalTimeToUniversal(Now);
       if LoadFrom.EndTime <= TimeNow then
       begin
 
@@ -1195,15 +1201,15 @@ begin
       end
       else
       begin
-        NewPendingTickCount:=MilliSecondsBetween(TimeNow, LoadFrom.EndTime);
+        NewPendingTickCount := MilliSecondsBetween(TimeNow, LoadFrom.EndTime);
         Start;
         with LoadFrom do
         begin
           FRunning := Running;
           FPaused := Paused;
-          FPendingTickCount:=NewPendingTickCount;
-          FEndTickCount:=GetTickCount64 + NewPendingTickCount;
-          FOrigTickDuration:=DurationTicks;
+          FPendingTickCount := NewPendingTickCount;
+          FEndTickCount := GetTickCount64 + NewPendingTickCount;
+          FOrigTickDuration := DurationTicks;
         end;
         //UpdateProgress(NewPendingTickCount);
       end;
