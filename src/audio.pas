@@ -492,17 +492,17 @@ begin
   { Create the record to hold raw sound }
 
 
-  if SoundPoolEntry^.Raw <> nil then
+  if SoundPoolEntry^.Raw = nil then
   begin
-    FreeMem(SoundPoolEntry^.Raw^.Buffer);
-    Dispose(SoundPoolEntry^.Raw);
-  end;
+    //FreeMem(SoundPoolEntry^.Raw^.Buffer);
+    //Dispose(SoundPoolEntry^.Raw);
 
-  SoundPoolEntry^.Raw := New(PRawSoundData);
-  SoundPoolEntry^.Raw^.Buffer :=
-    AllocMem(SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
-  SoundPoolEntry^.Raw^.Size :=
-    (SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
+    SoundPoolEntry^.Raw := New(PRawSoundData);
+    SoundPoolEntry^.Raw^.Buffer :=
+      AllocMem(SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
+    SoundPoolEntry^.Raw^.Size :=
+      (SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
+  end;
 
   { Create the record to hold raw volume adjusted sound }
   //SoundPoolEntry^.RawVolumeAdjusted := New(PRawSoundData);
