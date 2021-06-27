@@ -72,6 +72,7 @@ type
     procedure bbTestSoundClick(Sender: TObject);
     procedure ckbUseDefaultSoundChange(Sender: TObject);
     procedure cmbSoundTypeChange(Sender: TObject);
+    procedure cmbSoundTypeEnter(Sender: TObject);
     procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
     procedure edtDescriptionChange(Sender: TObject);
@@ -93,6 +94,8 @@ type
     //FSoundType: TClockSoundType;
     FSoundIndex: integer;
     FLoadedSoundIndex: integer;
+
+    FSoundTypePrevious: integer;
     //FDefaultSound: TSndSound;
     //FSoundInfo: TTimerSoundInfo;
 
@@ -133,6 +136,7 @@ type
     function ShowForEdit(Sender: TFrame): boolean;
     // Single place where controls are enabled/disabled
     procedure ReenableControls;
+    function LoadSoundFile: boolean;
 
     property Duration: TTime read GetDuration write SetDuration;
     property Description: string read GetDescription write SetDescription;
@@ -182,8 +186,8 @@ begin
   FAudioPlayer := TAudioPlayer.Create;
   FAudioPlayer.OnPlayCompletion := @AudioPlayed;
   //FDefaultSound := nil;
-  FSoundIndex:=SoundPool.DefaultSoundIndex;
-  FLoadedSoundIndex:=INVALID_SOUNDPOOL_INDEX;
+  FSoundIndex := SoundPool.DefaultSoundIndex;
+  FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
 
   //FSoundType:=ClockSoundDefault;
 
@@ -250,7 +254,7 @@ end;
 procedure TfrmEdit.bbSelectSoundClick(Sender: TObject);
 var
   FileName: string;
-//TempSound: TSound = nil;
+  //TempSound: TSound = nil;
 begin
   odgAudio.InitialDir := '.';
   odgAudio.Options := [ofFileMustExist];
@@ -275,38 +279,32 @@ begin
 end;
 
 procedure TfrmEdit.bbTestSoundClick(Sender: TObject);
-//var
-//DefaultSound: TSndSound = nil;
-//SoundToPlay: TSound = nil;
+var
+  Raw: PRawSoundData;
+  //DefaultSound: TSndSound = nil;
+  //SoundToPlay: TSound = nil;
 begin
   {If the default sound is being used, play that, and scamper}
   if (FSoundIndex = SoundPool.DefaultSoundIndex) then
+    FAudioPlayer.Play(SoundPool.RawDefaultSound)
+  else if (FLoadedSoundIndex <> INVALID_SOUNDPOOL_INDEX) then
   begin
-    //if FDefaultSound = nil then
-    //begin
-    //  FDefaultSound := TSndSound.Create;
-    //  FDefaultSound.LoadDefaultSound;
-    //end;
-    //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped);
-    { TODO : Play looped is missing }
-    FAudioPlayer.Play(SoundPool.RawDefaultSound);
-    ReenableControls;
-    Exit;
+    Raw := SoundPool.RawSound[FLoadedSoundIndex];
+    if Raw <> nil then
+      FAudioPlayer.Play(Raw)
+    else
+    begin
+      Logger.Error('TfrmEdit.bbTestSoundClick failed.' +
+        'Sound pool returned nil for index' + IntToStr(FLoadedSoundIndex) +
+        ' at ' + string(
+    {$INCLUDE %FILE%}
+        ) + ':' + string(
+    {$INCLUDE %LINE%}
+        ));
+    end;
   end;
 
 
-  //if FNewSound <> nil then
-  //  SoundToPlay := FNewSound
-  //else if FCurrentSound <> nil then
-  //  SoundToPlay := FCurrentSound
-  //else
-  //  Assert(False);
-
-  //if SoundToPlay = nil then
-  //  Exit;
-
-  //FAudioPlayer.Play(SoundToPlay, GlobalUserConfig.Volume, SoundLooped);
-  FAudioPlayer.Play(SoundPool.RawDefaultSound);
   ReenableControls;
 end;
 
@@ -324,7 +322,18 @@ end;
 procedure TfrmEdit.cmbSoundTypeChange(Sender: TObject);
 begin
   //ShowMessage('cmbSoundType.ItemIndex - ' + IntToStr(cmbSoundType.ItemIndex));
+  if (cmbSoundType.ItemIndex = SOUND_CUSTOM) and (FLoadedSoundIndex =
+    INVALID_SOUNDPOOL_INDEX) then
+    if LoadSoundFile then
+      FSoundIndex := FLoadedSoundIndex
+    else
+      cmbSoundType.ItemIndex := FSoundTypePrevious;
   ReenableControls;
+end;
+
+procedure TfrmEdit.cmbSoundTypeEnter(Sender: TObject);
+begin
+  FSoundTypePrevious := cmbSoundType.ItemIndex;
 end;
 
 procedure TfrmEdit.dtpByChange(Sender: TObject);
@@ -448,6 +457,29 @@ begin
 
 
   bbSave.Enabled := Validate;
+end;
+
+function TfrmEdit.LoadSoundFile: boolean;
+var
+  FileName: string;
+  Index: integer;
+  //TempSound: TSound = nil;
+begin
+  Result := False;
+
+  odgAudio.InitialDir := '.';
+  odgAudio.Options := [ofFileMustExist];
+
+  if odgAudio.Execute then
+  begin
+    FileName := odgAudio.FileName;
+    Index := SoundPool.LoadSoundFromFile(FileName);
+    if Index <> INVALID_SOUNDPOOL_INDEX then
+      FLoadedSoundIndex := Index;
+  end
+  else
+    Exit;
+  Result := True;
 end;
 
 procedure TfrmEdit.AudioPlayed(Sender: TObject);

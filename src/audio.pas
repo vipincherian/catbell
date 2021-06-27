@@ -181,13 +181,14 @@ type
     {%H-}destructor {%H-}Destroy; override;
     function GetCustomSoundRangeStart: integer;
     function GetRawDefaultSound: PRawSoundData;
-    procedure RefillRawSound(const Index: integer);
+    function GetRawSound(Index: integer): PRawSoundData;
+    function RefillRawSound(const Index: integer): boolean;
     function LoadDefaultSound(const ResourceID: string): integer;
     procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
   public
     procedure LoadAllDefaultSounds;
-
     property RawDefaultSound: PRawSoundData read GetRawDefaultSound;
+    property RawSound[Index: integer]: PRawSoundData read GetRawSound;
     property DefaultSoundIndex: integer read FDefaultSoundIndex;
     property CustomSoundRangeStart: integer read GetCustomSoundRangeStart;
     function LoadSoundFromFile(const FileName: string): integer;
@@ -432,7 +433,23 @@ begin
   Result := SoundPoolEntry^.Raw;
 end;
 
-procedure TSoundPool.RefillRawSound(const Index: integer);
+function TSoundPool.GetRawSound(Index: integer): PRawSoundData;
+begin
+  Result := nil;
+  if (Index > FTickIndex) and (Index < FEntries.Count) then
+    Result := FEntries.Items[Index]^.Raw
+  else
+  begin
+    Logger.Error('TSoundPool.GetRawSound failed for Index ' +
+      IntToStr(Index) + ' at ' + string(
+  {$INCLUDE %FILE%}
+      ) + ':' + string(
+  {$INCLUDE %LINE%}
+      ));
+  end;
+end;
+
+function TSoundPool.RefillRawSound(const Index: integer): boolean;
 var
   SoundPoolEntry: PSoundPoolEntry;
   SndFile: TSound = nil;
@@ -445,6 +462,8 @@ var
   AmpScale: double;
 begin
   Logger.Debug('Enteringe RefillRawSound');
+
+  Result := False;
   SoundPoolEntry := FEntries.Items[Index];
 
   //SndFile := TSndSound.Create;
@@ -454,7 +473,7 @@ begin
   begin
     ShowMessage('Fatal error: sound factory could not create sound. Index - ' +
       IntToStr(Index));
-    Halt;//Application.Terminate;
+    Exit;
   end;
 
   Logger.Debug('Soundpool - loading default sound');
@@ -541,6 +560,7 @@ begin
   //FreeMem(Buffer);
   Logger.Debug('Size of default sound - ' + IntToStr(Size));
   SndFile.Free;
+  Result := True;
 end;
 
 function TSoundPool.LoadDefaultSound(const ResourceID: string): integer;
@@ -628,8 +648,69 @@ begin
 end;
 
 function TSoundPool.LoadSoundFromFile(const FileName: string): integer;
+var
+  Stream: TFileStream = nil;
+  Sound: PSoundData = nil;
+  SoundPoolEntry: PSoundPoolEntry = nil;
+  Index: integer = INVALID_SOUNDPOOL_INDEX;
 begin
-  Result := FTickIndex+1;
+  Result := INVALID_SOUNDPOOL_INDEX;
+  try
+    Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+    Sound := New(PSoundData);
+    Sound^.Buffer := AllocMem(Stream.Size);
+    Sound^.Size := Stream.Size;
+    Stream.Position:=0;
+    Stream.Read(Sound^.Buffer^, Stream.Size);
+    Stream.Free;
+  except
+    on E: Exception do
+    begin
+      Logger.Warning('Error while loading file ' + FileName + ' - ' + E.Message);
+      if Sound <> nil then
+        FreeMem(Sound^.Buffer);
+      Dispose(Sound);
+      Stream.Free;
+      Exit;
+    end;
+  end;
+
+
+  try
+    { Create the record to hold file contents }
+    SoundPoolEntry := New(PSoundPoolEntry);
+    SoundPoolEntry^.Original := Sound;
+    SoundPoolEntry^.Raw := nil;
+    Index := FEntries.Add(SoundPoolEntry);
+    Result := Index;
+  except
+    on E: Exception do
+    begin
+      Logger.Warning('Error while adding data from file ' + FileName +
+        ' to sound pool - ' + E.Message);
+      if Sound <> nil then
+        FreeMem(Sound^.Buffer);
+      Dispose(Sound);
+      Dispose(SoundPoolEntry);
+      Exit;
+    end;
+  end;
+
+  if not RefillRawSound(Index) then
+  begin
+    Logger.Warning('After loading file ' + FileName +
+      ', could not extract and refill raw sound data');
+    FEntries.Remove(SoundPoolEntry);
+    if Sound <> nil then
+      FreeMem(Sound^.Buffer);
+    Dispose(Sound);
+    Dispose(SoundPoolEntry);
+    Exit;
+  end;
+
+
+
+  Result := Index;
 end;
 
 { This is called when playback is finished.
@@ -1128,7 +1209,7 @@ begin
 
   { Fill a Sine wavetable (Float Data -1 .. +1) }
   //for i := 0 to TableSize - 1 do
-    //Data.Sine[i] := CFloat((Sin((CFloat(i) / CFloat(TableSize)) * Pi * 2)));
+  //Data.Sine[i] := CFloat((Sin((CFloat(i) / CFloat(TableSize)) * Pi * 2)));
 
   //Data.LeftPhase := 0;
   //Data.RightPhase := 0;

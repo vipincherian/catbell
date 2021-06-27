@@ -209,8 +209,10 @@ object frmEdit: TfrmEdit
           Items.Strings = (
             'Default'
             'None'
+            'Custom'
           )
           OnChange = cmbSoundTypeChange
+          OnEnter = cmbSoundTypeEnter
           TabOrder = 0
           Text = 'Default'
         end
