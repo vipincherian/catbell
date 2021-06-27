@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
   Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
-  {portaudio, } {EventLog,} audio, Math, metronome, log, sound;
+  {portaudio, }{EventLog,} audio, Math, metronome, log, sound;
 
 const
   LSVADUIO_INDEX_HOSTAPI: integer = 0;
@@ -144,7 +144,7 @@ uses
 
 procedure TfrmOptions.pgcOptionsChange(Sender: TObject);
 begin
-
+  ;
 end;
 
 procedure TfrmOptions.tbVolumeChange(Sender: TObject);
@@ -208,6 +208,7 @@ begin
     case TaskbarIconType of
       TaskbarAppIcon: rbProgressOnAppIcon.Checked := True;
       TaskbarOverlayIcon: rbProgressOnOverlayIcon.Checked := True;
+      else;
     end;
 
     cbUseDefaultSound.Checked := UseDefaultSound;
@@ -347,7 +348,7 @@ begin
   FAudioPlayer := nil;
   bbStop.Enabled := False;
 
-  FVolume:=GlobalUserConfig.Volume;
+  FVolume := GlobalUserConfig.Volume;
 
   if AudioSystem.Loaded then
   begin
@@ -356,6 +357,7 @@ begin
     edtDefaultDeviceName.Text := AudioDevice.DeviceName;
     edtDefaultHostAPI.Text := AudioDevice.HostAPIName;
     FAudioPlayer := TAudioPlayer.Create;
+    FAudioPlayer.Looped := True;
     bbPlay.Enabled := True;
 
     FTestSound := TSndSound.Create;
@@ -445,7 +447,7 @@ begin
           // TODO: FOutpuDevice should be renamed?
           Device.DeviceName := Item.Caption;
           Device.HostAPIName := Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
-          AudioSystem.OutputDevice:=Device;
+          AudioSystem.OutputDevice := Device;
         end;
       end;
 
@@ -455,7 +457,7 @@ begin
 
     //FAudioPlayer.PlaySine;
     //FAudioPlayer.PlayTest;
-
+    //FAudioPlayer.Looped:=True;
     FAudioPlayer.Play(SoundPool.RawDefaultSound);{ TODO : This should be looped. }
 
     pgbAudio.Style := pbstMarquee;

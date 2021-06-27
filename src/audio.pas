@@ -224,13 +224,12 @@ it closes the sound file and returns paComplete.
 This will stop the stream and the associated callback - which
 triggers on stoppage of the steam - gets called.}
 
-function FeedAudioStreamBuffered({%H-}input: pointer; output: pointer;
-  frameCount: culong;
+function FeedAudioStream({%H-}input: pointer; output: pointer; frameCount: culong;
   {%H-}timeInfo: PPaStreamCallbackTimeInfo; {%H-}statusFlags: PaStreamCallbackFlags;
   userData: pointer): cint; cdecl;
 var
   AudioInfo: PRawUserInfo;
-  BytesRead: integer;
+  BytesToRead: integer = 0;
   //readSuccess: boolean;
   //UsedSound: TSound;
   //Data: pcfloat;
@@ -250,12 +249,12 @@ begin
   //Assert(AudioInfo^.Sound^. <> nil);
   //AudioInfo^.Sound.;
 
-  BytesRead := Min(AudioInfo^.RawSeekable.RawSound^.Size -
+  BytesToRead := Min(AudioInfo^.RawSeekable.RawSound^.Size -
     AudioInfo^.RawSeekable.Position + 1, frameCount *
     AudioInfo^.RawSeekable.RawSound^.ChannelCount * sizeof(cfloat));
 
   //Logger.Debug('frameCount - ' + IntToStr(frameCount));
-  //Logger.Debug('BytesRead - ' + IntToStr(BytesRead));
+  //Logger.Debug('BytesRead - ' + IntToStr(BytesToRead));
   //Logger.Debug('AudioInfo^.RawSeekable.Position - ' + IntToStr(AudioInfo^.RawSeekable.Position));
   //Logger.Debug('AudioInfo^.RawSeekable.Sound^.Size - ' + IntToStr(AudioInfo^.RawSeekable.RawSound^.Size));
   //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
@@ -264,12 +263,12 @@ begin
   //    );
   Move((AudioInfo^.RawSeekable.RawSound^.Buffer +
     AudioInfo^.RawSeekable.Position)^, output^,
-    BytesRead);
+    BytesToRead);
   //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
   //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
   //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
   //    );
-  AudioInfo^.RawSeekable.Position += BytesRead;
+  AudioInfo^.RawSeekable.Position += BytesToRead;
 
   if (AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size) then
   begin
@@ -283,12 +282,75 @@ begin
 
 end;
 
+function FeedAudioStreamLooped({%H-}input: pointer; output: pointer; frameCount: culong;
+  {%H-}timeInfo: PPaStreamCallbackTimeInfo; {%H-}statusFlags: PaStreamCallbackFlags;
+  userData: pointer): cint; cdecl;
+var
+  AudioInfo: PRawUserInfo;
+  BytesToRead: integer = 0;
+  FrameCountBytes: integer = 0;
+  BytesCompleted: integer = 0;
+  //readSuccess: boolean;
+  //UsedSound: TSound;
+  //Data: pcfloat;
+  //Count: integer;
+  //Volume: integer;
+  //AmpScale: double;
+begin
+  //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
+  //Logger.Debug('Inside FeedAudioStream');
+
+  { Log statements in this callback will invariably result in a crash }
+
+  AudioInfo := PRawUserinfo(userData);
+  FrameCountBytes := frameCount * AudioInfo^.RawSeekable.RawSound^.ChannelCount *
+    sizeof(cfloat);
+
+
+  //Assert(AudioInfo <> nil);
+  //Assert(AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size);
+  //Assert(AudioInfo^.Sound^. <> nil);
+  //AudioInfo^.Sound.;
+
+  BytesToRead := Min(AudioInfo^.RawSeekable.RawSound^.Size -
+    AudioInfo^.RawSeekable.Position + 1, FrameCountBytes);
+
+  //Logger.Debug('frameCount - ' + IntToStr(frameCount));
+  //Logger.Debug('BytesRead - ' + IntToStr(BytesToRead));
+  //Logger.Debug('AudioInfo^.RawSeekable.Position - ' + IntToStr(AudioInfo^.RawSeekable.Position));
+  //Logger.Debug('AudioInfo^.RawSeekable.Sound^.Size - ' + IntToStr(AudioInfo^.RawSeekable.RawSound^.Size));
+  //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
+  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
+  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
+  //    );
+  Move((AudioInfo^.RawSeekable.RawSound^.Buffer +
+    AudioInfo^.RawSeekable.Position)^, output^,
+    BytesToRead);
+  //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
+  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
+  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
+  //    );
+
+  AudioInfo^.RawSeekable.Position += BytesToRead;
+
+  if BytesToRead < FrameCountBytes then
+  begin
+    BytesCompleted := BytesToRead;
+    BytesToRead := FrameCountBytes - BytesToRead;
+    Move(AudioInfo^.RawSeekable.RawSound^.Buffer^, (output + BytesCompleted)^,
+      BytesToRead);
+    AudioInfo^.RawSeekable.Position := BytesToRead + 1;
+  end;
+
+  Result := cint(paContinue);
+end;
+
 {This function is called by PortAudio to signal that the stream has stopped.
 As this is a non-class function, it sends a message to frame using the frame's
 handle.}
 
 
-procedure AudioStreamFinishedRaw(UserData: pointer); cdecl;
+procedure AudioStreamFinished(UserData: pointer); cdecl;
 var
   AudioInfo: PRawUserInfo;
   {%H-}AudioTemp: TAudioPlayer; // Possibly buggy hint, omitting
@@ -296,7 +358,7 @@ begin
   //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
 
   AudioInfo := PRawUserInfo(userData);
-
+  AudioInfo^.RawSeekable.Position := 0;
   AudioTemp := TAudioPlayer(AudioInfo^.Player);
 
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
@@ -806,24 +868,24 @@ end;
 //  //AmpScale: double;
 //begin
 //  //EnterCriticalSection(AudioCriticalSection);
-//
+
 //  try
 //    if not AudioSystem.Loaded then
 //      raise EAudioNotLoaded.Create('Audio not loaded.');
-//
+
 //    if FAudioPlaying then
 //    begin
 //      ShowMessage('Again?');
 //      //LeaveCriticalsection(AudioCriticalSection);
 //      Exit;
 //    end;
-//
+
 //    {if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
 //    begin
 //      Logger.Debug('Sf_seek returned error');
 //    end;}
 //    Sound.SeekToBeginning;
-//
+
 //    if AudioSystem.UseDefaultDevice or (AudioSystem.OutputDevice.HostAPIName = '') or
 //      (AudioSystem.OutputDevice.DeviceName = '') then
 //    begin
@@ -837,40 +899,40 @@ end;
 //        ' host api - ' + AudioSystem.OutputDevice.HostAPIName);
 //    end;
 //    StreamParams.device := DeviceId;
-//
+
 //    Logger.Debug('Audio device is ' + IntToStr(StreamParams.device));
-//
+
 //    //StreamParams.channelCount := FInfo.channels;
 //    StreamParams.channelCount := Sound.Channels;
 //    StreamParams.sampleFormat := Sound.SampleFormat;
-//
+
 //    Logger.Debug('Oldplay - StreamParams.channelCount ' +
 //      IntToStr(StreamParams.channelCount));
 //    Logger.Debug('Oldplay - StreamParams.sampleFormat ' +
 //      IntToStr(StreamParams.sampleFormat));
 //    //Sound.SampleRate
 //    Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate));
-//
+
 //    Streamparams.suggestedLatency :=
 //      //0.5;
 //      Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
 //    StreamParams.hostApiSpecificStreamInfo := nil;
 //    //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
-//
+
 //    //FUserInfo.SoundFile := FSoundFile;
-//
+
 //    FUserInfo.Sound := Sound;
 //    FUserInfo.Looped := PlayLooped;
 //    FUserInfo.Player := Self;
-//
+
 //    //Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
 //    //AmpScale := Volume / MAX_VOLUME;
 //    //FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
 //    //Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
 //    FUserInfo.Volume := @Volume;
-//
+
 //    //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
-//
+
 //    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams,
 //      Sound.SampleRate, paFramesPerBufferUnspecified,
 //      //2024,
@@ -881,7 +943,7 @@ end;
 //      Logger.Debug('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
 //      Exit;
 //    end;
-//
+
 //    PaErrCode := Pa_SetStreamFinishedCallback(FStream,
 //      PPaStreamFinishedCallback(@AudioStreamFinished));
 //    if (paErrCode <> Int32(paNoError)) then
@@ -890,7 +952,7 @@ end;
 //      Logger.Debug('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
 //      Exit;
 //    end;
-//
+
 //    PaErrCode := Pa_StartStream(FStream);
 //    if (paErrCode <> Int32(paNoError)) then
 //    begin
@@ -898,9 +960,9 @@ end;
 //      Logger.Debug('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
 //      Exit;
 //    end;
-//
+
 //    FAudioPlaying := True;
-//
+
 //  finally
 //    ;//LeaveCriticalSection(AudioCriticalSection);
 //  end;
@@ -918,15 +980,16 @@ begin
   if FAudioPlaying then
   begin
     { TODO : Handle this situation more elegantly }
-    ShowMessage('Again?');
-    //LeaveCriticalsection(AudioCriticalSection);
+    Logger.Error('Attempt to play audio when audio is already being played. At '
+      + string(
+  {$INCLUDE %FILE%}
+      ) + ':' + string(
+  {$INCLUDE %LINE%}
+      ));
     Exit;
   end;
 
-  {if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
-  begin
-    Logger.Debug('Sf_seek returned error');
-  end;}
+
   FSeekableSoundData.Position := 0;
   FSeekableSoundData.RawSound := RawSound;
 
@@ -990,19 +1053,34 @@ begin
   Logger.Debug('StreamParams.channelCount - ' + IntToStr(StreamParams.channelCount));
 
 
-
-  PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, 44100,
-    paFramesPerBufferUnspecified, paClipOff or paDitherOff,
-    PPaStreamCallback(@FeedAudioStreamBuffered), @FRawUserInfo);
-  if (paErrCode <> Int32(paNoError)) then
+  if Looped then
   begin
-    Logger.Debug('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
-    Logger.Debug('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
-    Exit;
+    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, 44100,
+      paFramesPerBufferUnspecified, paClipOff or paDitherOff,
+      PPaStreamCallback(@FeedAudioStreamLooped), @FRawUserInfo);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      Logger.Debug('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+      Exit;
+    end;
+  end
+  else
+  begin
+    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams, 44100,
+      paFramesPerBufferUnspecified, paClipOff or paDitherOff,
+      PPaStreamCallback(@FeedAudioStream), @FRawUserInfo);
+    if (paErrCode <> Int32(paNoError)) then
+    begin
+      Logger.Debug('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
+      Logger.Debug('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
+      Exit;
+    end;
   end;
 
+
   PaErrCode := Pa_SetStreamFinishedCallback(FStream,
-    PPaStreamFinishedCallback(@AudioStreamFinishedRaw));
+    PPaStreamFinishedCallback(@AudioStreamFinished));
   if (paErrCode <> Int32(paNoError)) then
   begin
     Logger.Debug('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
