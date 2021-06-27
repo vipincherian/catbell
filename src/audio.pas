@@ -128,8 +128,8 @@ type
     FLoaded: boolean;
     FOutputDevice: TAudioDevice;
     {Default sounds }
-    FDefaultSound: TSoundData;
-    FDefaultTick: TSoundData;
+    //FDefaultSound: TSoundData;
+    //FDefaultTick: TSoundData;
     FDevices: TAudioDeviceList;
     FDefaultDevice: integer;
     {%H-}constructor Create;
@@ -157,8 +157,8 @@ type
     property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
     property Loaded: boolean read FLoaded;
     function LoadSound(Avalue: string): TSound;
-    property DefaultSound: TSoundData read FDefaultSound;
-    property DefaultTick: TSoundData read FDefaultTick;
+    //property DefaultSound: TSoundData read FDefaultSound;
+    //property DefaultTick: TSoundData read FDefaultTick;
   end;
 
   TSoundPoolEntryDetails = record
@@ -1355,8 +1355,8 @@ begin
   end;
   FDevices.Clear;
 
-  FreeMem(FDefaultSound.Buffer);
-  FreeMem(FDefaultTick.Buffer);
+  //FreeMem(FDefaultSound.Buffer);
+  //FreeMem(FDefaultTick.Buffer);
 end;
 
 { TODO : Is this implementation ?}
@@ -1371,14 +1371,14 @@ begin
   begin
     Exit;
   end;
-  SoundPool.LoadSoundFromResource('DEFAULT_SOUND', FDefaultSound);
-  SoundPool.LoadSoundFromResource('TICK', FDefaultTick);
+  //SoundPool.LoadSoundFromResource('DEFAULT_SOUND', FDefaultSound);
+  //SoundPool.LoadSoundFromResource('TICK', FDefaultTick);
 end;
 
 procedure TAudioSystem.FreeDefaultSounds;
 begin
-  FreeMem(FDefaultSound.Buffer);
-  FreeMem(FDefaultTick.Buffer);
+  //FreeMem(FDefaultSound.Buffer);
+  //FreeMem(FDefaultTick.Buffer);
 end;
 
 procedure TAudioPlayer.Abort;

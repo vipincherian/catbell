@@ -88,8 +88,8 @@ type
 
     property FileName: string read FFileName write SetFileName;
     function LoadInMemorySound(SoundData: PSoundData): boolean; override;
-    procedure LoadDefaultSound;
-    procedure LoadTick;
+    //procedure LoadDefaultSound;
+    //procedure LoadTick;
     property Channels: integer read GetChannels;
     property SampleRate: integer read GetSampleRate;
     property Duration: double read GetAudioLength;
@@ -147,7 +147,7 @@ type
 
 implementation
 
-uses audio;
+//uses audio;
 
 function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
 var
@@ -772,7 +772,7 @@ begin
     Write := @sf_vio_write_impl;
   end;
 
-  FSeekableSoundData.Sound := @AudioSystem.DefaultSound;
+  FSeekableSoundData.Sound := nil;
   FSeekableSoundData.Position := 0;
 
 end;
@@ -862,16 +862,16 @@ begin
 
 end;
 
-procedure TSndSound.LoadDefaultSound;
-begin
-  Logger.Debug('Loading default sound');
-  LoadInMemorySound(@AudioSystem.DefaultSound);
-end;
-
-procedure TSndSound.LoadTick;
-begin
-  Logger.Debug('Loading default tick');
-  LoadInMemorySound(@AudioSystem.DefaultTick);
-end;
-
+//procedure TSndSound.LoadDefaultSound;
+//begin
+//  Logger.Debug('Loading default sound');
+//  LoadInMemorySound(@AudioSystem.DefaultSound);
+//end;
+//
+//procedure TSndSound.LoadTick;
+//begin
+//  Logger.Debug('Loading default tick');
+//  LoadInMemorySound(@AudioSystem.DefaultTick);
+//end;
+//
 end.

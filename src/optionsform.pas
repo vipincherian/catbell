@@ -359,7 +359,7 @@ begin
     bbPlay.Enabled := True;
 
     FTestSound := TSndSound.Create;
-    FTestSound.LoadDefaultSound;
+    //FTestSound.LoadDefaultSound;
 
   end
   else
@@ -456,7 +456,7 @@ begin
     //FAudioPlayer.PlaySine;
     //FAudioPlayer.PlayTest;
 
-    FAudioPlayer.Play(FTestSound, FVolume, True);
+    FAudioPlayer.Play(SoundPool.RawDefaultSound);{ TODO : This should be looped. }
 
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;

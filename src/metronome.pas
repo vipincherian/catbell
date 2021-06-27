@@ -14,7 +14,7 @@ type
   TMetronome = class(TObject)
   private
     FAudioPlayer: TAudioPlayer;
-    FTickSound: TSndSound;
+    //FTickSound: TSndSound;
     FRunning: boolean;
     FLastPlayedTick: longword;
     FBpm: integer;
@@ -61,8 +61,8 @@ constructor TMetronome.Create;
 begin
   FSubscriptions:=0;
   FAudioPlayer := TAudioPlayer.Create;
-  FTickSound := TSndSound.Create;
-  FTickSound.LoadTick;
+  //FTickSound := TSndSound.Create;
+  //FTickSound.LoadTick;
 
   FLastPlayedTick := GetTickCount64;
 
@@ -83,7 +83,7 @@ begin
   FBpmTimer.Free;
   if FAudioPlayer.Playing then
     Abort;
-  FTickSound.Free;
+  //FTickSound.Free;
   FAudioPlayer.Free;
   inherited Destroy;
 end;
@@ -130,7 +130,7 @@ begin
   if FSubscriptions > 0 then
   begin
     if not FAudioPlayer.Playing then
-      FAudioPlayer.Play(FTickSound, GlobalUserConfig.Volume, False);
+      ;//FAudioPlayer.Play(FTickSound, GlobalUserConfig.Volume, False);
   end;
 end;
 
