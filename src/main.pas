@@ -195,7 +195,7 @@ type
     procedure tiMainMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
     procedure uqiMainOtherInstance(Sender: TObject;
-      {%H-}ParamCount: Integer; const {%H-}Parameters: array of String);
+    {%H-}ParamCount: integer; const {%H-}Parameters: array of string);
 
   private
     { private declarations }
@@ -300,7 +300,7 @@ begin
   FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
   {$ENDIF}
 
-    { TODO : Merge these calls - SoundPool should load default audio too. }
+  { TODO : Merge these calls - SoundPool should load default audio too. }
   AudioSystem.LoadDefaultSounds;
   SoundPool.LoadAllDefaultSounds;
 
@@ -368,9 +368,9 @@ begin
 
   FReportStale := False;
 
-  tbVolume.Position:=GlobalUserConfig.Volume;
-  imgVolumeOff.Left:=imgVolumeOn.Left;
-  imgVolumeOff.Top:=imgVolumeOn.Top;
+  tbVolume.Position := GlobalUserConfig.Volume;
+  imgVolumeOff.Left := imgVolumeOn.Left;
+  imgVolumeOff.Top := imgVolumeOn.Top;
 
   //tbVolume.Position:=0;
 
@@ -682,10 +682,10 @@ end;
 
 procedure TfrmMain.tbVolumeChange(Sender: TObject);
 begin
-  lblVolume.Caption:=IntToStr(tbVolume.Position) + '%';
-  GlobalUserConfig.Volume:=tbVolume.Position;
+  lblVolume.Caption := IntToStr(tbVolume.Position) + '%';
+  GlobalUserConfig.Volume := tbVolume.Position;
   imgVolumeOn.Visible := (tbVolume.Position > 0);
-  imgVolumeOff.Visible:= (not imgVolumeOn.Visible);
+  imgVolumeOff.Visible := (not imgVolumeOn.Visible);
 end;
 
 procedure TfrmMain.tiMainClick(Sender: TObject);
@@ -705,8 +705,8 @@ begin
     pmTray.PopUp;
 end;
 
-procedure TfrmMain.uqiMainOtherInstance(Sender: TObject;
-  ParamCount: Integer; const Parameters: array of String);
+procedure TfrmMain.uqiMainOtherInstance(Sender: TObject; ParamCount: integer;
+  const Parameters: array of string);
 begin
   { If an attempt was made to start another instance of this application,
   bring the main form to the front }
@@ -733,7 +733,7 @@ begin
   //AppIconSize := GetSystemMetrics(SM_CXICON);
 
   TrayIconSize := GlobalUserConfig.TrayIconSize;
-  AppIconSize:=GlobalUserConfig.AppIconSize;
+  AppIconSize := GlobalUserConfig.AppIconSize;
 
   // Read the image in resources to a stream
   Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
@@ -1316,7 +1316,7 @@ begin
     end;
   end;
 
-  tbVolume.Position:=GlobalUserConfig.Volume;
+  tbVolume.Position := GlobalUserConfig.Volume;
   //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
 end;
@@ -1365,6 +1365,8 @@ var
   ErrorText, AudioFileName: string;
   fs: TFormatSettings;
   State: TTimerState;
+  SoundIndex: integer = 0;
+  SoundType: integer = 0;
 begin
 
   ErrorText := '';
@@ -1397,49 +1399,46 @@ begin
 
       //NewTimerClock.UseDefaultSound :=
       //  Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
-      NewTimerClock.SoundIndex:=SoundPool.DefaultSoundIndex;{ TODO : Read from settings }
+      NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+      { TODO : Read from settings }
 
-      if AudioSystem.Loaded then
-      begin
-        try
-          //NewTimerClock.Audio.FileName :=
-          //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
-          AudioFileName := string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
-          if AudioFileName = '' then
-            //NewTimerclock.CustomSound := nil
-          else
+
+
+      AudioFileName := string(
+        Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH), ''));
+      SoundType := Conf.GetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_DEFALUT);
+
+      case SoundType of
+        TIMER_CONF_SOUND_NONE:
+          NewTimerClock.SoundIndex := INVALID_SOUNDPOOL_INDEX;
+        TIMER_CONF_SOUND_DEFALUT:
+          NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+        TIMER_CONF_SOUND_CUSTOM:
+        begin
+          SoundIndex := SoundPool.LoadSoundFromFile(AudioFileName);
+          if SoundIndex > INVALID_SOUNDPOOL_INDEX then
           begin
-            //NewTimerClock.Audio.LoadFromFile(AudioFileName);
-            //NewTimerclock.CustomSound := AudioSystem.LoadSound(AudioFileName);
-          end;
-          //NewTimerClock.Audio.Looped :=
-          //  Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
-          NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
-        except
-          on E: EInvalidAudio do
-          begin
-            ErrorText := ErrorText + 'Could not load audio file ' +
-              string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), '')) +
-              ' - unsupported format or invalide file. ' +
-              'File name will be reset to blank.' + LineEnding;
+            NewTimerClock.SoundIndex := SoundIndex;
+            NewTimerClock.LoadedSoundIndex := SoundIndex;
           end
           else
-            ErrorText := ErrorText + 'Could not load audio file ' +
-              string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), '')) +
-              ' - unknown error. File name will be reset to blank.' +
-              LineEnding;
+            NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+        end
+        else
+        begin
+          NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+          Logger.Error('Invalid sound type loaded for clock #' +
+            IntToStr(Count) + ' - ' + IntToStr(SoundType) + ' at ' + string(
+        {$INCLUDE %FILE%}
+            ) + ':' + string(
+        {$INCLUDE %LINE%}
+            ));
         end;
-
-      end
-      else
-      begin
-        //NewTimerclock.SoundInfo.FileName :=
-        //  string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUND), ''));
-        //NewTimerClock.SoundInfo.Duration :=
-        //  StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH), '0')), fs);
-        //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
-        ;
       end;
+
+
+      NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
+
 
       //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       NewTimerClock.ModalAlert :=
@@ -1603,11 +1602,12 @@ begin
       UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
 
     Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.IsProgressOnIcon);
+
     {if AudioSystem.Loaded then
     begin
       if TimerClock.CustomSound <> nil then
       begin
-        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
+        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH),
           UTF8Decode(TimerClock.CustomSound.Source));
         Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
           UTF8Decode(FloatToStr(TimerClock.CustomSound.Duration, fs)));
@@ -1616,7 +1616,7 @@ begin
       end
       else
       begin
-        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
+        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH),
           UTF8Decode(''));
         Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
           UTF8Decode(FloatToStr(0.0)));
@@ -1625,7 +1625,7 @@ begin
     end
     else
     begin
-      //Conf.SetValue(UTF8Decode(TIMER_CONF_SOUND),
+      //Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH),
       //  UTF8Decode(TimerClock.SoundInfo.FileName));
       //Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
       //  UTF8Decode(FloatToStr(TimerClock.SoundInfo.Duration, fs)));
@@ -1638,8 +1638,20 @@ begin
       TimerClock.ModalAlert);
     Conf.SetValue(TIMER_CONF_TRAYNOTIFICATION,
       TimerClock.TrayNotification);
-    Conf.SetValue(TIMER_CONF_USEDEFSOUND,
-      True);
+
+    Conf.SetValue(TIMER_CONF_SOUNDFILEPATH, '');
+    if TimerClock.SoundIndex = INVALID_SOUNDPOOL_INDEX then
+      Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_NONE)
+    else if TimerClock.SoundIndex = SoundPool.DefaultSoundIndex then
+      Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_DEFALUT)
+    else if TimerClock.SoundIndex >= SoundPool.CustomSoundRangeStart then
+    begin
+      Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_CUSTOM);
+      Conf.SetValue(TIMER_CONF_SOUNDFILEPATH,
+        SoundPool.RawSoundDetails[TimerClock.SoundIndex]^.Source);
+    end
+    else
+      Logger.Warning('Error while saving clocks');
 
     State.Paused := False;
 

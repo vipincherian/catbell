@@ -53,7 +53,12 @@ const
   TIMER_CONF_COUNT = 'count';
   //TIMER_CONF_ORDER = 'order';
 
-  TIMER_CONF_SOUND = 'audio_file';
+  TIMER_CONF_SOUND_NONE = INVALID_SOUNDPOOL_INDEX;
+  TIMER_CONF_SOUND_DEFALUT = 0;
+  TIMER_CONF_SOUND_CUSTOM = 1;
+
+  TIMER_CONF_SOUNDTYPE = 'audio_type';
+  TIMER_CONF_SOUNDFILEPATH = 'audio_file';
   TIMER_CONF_SOUNDLENGTH = 'audio_duration';
   TIMER_CONF_SOUNDLOOP = 'audio_loop';
 
@@ -66,7 +71,7 @@ const
   TIMER_CONF_ORIGTICKCOUNT = 'orig_tick_count';
 
 
-  TIMER_CONF_USEDEFSOUND = 'use_default_audio';
+
 
   TIMER_CONF_RUNNING = 'running';
   TIMER_CONF_PAUSED = 'paused';
@@ -160,6 +165,7 @@ type
     procedure SetDuration(AValue: TDateTime);
     procedure SetDurationEnabled(AValue: boolean);
     procedure SetIsProgressOnIcon(AValue: boolean);
+    procedure SetLoadedSoundIndex(AValue: integer);
     procedure SetMetronome(AValue: boolean);
     procedure SetModalAlert(AValue: boolean);
     procedure SetPauseButtonEnabled(AValue: boolean);
@@ -241,6 +247,7 @@ type
     //property CustomSound: TSound read FCustomSound write SetCustomSound;
     property Metronome: boolean read FMetronome write SetMetronome;
     property SoundIndex: integer read FSoundIndex write SetSoundIndex;
+    property LoadedSoundIndex: integer read FLoadedSoundIndex write SetLoadedSoundIndex;
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
@@ -486,6 +493,12 @@ end;
 procedure TfraTimer.SetIsProgressOnIcon(AValue: boolean);
 begin
   ckbIconProgress.Checked := AValue;
+end;
+
+procedure TfraTimer.SetLoadedSoundIndex(AValue: integer);
+begin
+  if FLoadedSoundIndex=AValue then Exit;
+  FLoadedSoundIndex:=AValue;
 end;
 
 procedure TfraTimer.SetMetronome(AValue: boolean);
