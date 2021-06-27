@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
   ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} {EventLog,}
-  {Math,} audio, log{, sound};
+  Math, audio, log{, sound};
 
 type
   {TTimerSoundInfo = record
@@ -217,8 +217,6 @@ begin
   //FSoundInfo.FileName := '';
   //FSoundInfo.Duration := 0;
   //FSoundInfo.Looped := False;
-
-  //lsvSoundDetails.Items[0].SubItems.Add('');
 
   ReenableControls;
 
@@ -616,12 +614,19 @@ begin
     lsvSoundDetails.Items.BeginUpdate;
     lsvSoundDetails.Clear;
     //lsvSoundDetails.Column[0].Width:=LVSCW_AUTOSIZE;
+
     Item := lsvSoundDetails.Items.Add;
     Item.Caption:='Source';
     Item.SubItems.Add(ExtractFileName(Details.Source));
+
     Item := lsvSoundDetails.Items.Add;
     Item.Caption:='Full Path';
     Item.SubItems.Add(Details.Source);
+
+    Item := lsvSoundDetails.Items.Add;
+    Item.Caption:='Duration';
+    Item.SubItems.Add(FloatToStr(RoundTo(Details.Duration, -2)) + 's');
+
     lsvSoundDetails.Items.EndUpdate;
   end;
 end;

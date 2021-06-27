@@ -163,6 +163,7 @@ type
 
   TSoundPoolEntryDetails = record
     Source: string;
+    Duration: double;
   end;
   PSoundPoolEntryDetails = ^TSoundPoolEntryDetails;
 
@@ -585,6 +586,10 @@ begin
 
   //FreeMem(Buffer);
   Logger.Debug('Size of default sound - ' + IntToStr(Size));
+
+  // Set
+  SoundPoolEntry^.Details.Duration:=SndFile.Duration;
+
   SndFile.Free;
   Result := True;
 end;
