@@ -368,7 +368,9 @@ begin
 
   FReportStale := False;
 
-  tbVolume.Position := GlobalUserConfig.Volume;
+  AudioSystem.Volume:= GlobalUserConfig.Volume;
+
+  tbVolume.Position := AudioSystem.Volume;
   imgVolumeOff.Left := imgVolumeOn.Left;
   imgVolumeOff.Top := imgVolumeOn.Top;
 
@@ -570,7 +572,7 @@ begin
   SavetoFile;
 end;
 
-procedure TfrmMain.alUnmuteExecute(Sender: TObject);
+procedure TfrmMain.alUnmuteExecute(Sender: TObject); { TODO : What is this? Unmute? }
 begin
   GlobalUserConfig.Volume := DEF_VOLUME_LEVEL;
   //tbUnmute.Enabled := False;
@@ -683,7 +685,7 @@ end;
 procedure TfrmMain.tbVolumeChange(Sender: TObject);
 begin
   lblVolume.Caption := IntToStr(tbVolume.Position) + '%';
-  GlobalUserConfig.Volume := tbVolume.Position;
+  AudioSystem.Volume := tbVolume.Position;
   imgVolumeOn.Visible := (tbVolume.Position > 0);
   imgVolumeOff.Visible := (not imgVolumeOn.Visible);
 end;
@@ -1316,7 +1318,7 @@ begin
     end;
   end;
 
-  tbVolume.Position := GlobalUserConfig.Volume;
+  tbVolume.Position := AudioSystem.Volume;
   //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
 
 end;

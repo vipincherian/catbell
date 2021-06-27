@@ -22,6 +22,8 @@ const
   TableSize = 200;
 
   MAX_VOLUME = 100;
+  MIN_VOLUME = 0;
+
   DEFAULT_VOLUME = 90;
   VOLUME_LOG_BASE = 10;
 
@@ -94,7 +96,7 @@ type
   TAudioPlayer = class(TObject)
   private
 
-    FUserInfo: TUserInfo;
+    //FUserInfo: TUserInfo;
     FRawUserInfo: TRawUserInfo;
     FStream: PPaStream;
     FSeekableSoundData: TSeekableRawSoundData;
@@ -132,13 +134,18 @@ type
     //FDefaultTick: TSoundData;
     FDevices: TAudioDeviceList;
     FDefaultDevice: integer;
+    FVolume: integer;
+    FAmpScale: double;
+
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
+    //function GetAmplitudeScale: double;
 
 
     function GetDevices: TAudioDeviceList;
     procedure SetOutputDevice(AValue: TAudioDevice);
     procedure CleanUp;
+    procedure SetVolume(AValue: integer);
   public
 
     UseDefaultDevice: boolean;
@@ -156,6 +163,8 @@ type
     procedure FreeDefaultSounds;
     property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
     property Loaded: boolean read FLoaded;
+    property Volume: integer read FVolume write SetVolume;
+    property AmplitudeScale: double read FAmpScale;
     function LoadSound(Avalue: string): TSound;
     //property DefaultSound: TSoundData read FDefaultSound;
     //property DefaultTick: TSoundData read FDefaultTick;
@@ -202,6 +211,7 @@ type
     property DefaultSoundIndex: integer read FDefaultSoundIndex;
     property CustomSoundRangeStart: integer read GetCustomSoundRangeStart;
     function LoadSoundFromFile(const FileName: string): integer;
+    procedure RefillAll;
 
   end;
 
@@ -454,8 +464,8 @@ var
   //VolumeBuffer: PCFloat;
   RawBuffer: PCFloat;
   Count: integer;
-  Volume: integer;
-  AmpScale: double;
+  //Volume: integer;
+  //AmpScale: double;
 begin
   Logger.Debug('Enteringe RefillRawSound');
 
@@ -541,16 +551,10 @@ begin
   RawBuffer := PCFloat(SoundPoolEntry^.Raw^.Buffer);
   //VolumeBuffer := PCFloat(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
 
-  Volume := GlobalUserConfig.Volume;
-  Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
-  AmpScale := Volume / MAX_VOLUME;
-  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
-  Assert((AmpScale >= 0) and (AmpScale <= 1));
-
   { Apply scaling to amplitude to control volume }
   for Count := 0 to (SndFile.FrameLength * SndFile.Channels) - 1 do
   begin
-    RawBuffer[Count] := RawBuffer[Count] * AmpScale; //AudioInfo^.Volume;
+    RawBuffer[Count] := RawBuffer[Count] * AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
   end;
 
   //FreeMem(Buffer);
@@ -729,6 +733,22 @@ begin
   Result := Index;
 end;
 
+procedure TSoundPool.RefillAll;
+var
+  Count: integer;
+begin
+  for Count := 0 to FEntries.Count -1 do
+  begin
+    if not RefillRawSound(Count) then
+      Logger.Error('Attempting to decode and re-fill raw sound data for index ' +
+      IntToStr(Count) + ' failed at ' + string(
+        {$INCLUDE %FILE%}
+            ) + ':' + string(
+        {$INCLUDE %LINE%}
+            ));
+  end;
+end;
+
 { This is called when playback is finished.
   Remember: ALWAYS USE CDECL or your pointers will be messed up!
   Pointers to this function must be castable to PPaStreamFinishedCallback: }
@@ -752,6 +772,9 @@ var
   PaErrCode: PaError;
 begin
   FLoaded := False;
+  FVolume := MAX_VOLUME;
+  FAmpScale := 1;
+  ;
   //FDefaultSound.Loaded := False;
   //FDefaultTick.Loaded := False;
   FDevices := TAudioDeviceList.Create;
@@ -860,6 +883,17 @@ begin
 
   inherited Destroy;
 end;
+
+//function TAudioSystem.GetAmplitudeScale: double;
+//var
+//  AmpScale: double;
+//begin
+//  Assert((FVolume >= 0) and (FVolume <= MAX_VOLUME));
+//  AmpScale := Volume / MAX_VOLUME;
+//  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+//  Assert((AmpScale >= 0) and (AmpScale <= 1));
+//  Result := AmpScale;
+//end;
 
 
 
@@ -1229,8 +1263,8 @@ begin
 end;}
 
 constructor TAudioPlayer.Create;
-var
-  i: integer;
+//var
+//  i: integer;
 begin
 
   if not AudioSystem.Loaded then
@@ -1344,6 +1378,25 @@ begin
 
   //FreeMem(FDefaultSound.Buffer);
   //FreeMem(FDefaultTick.Buffer);
+end;
+
+procedure TAudioSystem.SetVolume(AValue: integer);
+var
+  AmpScale: double;
+begin
+  if FVolume = AValue then
+    Exit;
+  FVolume := Max(Min(AValue, MAX_VOLUME), MIN_VOLUME);
+  GlobalUserConfig.Volume := FVolume;
+
+  Assert((FVolume >= 0) and (FVolume <= MAX_VOLUME));
+  AmpScale := Volume / MAX_VOLUME;
+  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+  Assert((AmpScale >= 0) and (AmpScale <= 1));
+
+  FAmpScale := AmpScale;
+
+  SoundPool.RefillAll;
 end;
 
 { TODO : Is this implementation ?}

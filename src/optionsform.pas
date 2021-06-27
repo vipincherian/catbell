@@ -348,7 +348,7 @@ begin
   FAudioPlayer := nil;
   bbStop.Enabled := False;
 
-  FVolume := GlobalUserConfig.Volume;
+  FVolume := AudioSystem.Volume;
 
   if AudioSystem.Loaded then
   begin
