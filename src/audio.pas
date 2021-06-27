@@ -424,19 +424,20 @@ begin
 end;
 
 function TSoundPool.GetRawDefaultSound: PRawSoundData;
-var
+//var
   //Buffer: PSeekableRawSoundData;
-  SoundPoolEntry: PSoundPoolEntry;
+  //SoundPoolEntry: PSoundPoolEntry;
 begin
   { TODO : Change to a single line. }
-  SoundPoolEntry := FEntries.Items[FDefaultSoundIndex];
-  Result := SoundPoolEntry^.Raw;
+  //SoundPoolEntry := FEntries.Items[FDefaultSoundIndex];
+  //Result := SoundPoolEntry^.Raw;
+  Result := GetRawSound(FDefaultSoundIndex);
 end;
 
 function TSoundPool.GetRawSound(Index: integer): PRawSoundData;
 begin
   Result := nil;
-  if (Index > FTickIndex) and (Index < FEntries.Count) then
+  if (Index >= FDefaultSoundIndex) and (Index < FEntries.Count) then
     Result := FEntries.Items[Index]^.Raw
   else
   begin

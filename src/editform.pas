@@ -287,9 +287,7 @@ var
   //SoundToPlay: TSound = nil;
 begin
   {If the default sound is being used, play that, and scamper}
-  if (FSoundIndex = SoundPool.DefaultSoundIndex) then
-    FAudioPlayer.Play(SoundPool.RawDefaultSound)
-  else if (FLoadedSoundIndex <> INVALID_SOUNDPOOL_INDEX) then
+  if (FSoundIndex >= SoundPool.DefaultSoundIndex) then
   begin
     Raw := SoundPool.RawSound[FLoadedSoundIndex];
     if Raw <> nil then

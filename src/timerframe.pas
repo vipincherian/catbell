@@ -929,14 +929,14 @@ begin
       end;
       ReenableEditControls;
       // Play the sound as per configuration
-      if FSoundIndex = SoundPool.DefaultSoundIndex then
+      if FSoundIndex >= SoundPool.DefaultSoundIndex then
       begin
         //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
         //Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));
-        FAudioPlayer.Play(SoundPool.RawDefaultSound)
-      end
-      else
-      begin
+      //  FAudioPlayer.Play(SoundPool.RawDefaultSound)
+      //end
+      //else
+      //begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
         //if FCustomSound <> nil then
