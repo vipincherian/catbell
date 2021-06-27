@@ -258,12 +258,12 @@ object frmEdit: TfrmEdit
         ClientWidth = 268
         TabOrder = 2
         object bbSelectSound: TBitBtn
-          Left = 48
+          Left = 8
           Height = 30
           Top = 3
-          Width = 110
+          Width = 72
           Anchors = [akTop, akRight]
-          Caption = 'Load file'
+          Caption = 'Load'
           Images = imlEdit
           ImageIndex = 1
           OnClick = bbSelectSoundClick

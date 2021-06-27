@@ -253,24 +253,16 @@ begin
 end;
 
 procedure TfrmEdit.bbSelectSoundClick(Sender: TObject);
-var
-  FileName: string;
-  //TempSound: TSound = nil;
+//var
+//  FileName: string;
+//TempSound: TSound = nil;
 begin
-  odgAudio.InitialDir := '.';
-  odgAudio.Options := [ofFileMustExist];
-
-  if odgAudio.Execute then
+  if LoadSoundFile then
   begin
-    FileName := odgAudio.FileName;
-    //TempSound := AudioSystem.LoadSound(FileName);
-    //if TempSound <> nil then
-    //begin
-    //  NewSound.Free;
-    //  NewSound := TempSound;
-    //end;
-    ;
+    FSoundIndex := FLoadedSoundIndex;
+    cmbSoundType.ItemIndex := SOUND_CUSTOM;
   end;
+
   ReenableControls;
 end;
 
@@ -376,6 +368,8 @@ procedure TfrmEdit.bbClearSoundClick(Sender: TObject);
 begin
   //AudioFileName := '';
   //edtSound.Text := '';
+  LoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
+  FSoundIndex := SoundPool.DefaultSoundIndex;
   ReenableControls;
 end;
 
@@ -453,7 +447,19 @@ begin
     (not FAudioPlayer.Playing) and (cmbSoundType.ItemIndex <> SOUND_NONE);
   bbStopSound.Enabled := AudioSystem.Loaded and FAudioPlayer.Playing;
 
-
+  if FSoundIndex = SoundPool.DefaultSoundIndex then
+    cmbSoundType.ItemIndex := SOUND_DEFAULT
+  else if FSoundIndex = INVALID_SOUNDPOOL_INDEX then
+    cmbSoundType.ItemIndex := SOUND_NONE
+  else if FSoundIndex >= SoundPool.CustomSoundRangeStart then
+    cmbSoundType.ItemIndex := SOUND_CUSTOM
+  else
+    Logger.Warning('Unexpected FSoundIndex - ' + IntToStr(FSoundIndex) +
+      ' at ' + string(
+  {$INCLUDE %FILE%}
+      ) + ':' + string(
+  {$INCLUDE %LINE%}
+      ));
 
   bbSave.Enabled := Validate;
 end;
@@ -605,30 +611,34 @@ var
 begin
   Assert((FLoadedSoundIndex = INVALID_SOUNDPOOL_INDEX) or
     (FLoadedSoundIndex >= SoundPool.CustomSoundRangeStart));
+
+  if FLoadedSoundIndex = AValue then
+    Exit;
+
   FLoadedSoundIndex := AValue;
 
+  lsvSoundDetails.Items.BeginUpdate;
+  lsvSoundDetails.Clear;
   if FLoadedSoundIndex > INVALID_SOUNDPOOL_INDEX then
   begin
     { TODO : Autosize columns }
     Details := SoundPool.RawSoundDetails[FLoadedSoundIndex]^;
-    lsvSoundDetails.Items.BeginUpdate;
-    lsvSoundDetails.Clear;
+
     //lsvSoundDetails.Column[0].Width:=LVSCW_AUTOSIZE;
 
     Item := lsvSoundDetails.Items.Add;
-    Item.Caption:='Source';
+    Item.Caption := 'Source';
     Item.SubItems.Add(ExtractFileName(Details.Source));
 
     Item := lsvSoundDetails.Items.Add;
-    Item.Caption:='Full Path';
+    Item.Caption := 'Full Path';
     Item.SubItems.Add(Details.Source);
 
     Item := lsvSoundDetails.Items.Add;
-    Item.Caption:='Duration';
+    Item.Caption := 'Duration';
     Item.SubItems.Add(FloatToStr(RoundTo(Details.Duration, -2)) + 's');
-
-    lsvSoundDetails.Items.EndUpdate;
   end;
+  lsvSoundDetails.Items.EndUpdate;
 end;
 
 procedure TfrmEdit.SetMetronome(AValue: boolean);
