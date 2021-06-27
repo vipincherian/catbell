@@ -161,10 +161,16 @@ type
     property DefaultTick: TSoundData read FDefaultTick;
   end;
 
+  TSoundPoolEntryDetails = record
+    Source: string;
+  end;
+  PSoundPoolEntryDetails = ^TSoundPoolEntryDetails;
+
   TSoundPoolEntry = record
     Original: PSoundData;
     Raw: PRawSoundData;
     //RawVolumeAdjusted: PRawSoundData;
+    Details: TSoundPoolEntryDetails;
   end;
   PSoundPoolEntry = ^TSoundPoolEntry;
 
@@ -182,6 +188,7 @@ type
     function GetCustomSoundRangeStart: integer;
     function GetRawDefaultSound: PRawSoundData;
     function GetRawSound(Index: integer): PRawSoundData;
+    function GetSoundPoolEntryDetails(Index: integer): PSoundPoolEntryDetails;
     function RefillRawSound(const Index: integer): boolean;
     function LoadDefaultSound(const ResourceID: string): integer;
     procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
@@ -189,6 +196,7 @@ type
     procedure LoadAllDefaultSounds;
     property RawDefaultSound: PRawSoundData read GetRawDefaultSound;
     property RawSound[Index: integer]: PRawSoundData read GetRawSound;
+    property RawSoundDetails[Index: integer]: PSoundPoolEntryDetails read GetSoundPoolEntryDetails;
     property DefaultSoundIndex: integer read FDefaultSoundIndex;
     property CustomSoundRangeStart: integer read GetCustomSoundRangeStart;
     function LoadSoundFromFile(const FileName: string): integer;
@@ -424,7 +432,7 @@ begin
 end;
 
 function TSoundPool.GetRawDefaultSound: PRawSoundData;
-//var
+  //var
   //Buffer: PSeekableRawSoundData;
   //SoundPoolEntry: PSoundPoolEntry;
 begin
@@ -439,6 +447,23 @@ begin
   Result := nil;
   if (Index >= FDefaultSoundIndex) and (Index < FEntries.Count) then
     Result := FEntries.Items[Index]^.Raw
+  else
+  begin
+    Logger.Error('TSoundPool.GetRawSound failed for Index ' +
+      IntToStr(Index) + ' at ' + string(
+  {$INCLUDE %FILE%}
+      ) + ':' + string(
+  {$INCLUDE %LINE%}
+      ));
+  end;
+end;
+
+function TSoundPool.GetSoundPoolEntryDetails(Index: integer
+  ): PSoundPoolEntryDetails;
+begin
+  Result := nil;
+  if (Index >= FDefaultSoundIndex) and (Index < FEntries.Count) then
+    Result := @FEntries.Items[Index]^.Details
   else
   begin
     Logger.Error('TSoundPool.GetRawSound failed for Index ' +
@@ -661,7 +686,7 @@ begin
     Sound := New(PSoundData);
     Sound^.Buffer := AllocMem(Stream.Size);
     Sound^.Size := Stream.Size;
-    Stream.Position:=0;
+    Stream.Position := 0;
     Stream.Read(Sound^.Buffer^, Stream.Size);
     Stream.Free;
   except
@@ -709,8 +734,7 @@ begin
     Exit;
   end;
 
-
-
+  SoundPoolEntry^.Details.Source := FileName;
   Result := Index;
 end;
 

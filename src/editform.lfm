@@ -281,12 +281,18 @@ object frmEdit: TfrmEdit
           OnClick = bbClearSoundClick
           TabOrder = 1
         end
-        object ListView1: TListView
+        object lsvSoundDetails: TListView
           Left = 8
           Height = 110
           Top = 40
           Width = 248
-          Columns = <>
+          Columns = <          
+            item
+            end          
+            item
+              Width = 181
+            end>
+          ReadOnly = True
           TabOrder = 2
         end
       end

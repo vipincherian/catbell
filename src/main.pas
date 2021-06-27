@@ -1117,7 +1117,7 @@ begin
       Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
       Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';}
     //frmAlert.lbMessages.Items.Add(Message);
-
+    { TODO : Add beginupdate? }
     Item := frmAlert.lsvMessages.Items.Add;
     Item.Caption := Sender.Caption;
     Item.SubItems.Add(DurationText);

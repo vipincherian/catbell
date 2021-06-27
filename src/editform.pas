@@ -59,7 +59,7 @@ type
     imlEdit: TImageList;
     Label1: TLabel;
     Label2: TLabel;
-    ListView1: TListView;
+    lsvSoundDetails: TListView;
     odgAudio: TOpenDialog;
     pgEditTimer: TPageControl;
     tsTimer: TTabSheet;
@@ -218,6 +218,7 @@ begin
   //FSoundInfo.Duration := 0;
   //FSoundInfo.Looped := False;
 
+  //lsvSoundDetails.Items[0].SubItems.Add('');
 
   ReenableControls;
 
@@ -475,7 +476,7 @@ begin
     FileName := odgAudio.FileName;
     Index := SoundPool.LoadSoundFromFile(FileName);
     if Index <> INVALID_SOUNDPOOL_INDEX then
-      FLoadedSoundIndex := Index;
+      LoadedSoundIndex := Index;
   end
   else
     Exit;
@@ -600,10 +601,24 @@ begin
 end;
 
 procedure TfrmEdit.SetLoadedSoundIndex(AValue: integer);
+var
+  Details: TSoundPoolEntryDetails;
+  Item: TListItem;
 begin
   Assert((FLoadedSoundIndex = INVALID_SOUNDPOOL_INDEX) or
     (FLoadedSoundIndex >= SoundPool.CustomSoundRangeStart));
   FLoadedSoundIndex := AValue;
+
+  if FLoadedSoundIndex > INVALID_SOUNDPOOL_INDEX then
+  begin
+    Details := SoundPool.RawSoundDetails[FLoadedSoundIndex]^;
+    lsvSoundDetails.Items.BeginUpdate;
+    lsvSoundDetails.Clear;
+    Item := lsvSoundDetails.Items.Add;
+    Item.Caption:='Source';
+    Item.SubItems.Add(Details.Source);
+    lsvSoundDetails.Items.EndUpdate;
+  end;
 end;
 
 procedure TfrmEdit.SetMetronome(AValue: boolean);
