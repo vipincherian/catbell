@@ -119,12 +119,15 @@ type
     FTestSound: TSndSound;
     FAudioPlayer: TAudioPlayer;
     FVolume: integer;
+    FAmpScale: double;
     function GetVolume: integer;
+    function GetAmplitudeScale: double;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
     procedure SetVolume(AValue: integer);
     procedure ReenableControls;
+    property Volume:integer read GetVolume write SetVolume;
   public
     { public declarations }
     //property Volume: integer read GetVolume write SetVolume;
@@ -150,7 +153,7 @@ end;
 procedure TfrmOptions.tbVolumeChange(Sender: TObject);
 begin
   lblVolume.Caption := IntToStr(tbVolume.Position) + '%';
-  FVolume := tbVolume.Position;
+  Volume := Min(Max(tbVolume.Position, MIN_VOLUME), MAX_VOLUME);
 end;
 
 procedure TfrmOptions.tsAudioShow(Sender: TObject);
@@ -213,7 +216,7 @@ begin
 
     cbUseDefaultSound.Checked := UseDefaultSound;
     cbLoopSound.Checked := LoopSound;
-    tbVolume.Position := Volume;
+    tbVolume.Position := FVolume;
     speBpm.Value := Bpm;
 
     cbOverrideTrayIconSize.Checked := OverrideTrayIconSize;
@@ -253,7 +256,12 @@ end;
 
 function TfrmOptions.GetVolume: integer;
 begin
-  Result := Min(tbVolume.Position, MAX_VOLUME);
+  Result := FVolume;//Min(tbVolume.Position, MAX_VOLUME);
+end;
+
+function TfrmOptions.GetAmplitudeScale: double;
+begin
+  Result := FAmpScale;
 end;
 
 procedure TfrmOptions.GetConfigFromControls(Config: TUserConfig);
@@ -324,7 +332,9 @@ end;
 
 procedure TfrmOptions.SetVolume(AValue: integer);
 begin
-  tbVolume.Position := Min(AValue, MAX_VOLUME);
+  FVolume := Max(Min(AValue, MAX_VOLUME), MIN_VOLUME);
+  //tbVolume.Position := FVolume;
+  FAmpScale:=AudioSystem.ConvertVolumeToAmplitudeScale(FVolume);
 end;
 
 procedure TfrmOptions.ReenableControls;
@@ -349,6 +359,7 @@ begin
   bbStop.Enabled := False;
 
   FVolume := AudioSystem.Volume;
+  FAmpScale:=AudioSystem.AmplitudeScale;
 
   if AudioSystem.Loaded then
   begin
@@ -455,7 +466,8 @@ begin
     //FAudioPlayer.PlaySine;
     //FAudioPlayer.PlayTest;
     //FAudioPlayer.Looped:=True;
-    FAudioPlayer.Play(SoundPool.RawDefaultSound);{ TODO : This should be looped. }
+    FAudioPlayer.AmplitudeScalePoller:=@GetAmplitudeScale;
+    FAudioPlayer.Play(SoundPool.RawDefaultSound);
 
     pgbAudio.Style := pbstMarquee;
     bbPlay.Enabled := False;

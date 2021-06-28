@@ -958,6 +958,7 @@ begin
         //if FCustomSound <> nil then
         //FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
         FAudioPlayer.Looped := SoundLooped;
+        FAudioPlayer.AmplitudeScalePoller:=@AudioSystem.GetAmplitudeScale;
         FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
         { TODO : Implementation for custom sound missing }
       end;

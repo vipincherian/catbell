@@ -37,7 +37,7 @@ type
   EInvalidAudio = class(Exception);
   AudioDeviceIndex = PaDeviceIndex;
 
-  TAmplitudeScalePoller = function(): double of Object;
+  TAmplitudeScalePoller = function(): double of object;
 
   TRawSoundData = record
     Buffer: PAnsiChar;
@@ -114,7 +114,7 @@ type
 
   public
 
-
+    AmplitudeScalePoller: TAmplitudeScalePoller;
     OnPlayCompletion: TNotifyEvent;
     Looped: boolean;
     constructor Create;
@@ -143,7 +143,7 @@ type
 
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
-    function GetAmplitudeScale: double;
+
     //function GetAmplitudeScale: double;
 
 
@@ -159,6 +159,7 @@ type
     function GetDefaultDeviceIndex: AudioDeviceIndex;
     procedure GetDefaultDevice(Device: PAudioDevice);
     function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
+    function GetAmplitudeScale: double;
     property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
     property Devices: TAudioDeviceList read GetDevices;
     //property Volume: integer read FVolume write SetVolume;
@@ -171,6 +172,7 @@ type
     property Volume: integer read FVolume write SetVolume;
     property AmplitudeScale: double read GetAmplitudeScale;
     function LoadSound(Avalue: string): TSound;
+    function ConvertVolumeToAmplitudeScale(Vol: integer): double;
     //property DefaultSound: TSoundData read FDefaultSound;
     //property DefaultTick: TSoundData read FDefaultTick;
   end;
@@ -249,9 +251,9 @@ var
   //UsedSound: TSound;
   Data: pcfloat;
   Count: integer;
-  Volume: double;
+  AmpScale: double;
   //AmpScale: double;
-  //PollVolume: TAmplitudeScalePoller;
+  Poller: TAmplitudeScalePoller;
 begin
   //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
   //Logger.Debug('Inside FeedAudioStream');
@@ -260,9 +262,13 @@ begin
 
   AudioInfo := PRawUserinfo(userData);
 
-  Volume := AudioInfo^.RawSeekable.VolumePoll();
-  Assert((Volume >= MIN_VOLUME) and (Volume <= MAX_VOLUME));
-  //Volume := PollVolume();
+  Poller := AudioInfo^.RawSeekable.VolumePoll;
+  if Poller = nil then
+    Poller := @AudioSystem.GetAmplitudeScale;
+
+
+  AmpScale := Poller();
+  Assert((AmpScale >= 0) and (AmpScale <= 1));
 
   //Assert(AudioInfo <> nil);
   //Assert(AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size);
@@ -289,12 +295,13 @@ begin
   //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
   //    );
 
-  { Apply scaling to amplitude to control volume }
-   Data := output;
-   for Count := 0 to (AudioInfo^.RawSeekable.RawSound^.ChannelCount* frameCount) - 1 do
-   begin
-     Data[Count] := Data[Count] * Volume;//AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
-   end;
+  { Apply scaling to amplitude to control AmpScale }
+  Data := output;
+  for Count := 0 to (AudioInfo^.RawSeekable.RawSound^.ChannelCount * frameCount) - 1 do
+  begin
+    Data[Count] := Data[Count] * AmpScale;
+    //AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
+  end;
 
   AudioInfo^.RawSeekable.Position += BytesToRead;
 
@@ -320,10 +327,11 @@ var
   BytesCompleted: integer = 0;
   //readSuccess: boolean;
   //UsedSound: TSound;
-  //Data: pcfloat;
-  //Count: integer;
-  //Volume: integer;
+  Data: pcfloat;
+  Count: integer;
+  AmpScale: double;
   //AmpScale: double;
+  Poller: TAmplitudeScalePoller;
 begin
   //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
   //Logger.Debug('Inside FeedAudioStream');
@@ -331,6 +339,13 @@ begin
   { Log statements in this callback will invariably result in a crash }
 
   AudioInfo := PRawUserinfo(userData);
+
+  Poller := AudioInfo^.RawSeekable.VolumePoll;
+  if Poller = nil then
+    Poller := @AudioSystem.GetAmplitudeScale;
+  AmpScale := Poller();
+
+  Assert((AmpScale >= 0) and (AmpScale <= 1));
 
   Result := cint(paContinue);
 
@@ -363,6 +378,14 @@ begin
   Move((AudioInfo^.RawSeekable.RawSound^.Buffer +
     AudioInfo^.RawSeekable.Position)^, output^,
     BytesToRead);
+
+  { Apply scaling to amplitude to control AmpScale }
+  Data := output;
+  for Count := 0 to (AudioInfo^.RawSeekable.RawSound^.ChannelCount * frameCount) - 1 do
+  begin
+    Data[Count] := Data[Count] * AmpScale;
+    //AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
+  end;
   //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
   //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
   //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
@@ -755,15 +778,15 @@ procedure TSoundPool.RefillAll;
 var
   Count: integer;
 begin
-  for Count := 0 to FEntries.Count -1 do
+  for Count := 0 to FEntries.Count - 1 do
   begin
     if not RefillRawSound(Count) then
       Logger.Error('Attempting to decode and re-fill raw sound data for index ' +
-      IntToStr(Count) + ' failed at ' + string(
+        IntToStr(Count) + ' failed at ' + string(
         {$INCLUDE %FILE%}
-            ) + ':' + string(
+        ) + ':' + string(
         {$INCLUDE %LINE%}
-            ));
+        ));
   end;
 end;
 
@@ -1054,7 +1077,7 @@ begin
 
   FSeekableSoundData.Position := 0;
   FSeekableSoundData.RawSound := RawSound;
-  FSeekableSoundData.VolumePoll:=@AudioSystem.GetAmplitudeScale;
+  FSeekableSoundData.VolumePoll := AmplitudeScalePoller;
 
 
   if AudioSystem.UseDefaultDevice or (AudioSystem.OutputDevice.HostAPIName = '') or
@@ -1287,12 +1310,14 @@ begin
 end;}
 
 constructor TAudioPlayer.Create;
-//var
-//  i: integer;
+  //var
+  //  i: integer;
 begin
 
   if not AudioSystem.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  AmplitudeScalePoller := nil;
 
   Looped := False;
   FAudioPlaying := False;
@@ -1413,12 +1438,7 @@ begin
   FVolume := Max(Min(AValue, MAX_VOLUME), MIN_VOLUME);
   GlobalUserConfig.Volume := FVolume;
 
-  Assert((FVolume >= 0) and (FVolume <= MAX_VOLUME));
-  AmpScale := Volume / MAX_VOLUME;
-  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
-  Assert((AmpScale >= 0) and (AmpScale <= 1));
-
-  FAmpScale := AmpScale;
+  FAmpScale := ConvertVolumeToAmplitudeScale(FVolume);
 
   //SoundPool.RefillAll;
 end;
@@ -1441,7 +1461,7 @@ end;
 
 procedure TAudioSystem.FreeDefaultSounds;
 begin
-  //FreeMem(FDefaultSound.Buffer);
+  ;//FreeMem(FDefaultSound.Buffer);
   //FreeMem(FDefaultTick.Buffer);
 end;
 
@@ -1555,6 +1575,17 @@ begin
   MpgSound.Free;
 
   raise EInvalidAudio.Create('sndfile & mpg123 returned error for ' + AValue);
+end;
+
+function TAudioSystem.ConvertVolumeToAmplitudeScale(Vol: integer): double;
+var
+  AmpScale: double = 0;
+begin
+  Assert((Vol >= 0) and (Vol <= MAX_VOLUME));
+  AmpScale := Vol / MAX_VOLUME;
+  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
+  Assert((AmpScale >= 0) and (AmpScale <= 1));
+  Result := AmpScale;
 end;
 
 

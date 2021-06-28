@@ -259,6 +259,7 @@ object frmOptions: TfrmOptions
           Caption = 'Changing application icon'
           Checked = True
           TabOrder = 3
+          TabStop = True
         end
         object rbProgressOnOverlayIcon: TRadioButton
           Left = 40
