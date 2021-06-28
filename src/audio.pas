@@ -242,8 +242,8 @@ var
   BytesToRead: integer = 0;
   //readSuccess: boolean;
   //UsedSound: TSound;
-  //Data: pcfloat;
-  //Count: integer;
+  Data: pcfloat;
+  Count: integer;
   //Volume: integer;
   //AmpScale: double;
 begin
@@ -278,6 +278,14 @@ begin
   //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
   //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
   //    );
+
+  { Apply scaling to amplitude to control volume }
+   Data := output;
+   for Count := 0 to (AudioInfo^.RawSeekable.RawSound^.ChannelCount* frameCount) - 1 do
+   begin
+     Data[Count] := Data[Count] * AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
+   end;
+
   AudioInfo^.RawSeekable.Position += BytesToRead;
 
   if (AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size) then
@@ -552,10 +560,10 @@ begin
   //VolumeBuffer := PCFloat(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
 
   { Apply scaling to amplitude to control volume }
-  for Count := 0 to (SndFile.FrameLength * SndFile.Channels) - 1 do
+  {for Count := 0 to (SndFile.FrameLength * SndFile.Channels) - 1 do
   begin
     RawBuffer[Count] := RawBuffer[Count] * AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
-  end;
+  end;}
 
   //FreeMem(Buffer);
   Logger.Debug('Size of default sound - ' + IntToStr(Size));
@@ -1396,7 +1404,7 @@ begin
 
   FAmpScale := AmpScale;
 
-  SoundPool.RefillAll;
+  //SoundPool.RefillAll;
 end;
 
 { TODO : Is this implementation ?}
