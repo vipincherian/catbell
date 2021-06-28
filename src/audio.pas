@@ -37,11 +37,14 @@ type
   EInvalidAudio = class(Exception);
   AudioDeviceIndex = PaDeviceIndex;
 
+  TAmplitudeScalePoller = function(): double of Object;
+
   TRawSoundData = record
     Buffer: PAnsiChar;
     Size: integer;
     ChannelCount: integer;
     SampleFormat: PaSampleFormat;
+    //VolumePoll: TAmplitudeScalePoller;
     //Loaded: boolean;
   end;
   PRawSoundData = ^TRawSoundData;
@@ -52,6 +55,7 @@ type
     RawSound: PRawSoundData;
     //Channels: integer;
     Position: sf_count_t;
+    VolumePoll: TAmplitudeScalePoller;
   end;
   PSeekableRawSoundData = ^TSeekableRawSoundData;
 
@@ -139,6 +143,7 @@ type
 
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
+    function GetAmplitudeScale: double;
     //function GetAmplitudeScale: double;
 
 
@@ -164,7 +169,7 @@ type
     property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
     property Loaded: boolean read FLoaded;
     property Volume: integer read FVolume write SetVolume;
-    property AmplitudeScale: double read FAmpScale;
+    property AmplitudeScale: double read GetAmplitudeScale;
     function LoadSound(Avalue: string): TSound;
     //property DefaultSound: TSoundData read FDefaultSound;
     //property DefaultTick: TSoundData read FDefaultTick;
@@ -244,8 +249,9 @@ var
   //UsedSound: TSound;
   Data: pcfloat;
   Count: integer;
-  //Volume: integer;
+  Volume: double;
   //AmpScale: double;
+  //PollVolume: TAmplitudeScalePoller;
 begin
   //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
   //Logger.Debug('Inside FeedAudioStream');
@@ -253,6 +259,10 @@ begin
   { Log statements in this callback will invariably result in a crash }
 
   AudioInfo := PRawUserinfo(userData);
+
+  Volume := AudioInfo^.RawSeekable.VolumePoll();
+  Assert((Volume >= MIN_VOLUME) and (Volume <= MAX_VOLUME));
+  //Volume := PollVolume();
 
   //Assert(AudioInfo <> nil);
   //Assert(AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size);
@@ -283,7 +293,7 @@ begin
    Data := output;
    for Count := 0 to (AudioInfo^.RawSeekable.RawSound^.ChannelCount* frameCount) - 1 do
    begin
-     Data[Count] := Data[Count] * AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
+     Data[Count] := Data[Count] * Volume;//AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
    end;
 
   AudioInfo^.RawSeekable.Position += BytesToRead;
@@ -892,6 +902,11 @@ begin
   inherited Destroy;
 end;
 
+function TAudioSystem.GetAmplitudeScale: double;
+begin
+  Result := FAmpScale;
+end;
+
 //function TAudioSystem.GetAmplitudeScale: double;
 //var
 //  AmpScale: double;
@@ -1039,6 +1054,7 @@ begin
 
   FSeekableSoundData.Position := 0;
   FSeekableSoundData.RawSound := RawSound;
+  FSeekableSoundData.VolumePoll:=@AudioSystem.GetAmplitudeScale;
 
 
   if AudioSystem.UseDefaultDevice or (AudioSystem.OutputDevice.HostAPIName = '') or
