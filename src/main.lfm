@@ -255,10 +255,10 @@ object frmMain: TfrmMain
   object bbDelete: TBitBtn
     Cursor = crHandPoint
     Left = 611
-    Height = 32
+    Height = 36
     Hint = 'Delete the sected timer(s)'
     Top = 178
-    Width = 32
+    Width = 36
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
     Images = ilMain
@@ -270,10 +270,10 @@ object frmMain: TfrmMain
   object bbMoveUp: TBitBtn
     Cursor = crHandPoint
     Left = 611
-    Height = 32
+    Height = 36
     Hint = 'Move the selected timer(s) up'
     Top = 218
-    Width = 32
+    Width = 36
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
     Images = ilMain
@@ -285,10 +285,10 @@ object frmMain: TfrmMain
   object bbMoveDown: TBitBtn
     Cursor = crHandPoint
     Left = 611
-    Height = 32
+    Height = 36
     Hint = 'Move the selected timer(s) down'
     Top = 258
-    Width = 32
+    Width = 36
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
     Images = ilMain
