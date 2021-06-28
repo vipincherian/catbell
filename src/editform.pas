@@ -386,11 +386,7 @@ begin
   //edtSound.Text := '';
   LoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
   FSoundIndex := SoundPool.DefaultSoundIndex;
-  lsvSoundDetails.BeginUpdate;
-  lsvSoundDetails.Items[0].SubItems.Clear;
-  lsvSoundDetails.Items[1].SubItems.Clear;
-  lsvSoundDetails.Items[2].SubItems.Clear;
-  lsvSoundDetails.EndUpdate;
+  LoadedSoundSource := '';
   ReenableControls;
 end;
 
@@ -663,6 +659,10 @@ begin
     lsvSoundDetails.Items[2].SubItems.Clear;
     lsvSoundDetails.Items[2].SubItems.Add(
       FloatToStr(RoundTo(Details.Duration, -2)) + 's');
+  end
+  else
+  begin
+    lsvSoundDetails.Items[2].SubItems.Clear;
   end;
   lsvSoundDetails.Items.EndUpdate;
 end;
@@ -672,12 +672,24 @@ begin
   if FLoadedSoundSource = AValue then
     Exit;
   FLoadedSoundSource := AValue;
+
   lsvSoundDetails.BeginUpdate;
-  lsvSoundDetails.Items[0].SubItems.Clear;
-  lsvSoundDetails.Items[0].SubItems.Add(ExtractFileName(LoadedSoundSource));
-  lsvSoundDetails.Items[1].SubItems.Clear;
-  lsvSoundDetails.Items[1].SubItems.Add(LoadedSoundSource);
+  if FLoadedSoundSource <> '' then
+  begin
+
+    lsvSoundDetails.Items[0].SubItems.Clear;
+    lsvSoundDetails.Items[0].SubItems.Add(ExtractFileName(LoadedSoundSource));
+    lsvSoundDetails.Items[1].SubItems.Clear;
+    lsvSoundDetails.Items[1].SubItems.Add(LoadedSoundSource);
+
+  end
+  else
+  begin
+    lsvSoundDetails.Items[0].SubItems.Clear;
+    lsvSoundDetails.Items[1].SubItems.Clear;
+  end;
   lsvSoundDetails.EndUpdate;
+
 end;
 
 procedure TfrmEdit.SetMetronome(AValue: boolean);
