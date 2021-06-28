@@ -95,6 +95,7 @@ type
     //FSoundType: TClockSoundType;
     FSoundIndex: integer;
     FLoadedSoundIndex: integer;
+    FLoadedSoundSource: string;
 
     FSoundTypePrevious: integer;
     //FDefaultSound: TSndSound;
@@ -114,6 +115,7 @@ type
     function GetTrayNotification: boolean;
     function GetUseDefaultSound: boolean;
     procedure SetLoadedSoundIndex(AValue: integer);
+    procedure SetLoadedSoundSource(AValue: string);
     procedure SetMetronome(AValue: boolean);
     //function GetAudioFileName: string;
     //function GetAudioLooped: boolean;
@@ -149,6 +151,9 @@ type
     //property UseDefaultSound: boolean read GetUseDefaultSound write SetUseDefaultSound;
     property SoundIndex: integer read FSoundIndex write SetSoundIndex;
     property LoadedSoundIndex: integer read FLoadedSoundIndex write SetLoadedSoundIndex;
+    property LoadedSoundSource: string read FLoadedSoundSource
+      write SetLoadedSoundSource;
+
     property Id: longword read FId;
 
     //property Audio: TAudioPlayer read FAudioPlayer write SetAudio;
@@ -191,6 +196,7 @@ begin
   //FDefaultSound := nil;
   FSoundIndex := SoundPool.DefaultSoundIndex;
   FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
+  LoadedSoundSource := '';
 
   //FSoundType:=ClockSoundDefault;
 
@@ -249,7 +255,7 @@ begin
   //      break;
   //  end;
   //end;
-  //
+
   Close;
 end;
 
@@ -275,8 +281,8 @@ end;
 procedure TfrmEdit.bbTestSoundClick(Sender: TObject);
 begin
   {If the default sound is being used, play that, and scamper}
-  FAudioPlayer.Looped:=ckbLoop.Checked;
-  FAudioPlayer.AmplitudeScalePoller:=@AudioSystem.GetAmplitudeScale;
+  FAudioPlayer.Looped := ckbLoop.Checked;
+  FAudioPlayer.AmplitudeScalePoller := @AudioSystem.GetAmplitudeScale;
   if (FSoundIndex >= SoundPool.DefaultSoundIndex) then
     FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
   ReenableControls;
@@ -380,6 +386,11 @@ begin
   //edtSound.Text := '';
   LoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
   FSoundIndex := SoundPool.DefaultSoundIndex;
+  lsvSoundDetails.BeginUpdate;
+  lsvSoundDetails.Items[0].SubItems.Clear;
+  lsvSoundDetails.Items[1].SubItems.Clear;
+  lsvSoundDetails.Items[2].SubItems.Clear;
+  lsvSoundDetails.EndUpdate;
   ReenableControls;
 end;
 
@@ -490,7 +501,10 @@ begin
     FileName := odgAudio.FileName;
     Index := SoundPool.LoadSoundFromFile(FileName);
     if Index <> INVALID_SOUNDPOOL_INDEX then
+    begin
       LoadedSoundIndex := Index;
+      LoadedSoundSource := FileName;
+    end;
   end
   else
     Exit;
@@ -628,7 +642,7 @@ begin
   FLoadedSoundIndex := AValue;
 
   lsvSoundDetails.Items.BeginUpdate;
-  lsvSoundDetails.Clear;
+  //lsvSoundDetails.Clear;
   if FLoadedSoundIndex > INVALID_SOUNDPOOL_INDEX then
   begin
     { TODO : Autosize columns }
@@ -636,19 +650,34 @@ begin
 
     //lsvSoundDetails.Column[0].Width:=LVSCW_AUTOSIZE;
 
-    Item := lsvSoundDetails.Items.Add;
-    Item.Caption := 'Source';
-    Item.SubItems.Add(ExtractFileName(Details.Source));
+    //Item := lsvSoundDetails.Items.Add;
+    //Item.Caption := 'Source';
+    //Item.SubItems.Add(ExtractFileName(LoadedSoundSource));
 
-    Item := lsvSoundDetails.Items.Add;
-    Item.Caption := 'Full Path';
-    Item.SubItems.Add(Details.Source);
+    //Item := lsvSoundDetails.Items.Add;
+    //Item.Caption := 'Full Path';
+    //Item.SubItems.Add(Details.Source);
 
-    Item := lsvSoundDetails.Items.Add;
-    Item.Caption := 'Duration';
-    Item.SubItems.Add(FloatToStr(RoundTo(Details.Duration, -2)) + 's');
+    //Item := lsvSoundDetails.Items.Add;
+    //Item.Caption := 'Duration';
+    lsvSoundDetails.Items[2].SubItems.Clear;
+    lsvSoundDetails.Items[2].SubItems.Add(
+      FloatToStr(RoundTo(Details.Duration, -2)) + 's');
   end;
   lsvSoundDetails.Items.EndUpdate;
+end;
+
+procedure TfrmEdit.SetLoadedSoundSource(AValue: string);
+begin
+  if FLoadedSoundSource = AValue then
+    Exit;
+  FLoadedSoundSource := AValue;
+  lsvSoundDetails.BeginUpdate;
+  lsvSoundDetails.Items[0].SubItems.Clear;
+  lsvSoundDetails.Items[0].SubItems.Add(ExtractFileName(LoadedSoundSource));
+  lsvSoundDetails.Items[1].SubItems.Clear;
+  lsvSoundDetails.Items[1].SubItems.Add(LoadedSoundSource);
+  lsvSoundDetails.EndUpdate;
 end;
 
 procedure TfrmEdit.SetMetronome(AValue: boolean);

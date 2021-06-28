@@ -178,7 +178,7 @@ type
   end;
 
   TSoundPoolEntryDetails = record
-    Source: string;
+    //Source: string;
     Duration: double;
   end;
   PSoundPoolEntryDetails = ^TSoundPoolEntryDetails;
@@ -770,7 +770,7 @@ begin
     Exit;
   end;
 
-  SoundPoolEntry^.Details.Source := FileName;
+  //SoundPoolEntry^.Details.Source := FileName;
   Result := Index;
 end;
 

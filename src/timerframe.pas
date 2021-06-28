@@ -145,6 +145,7 @@ type
     FAudioPlayer: TAudioPlayer;
     FSoundIndex: integer;
     FLoadedSoundIndex: integer;
+    FLoadedSoundSource: string;
     //FDefaultSound: TSound;
     //FCustomSound: TSound;
 
@@ -248,6 +249,7 @@ type
     property Metronome: boolean read FMetronome write SetMetronome;
     property SoundIndex: integer read FSoundIndex write SetSoundIndex;
     property LoadedSoundIndex: integer read FLoadedSoundIndex write SetLoadedSoundIndex;
+    property LoadedSoundSource: string read FLoadedSoundSource write FLoadedSoundSource;
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
@@ -311,6 +313,7 @@ begin
   //frmEdit.UseDefaultSound:=UseDefaultSound;
   frmEdit.SoundIndex := FSoundIndex;
   frmEdit.LoadedSoundIndex := FLoadedSoundIndex;
+  frmEdit.LoadedSoundSource:=FLoadedSoundSource;
 
   {if AudioSystem.Loaded then
   begin
@@ -333,6 +336,8 @@ begin
     FTrayNotification := frmEdit.TrayNotification;
     FSoundIndex := frmEdit.SoundIndex;
     FLoadedSoundIndex := frmEdit.LoadedSoundIndex;
+    FLoadedSoundSource := frmEdit.LoadedSoundSource;
+
     FModalAlert := frmEdit.ModalAlert;
 
     //OldCustomSound := FCustomSound;
@@ -686,6 +691,7 @@ begin
   //UseDefaultSound:=True;
   FSoundIndex := SoundPool.DefaultSoundIndex;
   FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
+  FLoadedSoundSource:='';
 
   FRunning := False;
   FPaused := False;

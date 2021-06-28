@@ -1422,9 +1422,13 @@ begin
           begin
             NewTimerClock.SoundIndex := SoundIndex;
             NewTimerClock.LoadedSoundIndex := SoundIndex;
+            NewTimerClock.LoadedSoundSource:=AudioFileName;
           end
           else
+          begin
+            Application.MessageBox(PAnsiChar('Could not load file ' + AudioFileName + '. Restting to default sound.'), 'Alert', MB_OK);
             NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+          end;
         end
         else
         begin
@@ -1648,7 +1652,7 @@ begin
     begin
       Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_CUSTOM);
       Conf.SetValue(TIMER_CONF_SOUNDFILEPATH,
-        SoundPool.RawSoundDetails[TimerClock.SoundIndex]^.Source);
+        TimerClock.LoadedSoundSource);
     end
     else
       Logger.Warning('Error while saving clocks');

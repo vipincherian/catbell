@@ -293,6 +293,11 @@ object frmEdit: TfrmEdit
             item
               Width = 181
             end>
+          Items.LazData = {
+            5400000003000000FFFFFFFFFFFFFFFFFFFFFFFF000000000400000046696C65
+            FFFFFFFFFFFFFFFFFFFFFFFF000000000400000050617468FFFFFFFFFFFFFFFF
+            FFFFFFFF00000000080000004475726174696F6E
+          }
           ReadOnly = True
           ShowColumnHeaders = False
           TabOrder = 2
