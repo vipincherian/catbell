@@ -76,7 +76,7 @@ type
     procedure dtpByChange(Sender: TObject);
     procedure dtpDurationChange(Sender: TObject);
     procedure edtDescriptionChange(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -120,7 +120,7 @@ type
     //function GetAudioFileName: string;
     //function GetAudioLooped: boolean;
     //procedure SetAudio(AValue: TAudioPlayer);
-    procedure SetSoundDuration(AValue: double);
+    //procedure SetSoundDuration(AValue: double);
     procedure SetSoundIndex(AValue: integer);
     //procedure SetAudioFileName(AValue: string);
     procedure SetSoundLooped(AValue: boolean);
@@ -160,7 +160,7 @@ type
     //property CurrentSound: TSound read FCurrentSound write SetCurrentSound;
     //property NewSound: TSound read FNewSound write SetNewSound;
     //property AudioFileName: string read GetAudioFileName write SetAudioFileName;
-    property SoundDuration: double read GetSoundDuration write SetSoundDuration;
+    //property SoundDuration: double read GetSoundDuration write SetSoundDuration;
     property SoundLooped: boolean read GetSoundLooped write SetSoundLooped;
     property Metronome: boolean read GetMetronome write SetMetronome;
   end;
@@ -230,8 +230,8 @@ begin
 end;
 
 procedure TfrmEdit.bbSaveClick(Sender: TObject);
-var
-  StartTickCount: longword;
+//var
+//  StartTickCount: longword;
 begin
   //FDescription := edtDescription.Text;
 
@@ -627,7 +627,7 @@ end;
 procedure TfrmEdit.SetLoadedSoundIndex(AValue: integer);
 var
   Details: TSoundPoolEntryDetails;
-  Item: TListItem;
+  //Item: TListItem;
 begin
   Assert((FLoadedSoundIndex = INVALID_SOUNDPOOL_INDEX) or
     (FLoadedSoundIndex >= SoundPool.CustomSoundRangeStart));
@@ -726,15 +726,6 @@ begin
     lblLenthVal.Visible := True;
   end;
 end;}
-
-procedure TfrmEdit.SetSoundDuration(AValue: double);
-begin
-  if not AudioSystem.Loaded then
-  begin
-    //FSoundInfo.Duration := AValue;
-    ;//lblLenthVal.Caption := FloatToStr(RoundTo(FSoundInfo.Duration, -2));
-  end;
-end;
 
 procedure TfrmEdit.SetSoundIndex(AValue: integer);
 begin

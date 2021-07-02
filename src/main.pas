@@ -408,7 +408,7 @@ begin
   begin
     //frmEdit.Audio := nil;
     //frmEdit.AudioFileName := '';
-    frmEdit.SoundDuration := 0;
+    //frmEdit.SoundDuration := 0;
     frmEdit.SoundLooped := False;
   end;
 
@@ -1652,7 +1652,7 @@ begin
     begin
       Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_CUSTOM);
       Conf.SetValue(TIMER_CONF_SOUNDFILEPATH,
-        TimerClock.LoadedSoundSource);
+        UTF8Decode(TimerClock.LoadedSoundSource));
     end
     else
       Logger.Warning('Error while saving clocks');

@@ -572,50 +572,6 @@ begin
     //Exit;
   end;
 
-  {FError := mpg123_format_none(FHandle);
-  if FError <> MPG123_OK then
-  begin
-    Logger.Warning('Error after mpg123_format_none ' + IntToStr(FError) +
-      ' at ' + string(
-{$INCLUDE %FILE%}
-      ) + ':' + string(
-{$INCLUDE %LINE%}
-      ));
-    //Exit;
-  end;}
-
-  {mpg123_rates(Rates, RateCount);
-
-  if Rates <> nil then
-    Logger.Debug('Rates is not nil');
-
-  //Logger.Debug('After mpg123_rates. Rate count is ' + IntToStr(Rates[0]));
-
-
-  for Count := 0 to RateCount - 1 do
-  begin
-    //Logger.Debug('Handling rate count ' + IntToStr(Rates[Count]));
-
-    mpg123_format(FHandle, Rates[Count], MPG123_MONO or MPG123_STEREO,
-      MPG123_ENC_FLOAT_32);
-    if FError <> MPG123_OK then
-      Logger.Debug('Error after mpg123_format ' + IntToStr(FError));
-
-  end;}
-
-  {FError := mpg123_format(FHandle, 44100, MPG123_MONO or MPG123_STEREO,
-    MPG123_ENC_FLOAT_32);
-  if FError <> MPG123_OK then
-  begin
-    Logger.Warning('Error after mpg123_format ' + IntToStr(FError) +
-      ' at ' + string(
-{$INCLUDE %FILE%}
-      ) + ':' + string(
-{$INCLUDE %LINE%}
-      ));
-    //Exit;
-  end;}
-
   FSeekableSoundData.Sound := SoundData;
   FSeekableSoundData.Position := 0;
 

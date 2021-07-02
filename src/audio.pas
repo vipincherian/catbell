@@ -324,7 +324,7 @@ var
   AudioInfo: PRawUserInfo;
   BytesToRead: integer = 0;
   FrameCountBytes: integer = 0;
-  BytesCompleted: integer = 0;
+  //BytesCompleted: integer = 0;
   //readSuccess: boolean;
   //UsedSound: TSound;
   Data: pcfloat;
@@ -503,8 +503,8 @@ var
   Size: integer;
   Read: integer;
   //VolumeBuffer: PCFloat;
-  RawBuffer: PCFloat;
-  Count: integer;
+  //RawBuffer: PCFloat;
+  //Count: integer;
   //Volume: integer;
   //AmpScale: double;
 begin
@@ -565,13 +565,6 @@ begin
       Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer +
         (Size {* SizeOf(cfloat)}), 4096); { TODO : Remove hardcoding of the number }
 
-      //Read := SndFile.Read(@Buffer[0], 10);
-      {Logger.Debug('SoundPoolEntry^.Raw^.Buffer - ' +
-        IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer + (Size * SizeOf(cfloat)))
-        [0], 16) + ' ' + IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer +
-        (Size {* SizeOf(cfloat)}))[1], 16)
-        );}
-      //Logger.Debug('Read bytes - ' + IntToStr(Read));
       Size += Read;
       if Read = 0 then
         Break;
@@ -589,7 +582,7 @@ begin
     );
   { Fill the volume adjusted raw data too. This is used for playing }
 
-  RawBuffer := PCFloat(SoundPoolEntry^.Raw^.Buffer);
+  //RawBuffer := PCFloat(SoundPoolEntry^.Raw^.Buffer);
   //VolumeBuffer := PCFloat(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
 
   { Apply scaling to amplitude to control volume }
@@ -1430,8 +1423,8 @@ begin
 end;
 
 procedure TAudioSystem.SetVolume(AValue: integer);
-var
-  AmpScale: double;
+//var
+//  AmpScale: double;
 begin
   if FVolume = AValue then
     Exit;
