@@ -134,9 +134,9 @@ object frmAbout: TfrmAbout
     TabOrder = 0
     object Label1: TLabel
       Left = 16
-      Height = 15
+      Height = 14
       Top = 8
-      Width = 65
+      Width = 61
       Caption = 'Catbell v1.0'
       Font.Style = [fsBold]
       ParentColor = False
@@ -144,17 +144,17 @@ object frmAbout: TfrmAbout
     end
     object Label2: TLabel
       Left = 16
-      Height = 15
+      Height = 14
       Top = 56
-      Width = 285
+      Width = 276
       Caption = 'A full featured countdown timer manager application.'
       ParentColor = False
     end
     object Label4: TLabel
       Left = 16
-      Height = 15
+      Height = 14
       Top = 32
-      Width = 117
+      Width = 110
       Caption = '© Vipin Cherian 2019'
       Font.Style = [fsBold]
       ParentColor = False
@@ -163,9 +163,9 @@ object frmAbout: TfrmAbout
     object sttUrl: TStaticText
       Cursor = crHandPoint
       Left = 16
-      Height = 16
+      Height = 20
       Top = 80
-      Width = 215
+      Width = 208
       AutoSize = True
       Caption = 'https://sourceforge.net/projects/catbell/'
       Color = clDefault
@@ -193,39 +193,39 @@ object frmAbout: TfrmAbout
     Height = 152
     Top = 128
     Width = 389
-    ActivePage = tsBuild
-    TabIndex = 1
+    ActivePage = tsLicense
+    TabIndex = 0
     TabOrder = 1
     object tsLicense: TTabSheet
       Caption = 'License'
-      ClientHeight = 124
-      ClientWidth = 381
+      ClientHeight = 118
+      ClientWidth = 383
       object ScrollBox1: TScrollBox
-        Left = 0
-        Height = 112
+        Left = 8
+        Height = 104
         Top = 8
-        Width = 376
+        Width = 368
         HorzScrollBar.Page = 28
-        VertScrollBar.Page = 15
-        ClientHeight = 108
-        ClientWidth = 372
+        VertScrollBar.Page = 14
+        ClientHeight = 102
+        ClientWidth = 366
         TabOrder = 0
         object Panel2: TPanel
           Left = 0
-          Height = 108
+          Height = 102
           Top = 0
-          Width = 372
+          Width = 366
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel2'
-          ClientHeight = 108
-          ClientWidth = 372
+          ClientHeight = 102
+          ClientWidth = 366
           TabOrder = 0
           object lblLicense: TLabel
             Left = 0
-            Height = 108
+            Height = 102
             Top = 0
-            Width = 372
+            Width = 366
             Align = alClient
             Caption = 'Label'
             ParentColor = False
@@ -236,8 +236,8 @@ object frmAbout: TfrmAbout
     end
     object tsBuild: TTabSheet
       Caption = 'Build'
-      ClientHeight = 124
-      ClientWidth = 381
+      ClientHeight = 118
+      ClientWidth = 383
       object lsvBuild: TListView
         Left = 8
         Height = 112
@@ -247,12 +247,12 @@ object frmAbout: TfrmAbout
           item
             AutoSize = True
             Caption = 'Key'
-            Width = 34
+            Width = 1
           end        
           item
             AutoSize = True
             Caption = 'Data'
-            Width = 39
+            Width = 351
           end>
         ReadOnly = True
         ShowColumnHeaders = False
