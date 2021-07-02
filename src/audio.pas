@@ -204,6 +204,7 @@ type
     {%H-}destructor {%H-}Destroy; override;
     function GetCustomSoundRangeStart: integer;
     function GetRawDefaultSound: PRawSoundData;
+    function GetRawTickSound: PRawSoundData;
     function GetRawSound(Index: integer): PRawSoundData;
     function GetSoundPoolEntryDetails(Index: integer): PSoundPoolEntryDetails;
     function RefillRawSound(const Index: integer): boolean;
@@ -212,6 +213,7 @@ type
   public
     procedure LoadAllDefaultSounds;
     property RawDefaultSound: PRawSoundData read GetRawDefaultSound;
+    property RawTickSound: PRawSoundData read GetRawTickSound;
     property RawSound[Index: integer]: PRawSoundData read GetRawSound;
     property RawSoundDetails[Index: integer]: PSoundPoolEntryDetails
       read GetSoundPoolEntryDetails;
@@ -462,6 +464,11 @@ begin
   //SoundPoolEntry := FEntries.Items[FDefaultSoundIndex];
   //Result := SoundPoolEntry^.Raw;
   Result := GetRawSound(FDefaultSoundIndex);
+end;
+
+function TSoundPool.GetRawTickSound: PRawSoundData;
+begin
+  Result := GetRawSound(FTickIndex);
 end;
 
 function TSoundPool.GetRawSound(Index: integer): PRawSoundData;

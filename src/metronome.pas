@@ -16,63 +16,72 @@ type
     FAudioPlayer: TAudioPlayer;
     //FTickSound: TSndSound;
     FRunning: boolean;
-    FLastPlayedTick: longword;
-    FBpm: integer;
+    FSubscribers: integer;
+    //FLastPlayedTick: longword;
+    //FBpm: integer;
     //FInterval: integer;
-    FSubscriptions: integer;
-    FBpmTimer: TTimer;
-    procedure SetBpm(AValue: integer);
-    procedure SetRunning(AValue: boolean);
+    //FSubscriptions: integer;
+    //FBpmTimer: TTimer;
+    //procedure SetBpm(AValue: integer);
+    //procedure SetRunning(AValue: boolean);
+    {%H-}constructor Create;
+    {%H-}destructor {%H-}Destroy; override;
 
   public
-    constructor Create;
-    destructor Destroy; override;
+
     //procedure HandleTimerTrigger;
     procedure Abort;
-    procedure Subscribe;
-    procedure Unsubscribe;
-    procedure OnBpmTimer(Sender: TObject);
-    property Running: boolean read FRunning write SetRunning;
-    property Bpm: integer read FBpm write SetBpm;
+    procedure Start;
+    procedure Stop;
+    //procedure Subscribe;
+    //procedure Unsubscribe;
+    //procedure OnBpmTimer(Sender: TObject);
+    property Running: boolean read FRunning;
+    //property Bpm: integer read FBpm write SetBpm;
   end;
+
+var
+  MetronomeInstance: TMetronome = nil;
 
 implementation
 
 { TMetronome }
 
-procedure TMetronome.SetRunning(AValue: boolean);
-begin
-  if FRunning = AValue then
-    Exit;
+//procedure TMetronome.SetRunning(AValue: boolean);
+//begin
+//  if FRunning = AValue then
+//    Exit;
 
-  FRunning := AValue;
-end;
+//  FRunning := AValue;
+//end;
 
-procedure TMetronome.SetBpm(AValue: integer);
-begin
-  if FBpm = AValue then
-    Exit;
-  FBpm := AValue;
-  //FInterval := 60000 div FBpm;
-  FBpmTimer.Interval := 60000 div FBpm
-end;
+//procedure TMetronome.SetBpm(AValue: integer);
+//begin
+//  if FBpm = AValue then
+//    Exit;
+//  FBpm := AValue;
+//  //FInterval := 60000 div FBpm;
+//  FBpmTimer.Interval := 60000 div FBpm;
+//end;
 
 constructor TMetronome.Create;
 begin
-  FSubscriptions:=0;
+  //FSubscriptions := 0;
   FAudioPlayer := TAudioPlayer.Create;
+  FAudioPlayer.Looped := True;
+  FSubscribers := 0;
   //FTickSound := TSndSound.Create;
   //FTickSound.LoadTick;
 
-  FLastPlayedTick := GetTickCount64;
+  //FLastPlayedTick := GetTickCount64;
 
 
-  FBpmTimer := TTimer.Create(nil);
+  //FBpmTimer := TTimer.Create(nil);
   //FBpmTimer.Interval := 60000 div FBpm;
-  FBpmTimer.Enabled := False;
-  FBpmTimer.OnTimer := @OnBpmTimer;
+  //FBpmTimer.Enabled := False;
+  //FBpmTimer.OnTimer := @OnBpmTimer;
 
-  Bpm:=GlobalUserConfig.Bpm;
+  //Bpm := GlobalUserConfig.Bpm;
 
   //Bpm := 100;
   FRunning := False;
@@ -80,7 +89,7 @@ end;
 
 destructor TMetronome.Destroy;
 begin
-  FBpmTimer.Free;
+  //FBpmTimer.Free;
   if FAudioPlayer.Playing then
     Abort;
   //FTickSound.Free;
@@ -105,33 +114,66 @@ begin
   end;
 end;
 
-procedure TMetronome.Subscribe;
+procedure TMetronome.Start;
 begin
-  Inc(FSubscriptions);
-  if not FBpmTimer.Enabled then
+  if not FAudioPlayer.Playing then
   begin
-    FBpmTimer.Enabled:=True;
+    Assert(FSubscribers = 0);
+    FAudioPlayer.Play(SoundPool.RawTickSound);
+    Logger.Info('Metronome started.');
   end;
+  Inc(FSubscribers);
+
+
 end;
 
-procedure TMetronome.Unsubscribe;
+procedure TMetronome.Stop;
 begin
-  Assert(FSubscriptions > 0);
-  //Assert(False);
-  Dec(FSubscriptions);
-  if FSubscriptions = 0 then
-    FBpmTimer.Enabled:=False;
+  if FSubscribers > 0 then
+  begin
+    Assert(FAudioPlayer.Playing);
+    FAudioPlayer.Abort;
+    Logger.Info('Metronome stopped.');
+  end;
+  Dec(FSubscribers);
 end;
 
-procedure TMetronome.OnBpmTimer(Sender: TObject);
-begin
-  //if Bpm <> GlobalUserConfig.Bpm then
-  //  Bpm := GlobalUserConfig.Bpm;
-  if FSubscriptions > 0 then
+//procedure TMetronome.Subscribe;
+//begin
+//  Inc(FSubscriptions);
+//  if not FBpmTimer.Enabled then
+//  begin
+//    FBpmTimer.Enabled := True;
+//  end;
+//end;
+
+//procedure TMetronome.Unsubscribe;
+//begin
+//  Assert(FSubscriptions > 0);
+//  //Assert(False);
+//  Dec(FSubscriptions);
+//  if FSubscriptions = 0 then
+//    FBpmTimer.Enabled := False;
+//end;
+
+//procedure TMetronome.OnBpmTimer(Sender: TObject);
+//begin
+//  //if Bpm <> GlobalUserConfig.Bpm then
+//  //  Bpm := GlobalUserConfig.Bpm;
+//  if FSubscriptions > 0 then
+//  begin
+//    if not FAudioPlayer.Playing then
+//    ;//FAudioPlayer.Play(FTickSound, GlobalUserConfig.Volume, False);
+//  end;
+//end;
+
+initialization;
+  if AudioSystem.Loaded then
   begin
-    if not FAudioPlayer.Playing then
-      ;//FAudioPlayer.Play(FTickSound, GlobalUserConfig.Volume, False);
+    MetronomeInstance := TMetronome.Create;
   end;
-end;
+
+finalization;
+  FreeAndNil(MetronomeInstance);
 
 end.

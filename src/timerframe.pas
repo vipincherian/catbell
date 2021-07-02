@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, {EventLog,} adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LCLIntf, StrUtils, log{, sound};
+  {ctypes,} LCLIntf, StrUtils, log{, sound}, metronome;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -514,9 +514,9 @@ begin
   FMetronome := AValue;
   if Running then
     if FMetronome then
-      frmMain.Metronome.Subscribe
+      MetronomeInstance.Start
     else
-      frmMain.Metronome.Unsubscribe;
+      MetronomeInstance.Stop;
 end;
 
 procedure TfraTimer.SetModalAlert(AValue: boolean);
@@ -839,7 +839,7 @@ begin
   frmMain.TimerStarted(Self);
 
   if Metronome then
-    frmMain.Metronome.Subscribe;
+    MetronomeInstance.Start;
 
   {if frmEdit.Showing and (frmEdit.Id = FId) then
   begin
@@ -873,7 +873,7 @@ begin
   frmMain.TimerPaused(Self);
 
   if Metronome then
-    frmMain.Metronome.Unsubscribe;
+    MetronomeInstance.Stop;
 
 end;
 
@@ -908,7 +908,7 @@ begin
 
     // Stop the Metronome if it is running
     if Metronome and not Paused then
-      frmMain.Metronome.Unsubscribe;
+      MetronomeInstance.Stop;
 
     FRunning := False;
     FPaused := False;

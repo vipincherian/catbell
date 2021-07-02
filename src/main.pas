@@ -223,7 +223,7 @@ type
     FOrder: TIdList;
     FCounterClockID: TSequence;
 
-    FMetronome: TMetronome;
+    //FMetronome: TMetronome;
 
     FShortTimer: TTimer;
 
@@ -275,7 +275,7 @@ type
     procedure AfterShow({%H-}Data: PtrInt);
     procedure ShowModalAlert({%H-}Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
-    property Metronome: TMetronome read FMetronome;
+    //property Metronome: TMetronome read FMetronome;
 
   end;
 
@@ -304,7 +304,7 @@ begin
   AudioSystem.LoadDefaultSounds;
   SoundPool.LoadAllDefaultSounds;
 
-  FMetronome := TMetronome.Create;
+  //FMetronome := TMetronome.Create;
 
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
@@ -615,7 +615,7 @@ begin
 
   FShortTimer.Free;
 
-  FMetronome.Free;
+  //FMetronome.Free;
   //inherited Destroy;
 end;
 

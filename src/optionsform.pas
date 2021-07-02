@@ -319,7 +319,7 @@ begin
     Volume := tbVolume.Position;
 
     Bpm := speBpm.Value;
-    frmMain.Metronome.Bpm := Bpm;
+    //frmMain.Metronome.Bpm := Bpm;
 
     OverrideTrayIconSize := cbOverrideTrayIconSize.Checked;
     OverrideAppIconSize := cbOverrideAppIconSize.Checked;
