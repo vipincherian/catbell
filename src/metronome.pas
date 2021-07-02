@@ -81,7 +81,7 @@ begin
   //FBpmTimer.Enabled := False;
   //FBpmTimer.OnTimer := @OnBpmTimer;
 
-  //Bpm := GlobalUserConfig.Bpm;
+  //Bpm := UserConfig.Bpm;
 
   //Bpm := 100;
   FRunning := False;
@@ -158,12 +158,12 @@ end;
 
 //procedure TMetronome.OnBpmTimer(Sender: TObject);
 //begin
-//  //if Bpm <> GlobalUserConfig.Bpm then
-//  //  Bpm := GlobalUserConfig.Bpm;
+//  //if Bpm <> UserConfig.Bpm then
+//  //  Bpm := UserConfig.Bpm;
 //  if FSubscriptions > 0 then
 //  begin
 //    if not FAudioPlayer.Playing then
-//    ;//FAudioPlayer.Play(FTickSound, GlobalUserConfig.Volume, False);
+//    ;//FAudioPlayer.Play(FTickSound, UserConfig.Volume, False);
 //  end;
 //end;
 

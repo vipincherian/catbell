@@ -357,7 +357,7 @@ begin
 
   tiMain.Icon.Assign(FTrayStoppedBitmap);
 
-  //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
+  //tbUnmute.Enabled := (UserConfig.Volume = 0);
 
   stbMain.BeginUpdate;
   if AudioSystem.Loaded then
@@ -368,7 +368,7 @@ begin
 
   FReportStale := False;
 
-  AudioSystem.Volume:= GlobalUserConfig.Volume;
+  AudioSystem.Volume:= UserConfig.Volume;
 
   tbVolume.Position := AudioSystem.Volume;
   imgVolumeOff.Left := imgVolumeOn.Left;
@@ -385,7 +385,7 @@ var
   Added: TfraTimer;
   //TempAudio: TAudioPlayer;
 begin
-  with GlobalUserConfig do
+  with UserConfig do
   begin
     frmEdit.Duration := DefaultTimerDuration;
 
@@ -511,7 +511,7 @@ begin
   CurrPosRestored.Width := RestoredWidth;
   CurrPosRestored.Height := RestoredHeight;
 
-  with GlobalUserConfig do
+  with UserConfig do
   begin
     LastPosNormal := CurrPosNormal;
     LastPosRestored := CurrPosRestored;
@@ -523,7 +523,7 @@ end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
-  if GlobalUserConfig.QueryExit then
+  if UserConfig.QueryExit then
     CanClose := MessageDlg('Do you really want to close the application?',
       mtConfirmation, [mbYes, mbNo], 0) = mrYes;
 
@@ -574,7 +574,7 @@ end;
 
 procedure TfrmMain.alUnmuteExecute(Sender: TObject); { TODO : What is this? Unmute? }
 begin
-  GlobalUserConfig.Volume := DEF_VOLUME_LEVEL;
+  UserConfig.Volume := DEF_VOLUME_LEVEL;
   //tbUnmute.Enabled := False;
 end;
 
@@ -635,7 +635,7 @@ end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
-  with GlobalUserConfig do
+  with UserConfig do
   begin
     if LastWindowState = wsMaximized then
     begin
@@ -679,7 +679,7 @@ end;
 
 procedure TfrmMain.tbProgressAutoClick(Sender: TObject);
 begin
-  GlobalUserConfig.AutoProgress := tbProgressAuto.Down;
+  UserConfig.AutoProgress := tbProgressAuto.Down;
 end;
 
 procedure TfrmMain.tbVolumeChange(Sender: TObject);
@@ -734,8 +734,8 @@ begin
   //TrayIconSize := GetSystemMetrics(SM_CXSMICON);
   //AppIconSize := GetSystemMetrics(SM_CXICON);
 
-  TrayIconSize := GlobalUserConfig.TrayIconSize;
-  AppIconSize := GlobalUserConfig.AppIconSize;
+  TrayIconSize := UserConfig.TrayIconSize;
+  AppIconSize := UserConfig.AppIconSize;
 
   // Read the image in resources to a stream
   Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
@@ -1202,10 +1202,10 @@ begin
     Icon.Assign(FTrayStoppedBitmap);
 
     {$IF not defined(windows)}
-    Assert(GlobalUserConfig.TaskbarIconType <> TaskbarOverlayIcon);
+    Assert(UserConfig.TaskbarIconType <> TaskbarOverlayIcon);
     {$ENDIF}
 
-    if GlobalUserConfig.TaskbarIconType = TaskbarAppIcon then
+    if UserConfig.TaskbarIconType = TaskbarAppIcon then
       Application.Icon.Assign(FAppStoppedBitmap);
 
     {$IF defined(windows) }
@@ -1247,7 +1247,7 @@ begin
 
 
 
-        if GlobalUserConfig.TaskbarIconType = TaskbarAppIcon then
+        if UserConfig.TaskbarIconType = TaskbarAppIcon then
           Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         {$IF defined(windows)}
         if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
@@ -1304,7 +1304,7 @@ begin
 
   {Once the options form is closed, tool buttons have to be set according
   to the changed options}
-  with GlobalUserConfig do
+  with UserConfig do
   begin
     if tbProgressAuto.Down <> AutoProgress then
     begin
@@ -1319,7 +1319,7 @@ begin
   end;
 
   tbVolume.Position := AudioSystem.Volume;
-  //tbUnmute.Enabled := (GlobalUserConfig.Volume = 0);
+  //tbUnmute.Enabled := (UserConfig.Volume = 0);
 
 end;
 
@@ -1491,7 +1491,7 @@ begin
 
   NewWidget := TfraTimer.Create(sbxClocks);
   NewWidget.Id := Id;
-  NewWidget.TitleEditable := GlobalUserConfig.AllowTimerTitleEdit;
+  NewWidget.TitleEditable := UserConfig.AllowTimerTitleEdit;
 
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;

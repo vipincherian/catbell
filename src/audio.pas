@@ -1436,7 +1436,7 @@ begin
   if FVolume = AValue then
     Exit;
   FVolume := Max(Min(AValue, MAX_VOLUME), MIN_VOLUME);
-  GlobalUserConfig.Volume := FVolume;
+  UserConfig.Volume := FVolume;
 
   FAmpScale := ConvertVolumeToAmplitudeScale(FVolume);
 

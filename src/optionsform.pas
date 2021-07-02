@@ -196,13 +196,13 @@ begin
 
     if AudioSystem.Loaded then
     begin
-      if (GlobalUserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME) or
-        (GlobalUserConfig.AudioHostAPIName <> DEF_AUDIO_HOSTAPI_NAME) then
+      if (UserConfig.AudioDeviceName <> DEF_AUDIO_DEVICE_NAME) or
+        (UserConfig.AudioHostAPIName <> DEF_AUDIO_HOSTAPI_NAME) then
       begin
         for Item in lsvAudioDevices.Items do
         begin
-          Item.Checked := ((Item.Caption = GlobalUserConfig.AudioDeviceName) and
-            (Item.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
+          Item.Checked := ((Item.Caption = UserConfig.AudioDeviceName) and
+            (Item.SubItems[LSVADUIO_INDEX_HOSTAPI] = UserConfig.AudioHostAPIName));
         end;
 
       end;
@@ -247,8 +247,8 @@ begin
       Itm := lsvAudioDevices.Items.Add;
       Itm.Caption := Device^.DeviceName;
       Itm.SubItems.Add(Device^.HostAPIName);
-      Itm.Checked := ((Itm.Caption = GlobalUserConfig.AudioDeviceName) and
-        (Itm.SubItems[LSVADUIO_INDEX_HOSTAPI] = GlobalUserConfig.AudioHostAPIName));
+      Itm.Checked := ((Itm.Caption = UserConfig.AudioDeviceName) and
+        (Itm.SubItems[LSVADUIO_INDEX_HOSTAPI] = UserConfig.AudioHostAPIName));
     end;
     lsvAudioDevices.Items.EndUpdate;
   end;
@@ -353,7 +353,7 @@ begin
   FLastConfig := TUserConfig.Create;
   FChangedConfig := TUserConfig.Create;
   FDefaultConfig := TUserConfig.Create;
-  SetControlsAs(GlobalUserConfig);
+  SetControlsAs(UserConfig);
   pgcOptions.ActivePage := tsTimers;
   FAudioPlayer := nil;
   bbStop.Enabled := False;
@@ -521,8 +521,8 @@ procedure TfrmOptions.bbtnSaveClick(Sender: TObject);
 {var
   Audio: TAudioPlayer;}
 begin
-  GetConfigFromControls(GlobalUserConfig);
-  GlobalUserConfig.Flush;
+  GetConfigFromControls(UserConfig);
+  UserConfig.Flush;
 
   Close;
 end;
@@ -539,7 +539,7 @@ end;
 
 procedure TfrmOptions.cbUseDefaultAudioChange(Sender: TObject);
 begin
-  GlobalUserConfig.UseDefaultAudioDevice := cbUseDefaultAudio.Checked;
+  UserConfig.UseDefaultAudioDevice := cbUseDefaultAudio.Checked;
   lsvAudioDevices.Enabled := (not cbUseDefaultAudio.Checked);
 
 end;
@@ -547,8 +547,8 @@ end;
 
 procedure TfrmOptions.FormShow(Sender: TObject);
 begin
-  SetControlsAs(GlobalUserConfig);
-  FLastConfig.CopyFrom(GlobalUserConfig);
+  SetControlsAs(UserConfig);
+  FLastConfig.CopyFrom(UserConfig);
 end;
 
 procedure TfrmOptions.lsvAudioDevicesDblClick(Sender: TObject);

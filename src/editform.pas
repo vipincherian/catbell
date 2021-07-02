@@ -203,7 +203,7 @@ begin
 
   //FSoundType:=ClockSoundDefault;
 
-  with GlobalUserConfig do
+  with UserConfig do
   begin
     Duration := DefaultTimerDuration;
     Description := DefaultTimerTitle;
@@ -869,8 +869,8 @@ begin
   Caption := 'Add Timer';
   tsTimer.Show;
   FId := longword(-1);
-  //ckbUseDefaultSound.Checked := GlobalUserConfig.LoopSound;
-  //ckbLoop.Checked := GlobalUserConfig.UseDefaultSound;
+  //ckbUseDefaultSound.Checked := UserConfig.LoopSound;
+  //ckbLoop.Checked := UserConfig.UseDefaultSound;
   ReenableControls;
   Result := ShowAndGetSpecs;
 end;

@@ -108,7 +108,7 @@ type
 
 var
   //GlobalDefault: TDefaultConfig;
-  GlobalUserConfig: TUserFileConfig;
+  UserConfig: TUserFileConfig;
 //Logger: TEventLog;
 
 const
@@ -226,14 +226,14 @@ implementation
 //  if not DirectoryExists(GetAppConfigDir(False)) then
 //    CreateDir(GetAppConfigDir(False));
 //
-//  GlobalUserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
+//  UserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
 //
-//  GlobalUserConfig.Load;
+//  UserConfig.Load;
 //end;
 //
 //procedure CleanupSettings;
 //begin
-//  GlobalUserConfig.Free;
+//  UserConfig.Free;
 //end;
 
 
@@ -690,10 +690,10 @@ initialization;
   if not DirectoryExists(GetAppConfigDir(False)) then
     CreateDir(GetAppConfigDir(False));
 
-  GlobalUserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
+  UserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
 
-  GlobalUserConfig.Load;
+  UserConfig.Load;
 
 finalization;
-  FreeAndNil(GlobalUserConfig);
+  FreeAndNil(UserConfig);
 end.

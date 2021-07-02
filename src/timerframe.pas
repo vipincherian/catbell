@@ -645,7 +645,7 @@ begin
   FId := 0;
   FProgress := 0.0;
 
-  with GlobalUserConfig do
+  with UserConfig do
   begin
     dtpSet.Time := DefaultTimerDuration;
     edtTitle.Text := DefaultTimerTitle;
@@ -781,7 +781,7 @@ begin
       longword(Seconds)) * 1000);
 
     FOrigTickDuration := FEndTickCount - FStartTickCount;
-    if GlobalUserConfig.AutoProgress = True then
+    if UserConfig.AutoProgress = True then
     begin
       IsProgressOnIcon := True;
     end;
@@ -901,17 +901,17 @@ begin
       PlayButtonEnabled := False;
       StopButtonEnabled := True;
 
-      AudioSystem.UseDefaultDevice := GlobalUserConfig.UseDefaultAudioDevice;
+      AudioSystem.UseDefaultDevice := UserConfig.UseDefaultAudioDevice;
 
       if not AudioSystem.UseDefaultDevice then
       begin
-        if (GlobalUserConfig.AudioDeviceName = '') or
-          (GlobalUserConfig.AudioHostAPIName = '') then
+        if (UserConfig.AudioDeviceName = '') or
+          (UserConfig.AudioHostAPIName = '') then
           AudioSystem.SetDefaulDevice
         else
         begin
-          Device.DeviceName := GlobalUserConfig.AudioDeviceName;
-          Device.HostAPIName := GlobalUserConfig.AudioHostAPIName;
+          Device.DeviceName := UserConfig.AudioDeviceName;
+          Device.HostAPIName := UserConfig.AudioHostAPIName;
           AudioSystem.OutputDevice := Device;
         end;
 
@@ -920,7 +920,7 @@ begin
       // Play the sound as per configuration
       if FSoundIndex >= SoundPool.DefaultSoundIndex then
       begin
-        //FAudioPlayer.Play(FDefaultSound, GlobalUserConfig.Volume, SoundLooped)
+        //FAudioPlayer.Play(FDefaultSound, UserConfig.Volume, SoundLooped)
         //Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));
         //  FAudioPlayer.Play(SoundPool.RawDefaultSound)
         //end
@@ -929,7 +929,7 @@ begin
         // If UseDefaultSound is false, then audio is loaded.
         // This is alredy checked. No need to check ...
         //if FCustomSound <> nil then
-        //FAudioPlayer.Play(FCustomSound, GlobalUserConfig.Volume, SoundLooped);
+        //FAudioPlayer.Play(FCustomSound, UserConfig.Volume, SoundLooped);
         FAudioPlayer.Looped := SoundLooped;
         FAudioPlayer.AmplitudeScalePoller:=@AudioSystem.GetAmplitudeScale;
         FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
