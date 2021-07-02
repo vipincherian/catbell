@@ -118,16 +118,16 @@ type
     FDefaultConfig: TUserConfig;
     FTestSound: TSndSound;
     FAudioPlayer: TAudioPlayer;
-    FVolume: integer;
+    //FVolume: integer;
     FAmpScale: double;
     function GetVolume: integer;
     function GetAmplitudeScale: double;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
-    procedure SetVolume(AValue: integer);
+    //procedure SetVolume(AValue: integer);
     procedure ReenableControls;
-    property Volume:integer read GetVolume write SetVolume;
+    //property Volume: integer read GetVolume write SetVolume;
   public
     { public declarations }
     //property Volume: integer read GetVolume write SetVolume;
@@ -153,7 +153,9 @@ end;
 procedure TfrmOptions.tbVolumeChange(Sender: TObject);
 begin
   lblVolume.Caption := IntToStr(tbVolume.Position) + '%';
-  Volume := Min(Max(tbVolume.Position, MIN_VOLUME), MAX_VOLUME);
+  //Volume := Min(Max(tbVolume.Position, MIN_VOLUME), MAX_VOLUME);
+  FAmpScale := AudioSystem.ConvertVolumeToAmplitudeScale(
+    Max(Min(tbVolume.Position, MAX_VOLUME), MIN_VOLUME));
 end;
 
 procedure TfrmOptions.tsAudioShow(Sender: TObject);
@@ -256,7 +258,7 @@ end;
 
 function TfrmOptions.GetVolume: integer;
 begin
-  Result := FVolume;//Min(tbVolume.Position, MAX_VOLUME);
+  Result := Max(Min(tbVolume.Position, MAX_VOLUME), MIN_VOLUME);
 end;
 
 function TfrmOptions.GetAmplitudeScale: double;
@@ -331,12 +333,13 @@ begin
   end;
 end;
 
-procedure TfrmOptions.SetVolume(AValue: integer);
-begin
-  FVolume := Max(Min(AValue, MAX_VOLUME), MIN_VOLUME);
-  //tbVolume.Position := FVolume;
-  FAmpScale:=AudioSystem.ConvertVolumeToAmplitudeScale(FVolume);
-end;
+//procedure TfrmOptions.SetVolume(AValue: integer);
+//begin
+//  //FVolume := Max(Min(AValue, MAX_VOLUME), MIN_VOLUME);
+//  //tbVolume.Position := FVolume;
+//  FAmpScale := AudioSystem.ConvertVolumeToAmplitudeScale(
+//    Max(Min(AValue, MAX_VOLUME), MIN_VOLUME));
+//end;
 
 procedure TfrmOptions.ReenableControls;
 begin
@@ -359,8 +362,8 @@ begin
   FAudioPlayer := nil;
   bbStop.Enabled := False;
 
-  FVolume := AudioSystem.Volume;
-  FAmpScale:=AudioSystem.AmplitudeScale;
+  //FVolume := AudioSystem.Volume;
+  FAmpScale := AudioSystem.AmplitudeScale;
 
   if AudioSystem.Loaded then
   begin
@@ -467,7 +470,7 @@ begin
     //FAudioPlayer.PlaySine;
     //FAudioPlayer.PlayTest;
     //FAudioPlayer.Looped:=True;
-    FAudioPlayer.AmplitudeScalePoller:=@GetAmplitudeScale;
+    FAudioPlayer.AmplitudeScalePoller := @GetAmplitudeScale;
     FAudioPlayer.Play(SoundPool.RawDefaultSound);
 
     pgbAudio.Style := pbstMarquee;
