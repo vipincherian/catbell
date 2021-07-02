@@ -195,7 +195,10 @@ begin
   FAudioPlayer.OnPlayCompletion := @AudioPlayed;
   //FDefaultSound := nil;
   FSoundIndex := SoundPool.DefaultSoundIndex;
-  FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
+  {SetLoadedSoundIndex has a check whether the value is changing. If not,
+  it does not do anything. Hence you cannot start with
+  INVALID_SOUNDPOOL_INDEX}
+  FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX - 1;
   LoadedSoundSource := '';
 
   //FSoundType:=ClockSoundDefault;
@@ -302,12 +305,34 @@ end;
 procedure TfrmEdit.cmbSoundTypeChange(Sender: TObject);
 begin
   //ShowMessage('cmbSoundType.ItemIndex - ' + IntToStr(cmbSoundType.ItemIndex));
-  if (cmbSoundType.ItemIndex = SOUND_CUSTOM) and (FLoadedSoundIndex =
-    INVALID_SOUNDPOOL_INDEX) then
-    if LoadSoundFile then
-      FSoundIndex := FLoadedSoundIndex
+  //if (cmbSoundType.ItemIndex = SOUND_CUSTOM) and (FLoadedSoundIndex =
+  //  INVALID_SOUNDPOOL_INDEX) then
+  //  if LoadSoundFile then
+  //    FSoundIndex := FLoadedSoundIndex
+  //  else
+  //    cmbSoundType.ItemIndex := FSoundTypePrevious;
+
+  case cmbSoundType.ItemIndex of
+    SOUND_CUSTOM:
+    begin
+      if FLoadedSoundIndex = INVALID_SOUNDPOOL_INDEX then
+        if LoadSoundFile then
+          FSoundIndex := FLoadedSoundIndex
+        else
+          cmbSoundType.ItemIndex := FSoundTypePrevious
+      else
+        FSoundIndex := FLoadedSoundIndex;
+    end;
+    SOUND_DEFAULT: FSoundIndex := SoundPool.DefaultSoundIndex;
+    SOUND_NONE: FSoundIndex := INVALID_SOUNDPOOL_INDEX;
     else
-      cmbSoundType.ItemIndex := FSoundTypePrevious;
+      Logger.Warning('cmbSoundType.ItemIndex - ' + IntToStr(FSoundIndex) +
+        ' at ' + string(
+    {$INCLUDE %FILE%}
+        ) + ':' + string(
+    {$INCLUDE %LINE%}
+        ));
+  end;
   ReenableControls;
 end;
 
@@ -477,8 +502,8 @@ begin
       ) + ':' + string(
   {$INCLUDE %LINE%}
       ));
-
   bbSave.Enabled := Validate;
+  lsvSoundDetails.Visible:=(FSoundIndex >= SoundPool.CustomSoundRangeStart);
 end;
 
 function TfrmEdit.LoadSoundFile: boolean;
@@ -629,8 +654,8 @@ var
   Details: TSoundPoolEntryDetails;
   //Item: TListItem;
 begin
-  Assert((FLoadedSoundIndex = INVALID_SOUNDPOOL_INDEX) or
-    (FLoadedSoundIndex >= SoundPool.CustomSoundRangeStart));
+  Assert((AValue = INVALID_SOUNDPOOL_INDEX) or
+    (AValue >= SoundPool.CustomSoundRangeStart));
 
   if FLoadedSoundIndex = AValue then
     Exit;
@@ -659,10 +684,12 @@ begin
     lsvSoundDetails.Items[2].SubItems.Clear;
     lsvSoundDetails.Items[2].SubItems.Add(
       FloatToStr(RoundTo(Details.Duration, -2)) + 's');
+    lsvSoundDetails.Visible := True;
   end
   else
   begin
     lsvSoundDetails.Items[2].SubItems.Clear;
+    lsvSoundDetails.Visible := False;
   end;
   lsvSoundDetails.Items.EndUpdate;
 end;
