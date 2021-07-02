@@ -485,10 +485,6 @@ begin
     (not FAudioPlayer.Playing);
   bbClearSound.Enabled := (not WidgetPlayingSound) and (not FAudioPlayer.Playing);
 
-  bbTestSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
-    (not FAudioPlayer.Playing) and (cmbSoundType.ItemIndex <> SOUND_NONE);
-  bbStopSound.Enabled := AudioSystem.Loaded and FAudioPlayer.Playing;
-
   if FSoundIndex = SoundPool.DefaultSoundIndex then
     cmbSoundType.ItemIndex := SOUND_DEFAULT
   else if FSoundIndex = INVALID_SOUNDPOOL_INDEX then
@@ -502,8 +498,19 @@ begin
       ) + ':' + string(
   {$INCLUDE %LINE%}
       ));
+
+  { This /has/ to be after cmbSoundType.ItemIndex is set, as there is a
+  dependency }
+  bbTestSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
+    (not FAudioPlayer.Playing) and (cmbSoundType.ItemIndex <> SOUND_NONE);
+  bbStopSound.Enabled := AudioSystem.Loaded and FAudioPlayer.Playing;
+
+  lsvSoundDetails.Visible := (FSoundIndex >= SoundPool.CustomSoundRangeStart);
+  bbClearSound.Enabled := lsvSoundDetails.Visible;
+
+
   bbSave.Enabled := Validate;
-  lsvSoundDetails.Visible:=(FSoundIndex >= SoundPool.CustomSoundRangeStart);
+
 end;
 
 function TfrmEdit.LoadSoundFile: boolean;
