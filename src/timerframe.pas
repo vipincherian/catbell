@@ -310,21 +310,10 @@ begin
   frmEdit.Duration := dtpSet.Time;
   frmEdit.TrayNotification := FTrayNotification;
   frmEdit.ModalAlert := FModalAlert;
-  //frmEdit.UseDefaultSound:=UseDefaultSound;
+
   frmEdit.SoundIndex := FSoundIndex;
   frmEdit.LoadedSoundIndex := FLoadedSoundIndex;
   frmEdit.LoadedSoundSource:=FLoadedSoundSource;
-
-  {if AudioSystem.Loaded then
-  begin
-    frmEdit.CurrentSound := FCustomSound;
-  end
-  else
-  begin
-    frmEdit.CurrentSound := Nil;
-    //frmEdit.edtSound.Text:= SoundInfo.FileName;
-    //frmEdit.SoundDuration:= SoundInfo.Duration;
-  end;}
 
   frmEdit.SoundLooped := SoundLooped;
   frmEdit.Metronome := Metronome;
@@ -340,31 +329,9 @@ begin
 
     FModalAlert := frmEdit.ModalAlert;
 
-    //OldCustomSound := FCustomSound;
-
     SoundLooped := frmEdit.SoundLooped;
     Metronome := frmEdit.Metronome;
-    {if AudioSystem.Loaded then
-    begin
-      //frmEdit.SoundLooped:=  frmEdit.ckbLoop.Checked;
-      //NewCustomSound := frmEdit.NewSound;
-      {if frmEdit.NewSound <> nil then
-      begin
-        //FCustomSound.Free;
-        //OldCustomSound := nil;
-        //FCustomSound := frmEdit.NewSound;
-        { Now what we have taken over the responsibility of the new sound
-        created, we will set it to nil for frmEdit }
-        frmEdit.NewSound := nil;
-      end;}
 
-    end
-    else
-    begin
-      //SoundInfo.FileName := frmEdit.edtSound.Text;
-      //SoundInfo.Duration := frmEdit.SoundDuration;
-      ;//SoundInfo.Looped := frmEdit.ckbLoop.Checked;
-    end; }
     frmMain.SavetoFile;
   end;
 end;
