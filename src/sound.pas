@@ -149,7 +149,8 @@ implementation
 
 //uses audio;
 
-function sf_vio_get_filelen_impl(user_data: pointer): sf_count_t; cdecl;
+// Implementation of sf_vio_get_filelen
+function SndPtrFileLength(user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSeekableSoundData;
 begin
@@ -160,7 +161,8 @@ begin
   //Logger.Debug('Exiting sf_vio_get_filelen_impl');
 end;
 
-function sf_vio_seek_impl(offset: sf_count_t; whence: cint;
+// Implementation of sf_vio_seek
+function SndPtrSeek(offset: sf_count_t; whence: cint;
   user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSeekableSoundData;
@@ -196,7 +198,8 @@ begin
   //Logger.Debug('Exiting sf_vio_seek_impl');
 end;
 
-function sf_vio_read_impl(ptr: pointer; Count: sf_count_t;
+// Implementation of sf_vio_read
+function SndPtrRead(ptr: pointer; Count: sf_count_t;
   user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSeekableSoundData;
@@ -230,7 +233,9 @@ begin
   //Logger.Debug('Exiting sf_vio_read_impl');
 end;
 
-function sf_vio_write_impl(const {%H-}ptr: pointer; {%H-}Count: sf_count_t;
+
+// Implementation of sf_vio_write
+function SndPtrWrite(const {%H-}ptr: pointer; {%H-}Count: sf_count_t;
   {%H-}user_data: pointer): sf_count_t; cdecl;
 begin
   //Logger.Debug('Entering sf_vio_write_impl');
@@ -238,7 +243,8 @@ begin
   //Logger.Debug('Exiting sf_vio_write_impl');
 end;
 
-function sf_vio_tell_impl(user_data: pointer): sf_count_t; cdecl;
+// Implementation of sf_vio_tell
+function SndPtrTell(user_data: pointer): sf_count_t; cdecl;
 var
   SoundData: PSeekableSoundData;
 begin
@@ -721,11 +727,11 @@ begin
   FSoundFile := nil;
   with FVirtualIOCallbacks do
   begin
-    get_filelen := @sf_vio_get_filelen_impl;
-    Read := @sf_vio_read_impl;
-    seek := @sf_vio_seek_impl;
-    tell := @sf_vio_tell_impl;
-    Write := @sf_vio_write_impl;
+    get_filelen := @SndPtrFileLength;
+    Read := @SndPtrRead;
+    seek := @SndPtrSeek;
+    tell := @SndPtrTell;
+    Write := @SndPtrWrite;
   end;
 
   FSeekableSoundData.Sound := nil;
