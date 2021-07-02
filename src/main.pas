@@ -97,7 +97,6 @@ const
 
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
-  TTimerFrameList = specialize TFPGList<TfraTimer>;
   TIdList = specialize TFPGList<longword>;
 
   { TfrmMain }
@@ -368,7 +367,7 @@ begin
 
   FReportStale := False;
 
-  AudioSystem.Volume:= UserConfig.Volume;
+  AudioSystem.Volume := UserConfig.Volume;
 
   tbVolume.Position := AudioSystem.Volume;
   imgVolumeOff.Left := imgVolumeOn.Left;
@@ -1084,7 +1083,7 @@ var
 
   Duration: TDateTime;
   DurationText: string;
-  Item: TListItem;
+  //Item: TListItem;
 begin
 
   Duration := Sender.Duration;
@@ -1120,9 +1119,11 @@ begin
       Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';}
     //frmAlert.lbMessages.Items.Add(Message);
     { TODO : Add beginupdate? }
-    Item := frmAlert.lsvMessages.Items.Add;
-    Item.Caption := Sender.Caption;
-    Item.SubItems.Add(DurationText);
+    //Item := frmAlert.lsvMessages.Items.Add;
+    //Item.Caption := Sender.Caption;
+    //Item.SubItems.Add(DurationText);
+
+    frmAlert.AddTimer(Sender);
 
 
     Application.QueueAsyncCall(@ShowModalAlert, 0);
@@ -1422,11 +1423,12 @@ begin
           begin
             NewTimerClock.SoundIndex := SoundIndex;
             NewTimerClock.LoadedSoundIndex := SoundIndex;
-            NewTimerClock.LoadedSoundSource:=AudioFileName;
+            NewTimerClock.LoadedSoundSource := AudioFileName;
           end
           else
           begin
-            Application.MessageBox(PAnsiChar('Could not load file ' + AudioFileName + '. Restting to default sound.'), 'Alert', MB_OK);
+            Application.MessageBox(PAnsiChar('Could not load file ' +
+              AudioFileName + '. Restting to default sound.'), 'Alert', MB_OK);
             NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
           end;
         end

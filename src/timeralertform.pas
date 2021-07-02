@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  LCLType, ExtCtrls, Buttons, ComCtrls;
+  LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, fgl, dateutils;
 
 type
 
@@ -35,17 +35,21 @@ type
   TfrmAlert = class(TForm)
     bbClose: TBitBtn;
     Label1: TLabel;
-    FTimer: TTimer;
+    //FTimer: TTimer;
     lsvMessages: TListView;
     procedure bbCloseClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
+    FTimers: TTimerFrameList;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
   public
+    procedure AddTimer(Timer: TfraTimer);
     { public declarations }
   end;
 
@@ -62,6 +66,13 @@ procedure TfrmAlert.FormCreate(Sender: TObject);
 begin
   //AlphaBlend:=True;
   AlphaBlendValue := 50;
+  FTimers := TTimerFrameList.Create;
+end;
+
+procedure TfrmAlert.FormDestroy(Sender: TObject);
+begin
+  FTimers.Clear;
+  FTimers.Free;
 end;
 
 procedure TfrmAlert.FormShow(Sender: TObject);
@@ -77,14 +88,58 @@ begin
   Params.Style := Params.Style or WS_THICKFRAME;
 end;
 
+procedure TfrmAlert.AddTimer(Timer: TfraTimer);
+var
+  Item: TListItem;
+  Hours: word;
+  Minutes: word;
+  Seconds: word;
+
+  Duration: TDateTime;
+  DurationText: string;
+begin
+  FTimers.Add(Timer);
+
+  Duration := Timer.Duration;
+
+  Hours := HourOf(Duration);
+  Minutes := MinuteOf(Duration);
+  Seconds := SecondOf(Duration);
+  DurationText := Format('%.2d', [Hours]) + ':' + Format('%.2d', [Minutes]) +
+    ':' + Format('%.2d', [Seconds]);
+
+  lsvMessages.BeginUpdate;
+  Item := lsvMessages.Items.Add;
+  Item.Caption := Timer.Caption;
+  Item.SubItems.Add(DurationText);
+
+  lsvMessages.EndUpdate;
+end;
+
 procedure TfrmAlert.bbCloseClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+procedure TfrmAlert.FormActivate(Sender: TObject);
 begin
+
+end;
+
+procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+  Timer: TfraTimer = nil;
+begin
+  lsvMessages.BeginUpdate;
   lsvMessages.Items.Clear;
+  lsvMessages.EndUpdate;
+
+  for Timer in FTimers do
+  begin
+    Timer.Stop(True);
+  end;
+  FTimers.Clear;
+
 end;
 
 end.

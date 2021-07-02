@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, {EventLog,} adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LCLIntf, StrUtils, log{, sound}, metronome;
+  {ctypes,} LCLIntf, StrUtils, log{, sound}, metronome, fgl;
 
 const
   TIMER_IMG_GREY_TIMER: integer = 0;
@@ -253,6 +253,7 @@ type
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
+  TTimerFrameList = specialize TFPGList<TfraTimer>;
 
 implementation
 
