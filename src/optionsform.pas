@@ -216,7 +216,7 @@ begin
 
     cbUseDefaultSound.Checked := UseDefaultSound;
     cbLoopSound.Checked := LoopSound;
-    tbVolume.Position := FVolume;
+    tbVolume.Position := AudioSystem.Volume;
     speBpm.Value := Bpm;
 
     cbOverrideTrayIconSize.Checked := OverrideTrayIconSize;
@@ -316,7 +316,8 @@ begin
 
     UseDefaultSound := cbUseDefaultSound.Checked;
     LoopSound := cbLoopSound.Checked;
-    Volume := tbVolume.Position;
+    AudioSystem.Volume := Max(Min(tbVolume.Position, MAX_VOLUME), MIN_VOLUME);
+    Volume := AudioSystem.Volume;
 
     Bpm := speBpm.Value;
     //frmMain.Metronome.Bpm := Bpm;
