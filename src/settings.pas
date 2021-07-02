@@ -25,7 +25,8 @@ unit settings;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf, audio, {EventLog,} LCLIntf, LCLType;
+  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf,
+  audio, {EventLog,} LCLIntf, LCLType;
 
 type
 
@@ -97,9 +98,10 @@ type
     FConf: TJSONConfig;
     procedure Save;
     procedure CreateAnew;
+    {%H-}constructor Create(FileName: string);
+    {%H-}destructor {%H-}Destroy; override;
   public
-    constructor Create(FileName: string);
-    destructor Destroy; override;
+
     procedure Load;
     procedure Flush;
   end;
@@ -107,7 +109,7 @@ type
 var
   //GlobalDefault: TDefaultConfig;
   GlobalUserConfig: TUserFileConfig;
-  //Logger: TEventLog;
+//Logger: TEventLog;
 
 const
   AUDIO_ABORT_SHORT_WAIT = 2000;
@@ -210,29 +212,29 @@ const
 
 
 
-procedure InitSettings;
-procedure CleanupSettings;
+//procedure InitSettings;
+//procedure CleanupSettings;
 
 implementation
 
-procedure InitSettings;
-begin
-  { Combo-box indices are set blindly. An assert to check this during development. }
-  Assert(integer(tf12) = 0);
-  Assert(integer(tf24) = 1);
-
-  if not DirectoryExists(GetAppConfigDir(False)) then
-    CreateDir(GetAppConfigDir(False));
-
-  GlobalUserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
-
-  GlobalUserConfig.Load;
-end;
-
-procedure CleanupSettings;
-begin
-  GlobalUserConfig.Free;
-end;
+//procedure InitSettings;
+//begin
+//  { Combo-box indices are set blindly. An assert to check this during development. }
+//  Assert(integer(tf12) = 0);
+//  Assert(integer(tf24) = 1);
+//
+//  if not DirectoryExists(GetAppConfigDir(False)) then
+//    CreateDir(GetAppConfigDir(False));
+//
+//  GlobalUserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
+//
+//  GlobalUserConfig.Load;
+//end;
+//
+//procedure CleanupSettings;
+//begin
+//  GlobalUserConfig.Free;
+//end;
 
 
 
@@ -310,16 +312,19 @@ begin
     TaskbarIconType := TTaskbarIconType(FConf.GetValue(TASKBAR_ICON_TYPE,
       integer(DEF_TASKBAR_ICON_TYPE)));
 
-    UseDefaultAudioDevice:=FConf.GetValue(USE_DEFAULT_SOUND, DEF_USE_DEFAULT_AUDIO_DEVICE);
-    LoopSound:=FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
-    Volume:=FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
+    UseDefaultAudioDevice := FConf.GetValue(USE_DEFAULT_SOUND,
+      DEF_USE_DEFAULT_AUDIO_DEVICE);
+    LoopSound := FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
+    Volume := FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
     Bpm := FConf.GetValue(METRONOME_BPM, DEF_METRONOME_BPM);
 
-    TrayIconSizeOverridden:= FConf.GetValue(TRAY_ICON_SIZE, DefaultTrayIconSize);
+    TrayIconSizeOverridden := FConf.GetValue(TRAY_ICON_SIZE, DefaultTrayIconSize);
     AppIconSizeOverridden := FConf.GetValue(APP_ICON_SIZE, DefaultAppIconSize);
 
-    OverrideTrayIconSize:=FConf.GetValue(OVERRIDE_TRAY_ICON_SIZE, DEF_OVERRIDE_TRAY_ICON_SIZE);
-    OverrideAppIconSize:=FConf.GetValue(OVERRIDE_APP_ICON_SIZE, DEF_OVERRIDE_APP_ICON_SIZE);
+    OverrideTrayIconSize := FConf.GetValue(OVERRIDE_TRAY_ICON_SIZE,
+      DEF_OVERRIDE_TRAY_ICON_SIZE);
+    OverrideAppIconSize := FConf.GetValue(OVERRIDE_APP_ICON_SIZE,
+      DEF_OVERRIDE_APP_ICON_SIZE);
 
   except
     CreateAnew;
@@ -471,17 +476,17 @@ end;
 function TUserConfig.GetAppIconSize: integer;
 begin
   if OverrideAppIconSize then
-    Result:=AppIconSizeOverridden
+    Result := AppIconSizeOverridden
   else
-    Result:=DefaultAppIconSize;
+    Result := DefaultAppIconSize;
 end;
 
 function TUserConfig.GetTrayIconSize: integer;
 begin
   if OverrideTrayIconSize then
-    Result:=TrayIconSizeOverridden
+    Result := TrayIconSizeOverridden
   else
-    Result:=DefaultTrayIconSize;
+    Result := DefaultTrayIconSize;
 end;
 
 
@@ -508,22 +513,22 @@ begin
 
   TaskbarIconType := DEF_TASKBAR_ICON_TYPE;
 
-  UseDefaultSound:=DEF_USE_DEFAULT_SOUND;
-  LoopSound:=DEF_LOOP_SOUND;
-  Volume:=DEF_VOLUME_LEVEL;
-  Bpm:= DEF_METRONOME_BPM;
+  UseDefaultSound := DEF_USE_DEFAULT_SOUND;
+  LoopSound := DEF_LOOP_SOUND;
+  Volume := DEF_VOLUME_LEVEL;
+  Bpm := DEF_METRONOME_BPM;
 
-  AdjustCompleteby:=DEF_ADJ_COMPLETEBY;
-  AdjustDiff:=DEF_ADJ_DIFF;
+  AdjustCompleteby := DEF_ADJ_COMPLETEBY;
+  AdjustDiff := DEF_ADJ_DIFF;
 
-  DefaultTrayIconSize:=GetSystemMetrics(SM_CXSMICON);
-  DefaultAppIconSize:=GetSystemMetrics(SM_CXICON);
+  DefaultTrayIconSize := GetSystemMetrics(SM_CXSMICON);
+  DefaultAppIconSize := GetSystemMetrics(SM_CXICON);
 
-  TrayIconSizeOverridden:=DefaultTrayIconSize;
-  AppIconSizeOverridden:=DefaultAppIconSize;
+  TrayIconSizeOverridden := DefaultTrayIconSize;
+  AppIconSizeOverridden := DefaultAppIconSize;
 
-  OverrideTrayIconSize:=DEF_OVERRIDE_TRAY_ICON_SIZE;
-  OverrideAppIconSize:=DEF_OVERRIDE_APP_ICON_SIZE;
+  OverrideTrayIconSize := DEF_OVERRIDE_TRAY_ICON_SIZE;
+  OverrideAppIconSize := DEF_OVERRIDE_APP_ICON_SIZE;
 end;
 
 destructor TUserConfig.Destroy;
@@ -553,16 +558,16 @@ begin
 
   TaskbarIconType := From.TaskbarIconType;
 
-  UseDefaultSound:=From.UseDefaultSound;
-  LoopSound:=From.LoopSound;
-  Volume:=From.Volume;
-  Bpm:=From.Bpm;
+  UseDefaultSound := From.UseDefaultSound;
+  LoopSound := From.LoopSound;
+  Volume := From.Volume;
+  Bpm := From.Bpm;
 
-  TrayIconSizeOverridden:=From.TrayIconSizeOverridden;
-  AppIconSizeOverridden:=From.AppIconSizeOverridden;
+  TrayIconSizeOverridden := From.TrayIconSizeOverridden;
+  AppIconSizeOverridden := From.AppIconSizeOverridden;
 
-  OverrideTrayIconSize:=From.OverrideTrayIconSize;
-  OverrideAppIconSize:=From.OverrideAppIconSize;
+  OverrideTrayIconSize := From.OverrideTrayIconSize;
+  OverrideAppIconSize := From.OverrideAppIconSize;
 
 end;
 
@@ -677,6 +682,18 @@ begin
   Result := True;
 end;
 
+initialization;
+  { Combo-box indices are set blindly. An assert to check this during development. }
+  Assert(integer(tf12) = 0);
+  Assert(integer(tf24) = 1);
 
+  if not DirectoryExists(GetAppConfigDir(False)) then
+    CreateDir(GetAppConfigDir(False));
+
+  GlobalUserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
+
+  GlobalUserConfig.Load;
+
+finalization;
+  FreeAndNil(GlobalUserConfig);
 end.
-

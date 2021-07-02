@@ -64,7 +64,7 @@ begin
 
 
   Application.Initialize;
-  InitSettings;
+  //InitSettings;
 
   Application.CreateForm(TfrmMain, frmMain);
 
@@ -78,6 +78,6 @@ begin
   Application.CreateForm(TfrmAdjust, frmAdjust);
   Application.Run;
 
-  CleanupSettings;
+  //CleanupSettings;
 
 end.
