@@ -1040,7 +1040,6 @@ begin
         FAudioPlayer.Looped := SoundLooped;
         FAudioPlayer.AmplitudeScalePoller := @AudioSystem.GetAmplitudeScale;
         FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
-        { TODO : Implementation for custom sound missing }
       end;
 
       //Logger.Debug('FAudio.Play');

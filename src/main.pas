@@ -908,7 +908,7 @@ begin
     Timer := FReference;
   end;
 
-  hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width;
+  hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width + (TIMER_PADDING div 2);
   Inc(Filled, hdrTimers.Sections.Items[0].Width);
 
   Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
@@ -1116,18 +1116,7 @@ begin
 
   if Sender.ModalAlert and (not UserInitiated) then
   begin
-    {Message :=
-      Sender.Caption + ' (' + Format('%.2d', [Hours]) + ':' +
-      Format('%.2d', [Minutes]) + ':' + Format('%.2d', [Seconds]) + ')';}
-    //frmAlert.lbMessages.Items.Add(Message);
-    { TODO : Add beginupdate? }
-    //Item := frmAlert.lsvMessages.Items.Add;
-    //Item.Caption := Sender.Caption;
-    //Item.SubItems.Add(DurationText);
-
     frmAlert.AddTimer(Sender);
-
-
     Application.QueueAsyncCall(@ShowModalAlert, 0);
   end;
   UpdateStatusTimerCount;
@@ -1405,9 +1394,6 @@ begin
       //NewTimerClock.UseDefaultSound :=
       //  Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
       NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
-      { TODO : Read from settings }
-
-
 
       AudioFileName := string(
         Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH), ''));

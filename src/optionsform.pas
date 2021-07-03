@@ -459,7 +459,6 @@ begin
       begin
         if Item.Checked then
         begin
-          // TODO: FOutpuDevice should be renamed?
           Device.DeviceName := Item.Caption;
           Device.HostAPIName := Item.SubItems[LSVADUIO_INDEX_HOSTAPI];
           AudioSystem.OutputDevice := Device;

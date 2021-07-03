@@ -1060,7 +1060,6 @@ begin
 
   if FAudioPlaying then
   begin
-    { TODO : Handle this situation more elegantly }
     Logger.Error('Attempt to play audio when audio is already being played. At '
       + string(
   {$INCLUDE %FILE%}
@@ -1101,7 +1100,7 @@ begin
     IntToStr(StreamParams.sampleFormat));
   //Sound.SampleRate
   //Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate);
-  { TODO : Change to low latency }
+
   Streamparams.suggestedLatency :=
     (Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency);
   StreamParams.hostApiSpecificStreamInfo := nil;

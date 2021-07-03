@@ -311,7 +311,7 @@ end;
 
 function TMpgSound.GetSampleFormat: PaSampleFormat;
 begin
-  Result := paFloat32;                { TODO : Is this defaulting correct? }
+  Result := paFloat32;
 end;
 
 function TMpgSound.GetSampleRate: integer;
