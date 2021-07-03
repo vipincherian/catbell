@@ -2,10 +2,10 @@ object fraTimer: TfraTimer
   Left = 0
   Height = 39
   Top = 0
-  Width = 708
+  Width = 707
   Align = alTop
   ClientHeight = 39
-  ClientWidth = 708
+  ClientWidth = 707
   TabOrder = 0
   DesignLeft = 248
   DesignTop = 159
@@ -21,14 +21,14 @@ object fraTimer: TfraTimer
     Left = 65
     Height = 25
     Top = 9
-    Width = 255
+    Width = 247
     Anchors = [akTop, akLeft, akRight]
     ReadOnly = True
     TabOrder = 1
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 568
+    Left = 560
     Height = 14
     Top = 14
     Width = 42
@@ -49,7 +49,7 @@ object fraTimer: TfraTimer
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 328
+    Left = 320
     Height = 22
     Top = 10
     Width = 63
@@ -74,7 +74,7 @@ object fraTimer: TfraTimer
   end
   object bbPlay: TBitBtn
     Cursor = crHandPoint
-    Left = 400
+    Left = 392
     Height = 36
     Hint = 'Start the timer'
     Top = 3
@@ -90,7 +90,7 @@ object fraTimer: TfraTimer
   end
   object bbPause: TBitBtn
     Cursor = crHandPoint
-    Left = 440
+    Left = 432
     Height = 36
     Hint = 'Pause the timer'
     Top = 3
@@ -182,7 +182,7 @@ object fraTimer: TfraTimer
   end
   object bbStop: TBitBtn
     Cursor = crHandPoint
-    Left = 480
+    Left = 472
     Height = 36
     Hint = 'Stop the timer'
     Top = 3
@@ -274,7 +274,7 @@ object fraTimer: TfraTimer
   end
   object bbEdit: TBitBtn
     Cursor = crHandPoint
-    Left = 665
+    Left = 664
     Height = 36
     Hint = 'Edit the timer'
     Top = 3
@@ -364,7 +364,7 @@ object fraTimer: TfraTimer
     TabOrder = 8
   end
   object ckbIconProgress: TCheckBox
-    Left = 633
+    Left = 624
     Height = 21
     Top = 11
     Width = 21
@@ -374,7 +374,7 @@ object fraTimer: TfraTimer
   end
   object bbAdjust: TBitBtn
     Cursor = crHandPoint
-    Left = 520
+    Left = 512
     Height = 36
     Hint = 'Tweak this run of the timer'
     Top = 3
