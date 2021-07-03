@@ -56,6 +56,7 @@ type
     GroupBox2: TGroupBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
+    GroupBox5: TGroupBox;
     imlEdit: TImageList;
     Label1: TLabel;
     Label2: TLabel;
