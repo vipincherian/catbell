@@ -93,6 +93,7 @@ object frmAlert: TfrmAlert
     ReadOnly = True
     TabOrder = 1
     ViewStyle = vsReport
+    OnItemChecked = lsvMessagesItemChecked
   end
   object bbRestart: TBitBtn
     Left = 8

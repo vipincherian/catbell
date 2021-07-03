@@ -45,12 +45,14 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure lsvMessagesItemChecked(Sender: TObject; Item: TListItem);
   private
     { private declarations }
-    FTimers: TTimerFrameList;
+    //FTimers: TTimerFrameList;
     procedure StopTimers;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
+    procedure ReenableControls;
   public
     procedure AddTimer(Timer: TfraTimer);
     { public declarations }
@@ -69,13 +71,14 @@ procedure TfrmAlert.FormCreate(Sender: TObject);
 begin
   //AlphaBlend:=True;
   AlphaBlendValue := 50;
-  FTimers := TTimerFrameList.Create;
+  //FTimers := TTimerFrameList.Create;
+  bbRestart.Enabled := False;
 end;
 
 procedure TfrmAlert.FormDestroy(Sender: TObject);
 begin
-  FTimers.Clear;
-  FTimers.Free;
+  //FTimers.Clear;
+  //FTimers.Free;
 end;
 
 procedure TfrmAlert.FormShow(Sender: TObject);
@@ -85,12 +88,25 @@ begin
   //FTimer.Interval:=2000;
 end;
 
+procedure TfrmAlert.lsvMessagesItemChecked(Sender: TObject; Item: TListItem);
+begin
+  ReenableControls;
+end;
+
+
 procedure TfrmAlert.StopTimers;
 var
   Timer: TfraTimer = nil;
+  Item: TListItem;
 begin
-  for Timer in FTimers do
+  //for Timer in FTimers do
+  //begin
+  //  Timer.Stop(True);
+  //end;
+
+  for Item in lsvMessages.Items do
   begin
+    Timer := TfraTimer(Item.Data);
     Timer.Stop(True);
   end;
 end;
@@ -99,6 +115,22 @@ procedure TfrmAlert.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
   Params.Style := Params.Style or WS_THICKFRAME;
+end;
+
+procedure TfrmAlert.ReenableControls;
+var
+  Item: TListItem;
+  AtLeastOneSelected: boolean = False;
+begin
+  for Item in lsvMessages.Items do
+  begin
+    if Item.Checked then
+    begin
+      AtLeastOneSelected := True;
+      Break;
+    end;
+  end;
+  bbRestart.Enabled := AtLeastOneSelected;
 end;
 
 procedure TfrmAlert.AddTimer(Timer: TfraTimer);
@@ -111,7 +143,7 @@ var
   Duration: TDateTime;
   DurationText: string;
 begin
-  FTimers.Add(Timer);
+  //FTimers.Add(Timer);
 
   Duration := Timer.Duration;
 
@@ -123,6 +155,7 @@ begin
 
   lsvMessages.BeginUpdate;
   Item := lsvMessages.Items.Add;
+  Item.Data := Timer;
   Item.Caption := Timer.Caption;
   Item.SubItems.Add(DurationText);
 
@@ -138,10 +171,18 @@ end;
 procedure TfrmAlert.bbRestartClick(Sender: TObject);
 var
   Entry: TfraTimer;
+  Item: TListItem;
 begin
   Cursor := crHourGlass;
   StopTimers;
-  for Entry in FTimers do Entry.RestartFromLastFinish;
+  //for Entry in FTimers do Entry.RestartFromLastFinish;
+  for Item in lsvMessages.Items do
+  begin
+    if not Item.Checked then
+      Continue;
+    Entry := TfraTimer(Item.Data);
+    Entry.RestartFromLastFinish;{ TODO : If any fail, show a message }
+  end;
   Cursor := crDefault;
   Close;
 end;
@@ -159,10 +200,10 @@ begin
   lsvMessages.Items.Clear;
   lsvMessages.EndUpdate;
 
-  FTimers.Clear;
+  ReenableControls;
+  //FTimers.Clear;
 
 end;
 
 end.
-
 
