@@ -78,6 +78,10 @@ const
 
   TIMER_CONF_METRONOME = 'metronome';
 
+  // For auto arranging
+  TIMER_PADDING = 5;
+  TIMER_REPORT_PADDING = 20;
+
 //UM_PLAY_AUDIO = LM_USER + 1;
 //UM_FINISHED_AUDIO = LM_USER + 2;
 
@@ -181,6 +185,7 @@ type
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: longword);
     procedure ReenableEditControls;
+    procedure ArrangeControls;
   public
     { public declarations }
 
@@ -600,6 +605,23 @@ begin
   end;
 end;
 
+procedure TfraTimer.ArrangeControls;
+begin
+  cbSelect.Left := TIMER_PADDING;
+  imgTimer.Left := cbSelect.Left + cbSelect.Width + TIMER_PADDING;
+  edtTitle.Left := imgTimer.Left + imgTimer.Width + TIMER_PADDING;
+
+  bbEdit.Left := ClientWidth - bbEdit.Width - TIMER_PADDING;
+  ckbIconProgress.Left := bbEdit.Left - ckbIconProgress.Width - TIMER_REPORT_PADDING;
+  lblCountdown.Left := ckbIconProgress.Left - lblCountdown.Width - TIMER_REPORT_PADDING;
+  bbAdjust.Left := lblCountdown.Left - bbAdjust.Width - TIMER_PADDING;
+  bbStop.Left := bbAdjust.Left - bbStop.Width - TIMER_PADDING;
+  bbPause.Left := bbStop.Left - bbPause.Width - TIMER_PADDING;
+  bbPlay.Left := bbPause.Left - bbPlay.Width - TIMER_PADDING;
+  dtpSet.Left := bbPlay.Left - dtpSet.Width - TIMER_PADDING;
+  edtTitle.Width := dtpSet.Left - edtTitle.Left - TIMER_PADDING;
+end;
+
 function TfraTimer.RestartFromLastFinish: boolean;
 var
   EstimatedCompletion, Diff, CurrentTime: TDateTime;
@@ -772,6 +794,7 @@ begin
   Metronome := False;
 
   FLastCompletionTime := 0;
+  ArrangeControls;
 end;
 
 destructor TfraTimer.Destroy;

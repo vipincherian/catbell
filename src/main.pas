@@ -931,12 +931,14 @@ begin
   Inc(Filled, Temp);
 
   Temp := Timer.lblCountdown.Left + Timer.lblCountdown.Width;
-  Temp := Temp + ((Timer.ckbIconProgress.Left - Temp) div 2) - Filled;
+  //Temp := Temp + ((Timer.ckbIconProgress.Left - Temp) div 2) - Filled;
+  Temp := Temp - Filled + (TIMER_PADDING div 2);
   hdrTimers.Sections.Items[3].Width := Temp;
   Inc(Filled, Temp);
 
   Temp := Timer.ckbIconProgress.Left + Timer.ckbIconProgress.Width;
-  Temp := Temp + ((Timer.bbEdit.Left - Temp) div 2) - Filled;
+  //Temp := Temp + ((Timer.bbEdit.Left - Temp) div 2) - Filled;
+  Temp := Temp - Filled + TIMER_REPORT_PADDING - (TIMER_PADDING div 2);
   hdrTimers.Sections.Items[4].Width := Temp;
   Inc(Filled, Temp);
 
