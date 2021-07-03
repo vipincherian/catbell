@@ -53,7 +53,7 @@ object frmAlert: TfrmAlert
   OnShow = FormShow
   LCLVersion = '2.0.6.0'
   object bbClose: TBitBtn
-    Left = 128
+    Left = 253
     Height = 30
     Top = 152
     Width = 75
@@ -77,6 +77,7 @@ object frmAlert: TfrmAlert
     Height = 112
     Top = 32
     Width = 320
+    Checkboxes = True
     Columns = <    
       item
         AutoSize = True
@@ -92,5 +93,14 @@ object frmAlert: TfrmAlert
     ReadOnly = True
     TabOrder = 1
     ViewStyle = vsReport
+  end
+  object bbRestart: TBitBtn
+    Left = 8
+    Height = 30
+    Top = 152
+    Width = 75
+    Caption = '&Restart'
+    OnClick = bbRestartClick
+    TabOrder = 2
   end
 end

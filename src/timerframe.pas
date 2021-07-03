@@ -146,6 +146,8 @@ type
     FSoundIndex: integer;
     FLoadedSoundIndex: integer;
     FLoadedSoundSource: string;
+
+    FLastCompletionTime: TDateTime;
     //FDefaultSound: TSound;
     //FCustomSound: TSound;
 
@@ -179,7 +181,6 @@ type
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: longword);
     procedure ReenableEditControls;
-
   public
     { public declarations }
 
@@ -219,6 +220,7 @@ type
     procedure LoadState(var LoadFrom: TTimerState);
 
     procedure AbortSound;
+    function RestartFromLastFinish: boolean;
 
     property PlayButtonEnabled: boolean read GetPlayButtonEnabled
       write SetPlayButtonEnabled;
@@ -253,6 +255,7 @@ type
     //property PendingTickCount: longword read FPendingTickCount;
 
   end;
+
   TTimerFrameList = specialize TFPGList<TfraTimer>;
 
 implementation
@@ -281,7 +284,7 @@ end;
 
 procedure TfraTimer.bbAdjustClick(Sender: TObject);
 begin
-;
+  ;
 end;
 
 procedure TfraTimer.ckbIconProgressChange(Sender: TObject);
@@ -314,7 +317,7 @@ begin
 
   frmEdit.SoundIndex := FSoundIndex;
   frmEdit.LoadedSoundIndex := FLoadedSoundIndex;
-  frmEdit.LoadedSoundSource:=FLoadedSoundSource;
+  frmEdit.LoadedSoundSource := FLoadedSoundSource;
 
   frmEdit.SoundLooped := SoundLooped;
   frmEdit.Metronome := Metronome;
@@ -361,7 +364,7 @@ end;
 
 procedure TfraTimer.imgTimerClick(Sender: TObject);
 begin
-;
+  ;
 end;
 
 procedure TfraTimer.SetId(AValue: longword);
@@ -597,6 +600,81 @@ begin
   end;
 end;
 
+function TfraTimer.RestartFromLastFinish: boolean;
+var
+  EstimatedCompletion, Diff, CurrentTime: TDateTime;
+  Hours, Mins, Secs: word;
+  DiffMilli: int64 = 0;
+  NewEndTickCount, Adjustment: longword;
+  StartTickCount: longword = 0;
+begin
+  Result := False;
+
+  Assert(not Running);
+
+  Hours := HourOf(Duration);
+  Mins := MinuteOf(Duration);
+  Secs := SecondOf(Duration);
+
+  EstimatedCompletion := FLastCompletionTime;
+  IncHour(EstimatedCompletion, Hours);
+  IncMinute(EstimatedCompletion, Mins);
+  IncSecond(EstimatedCompletion, Secs);
+
+  CurrentTime := Now;
+
+  { Is it too late to re-start? }
+  if (FLastCompletionTime + Duration) <= CurrentTime then
+  begin
+    Logger.Debug('EstimatedCompletion - ' + DateTimeToStr(EstimatedCompletion));
+    Logger.Debug('FLastCompletionTime - ' + DateTimeToStr(FLastCompletionTime));
+    Logger.Debug('Added - ' + DateTimeToStr(FLastCompletionTime + Duration));
+    Logger.Debug('Now - ' + DateTimeToStr(Now));
+    Exit;
+  end;
+
+  Diff := CurrentTime - FLastCompletionTime;
+
+  Hours := HourOf(Diff);
+  Mins := MinuteOf(Diff);
+  Secs := SecondOf(Diff);
+
+  //Logger.Debug('Adjustment Secs - ' + IntToStr(Secs));
+
+  // Wait for audio player to finish before starting again
+  StartTickCount := GetTickCount64;
+  // Wait for FAudio to complete
+  if FAudioPlayer.Playing then
+  begin
+    FAudioPlayer.Abort;
+    while FAudioPlayer.Playing do
+    begin
+      Logger.Debug('Waiting for');
+      Application.ProcessMessages;
+      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+      begin
+        Logger.Warning('FAudioPlayer Abort did not complete. ' +
+          'Cannot restart timer');
+        Exit;
+      end;
+    end;
+  end;
+
+  Start;
+
+  Adjustment := MilliSecondsBetween(CurrentTime, FLastCompletionTime);
+
+  //Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
+  //  longword(Secs)) * 1000);
+  Logger.Debug('Adjustment - ' + IntToStr(Adjustment));
+
+  NewEndTickCount := FEndTickCount - Adjustment;
+
+  FEndTickCount := NewEndTickCount;
+  HandleTimerTrigger();
+  Result := True;
+end;
+
 procedure TfraTimer.ClockSelected(Sender: TObject);
 begin
   frmMain.ClockSelected(Self);
@@ -659,7 +737,7 @@ begin
   //UseDefaultSound:=True;
   FSoundIndex := SoundPool.DefaultSoundIndex;
   FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
-  FLoadedSoundSource:='';
+  FLoadedSoundSource := '';
 
   FRunning := False;
   FPaused := False;
@@ -692,6 +770,8 @@ begin
   end;
   //FCustomSound := nil;
   Metronome := False;
+
+  FLastCompletionTime := 0;
 end;
 
 destructor TfraTimer.Destroy;
@@ -850,7 +930,10 @@ var
   Device: TAudioDevice;
 begin
   { The audio is playing and the user request is to terminate the audio.}
-  Logger.Debug('Entering Stop. UserInitiated - ' + IfThen(UserInitiated, 'True', 'False'));
+  Logger.Debug('Entering Stop. UserInitiated - ' +
+    IfThen(UserInitiated, 'True', 'False'));
+
+  //FLastCompletionTime := Now;
   if AudioSystem.Loaded and FAudioPlayer.Playing then
   begin
     FRunning := False;
@@ -873,7 +956,7 @@ begin
   else
     {The timer run has completed. Stop the timer and play audio if required}
   begin
-
+    FLastCompletionTime := Now;
     // Stop the Metronome if it is running
     if Metronome and not Paused then
       MetronomeInstance.Stop;
@@ -932,7 +1015,7 @@ begin
         //if FCustomSound <> nil then
         //FAudioPlayer.Play(FCustomSound, UserConfig.Volume, SoundLooped);
         FAudioPlayer.Looped := SoundLooped;
-        FAudioPlayer.AmplitudeScalePoller:=@AudioSystem.GetAmplitudeScale;
+        FAudioPlayer.AmplitudeScalePoller := @AudioSystem.GetAmplitudeScale;
         FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
         { TODO : Implementation for custom sound missing }
       end;

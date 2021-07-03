@@ -34,10 +34,12 @@ type
 
   TfrmAlert = class(TForm)
     bbClose: TBitBtn;
+    bbRestart: TBitBtn;
     Label1: TLabel;
     //FTimer: TTimer;
     lsvMessages: TListView;
     procedure bbCloseClick(Sender: TObject);
+    procedure bbRestartClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -46,6 +48,7 @@ type
   private
     { private declarations }
     FTimers: TTimerFrameList;
+    procedure StopTimers;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
   public
@@ -80,6 +83,16 @@ begin
   Left := (Screen.Width - Width) div 2;
   Top := (Screen.Height - Height) div 2;
   //FTimer.Interval:=2000;
+end;
+
+procedure TfrmAlert.StopTimers;
+var
+  Timer: TfraTimer = nil;
+begin
+  for Timer in FTimers do
+  begin
+    Timer.Stop(True);
+  end;
 end;
 
 procedure TfrmAlert.CreateParams(var Params: TCreateParams);
@@ -118,6 +131,18 @@ end;
 
 procedure TfrmAlert.bbCloseClick(Sender: TObject);
 begin
+  StopTimers;
+  Close;
+end;
+
+procedure TfrmAlert.bbRestartClick(Sender: TObject);
+var
+  Entry: TfraTimer;
+begin
+  Cursor := crHourGlass;
+  StopTimers;
+  for Entry in FTimers do Entry.RestartFromLastFinish;
+  Cursor := crDefault;
   Close;
 end;
 
@@ -134,10 +159,6 @@ begin
   lsvMessages.Items.Clear;
   lsvMessages.EndUpdate;
 
-  for Timer in FTimers do
-  begin
-    Timer.Stop(True);
-  end;
   FTimers.Clear;
 
 end;
