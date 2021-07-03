@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, fgl, dateutils;
+  LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, {fgl,} dateutils;
 
 type
 
@@ -45,7 +45,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure lsvMessagesItemChecked(Sender: TObject; Item: TListItem);
+    procedure lsvMessagesItemChecked(Sender: TObject; {%H-}Item: TListItem);
   private
     { private declarations }
     //FTimers: TTimerFrameList;
@@ -172,17 +172,27 @@ procedure TfrmAlert.bbRestartClick(Sender: TObject);
 var
   Entry: TfraTimer;
   Item: TListItem;
+  ErrorMessage: string;
+  Failures: integer = 0;
 begin
   Cursor := crHourGlass;
   StopTimers;
   //for Entry in FTimers do Entry.RestartFromLastFinish;
+  ErrorMessage := '';
   for Item in lsvMessages.Items do
   begin
     if not Item.Checked then
       Continue;
     Entry := TfraTimer(Item.Data);
-    Entry.RestartFromLastFinish;{ TODO : If any fail, show a message }
+    if not Entry.RestartFromLastFinish then
+    begin
+      Inc(Failures);
+      ErrorMessage += IntToStr(Failures) + '. ' + Entry.Caption + LineEnding;
+    end;
   end;
+  //ShowMessage('The following timers failed to restart:' + LineEnding + ErrorMessage);
+  MessageDlg('The following timers failed to restart: ' + LineEnding +
+    '(time duration elapsed).' + LineEnding + ErrorMessage, mtError, [mbOK], 0);
   Cursor := crDefault;
   Close;
 end;
@@ -193,8 +203,8 @@ begin
 end;
 
 procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-var
-  Timer: TfraTimer = nil;
+//var
+//  Timer: TfraTimer = nil;
 begin
   lsvMessages.BeginUpdate;
   lsvMessages.Items.Clear;
@@ -206,4 +216,3 @@ begin
 end;
 
 end.
-

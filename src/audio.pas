@@ -29,6 +29,8 @@ const
 
   INVALID_SOUNDPOOL_INDEX = -1;
 
+  REFILL_BUFFER_SIZE = 4096;
+
 //SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
 
 type
@@ -456,13 +458,7 @@ begin
 end;
 
 function TSoundPool.GetRawDefaultSound: PRawSoundData;
-  //var
-  //Buffer: PSeekableRawSoundData;
-  //SoundPoolEntry: PSoundPoolEntry;
 begin
-  { TODO : Change to a single line. }
-  //SoundPoolEntry := FEntries.Items[FDefaultSoundIndex];
-  //Result := SoundPoolEntry^.Raw;
   Result := GetRawSound(FDefaultSoundIndex);
 end;
 
@@ -570,7 +566,7 @@ begin
         { SndFile.Read returns the number of floats read. This already takes the
         number of channels to account, so no need to multiply }
       Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer +
-        (Size {* SizeOf(cfloat)}), 4096); { TODO : Remove hardcoding of the number }
+        (Size {* SizeOf(cfloat)}), REFILL_BUFFER_SIZE);
 
       Size += Read;
       if Read = 0 then
