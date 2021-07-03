@@ -118,13 +118,12 @@ procedure TMetronome.Start;
 begin
   if not FAudioPlayer.Playing then
   begin
+    Logger.Debug('When metronome started, FSubscribers - ' + IntToStr(FSubscribers));
     Assert(FSubscribers = 0);
     FAudioPlayer.Play(SoundPool.RawTickSound);
     Logger.Info('Metronome started.');
   end;
   Inc(FSubscribers);
-
-
 end;
 
 procedure TMetronome.Stop;
@@ -135,7 +134,8 @@ begin
     FAudioPlayer.Abort;
     Logger.Info('Metronome stopped.');
   end;
-  Dec(FSubscribers);
+  if FSubscribers > 0 then
+    Dec(FSubscribers);
 end;
 
 //procedure TMetronome.Subscribe;
