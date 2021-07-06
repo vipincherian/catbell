@@ -98,7 +98,7 @@ object frmEdit: TfrmEdit
         Top = 8
         Width = 489
         Caption = 'Specifications'
-        ClientHeight = 70
+        ClientHeight = 68
         ClientWidth = 485
         TabOrder = 0
         object Label1: TLabel
@@ -158,7 +158,7 @@ object frmEdit: TfrmEdit
         Top = 104
         Width = 488
         Caption = 'Show on completion'
-        ClientHeight = 71
+        ClientHeight = 69
         ClientWidth = 484
         TabOrder = 1
         object ckbModalAlert: TCheckBox
@@ -181,8 +181,8 @@ object frmEdit: TfrmEdit
     end
     object tsSound: TTabSheet
       Caption = 'Sound'
-      ClientHeight = 193
-      ClientWidth = 515
+      ClientHeight = 199
+      ClientWidth = 513
       ImageIndex = 1
       object GroupBox3: TGroupBox
         Left = 16
@@ -190,15 +190,15 @@ object frmEdit: TfrmEdit
         Top = 8
         Width = 208
         Caption = 'Alarm on completion'
-        ClientHeight = 87
+        ClientHeight = 85
         ClientWidth = 204
         TabOrder = 0
         object cmbSoundType: TComboBox
           Left = 16
-          Height = 25
+          Height = 23
           Top = 8
           Width = 100
-          ItemHeight = 0
+          ItemHeight = 15
           ItemIndex = 0
           Items.Strings = (
             'Default'
@@ -212,9 +212,9 @@ object frmEdit: TfrmEdit
         end
         object ckbLoop: TCheckBox
           Left = 16
-          Height = 21
+          Height = 19
           Top = 48
-          Width = 81
+          Width = 82
           Caption = 'Play in loop'
           TabOrder = 1
         end
@@ -247,7 +247,7 @@ object frmEdit: TfrmEdit
         Top = 8
         Width = 272
         Caption = 'Custom alarm'
-        ClientHeight = 158
+        ClientHeight = 156
         ClientWidth = 268
         TabOrder = 1
         object bbSelectSound: TBitBtn
@@ -281,9 +281,12 @@ object frmEdit: TfrmEdit
           Width = 248
           Columns = <          
             item
+              AutoSize = True
+              Width = 54
             end          
             item
-              Width = 181
+              AutoSize = True
+              Width = 25
             end>
           Items.LazData = {
             5400000003000000FFFFFFFFFFFFFFFFFFFFFFFF000000000400000046696C65
@@ -302,12 +305,12 @@ object frmEdit: TfrmEdit
         Top = 120
         Width = 208
         Caption = 'Metronome'
-        ClientHeight = 46
+        ClientHeight = 44
         ClientWidth = 204
         TabOrder = 2
         object ckbMetronome: TCheckBox
           Left = 16
-          Height = 21
+          Height = 19
           Top = 16
           Width = 170
           Caption = 'Ticking sound while running'
