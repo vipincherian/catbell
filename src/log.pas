@@ -53,7 +53,7 @@ begin
   FLogger := TEventLog.Create(nil);
   //Logger := frmMain.evlMain;
   FLogger.LogType := ltFile;
-  FLogger.FileName := 'catbell.log';
+  FLogger.FileName := GetAppConfigDir(False) + 'catbell.log';
   Level := LOG_ALL;
   FSubscribers := TLogListenerList.Create;
 end;

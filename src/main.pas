@@ -447,7 +447,7 @@ var
 begin
   { Take a backup of options that need to be watched for change }
   {$IF defined(windows) }
-  OldTaskbarIconType := GlobalUserConfig.TaskbarIconType;
+  OldTaskbarIconType := UserConfig.TaskbarIconType;
   {$ENDIF}
   frmOptions.ShowModal;
   OptionsFormClosed;
@@ -455,9 +455,9 @@ begin
   { if taskbar icon type has been changed, then artificially trigger the
   timer event }
   {$IF defined(windows) }
-  if OldTaskbarIconType <> GlobalUserConfig.TaskbarIconType then
+  if OldTaskbarIconType <> UserConfig.TaskbarIconType then
   begin
-    if GlobalUserConfig.TaskbarIconType = TaskbarAppIcon then
+    if UserConfig.TaskbarIconType = TaskbarAppIcon then
       FTaskBarList.SetOverlayIcon(AppHandle, 0, PWideChar(''));
     FReportStale := True;
     if FShortTimer.Enabled then
@@ -1201,7 +1201,7 @@ begin
       Application.Icon.Assign(FAppStoppedBitmap);
 
     {$IF defined(windows) }
-    if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
+    if UserConfig.TaskbarIconType = TaskbarOverlayIcon then
       FTaskbarList.SetOverlayIcon(AppHandle, 0, PWideChar(''));
     FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
     {$ENDIF}
@@ -1242,7 +1242,7 @@ begin
         if UserConfig.TaskbarIconType = TaskbarAppIcon then
           Application.Icon.Assign(FAppProgressIcons[Index + 1]);
         {$IF defined(windows)}
-        if GlobalUserConfig.TaskbarIconType = TaskbarOverlayIcon then
+        if UserConfig.TaskbarIconType = TaskbarOverlayIcon then
         begin
 
           Result := FTaskBarList.SetOverlayIcon(AppHandle,

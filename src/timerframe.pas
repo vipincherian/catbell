@@ -626,7 +626,7 @@ function TfraTimer.RestartFromLastFinish: boolean;
 var
   EstimatedCompletion, Diff, CurrentTime: TDateTime;
   Hours, Mins, Secs: word;
-  DiffMilli: int64 = 0;
+  //DiffMilli: int64 = 0;
   NewEndTickCount, Adjustment: longword;
   StartTickCount: longword = 0;
 begin
