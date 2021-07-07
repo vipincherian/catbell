@@ -31,18 +31,17 @@ Third party libraries used
 # How to setup your development environment #
 
 Install Lazarus
-Install BGRABitmap lkp
-Download from and unzip
-In Lazarus IDE Package > Open Package file (.lpk)  and select bgrabitmappack.lpk.
-Popup titled  Package BGRABitmapPack v9.3 click Compile and then Use > In Project
 
-Install UniqueInstance
-Using Lazarus IDE, install through Package > Online Package Manager
-Obtain libraries
+## Install additional Lazarus packages ##
 
-Logging
-Teventlog
-
+Download the packages from the sources mentioned above, and unzip.
+Steps:-
+* Package > Open Package File (.lpk)
+* Select bgrabitmappack.lpk or uniqueinstance_package.lpk
+* A dialog box opens, 
+  * Click on compile
+  * Click on Use > Add to project 
+(It is also possible to install these packages through the Lazarus package manager. However, that would involve re-compiling the IDE).
 Build
 Development
 Assertions
