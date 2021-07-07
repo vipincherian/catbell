@@ -15,11 +15,13 @@ For creating graphical elements used in the user interface:-
 
 Third party libraries used
   * Lazarus packages
+  
   | Library        | Version | Source                                                              |
   |----------------|---------|---------------------------------------------------------------------|
   | BGraBitmap     | 11.3.1  | https://github.com/bgrabitmap/bgrabitmap                            |
   | UniqueInstance | 1.1     | https://github.com/blikblum/luipack/releases/tag/uniqueinstance-1.1 |
   * External (non-FPC)
+  
   | Library   | Version |
   |-----------|---------|
   | PortAudio |         |
