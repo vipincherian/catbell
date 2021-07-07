@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, StdCtrls, UniqueInstance,
+  timerframe, fgl, sequence, editform, Math, StdCtrls,
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
@@ -164,7 +164,6 @@ type
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
     tbVolume: TTrackBar;
-    uqiMain: TUniqueInstance;
     procedure alUnmuteExecute(Sender: TObject);
     procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);

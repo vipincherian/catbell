@@ -41,12 +41,22 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   adjustform,
   audio,
   eventlog,
-  metronome, log, sound;
+  //metronome,
+  log,
+  //sound,
+  UniqueInstanceRaw;
 
 {$R *.res}
 
 begin
   //RequireDerivedFormResource := True;
+
+  if InstanceRunning then
+  begin
+    MessageDlg('This program is already running.' + LineEnding +
+      'Cannot start another instance.', mtWarning, [mbOK], 0);
+    Exit;
+  end;
 
   {$if declared(useHeapTrace)}
   {$IFOPT D+}
@@ -57,10 +67,18 @@ begin
   Logger.Info('************************');
   Logger.Info('Application run starting');
   Logger.Info('************************');
-  Logger.Info('  Build on -       ' + {$INCLUDE %DATE%});
-  Logger.Info('  Target CPU -     ' + {$INCLUDE %FPCTARGETCPU%});
-  Logger.Info('  Target OS -      ' + {$INCLUDE %FPCTARGETOS%});
-  Logger.Info('  FPC version -    ' + {$INCLUDE %FPCVERSION%});
+  Logger.Info('  Build on -       ' + string(
+{$INCLUDE %DATE%}
+    ));
+  Logger.Info('  Target CPU -     ' + string(
+{$INCLUDE %FPCTARGETCPU%}
+    ));
+  Logger.Info('  Target OS -      ' + string(
+{$INCLUDE %FPCTARGETOS%}
+    ));
+  Logger.Info('  FPC version -    ' + string(
+{$INCLUDE %FPCVERSION%}
+    ));
 
 
   Application.Initialize;
