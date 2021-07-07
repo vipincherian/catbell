@@ -165,9 +165,9 @@ object frmAbout: TfrmAbout
       Left = 16
       Height = 20
       Top = 80
-      Width = 206
+      Width = 208
       AutoSize = True
-      Caption = 'https://github.com/vipincherian/catbell'
+      Caption = 'https://sourceforge.net/projects/catbell/'
       Color = clDefault
       Font.Style = [fsUnderline]
       OnClick = sttUrlClick

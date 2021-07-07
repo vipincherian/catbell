@@ -12,8 +12,6 @@ uses
   LOG_WARN = 2;
   LOG_INFO = 3;
   LOG_ALL = 4;}
-const
-  LOGFILE_NAME = 'catbell.log';
 type
   TLogLevel = (LOG_NONE, LOG_ERROR, LOG_WARN, LOG_INFO, LOG_ALL);
   TNotifyLogEvent = procedure(Msg: string) of object;
@@ -55,7 +53,7 @@ begin
   FLogger := TEventLog.Create(nil);
   //Logger := frmMain.evlMain;
   FLogger.LogType := ltFile;
-  FLogger.FileName := GetAppConfigDir(False) + LOGFILE_NAME;
+  FLogger.FileName := GetAppConfigDir(False) + 'catbell.log';
   Level := LOG_ALL;
   FSubscribers := TLogListenerList.Create;
 end;
