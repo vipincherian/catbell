@@ -635,7 +635,8 @@ procedure TfrmMain.FormShow(Sender: TObject);
 begin
   if not AudioSystem.Loaded then
     MessageDlg('Audio not loaded.' + LineEnding +
-      'Alarms and other dependent functionalities will not work.',
+      'Alarms and other dependent functionalities will not work.' +
+      LineEnding + LineEnding + AudioSystem.Error,
       mtWarning, [mbOK], 0);
   with UserConfig do
   begin

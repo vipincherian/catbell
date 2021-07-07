@@ -134,6 +134,7 @@ type
   TAudioSystem = class(TObject)
   private
     FLoaded: boolean;
+    FLoadError: string;
     FOutputDevice: TAudioDevice;
     {Default sounds }
     //FDefaultSound: TSoundData;
@@ -171,6 +172,7 @@ type
     procedure FreeDefaultSounds;
     property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
     property Loaded: boolean read FLoaded;
+    property Error: string read FLoadError;
     property Volume: integer read FVolume write SetVolume;
     property AmplitudeScale: double read GetAmplitudeScale;
     function LoadSound(Avalue: string): TSound;
@@ -821,6 +823,13 @@ begin
   if not FLoaded then
   begin
     //Logger.Debug('Could not load portaudio');
+    FLoadError := 'Failed to load library: PortAudio (' + LIB_PORTAUDIO +
+      ').' + LineEnding;
+    {$IF defined(windows) }
+    FLoadError += 'Hint: Is this DLL missing?';
+    {$ELSEIF Defined(unix)}
+    FLoadError += 'Hint: Is ?';{ TODO : Correct this message }
+    {$ENDIF}
     Exit;
   end;
 
@@ -832,6 +841,13 @@ begin
     if not FLoaded then
     begin
       //Logger.Debug('Could not load sndfile');
+      FLoadError := 'Failed to load library: libsndfile (' + LIB_SNDFILE +
+        ').' + LineEnding;
+      {$IF defined(windows) }
+      FLoadError += 'Hint: Is this DLL missing?';
+      {$ELSEIF Defined(unix)}
+      FLoadError += 'Hint: Is ?';{ TODO : Correct this message }
+      {$ENDIF}
       Pa_Unload();
       Exit;
     end;
@@ -843,6 +859,12 @@ begin
     if not FLoaded then
     begin
       //Logger.Debug('Could not load mpg123');
+      FLoadError := 'Failed to load library: libmpg123 (' + LIB_MPG123 + ').' + LineEnding;
+      {$IF defined(windows) }
+      FLoadError += 'Hint: Is this DLL missing?';
+      {$ELSEIF Defined(unix)}
+      FLoadError += 'Hint: Is ?';{ TODO : Correct this message }
+      {$ENDIF}
       sf_Unload;
       Pa_Unload;
       Exit;
