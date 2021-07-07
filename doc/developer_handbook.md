@@ -48,6 +48,22 @@ Assertions
 Assertions are used liberally to intercept runtime anomalous behaviour. These checks run during development testing in builds with debug info, but would not be part of the release build.
 Compiler options -> Custom options -> -Sa
 
+## Install libraries ##
+
+### Windows ###
+
+The following DLLs are required in Windows:-
+* libportaudio-2.dll
+* libogg-0.dll
+* libvorbis-0.dll
+* libvorbisenc-2.dll
+* libsndfile-1.dll
+* libopus-0.dll
+* libFLAC-8.dll
+* libssp-0.dll
+* libmpg123-0.dll
+These are installed thorugh MSYS2
+
 # Notes #
 Occasionally, when quality of sound ouput became too bad in Linux, had to reset PulseAudio and Alsa.
 
