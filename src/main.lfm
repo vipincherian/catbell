@@ -91,7 +91,8 @@ object frmMain: TfrmMain
       Left = 273
       Hint = 'Help documentation'
       Top = 2
-      Caption = 'ToolButton6'
+      Action = aiHelp
+      Caption = 'Contents'
       ImageIndex = 4
       ParentShowHint = False
       ShowHint = True
@@ -589,7 +590,8 @@ object frmMain: TfrmMain
     end
     object MenuItem3: TMenuItem
       Caption = '&Help'
-      object MenuItem4: TMenuItem
+      object miHelpContents: TMenuItem
+        Action = aiHelp
         Caption = '&Contents'
         ImageIndex = 3
       end
@@ -674,8 +676,9 @@ object frmMain: TfrmMain
       Caption = 'aiMoveDown'
       OnExecute = aiMoveDownExecute
     end
-    object alUnmute: TAction
-      OnExecute = alUnmuteExecute
+    object aiHelp: TAction
+      Caption = 'aiHelp'
+      OnExecute = aiHelpExecute
     end
   end
   object ilMain: TImageList

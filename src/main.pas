@@ -92,8 +92,10 @@ const
   PANEL_AUDIO = 1;
   PANEL_MESSAGE = 2;
 
-  II_MUTED = 12;
-  II_NOTMUTED = 11;
+  //II_MUTED = 12;
+  //II_NOTMUTED = 11;
+
+  HELP_URL = 'https://github.com/vipincherian/catbell/blob/master/doc/help.md';
 
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
@@ -102,7 +104,7 @@ type
   { TfrmMain }
 
   TfrmMain = class(TForm)
-    alUnmute: TAction;
+    aiHelp: TAction;
     aiMoveDown: TAction;
     aiMoveUp: TAction;
     aiDeleteTimer: TAction;
@@ -136,7 +138,7 @@ type
     miToolsOptions: TMenuItem;
     miTools: TMenuItem;
     MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
+    miHelpContents: TMenuItem;
     miAbout: TMenuItem;
     mmMain: TMainMenu;
     miAlarm: TMenuItem;
@@ -164,6 +166,7 @@ type
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
     tbVolume: TTrackBar;
+    procedure aiHelpExecute(Sender: TObject);
     procedure alUnmuteExecute(Sender: TObject);
     procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);
@@ -574,6 +577,11 @@ procedure TfrmMain.alUnmuteExecute(Sender: TObject); { TODO : What is this? Unmu
 begin
   UserConfig.Volume := DEF_VOLUME_LEVEL;
   //tbUnmute.Enabled := False;
+end;
+
+procedure TfrmMain.aiHelpExecute(Sender: TObject);
+begin
+  OpenUrl(HELP_URL);
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
