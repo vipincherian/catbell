@@ -14,11 +14,17 @@ For creating graphical elements used in the user interface:-
   * Shell
 
 Third party libraries used
-  * BgraBitmap
-  * UniqueInstance
-  * PortAudio
-  * SndFile
-  * LibMpg123
+  * Lazarus packages
+  | Library        | Version | Source                                                              |
+  |----------------|---------|---------------------------------------------------------------------|
+  | BGraBitmap     | 11.3.1  | https://github.com/bgrabitmap/bgrabitmap                            |
+  | UniqueInstance | 1.1     | https://github.com/blikblum/luipack/releases/tag/uniqueinstance-1.1 |
+  * External (non-FPC)
+  | Library   | Version |
+  |-----------|---------|
+  | PortAudio |         |
+  | SndFile   |         |
+  | LibMpg123 |         |
 
 # How to setup your development environment #
 
