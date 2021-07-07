@@ -59,7 +59,10 @@
             </Options>
           </Linking>
           <Other>
-            <CustomOptions Value="-Sa"/>
+            <CompilerMessages>
+              <IgnoredMessages idx6058="True" idx3124="True" idx3123="True"/>
+            </CompilerMessages>
+            <CustomOptions Value="-Sa -Si"/>
           </Other>
         </CompilerOptions>
       </Item2>
