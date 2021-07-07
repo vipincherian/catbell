@@ -24,13 +24,18 @@ Third party libraries used
   
   | Library   | Version |
   |-----------|---------|
-  | PortAudio |         |
-  | SndFile   |         |
-  | LibMpg123 |         |
+  | PortAudio | 2.0     |
+  | SndFile   | 1.0.31  |
+  | LibMpg123 | 1.27.2  |
 
 # How to setup your development environment #
 
 Install Lazarus
+
+## Assertions ##
+
+Assertions are used liberally to intercept runtime anomalous behaviour. These checks run during development testing in builds with debug info, but would not be part of the release build.
+Compiler options -> Custom options -> -Sa
 
 ## Install additional Lazarus packages ##
 
@@ -42,11 +47,6 @@ Steps:-
   * Click on compile
   * Click on Use > Add to project 
 (It is also possible to install these packages through the Lazarus package manager. However, that would involve re-compiling the IDE).
-Build
-Development
-Assertions
-Assertions are used liberally to intercept runtime anomalous behaviour. These checks run during development testing in builds with debug info, but would not be part of the release build.
-Compiler options -> Custom options -> -Sa
 
 ## Install libraries ##
 
@@ -62,7 +62,21 @@ The following DLLs are required in Windows:-
 * libFLAC-8.dll
 * libssp-0.dll
 * libmpg123-0.dll
-These are installed thorugh MSYS2
+
+#### These are installed through MSYS2. ####
+
+Search for libraries:-
+`$ pacman -Ss portaudio | grep -i ucrt
+ucrt64/mingw-w64-ucrt-x86_64-portaudio 190600_20161030-3`
+
+Install library:-
+`$ pacman -S mingw-w64-ucrt-x86_64-portaudio`
+
+The DLLs are placed in the *lib* folder.
+
+### Linux ###
+
+The following libraries are required in Linux.
 
 # Notes #
 Occasionally, when quality of sound ouput became too bad in Linux, had to reset PulseAudio and Alsa.
