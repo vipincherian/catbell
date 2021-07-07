@@ -192,10 +192,13 @@ begin
   FProceed := False;
   FWidget := nil;
 
-  FAudioPlayer := TAudioPlayer.Create;
-  FAudioPlayer.OnPlayCompletion := @AudioPlayed;
-  //FDefaultSound := nil;
-  FSoundIndex := SoundPool.DefaultSoundIndex;
+  if AudioSystem.Loaded then
+  begin
+    FAudioPlayer := TAudioPlayer.Create;
+    FAudioPlayer.OnPlayCompletion := @AudioPlayed;
+    //FDefaultSound := nil;
+    FSoundIndex := SoundPool.DefaultSoundIndex;
+  end;
   {SetLoadedSoundIndex has a check whether the value is changing. If not,
   it does not do anything. Hence you cannot start with
   INVALID_SOUNDPOOL_INDEX}
@@ -374,15 +377,18 @@ begin
 
   StartTickCount := GetTickCount64;
   { Wait for FAudioPlayer to complete }
-  if FAudioPlayer.Playing then
+  if AudioSystem.Loaded then
   begin
-    FAudioPlayer.Abort;
-    while FAudioPlayer.Playing do
+    if FAudioPlayer.Playing then
     begin
-      Logger.Debug('Waiting for');
-      Application.ProcessMessages;
-      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
-        break;
+      FAudioPlayer.Abort;
+      while FAudioPlayer.Playing do
+      begin
+        Logger.Debug('Waiting for');
+        Application.ProcessMessages;
+        if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+          break;
+      end;
     end;
   end;
 end;
@@ -461,9 +467,13 @@ procedure TfrmEdit.ReenableControls;
 var
   WidgetRunning, WidgetPlayingSound: boolean;
   Widget: TfraTimer;
+  AudioPlaying: boolean = False;
 begin
   WidgetRunning := False;
   WidgetPlayingSound := False;
+
+  if AudioSystem.Loaded then
+    AudioPlaying := FAudioPlayer.Playing;
 
   if FWidget <> nil then
   begin
@@ -483,31 +493,38 @@ begin
     (not FAudioPlayer.Playing);
 
   bbSelectSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
-    (not FAudioPlayer.Playing);
-  bbClearSound.Enabled := (not WidgetPlayingSound) and (not FAudioPlayer.Playing);
+    (not AudioPlaying);
+  bbClearSound.Enabled := (not WidgetPlayingSound) and (not AudioPlaying) and
+    AudioSystem.Loaded;
 
-  if FSoundIndex = SoundPool.DefaultSoundIndex then
-    cmbSoundType.ItemIndex := SOUND_DEFAULT
-  else if FSoundIndex = INVALID_SOUNDPOOL_INDEX then
-    cmbSoundType.ItemIndex := SOUND_NONE
-  else if FSoundIndex >= SoundPool.CustomSoundRangeStart then
-    cmbSoundType.ItemIndex := SOUND_CUSTOM
-  else
-    Logger.Warning('Unexpected FSoundIndex - ' + IntToStr(FSoundIndex) +
-      ' at ' + string(
+  cmbSoundType.Enabled := AudioSystem.Loaded;
+
+  if AudioSystem.Loaded then
+  begin
+    if FSoundIndex = SoundPool.DefaultSoundIndex then
+      cmbSoundType.ItemIndex := SOUND_DEFAULT
+    else if FSoundIndex = INVALID_SOUNDPOOL_INDEX then
+      cmbSoundType.ItemIndex := SOUND_NONE
+    else if FSoundIndex >= SoundPool.CustomSoundRangeStart then
+      cmbSoundType.ItemIndex := SOUND_CUSTOM
+    else
+      Logger.Warning('Unexpected FSoundIndex - ' + IntToStr(FSoundIndex) +
+        ' at ' + string(
   {$INCLUDE %FILE%}
-      ) + ':' + string(
+        ) + ':' + string(
   {$INCLUDE %LINE%}
-      ));
+        ));
+
+    lsvSoundDetails.Visible := (FSoundIndex >= SoundPool.CustomSoundRangeStart);
+    bbClearSound.Enabled := lsvSoundDetails.Visible;
+  end;
 
   { This /has/ to be after cmbSoundType.ItemIndex is set, as there is a
   dependency }
   bbTestSound.Enabled := (not WidgetPlayingSound) and AudioSystem.Loaded and
-    (not FAudioPlayer.Playing) and (cmbSoundType.ItemIndex <> SOUND_NONE);
-  bbStopSound.Enabled := AudioSystem.Loaded and FAudioPlayer.Playing;
+    (not AudioPlaying) and (cmbSoundType.ItemIndex <> SOUND_NONE);
+  bbStopSound.Enabled := AudioSystem.Loaded and AudioPlaying;
 
-  lsvSoundDetails.Visible := (FSoundIndex >= SoundPool.CustomSoundRangeStart);
-  bbClearSound.Enabled := lsvSoundDetails.Visible;
 
 
   bbSave.Enabled := Validate;

@@ -633,6 +633,10 @@ end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
+  if not AudioSystem.Loaded then
+    MessageDlg('Audio not loaded.' + LineEnding +
+      'Alarms and other dependent functionalities will not work.',
+      mtWarning, [mbOK], 0);
   with UserConfig do
   begin
     if LastWindowState = wsMaximized then
@@ -907,7 +911,8 @@ begin
     Timer := FReference;
   end;
 
-  hdrTimers.Sections.Items[0].Width := Timer.cbSelect.Left + Timer.cbSelect.Width + (TIMER_PADDING div 2);
+  hdrTimers.Sections.Items[0].Width :=
+    Timer.cbSelect.Left + Timer.cbSelect.Width + (TIMER_PADDING div 2);
   Inc(Filled, hdrTimers.Sections.Items[0].Width);
 
   Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
@@ -1392,46 +1397,49 @@ begin
 
       //NewTimerClock.UseDefaultSound :=
       //  Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
-      NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+
 
       AudioFileName := string(
         Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH), ''));
       SoundType := Conf.GetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_DEFALUT);
 
-      case SoundType of
-        TIMER_CONF_SOUND_NONE:
-          NewTimerClock.SoundIndex := INVALID_SOUNDPOOL_INDEX;
-        TIMER_CONF_SOUND_DEFALUT:
-          NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
-        TIMER_CONF_SOUND_CUSTOM:
-        begin
-          SoundIndex := SoundPool.LoadSoundFromFile(AudioFileName);
-          if SoundIndex > INVALID_SOUNDPOOL_INDEX then
+      if AudioSystem.Loaded then
+      begin
+        NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+        case SoundType of
+          TIMER_CONF_SOUND_NONE:
+            NewTimerClock.SoundIndex := INVALID_SOUNDPOOL_INDEX;
+          TIMER_CONF_SOUND_DEFALUT:
+            NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+          TIMER_CONF_SOUND_CUSTOM:
           begin
-            NewTimerClock.SoundIndex := SoundIndex;
-            NewTimerClock.LoadedSoundIndex := SoundIndex;
-            NewTimerClock.LoadedSoundSource := AudioFileName;
+            SoundIndex := SoundPool.LoadSoundFromFile(AudioFileName);
+            if SoundIndex > INVALID_SOUNDPOOL_INDEX then
+            begin
+              NewTimerClock.SoundIndex := SoundIndex;
+              NewTimerClock.LoadedSoundIndex := SoundIndex;
+              NewTimerClock.LoadedSoundSource := AudioFileName;
+            end
+            else
+            begin
+              Application.MessageBox(PAnsiChar('Could not load file ' +
+                AudioFileName + '. Restting to default sound.'), 'Alert', MB_OK);
+              NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
+            end;
           end
           else
           begin
-            Application.MessageBox(PAnsiChar('Could not load file ' +
-              AudioFileName + '. Restting to default sound.'), 'Alert', MB_OK);
             NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
-          end;
-        end
-        else
-        begin
-          NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
-          Logger.Error('Invalid sound type loaded for clock #' +
-            IntToStr(Count) + ' - ' + IntToStr(SoundType) + ' at ' + string(
+            Logger.Error('Invalid sound type loaded for clock #' +
+              IntToStr(Count) + ' - ' + IntToStr(SoundType) + ' at ' + string(
         {$INCLUDE %FILE%}
-            ) + ':' + string(
+              ) + ':' + string(
         {$INCLUDE %LINE%}
-            ));
+              ));
+          end;
         end;
+        NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       end;
-      NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
-
 
       //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       NewTimerClock.ModalAlert :=
@@ -1633,19 +1641,23 @@ begin
       TimerClock.TrayNotification);
 
     Conf.SetValue(TIMER_CONF_SOUNDFILEPATH, '');
-    if TimerClock.SoundIndex = INVALID_SOUNDPOOL_INDEX then
-      Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_NONE)
-    else if TimerClock.SoundIndex = SoundPool.DefaultSoundIndex then
-      Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_DEFALUT)
-    else if TimerClock.SoundIndex >= SoundPool.CustomSoundRangeStart then
+    if AudioSystem.Loaded then
     begin
-      Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_CUSTOM);
-      Conf.SetValue(TIMER_CONF_SOUNDFILEPATH,
-        UTF8Decode(TimerClock.LoadedSoundSource));
-    end
-    else
-      Logger.Warning('Error while saving clocks');
-    Conf.SetValue(TIMER_CONF_SOUNDLOOP, TimerClock.SoundLooped);
+      if TimerClock.SoundIndex = INVALID_SOUNDPOOL_INDEX then
+        Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_NONE)
+      else if TimerClock.SoundIndex = SoundPool.DefaultSoundIndex then
+        Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_DEFALUT)
+      else if TimerClock.SoundIndex >= SoundPool.CustomSoundRangeStart then
+      begin
+        Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_CUSTOM);
+        Conf.SetValue(TIMER_CONF_SOUNDFILEPATH,
+          UTF8Decode(TimerClock.LoadedSoundSource));
+      end
+      else
+        Logger.Warning('Error while saving clocks');
+      Conf.SetValue(TIMER_CONF_SOUNDLOOP, TimerClock.SoundLooped);
+
+    end;
 
     State.Paused := False;
 

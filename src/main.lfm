@@ -19,7 +19,7 @@ object frmMain: TfrmMain
   OnMouseUp = FormMouseUp
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '2.0.6.0'
+  LCLVersion = '2.0.12.0'
   object tlbMain: TToolBar
     Left = 0
     Height = 34
@@ -237,8 +237,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 19
-    Top = 297
+    Height = 23
+    Top = 293
     Width = 652
     Panels = <    
       item
@@ -412,8 +412,8 @@ object frmMain: TfrmMain
   end
   object mmMain: TMainMenu
     Images = ilMainSmall
-    left = 488
-    top = 96
+    Left = 488
+    Top = 96
     object miAlarm: TMenuItem
       Caption = '&Clock'
       object miNewTimer: TMenuItem
@@ -637,8 +637,8 @@ object frmMain: TfrmMain
     end
   end
   object alMain: TActionList
-    left = 544
-    top = 96
+    Left = 544
+    Top = 96
     object aiNewTimer: TAction
       Caption = 'aiNewTimer'
       OnExecute = aiNewTimerExecute
@@ -681,8 +681,8 @@ object frmMain: TfrmMain
   object ilMain: TImageList
     Height = 24
     Width = 24
-    left = 488
-    top = 48
+    Left = 488
+    Top = 48
     Bitmap = {
       4C690D0000001800000018000000000000024141414A3F3F3F553F3F3F553F3F
       3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F
@@ -1624,8 +1624,8 @@ object frmMain: TfrmMain
     }
   end
   object ilMainSmall: TImageList
-    left = 544
-    top = 48
+    Left = 544
+    Top = 48
     Bitmap = {
       4C69060000001000000010000000414141374042498C4042498C4042498C4042
       498C4042498C4042498C4042498C4042498C4042498C4042498C4042498C4042
@@ -1826,18 +1826,18 @@ object frmMain: TfrmMain
     OnClick = tiMainClick
     OnDblClick = tiMainDblClick
     OnMouseUp = tiMainMouseUp
-    left = 488
-    top = 152
+    Left = 488
+    Top = 152
   end
   object sdgExport: TSaveDialog
     Filter = 'Catbell timers|*.ccq'
-    left = 544
-    top = 150
+    Left = 544
+    Top = 150
   end
   object pmTray: TPopupMenu
     Images = ilMainSmall
-    left = 544
-    top = 216
+    Left = 544
+    Top = 216
     object pmiShowWindow: TMenuItem
       Caption = 'Show window'
       ImageIndex = 0
@@ -1890,8 +1890,8 @@ object frmMain: TfrmMain
   end
   object pmMain: TPopupMenu
     Images = ilMainSmall
-    left = 488
-    top = 216
+    Left = 488
+    Top = 216
     object MenuItem6: TMenuItem
       Action = aiNewTimer
       Caption = 'Add timer'

@@ -467,8 +467,8 @@ object fraTimer: TfraTimer
   object ilTimer: TImageList
     Height = 24
     Width = 24
-    left = 75
-    top = 5
+    Left = 75
+    Top = 5
     Bitmap = {
       4C69070000001800000018000000000000024141414A3F3F3F553F3F3F553F3F
       3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F3F553F3F
@@ -978,8 +978,8 @@ object fraTimer: TfraTimer
     }
   end
   object alTimer: TActionList
-    left = 127
-    top = 7
+    Left = 127
+    Top = 7
     object aiPlay: TAction
       OnExecute = aiPlayExecute
     end

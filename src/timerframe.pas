@@ -406,7 +406,10 @@ end;}
 
 function TfraTimer.GetIsSoundPlaying: boolean;
 begin
-  Result := FAudioPlayer.Playing;
+  if AudioSystem.Loaded then
+    Result := FAudioPlayer.Playing
+  else
+    Result := False;
 end;
 
 
@@ -757,7 +760,7 @@ begin
   cbSelect.OnChange := @ClockSelected;
 
   //UseDefaultSound:=True;
-  FSoundIndex := SoundPool.DefaultSoundIndex;
+
   FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
   FLoadedSoundSource := '';
 
@@ -783,6 +786,7 @@ begin
   FAudioPlayer := nil;
   if AudioSystem.Loaded then
   begin
+    FSoundIndex := SoundPool.DefaultSoundIndex;
     FAudioPlayer := TAudioPlayer.Create;
     FAudioPlayer.OnPlayCompletion := @AudioPlayed;
 
