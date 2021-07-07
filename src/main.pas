@@ -1393,14 +1393,14 @@ begin
 
       NewTimerClock := AddTimer;
       NewTimerClock.Caption :=
-        string(Conf.GetValue(UTF8Decode(TIMER_CONF_TITLE), DEF_TIMER_TITLE));
+        string(Conf.GetValue(TIMER_CONF_TITLE, DEF_TIMER_TITLE));
 
       // When float is saved, it is saved as
       fs := FormatSettings;
       fs.DecimalSeparator := '.';
 
       NewTimerClock.Duration :=
-        StrToFloat(string(Conf.GetValue(UTF8Decode(TIMER_CONF_DURATION), '0')), fs);
+        StrToFloat(string(Conf.GetValue(TIMER_CONF_DURATION, '0')), fs);
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
 
@@ -1409,7 +1409,7 @@ begin
 
 
       AudioFileName := string(
-        Conf.GetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH), ''));
+        Conf.GetValue(TIMER_CONF_SOUNDFILEPATH, ''));
       SoundType := Conf.GetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_DEFALUT);
 
       if AudioSystem.Loaded then
@@ -1462,7 +1462,7 @@ begin
       State.Paused := Conf.GetValue(TIMER_CONF_PAUSED, False);
       State.PendingTicks := Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
       State.EndTime := StrToFloat(
-        string(Conf.GetValue(UTF8Decode(TIMER_CONF_ENDTIME), '0')), fs);
+        string(Conf.GetValue(TIMER_CONF_ENDTIME, '0')), fs);
       State.DurationTicks := Conf.GetValue(TIMER_CONF_ORIGTICKCOUNT, 0);
 
       NewTimerClock.LoadState(State);
@@ -1660,7 +1660,7 @@ begin
       begin
         Conf.SetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_CUSTOM);
         Conf.SetValue(TIMER_CONF_SOUNDFILEPATH,
-          UTF8Decode(TimerClock.LoadedSoundSource));
+          TimerClock.LoadedSoundSource);
       end
       else
         Logger.Warning('Error while saving clocks');
@@ -1678,7 +1678,7 @@ begin
     // Set pending tick count and end time to zero to begin with
     // Then udpate the ones applicable afterwards.
     Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, State.PendingTicks);
-    Conf.SetValue(TIMER_CONF_ENDTIME, UTF8Decode(FloatToStr(State.EndTime, fs)));
+    Conf.SetValue(TIMER_CONF_ENDTIME, FloatToStr(State.EndTime, fs));
     Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, State.DurationTicks);
 
 

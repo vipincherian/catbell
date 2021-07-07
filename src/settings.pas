@@ -303,9 +303,9 @@ begin
       AdjustCompleteby := DEF_ADJ_COMPLETEBY;
 
     AudioDeviceName := string(FConf.GetValue(AUDIO_DEVICE_NAME,
-      UTF8Decode(AudioDeviceName)));
+      AudioDeviceName));
     AudioHostAPIName := string(FConf.GetValue(AUDIO_HOSTAPI_NAME,
-      UTF8Decode(AudioHostAPIName)));
+      AudioHostAPIName));
     UseDefaultAudioDevice :=
       FConf.GetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
 
@@ -356,7 +356,7 @@ begin
   FConf.SetValue(AUTO_PROGRESS, AutoProgress);
   FConf.SetValue(QUERY_EXIT, QueryExit);
   FConf.SetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
-  Fconf.SetValue(TIMER_TITLE, UTF8Decode(DefaultTimerTitle));
+  Fconf.SetValue(TIMER_TITLE, DefaultTimerTitle);
 
   FConf.SetValue(TIMER_DURATION, DefaultTimerDuration);
 
@@ -365,8 +365,8 @@ begin
   FConf.SetValue(ADJ_DIFF, AdjustDiff);
   FConf.SetValue(ADJ_COMPLETEBY, AdjustCompleteby);
 
-  FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDeviceName));
-  FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioHostAPIName));
+  FConf.SetValue(AUDIO_DEVICE_NAME, AudioDeviceName);
+  FConf.SetValue(AUDIO_HOSTAPI_NAME, AudioHostAPIName);
   FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
 
   FConf.SetValue(TASKBAR_ICON_TYPE, integer(TaskbarIconType));
@@ -421,8 +421,8 @@ begin
   if AudioSystem.Loaded then
   begin
     AudioSystem.GetDefaultDevice(@AudioDevice);
-    FConf.SetValue(AUDIO_DEVICE_NAME, UTF8Decode(AudioDevice.DeviceName));
-    FConf.SetValue(AUDIO_HOSTAPI_NAME, UTF8Decode(AudioDevice.HostAPIName));
+    FConf.SetValue(AUDIO_DEVICE_NAME, AudioDevice.DeviceName);
+    FConf.SetValue(AUDIO_HOSTAPI_NAME, AudioDevice.HostAPIName);
     FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, DEF_USE_DEFAULT_AUDIO_DEVICE);
   end
   else
