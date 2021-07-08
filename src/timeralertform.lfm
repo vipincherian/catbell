@@ -51,7 +51,7 @@ object frmAlert: TfrmAlert
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.0.6.0'
+  LCLVersion = '2.0.12.0'
   object bbClose: TBitBtn
     Left = 253
     Height = 30
@@ -66,9 +66,9 @@ object frmAlert: TfrmAlert
   end
   object Label1: TLabel
     Left = 8
-    Height = 15
+    Height = 14
     Top = 8
-    Width = 176
+    Width = 167
     Caption = 'The following timers completed:-'
     ParentColor = False
   end
@@ -82,12 +82,12 @@ object frmAlert: TfrmAlert
       item
         AutoSize = True
         Caption = 'Title'
-        Width = 37
+        Width = 30
       end    
       item
         AutoSize = True
         Caption = 'Duration'
-        Width = 61
+        Width = 273
       end>
     ReadOnly = True
     TabOrder = 1

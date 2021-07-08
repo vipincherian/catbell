@@ -191,8 +191,10 @@ begin
     end;
   end;
   //ShowMessage('The following timers failed to restart:' + LineEnding + ErrorMessage);
-  MessageDlg('The following timers failed to restart: ' + LineEnding +
-    '(time duration elapsed).' + LineEnding + ErrorMessage, mtError, [mbOK], 0);
+  if Failures > 0 then
+    MessageDlg('The following timers failed to restart: ' + LineEnding +
+      '(time duration elapsed).' + LineEnding + ErrorMessage, mtError, [mbOK],
+      0);
   Cursor := crDefault;
   Close;
 end;
