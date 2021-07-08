@@ -345,6 +345,8 @@ procedure TfrmOptions.ReenableControls;
 begin
   speTrayIconSize.Enabled := cbOverrideTrayIconSize.Checked;
   speAppIconSize.Enabled := cbOverrideAppIconSize.Checked;
+  tbVolume.Enabled := AudioSystem.Loaded;
+  cbUseDefaultAudio.Enabled := AudioSystem.Loaded;
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);

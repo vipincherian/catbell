@@ -66,6 +66,7 @@ const
   //LIB_PORTAUDIO = 'xxx';
   {$ELSEIF Defined(unix)}
   LIB_PORTAUDIO = 'libportaudio.so.2';
+  //LIB_PORTAUDIO = 'xxx';
   {$ENDIF}
   PORTAUDIO_VERSION = '190600_20161030';
 

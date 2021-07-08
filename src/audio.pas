@@ -31,6 +31,12 @@ const
 
   REFILL_BUFFER_SIZE = 4096;
 
+  {$IF defined(windows) }
+  WIN_HINT = 'Hint: Is this DLL missing?';
+  {$ELSEIF Defined(unix)}
+  LX_HINT = 'Hint: Install packages libportaudio2, libsndfile1 and libmpg123-0';
+  {$ENDIF}
+
 //SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
 
 type
@@ -826,9 +832,9 @@ begin
     FLoadError := 'Failed to load library: PortAudio (' + LIB_PORTAUDIO +
       ').' + LineEnding;
     {$IF defined(windows) }
-    FLoadError += 'Hint: Is this DLL missing?';
+    FLoadError += WIN_HINT;
     {$ELSEIF Defined(unix)}
-    FLoadError += 'Hint: Is ?';{ TODO : Correct this message }
+    FLoadError += LX_HINT;
     {$ENDIF}
     Exit;
   end;
@@ -844,9 +850,9 @@ begin
       FLoadError := 'Failed to load library: libsndfile (' + LIB_SNDFILE +
         ').' + LineEnding;
       {$IF defined(windows) }
-      FLoadError += 'Hint: Is this DLL missing?';
+      FLoadError += WIN_HINT;
       {$ELSEIF Defined(unix)}
-      FLoadError += 'Hint: Is ?';{ TODO : Correct this message }
+      FLoadError += LX_HINT;
       {$ENDIF}
       Pa_Unload();
       Exit;
@@ -861,9 +867,9 @@ begin
       //Logger.Debug('Could not load mpg123');
       FLoadError := 'Failed to load library: libmpg123 (' + LIB_MPG123 + ').' + LineEnding;
       {$IF defined(windows) }
-      FLoadError += 'Hint: Is this DLL missing?';
+      FLoadError += WIN_HINT;
       {$ELSEIF Defined(unix)}
-      FLoadError += 'Hint: Is ?';{ TODO : Correct this message }
+      FLoadError += LX_HINT;
       {$ENDIF}
       sf_Unload;
       Pa_Unload;

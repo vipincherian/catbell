@@ -369,9 +369,17 @@ begin
 
   FReportStale := False;
 
-  AudioSystem.Volume := UserConfig.Volume;
+  if AudioSystem.Loaded then
+  begin
+    AudioSystem.Volume := UserConfig.Volume;
+    tbVolume.Position := AudioSystem.Volume;
+  end
+  else
+  begin
+    tbVolume.Position := 0;
+    tbVolume.Enabled := False;
+  end;
 
-  tbVolume.Position := AudioSystem.Volume;
   imgVolumeOff.Left := imgVolumeOn.Left;
   imgVolumeOff.Top := imgVolumeOn.Top;
 
@@ -1408,8 +1416,8 @@ begin
       //  Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
 
 
-      AudioFileName := string(
-        Conf.GetValue(TIMER_CONF_SOUNDFILEPATH, ''));
+      AudioFileName := string(Conf.GetValue(TIMER_CONF_SOUNDFILEPATH, ''));
+
       SoundType := Conf.GetValue(TIMER_CONF_SOUNDTYPE, TIMER_CONF_SOUND_DEFALUT);
 
       if AudioSystem.Loaded then
