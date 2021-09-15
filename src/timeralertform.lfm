@@ -3,6 +3,7 @@ object frmAlert: TfrmAlert
   Height = 190
   Top = 254
   Width = 336
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Timer Finished'
   ClientHeight = 190
@@ -66,9 +67,9 @@ object frmAlert: TfrmAlert
   end
   object Label1: TLabel
     Left = 8
-    Height = 14
+    Height = 15
     Top = 8
-    Width = 167
+    Width = 176
     Caption = 'The following timers completed:-'
     ParentColor = False
   end
@@ -82,12 +83,12 @@ object frmAlert: TfrmAlert
       item
         AutoSize = True
         Caption = 'Title'
-        Width = 30
+        Width = 37
       end    
       item
         AutoSize = True
         Caption = 'Duration'
-        Width = 273
+        Width = 61
       end>
     ReadOnly = True
     TabOrder = 1
