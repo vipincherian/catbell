@@ -6,7 +6,7 @@ Catbell developer handbook
 The following are the tools used for developing the application.
 
 For application development:-
-  *  Lazarus IDE
+  *  Lazarus IDE 2.0.12
   
 For creating graphical elements used in the user interface:-
   * Inkscape
@@ -44,6 +44,9 @@ Steps:-
 * Package > Open Package File (.lpk)
 * Select bgrabitmappack.lpk or uniqueinstance_package.lpk
 * A dialog box opens, 
+  * Browse to the location
+    1. bgrabitmappack.lpk under the directory bgrabitmap
+    2. uniqueinstance_package.lpk
   * Click on compile
   * Click on Use > Add to project 
 (It is also possible to install these packages through the Lazarus package manager. However, that would involve re-compiling the IDE).
