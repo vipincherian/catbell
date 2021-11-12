@@ -68,10 +68,8 @@ type
     GroupBox6: TGroupBox;
     GroupBox7: TGroupBox;
     GroupBox8: TGroupBox;
-    GroupBox9: TGroupBox;
     ilOptions: TImageList;
     Label1: TLabel;
-    Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
@@ -85,7 +83,6 @@ type
     pgcOptions: TPageControl;
     rbProgressOnAppIcon: TRadioButton;
     rbProgressOnOverlayIcon: TRadioButton;
-    speBpm: TSpinEdit;
     speTrayIconSize: TSpinEdit;
     speAppIconSize: TSpinEdit;
     TabSheet1: TTabSheet;
@@ -219,7 +216,7 @@ begin
     cbUseDefaultSound.Checked := UseDefaultSound;
     cbLoopSound.Checked := LoopSound;
     tbVolume.Position := AudioSystem.Volume;
-    speBpm.Value := Bpm;
+    //speBpm.Value := Bpm;
 
     cbOverrideTrayIconSize.Checked := OverrideTrayIconSize;
     cbOverrideAppIconSize.Checked := OverrideAppIconSize;
@@ -321,7 +318,7 @@ begin
     AudioSystem.Volume := Max(Min(tbVolume.Position, MAX_VOLUME), MIN_VOLUME);
     Volume := AudioSystem.Volume;
 
-    Bpm := speBpm.Value;
+    //Bpm := speBpm.Value;
     //frmMain.Metronome.Bpm := Bpm;
 
     OverrideTrayIconSize := cbOverrideTrayIconSize.Checked;

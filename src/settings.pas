@@ -68,7 +68,7 @@ type
 
     Volume: integer;
 
-    Bpm: integer;
+    //Bpm: integer;
 
     TrayIconSizeOverridden: integer;
     AppIconSizeOverridden: integer;
@@ -199,8 +199,8 @@ const
   VOLUME_LEVEL = 'volume';
   DEF_VOLUME_LEVEL = DEFAULT_VOLUME;
 
-  METRONOME_BPM = 'metronome_bpm';
-  DEF_METRONOME_BPM = 100;
+  //METRONOME_BPM = 'metronome_bpm';
+  //DEF_METRONOME_BPM = 100;
 
   TRAY_ICON_SIZE = 'tray_icon_size';
   APP_ICON_SIZE = 'app_icon_size';
@@ -316,7 +316,7 @@ begin
       DEF_USE_DEFAULT_AUDIO_DEVICE);
     LoopSound := FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
     Volume := FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
-    Bpm := FConf.GetValue(METRONOME_BPM, DEF_METRONOME_BPM);
+    //Bpm := FConf.GetValue(METRONOME_BPM, DEF_METRONOME_BPM);
 
     TrayIconSizeOverridden := FConf.GetValue(TRAY_ICON_SIZE, DefaultTrayIconSize);
     AppIconSizeOverridden := FConf.GetValue(APP_ICON_SIZE, DefaultAppIconSize);
@@ -374,7 +374,7 @@ begin
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
   FConf.SetValue(VOLUME_LEVEL, Volume);
-  Fconf.SetValue(METRONOME_BPM, Bpm);
+  //Fconf.SetValue(METRONOME_BPM, Bpm);
 
   FConf.SetValue(TRAY_ICON_SIZE, TrayIconSizeOverridden);
   FConf.SetValue(APP_ICON_SIZE, AppIconSizeOverridden);
@@ -437,7 +437,7 @@ begin
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
   FConf.SetValue(VOLUME_LEVEL, Volume);
-  FConf.SetValue(METRONOME_BPM, Bpm);
+  //FConf.SetValue(METRONOME_BPM, Bpm);
 
   FConf.SetValue(TRAY_ICON_SIZE, TrayIconSizeOverridden);
   FConf.SetValue(APP_ICON_SIZE, AppIconSizeOverridden);
@@ -516,7 +516,7 @@ begin
   UseDefaultSound := DEF_USE_DEFAULT_SOUND;
   LoopSound := DEF_LOOP_SOUND;
   Volume := DEF_VOLUME_LEVEL;
-  Bpm := DEF_METRONOME_BPM;
+  //Bpm := DEF_METRONOME_BPM;
 
   AdjustCompleteby := DEF_ADJ_COMPLETEBY;
   AdjustDiff := DEF_ADJ_DIFF;
@@ -561,7 +561,7 @@ begin
   UseDefaultSound := From.UseDefaultSound;
   LoopSound := From.LoopSound;
   Volume := From.Volume;
-  Bpm := From.Bpm;
+  //Bpm := From.Bpm;
 
   TrayIconSizeOverridden := From.TrayIconSizeOverridden;
   AppIconSizeOverridden := From.AppIconSizeOverridden;
@@ -654,11 +654,11 @@ begin
     Result := False;
     Exit;
   end;
-  if Bpm <> From.Bpm then
-  begin
-    Result := False;
-    Exit;
-  end;
+  //if Bpm <> From.Bpm then
+  //begin
+  //  Result := False;
+  //  Exit;
+  //end;
   if TrayIconSizeOverridden <> From.TrayIconSizeOverridden then
   begin
     Result := False;
