@@ -529,7 +529,7 @@ begin
   SndFile := TSoundFactory.CreateSound(SoundPoolEntry^.Original);
   if SndFile = nil then
   begin
-    ShowMessage('Fatal error: sound factory could not create sound. Index - ' +
+    Logger.Debug('Fatal error: sound factory could not create sound. Index - ' +
       IntToStr(Index));
     Exit;
   end;
@@ -771,6 +771,7 @@ begin
       FreeMem(Sound^.Buffer);
     Dispose(Sound);
     Dispose(SoundPoolEntry);
+    Result := INVALID_SOUNDPOOL_INDEX;
     Exit;
   end;
 

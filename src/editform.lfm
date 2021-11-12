@@ -282,11 +282,11 @@ object frmEdit: TfrmEdit
           Columns = <          
             item
               AutoSize = True
-              Width = 55
+              Width = 1
             end          
             item
               AutoSize = True
-              Width = 176
+              Width = 241
             end>
           Items.LazData = {
             5400000003000000FFFFFFFFFFFFFFFFFFFFFFFF000000000400000046696C65

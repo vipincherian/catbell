@@ -281,6 +281,8 @@ begin
     Result := Sound;
     Exit;
   end;
+  FreeAndNil(Sound);
+
   Result := nil;
 end;
 

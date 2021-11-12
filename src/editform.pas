@@ -550,7 +550,10 @@ begin
     begin
       LoadedSoundIndex := Index;
       LoadedSoundSource := FileName;
-    end;
+    end
+    else
+      MessageDlg('Error', 'Could not load audio from file: ' + LineEnding +
+        FileName, mtError, [mbOK], 0);
   end
   else
     Exit;

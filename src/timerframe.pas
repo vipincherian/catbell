@@ -663,13 +663,15 @@ begin
 
   CurrentTime := Now;
 
+  Logger.Debug('EstimatedCompletion - ' + DateTimeToStr(EstimatedCompletion));
+  Logger.Debug('FLastCompletionTime - ' + DateTimeToStr(FLastCompletionTime));
+  Logger.Debug('Added - ' + DateTimeToStr(FLastCompletionTime + Duration));
+  Logger.Debug('Now - ' + DateTimeToStr(CurrentTime));
+
   { Is it too late to re-start? }
   if (FLastCompletionTime + Duration) <= CurrentTime then
   begin
-    Logger.Debug('EstimatedCompletion - ' + DateTimeToStr(EstimatedCompletion));
-    Logger.Debug('FLastCompletionTime - ' + DateTimeToStr(FLastCompletionTime));
-    Logger.Debug('Added - ' + DateTimeToStr(FLastCompletionTime + Duration));
-    Logger.Debug('Now - ' + DateTimeToStr(Now));
+    Logger.Debug('Too late to re-start');
     Exit;
   end;
 
