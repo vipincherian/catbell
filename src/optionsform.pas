@@ -96,6 +96,7 @@ type
     procedure bbtnDefaultClick(Sender: TObject);
     procedure bbtnSaveClick(Sender: TObject);
     procedure cbOverrideAppIconSizeChange(Sender: TObject);
+    procedure cbOverrideLatencyChange(Sender: TObject);
     procedure cbOverrideTrayIconSizeChange(Sender: TObject);
     procedure cbUseDefaultAudioChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -223,6 +224,9 @@ begin
     speTrayIconSize.Value := TrayIconSizeOverridden;
     speAppIconSize.Value := AppIconSizeOverridden;
 
+    cbOverrideLatency.Checked := OverrideLatency;
+    seLatency.Value := Latency;
+
   end;
 end;
 
@@ -326,6 +330,9 @@ begin
     TrayIconSizeOverridden := speTrayIconSize.Value;
     AppIconSizeOverridden := speAppIconSize.Value;
 
+    OverrideLatency := cbOverrideLatency.Checked;
+    Latency := seLatency.Value;
+
   end;
 end;
 
@@ -343,6 +350,7 @@ begin
   speAppIconSize.Enabled := cbOverrideAppIconSize.Checked;
   tbVolume.Enabled := AudioSystem.Loaded;
   cbUseDefaultAudio.Enabled := AudioSystem.Loaded;
+  seLatency.Enabled:=cbOverrideLatency.Checked;
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
@@ -529,6 +537,11 @@ begin
 end;
 
 procedure TfrmOptions.cbOverrideAppIconSizeChange(Sender: TObject);
+begin
+  ReenableControls;
+end;
+
+procedure TfrmOptions.cbOverrideLatencyChange(Sender: TObject);
 begin
   ReenableControls;
 end;

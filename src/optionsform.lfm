@@ -499,6 +499,7 @@ object frmOptions: TfrmOptions
           Width = 105
           Anchors = [akLeft, akBottom]
           Caption = 'Override latency'
+          OnChange = cbOverrideLatencyChange
           TabOrder = 5
         end
       end

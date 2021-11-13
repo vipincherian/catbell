@@ -43,6 +43,9 @@ const
   LX_HINT = 'Hint: Install packages libportaudio2, libsndfile1 and libmpg123-0';
   {$ENDIF}
 
+  AUDIO_LATENCY_MIN = 0;
+  AUDIO_LATENCY_MAX = 50;
+
   {Main}
 
   FORM_MIN_WIDTH = 600;
@@ -265,6 +268,12 @@ const
 
   RESTART_FROM_FINISH = 'restart_from_finish';
   DEF_RESTART_FROM_FINISH = True;
+
+  OVERRIDE_LATENCY = 'override_latency';
+  DEF_OVERRIDE_LATENCY = False;
+
+  AUDIO_LATENCY = 'latency';
+  DEF_AUDIO_LATENCY = 0;
 
   {Adjust}
 

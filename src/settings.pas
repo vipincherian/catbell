@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, {Dialogs, }{Graphics,} DateTimePicker, jsonConf,
-  audio, {EventLog,} LCLIntf , LCLType, constants;
+  audio, {EventLog,} LCLIntf, LCLType, constants, Math;
 
 type
   { TUserConfig }
@@ -34,9 +34,11 @@ type
   TUserConfig = class(TObject)
   private
     FDefaultPos: TRect;
+    FLatency: integer;
     function GetAppIconSize: integer;
     function GetDefaultStartPosition: TRect;
     function GetTrayIconSize: integer;
+    procedure SetLatency(AValue: integer);
   public
     ShowModalAlert: boolean;
     ShowTrayAlert: boolean;
@@ -78,6 +80,8 @@ type
 
     RestartFromFinish: boolean;
 
+    OverrideLatency: boolean;
+
     constructor Create;
     destructor Destroy; override;
 
@@ -86,6 +90,7 @@ type
 
     property TrayIconSize: integer read GetTrayIconSize;
     property AppIconSize: integer read GetAppIconSize;
+    property Latency: integer read FLatency write SetLatency;
 
 
   end;
@@ -235,6 +240,9 @@ begin
 
     RestartFromFinish := FConf.GetValue(RESTART_FROM_FINISH, DEF_RESTART_FROM_FINISH);
 
+    OverrideLatency := FConf.GetValue(OVERRIDE_LATENCY, DEF_OVERRIDE_LATENCY);
+    Latency := FConf.GetValue(AUDIO_LATENCY, DEF_AUDIO_LATENCY);
+
   except
     CreateAnew;
   end;
@@ -292,6 +300,9 @@ begin
   FConf.SetValue(OVERRIDE_APP_ICON_SIZE, OverrideAppIconSize);
 
   FConf.SetValue(RESTART_FROM_FINISH, RestartFromFinish);
+
+  FConf.SetValue(OVERRIDE_LATENCY, OverrideLatency);
+  FConf.SetValue(AUDIO_LATENCY, Latency);
 
 end;
 
@@ -358,6 +369,9 @@ begin
 
   FConf.SetValue(RESTART_FROM_FINISH, DEF_RESTART_FROM_FINISH);
 
+  FConf.SetValue(OVERRIDE_LATENCY, DEF_OVERRIDE_LATENCY);
+  FConf.SetValue(AUDIO_LATENCY, DEF_AUDIO_LATENCY);
+
   FConf.Flush;
 end;
 
@@ -402,6 +416,13 @@ begin
     Result := DefaultTrayIconSize;
 end;
 
+procedure TUserConfig.SetLatency(AValue: integer);
+begin
+  if FLatency = AValue then
+    Exit;
+  FLatency := Max(AUDIO_LATENCY_MIN, Min(AValue, AUDIO_LATENCY_MAX));
+end;
+
 
 constructor TUserConfig.Create;
 begin
@@ -444,6 +465,9 @@ begin
   OverrideAppIconSize := DEF_OVERRIDE_APP_ICON_SIZE;
 
   RestartFromFinish := DEF_RESTART_FROM_FINISH;
+
+  OverrideLatency := DEF_OVERRIDE_LATENCY;
+  Latency := DEF_AUDIO_LATENCY;
 end;
 
 destructor TUserConfig.Destroy;
@@ -485,6 +509,9 @@ begin
   OverrideAppIconSize := From.OverrideAppIconSize;
 
   RestartFromFinish := From.RestartFromFinish;
+
+  OverrideLatency := From.OverrideLatency;
+  Latency := From.Latency;
 
 end;
 
@@ -560,6 +587,12 @@ begin
     Exit;
 
   if RestartFromFinish <> From.RestartFromFinish then
+    Exit;
+
+  if OverrideLatency <> From.OverrideLatency then
+    Exit;
+
+  if Latency <> From.Latency then
     Exit;
 
   Result := True;
