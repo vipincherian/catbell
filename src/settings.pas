@@ -78,6 +78,8 @@ type
     OverrideTrayIconSize: boolean;
     OverrideAppIconSize: boolean;
 
+    RestartFromFinish: boolean;
+
     constructor Create;
     destructor Destroy; override;
 
@@ -210,6 +212,9 @@ const
   OVERRIDE_APP_ICON_SIZE = 'override_app_icon_size';
   DEF_OVERRIDE_APP_ICON_SIZE = False;
 
+  RESTART_FROM_FINISH = 'restart_from_finish';
+  DEF_RESTART_FROM_FINISH = True;
+
 
 
 //procedure InitSettings;
@@ -222,15 +227,15 @@ implementation
 //  { Combo-box indices are set blindly. An assert to check this during development. }
 //  Assert(integer(tf12) = 0);
 //  Assert(integer(tf24) = 1);
-//
+
 //  if not DirectoryExists(GetAppConfigDir(False)) then
 //    CreateDir(GetAppConfigDir(False));
-//
+
 //  UserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
-//
+
 //  UserConfig.Load;
 //end;
-//
+
 //procedure CleanupSettings;
 //begin
 //  UserConfig.Free;
@@ -302,8 +307,7 @@ begin
     if AdjustCompleteby <= 0 then
       AdjustCompleteby := DEF_ADJ_COMPLETEBY;
 
-    AudioDeviceName := string(FConf.GetValue(AUDIO_DEVICE_NAME,
-      AudioDeviceName));
+    AudioDeviceName := string(FConf.GetValue(AUDIO_DEVICE_NAME, AudioDeviceName));
     AudioHostAPIName := string(FConf.GetValue(AUDIO_HOSTAPI_NAME,
       AudioHostAPIName));
     UseDefaultAudioDevice :=
@@ -325,6 +329,8 @@ begin
       DEF_OVERRIDE_TRAY_ICON_SIZE);
     OverrideAppIconSize := FConf.GetValue(OVERRIDE_APP_ICON_SIZE,
       DEF_OVERRIDE_APP_ICON_SIZE);
+
+    RestartFromFinish := FConf.GetValue(RESTART_FROM_FINISH, DEF_RESTART_FROM_FINISH);
 
   except
     CreateAnew;
@@ -381,6 +387,8 @@ begin
 
   FConf.SetValue(OVERRIDE_TRAY_ICON_SIZE, OverrideTrayIconSize);
   FConf.SetValue(OVERRIDE_APP_ICON_SIZE, OverrideAppIconSize);
+
+  FConf.SetValue(RESTART_FROM_FINISH, RestartFromFinish);
 
 end;
 
@@ -444,6 +452,8 @@ begin
 
   FConf.SetValue(OVERRIDE_TRAY_ICON_SIZE, OverrideTrayIconSize);
   FConf.SetValue(OVERRIDE_APP_ICON_SIZE, OverrideAppIconSize);
+
+  FConf.SetValue(RESTART_FROM_FINISH, DEF_RESTART_FROM_FINISH);
 
   FConf.Flush;
 end;
@@ -529,6 +539,8 @@ begin
 
   OverrideTrayIconSize := DEF_OVERRIDE_TRAY_ICON_SIZE;
   OverrideAppIconSize := DEF_OVERRIDE_APP_ICON_SIZE;
+
+  RestartFromFinish := DEF_RESTART_FROM_FINISH;
 end;
 
 destructor TUserConfig.Destroy;
@@ -569,116 +581,84 @@ begin
   OverrideTrayIconSize := From.OverrideTrayIconSize;
   OverrideAppIconSize := From.OverrideAppIconSize;
 
+  RestartFromFinish := From.RestartFromFinish;
+
 end;
 
 function TUserConfig.CompareWith(From: TUserConfig): boolean;
 begin
+
+  Result := False;
+
   if ShowModalAlert <> From.ShowModalAlert then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if ShowTrayAlert <> From.ShowTrayAlert then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if AutoProgress <> From.AutoProgress then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if QueryExit <> From.QueryExit then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if DefaultTimerTitle <> From.DefaultTimerTitle then
-  begin
-    Result := False;
     Exit;
-  end;
 
   if DefaultTimerDuration <> From.DefaultTimerDuration then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if DefaultTimeFormat <> From.DefaultTimeFormat then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if AdjustDiff <> From.AdjustDiff then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if AdjustCompleteby <> From.AdjustCompleteby then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if AudioDeviceName <> From.AudioDeviceName then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if AudioHostAPIName <> From.AudioHostAPIName then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if UseDefaultAudioDevice <> From.UseDefaultAudioDevice then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if TaskbarIconType <> From.TaskbarIconType then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if UseDefaultSound <> From.UseDefaultSound then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if LoopSound <> From.LoopSound then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if Volume <> From.Volume then
-  begin
-    Result := False;
     Exit;
-  end;
+
   //if Bpm <> From.Bpm then
   //begin
   //  Result := False;
   //  Exit;
   //end;
+
   if TrayIconSizeOverridden <> From.TrayIconSizeOverridden then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if AppIconSizeOverridden <> From.AppIconSizeOverridden then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if OverrideTrayIconSize <> From.OverrideTrayIconSize then
-  begin
-    Result := False;
     Exit;
-  end;
+
   if OverrideAppIconSize <> From.OverrideAppIconSize then
-  begin
-    Result := False;
     Exit;
-  end;
+
+  if RestartFromFinish <> From.RestartFromFinish then
+    Exit;
+
   Result := True;
 end;
 

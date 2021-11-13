@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, {fgl,} dateutils;
+  LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, {fgl,} dateutils, settings;
 
 type
 
@@ -35,11 +35,13 @@ type
   TfrmAlert = class(TForm)
     bbClose: TBitBtn;
     bbRestart: TBitBtn;
+    cbFromFinish: TCheckBox;
     Label1: TLabel;
     //FTimer: TTimer;
     lsvMessages: TListView;
     procedure bbCloseClick(Sender: TObject);
     procedure bbRestartClick(Sender: TObject);
+    procedure cbFromFinishChange(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -73,6 +75,8 @@ begin
   AlphaBlendValue := 50;
   //FTimers := TTimerFrameList.Create;
   bbRestart.Enabled := False;
+  cbFromFinish.Checked := UserConfig.RestartFromFinish;
+
 end;
 
 procedure TfrmAlert.FormDestroy(Sender: TObject);
@@ -197,6 +201,11 @@ begin
       0);
   Cursor := crDefault;
   Close;
+end;
+
+procedure TfrmAlert.cbFromFinishChange(Sender: TObject);
+begin
+  UserConfig.RestartFromFinish := cbFromFinish.Checked;
 end;
 
 procedure TfrmAlert.FormActivate(Sender: TObject);

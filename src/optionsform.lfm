@@ -55,10 +55,10 @@ object frmOptions: TfrmOptions
     Height = 352
     Top = 8
     Width = 523
-    ActivePage = tsTimers
+    ActivePage = TabSheet1
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = ilOptions
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
@@ -252,7 +252,7 @@ object frmOptions: TfrmOptions
           ParentColor = False
         end
         object rbProgressOnAppIcon: TRadioButton
-          Left = 40
+          Left = 24
           Height = 21
           Top = 104
           Width = 158
@@ -262,7 +262,7 @@ object frmOptions: TfrmOptions
           TabStop = True
         end
         object rbProgressOnOverlayIcon: TRadioButton
-          Left = 40
+          Left = 24
           Height = 21
           Top = 128
           Width = 168
@@ -440,12 +440,12 @@ object frmOptions: TfrmOptions
             item
               AutoSize = True
               Caption = 'Device'
-              Width = 41
+              Width = 1
             end          
             item
               AutoSize = True
               Caption = 'Host API'
-              Width = 392
+              Width = 443
             end>
           ColumnClick = False
           ReadOnly = True

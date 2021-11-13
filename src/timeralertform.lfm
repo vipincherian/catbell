@@ -1,12 +1,12 @@
 object frmAlert: TfrmAlert
   Left = 431
-  Height = 190
+  Height = 218
   Top = 254
   Width = 336
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Timer Finished'
-  ClientHeight = 190
+  ClientHeight = 218
   ClientWidth = 336
   Icon.Data = {
     7E04000000000100010010100000010020006804000016000000280000001000
@@ -56,8 +56,9 @@ object frmAlert: TfrmAlert
   object bbClose: TBitBtn
     Left = 253
     Height = 30
-    Top = 152
+    Top = 182
     Width = 75
+    Anchors = [akRight, akBottom]
     DefaultCaption = True
     GlyphShowMode = gsmAlways
     Kind = bkClose
@@ -98,12 +99,22 @@ object frmAlert: TfrmAlert
   object bbRestart: TBitBtn
     Left = 8
     Height = 30
-    Top = 152
+    Top = 182
     Width = 75
+    Anchors = [akLeft, akBottom]
     Caption = '&Restart'
     Kind = bkRetry
     ModalResult = 4
     OnClick = bbRestartClick
     TabOrder = 2
+  end
+  object cbFromFinish: TCheckBox
+    Left = 8
+    Height = 21
+    Top = 153
+    Width = 238
+    Caption = 'Restart from last finish (wherever possible)'
+    OnChange = cbFromFinishChange
+    TabOrder = 3
   end
 end
