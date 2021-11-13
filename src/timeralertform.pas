@@ -180,26 +180,36 @@ var
   Failures: integer = 0;
 begin
   Cursor := crHourGlass;
-  StopTimers;
-  //for Entry in FTimers do Entry.RestartFromLastFinish;
-  ErrorMessage := '';
-  for Item in lsvMessages.Items do
-  begin
-    if not Item.Checked then
-      Continue;
-    Entry := TfraTimer(Item.Data);
-    if not Entry.RestartFromLastFinish then
+
+  try
+    StopTimers;
+    //for Entry in FTimers do Entry.RestartFromLastFinish;
+    ErrorMessage := '';
+    for Item in lsvMessages.Items do
     begin
-      Inc(Failures);
-      ErrorMessage += IntToStr(Failures) + '. ' + Entry.Caption + LineEnding;
+      if not Item.Checked then
+        Continue;
+      Entry := TfraTimer(Item.Data);
+      if cbFromFinish.Checked then
+      begin
+        if not Entry.RestartFromLastFinish then
+        begin
+          Inc(Failures);
+          ErrorMessage += IntToStr(Failures) + '. ' + Entry.Caption + LineEnding;
+        end;
+      end
+      else
+        Entry.Start;
     end;
+    //ShowMessage('The following timers failed to restart:' + LineEnding + ErrorMessage);
+    if Failures > 0 then
+      MessageDlg('The following timers failed to restart: ' +
+        LineEnding + '(time duration elapsed).' + LineEnding +
+        ErrorMessage, mtError, [mbOK],
+        0);
+  finally
+    Cursor := crDefault;
   end;
-  //ShowMessage('The following timers failed to restart:' + LineEnding + ErrorMessage);
-  if Failures > 0 then
-    MessageDlg('The following timers failed to restart: ' + LineEnding +
-      '(time duration elapsed).' + LineEnding + ErrorMessage, mtError, [mbOK],
-      0);
-  Cursor := crDefault;
   Close;
 end;
 
