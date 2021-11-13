@@ -50,6 +50,7 @@ type
     cbUseDefaultAudio: TCheckBox;
     cbUseDefaultSound: TCheckBox;
     cbLoopSound: TCheckBox;
+    cbOverrideLatency: TCheckBox;
     ckbQueryExit: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
@@ -73,11 +74,11 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label2: TLabel;
-    lblVolume: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
+    lblVolume: TLabel;
     lsvAudioDevices: TListView;
     pgbAudio: TProgressBar;
     pgcOptions: TPageControl;
@@ -85,6 +86,7 @@ type
     rbProgressOnOverlayIcon: TRadioButton;
     speTrayIconSize: TSpinEdit;
     speAppIconSize: TSpinEdit;
+    seLatency: TSpinEdit;
     TabSheet1: TTabSheet;
     tbVolume: TTrackBar;
     tsAudio: TTabSheet;
