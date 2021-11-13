@@ -848,7 +848,8 @@ begin
     if not FLoaded then
     begin
       //Logger.Debug('Could not load mpg123');
-      FLoadError := 'Failed to load library: libmpg123 (' + LIB_MPG123 + ').' + LineEnding;
+      FLoadError := 'Failed to load library: libmpg123 (' + LIB_MPG123 +
+        ').' + LineEnding;
       {$IF defined(windows) }
       FLoadError += WIN_HINT;
       {$ELSEIF Defined(unix)}
@@ -1112,8 +1113,14 @@ begin
   //Sound.SampleRate
   //Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate);
 
-  Streamparams.suggestedLatency :=
-    (Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency);
+  // If latency has to be overridden, then do that.
+
+  if UserConfig.OverrideLatency then
+    Streamparams.suggestedLatency := UserConfig.Latency / AUDIO_LATENCY_DIVISOR
+  else
+    Streamparams.suggestedLatency :=
+      (Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency);
+
   StreamParams.hostApiSpecificStreamInfo := nil;
   //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
 

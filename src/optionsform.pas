@@ -350,7 +350,7 @@ begin
   speAppIconSize.Enabled := cbOverrideAppIconSize.Checked;
   tbVolume.Enabled := AudioSystem.Loaded;
   cbUseDefaultAudio.Enabled := AudioSystem.Loaded;
-  seLatency.Enabled:=cbOverrideLatency.Checked;
+  seLatency.Enabled := cbOverrideLatency.Checked;
 end;
 
 procedure TfrmOptions.FormCreate(Sender: TObject);
@@ -391,6 +391,10 @@ begin
     edtDefaultHostAPI.Text := '';
     bbPlay.Enabled := False;
   end;
+
+  seLatency.MinValue := AUDIO_LATENCY_MIN;
+  seLatency.MaxValue := AUDIO_LATENCY_MAX;
+
   ReenableControls;
 
 end;

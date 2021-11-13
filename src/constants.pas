@@ -274,6 +274,7 @@ const
 
   AUDIO_LATENCY = 'latency';
   DEF_AUDIO_LATENCY = 0;
+  AUDIO_LATENCY_DIVISOR = 1000;
 
   {Adjust}
 

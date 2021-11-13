@@ -586,8 +586,7 @@ begin
   if OverrideAppIconSize <> From.OverrideAppIconSize then
     Exit;
 
-  if RestartFromFinish <> From.RestartFromFinish then
-    Exit;
+  // RestartFromFinish is not compared as it is not set in options form
 
   if OverrideLatency <> From.OverrideLatency then
     Exit;
