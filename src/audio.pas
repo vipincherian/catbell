@@ -6,36 +6,9 @@ interface
 
 uses
   Classes, SysUtils, sndfile, mpg123, portaudio, {EventLog,} ctypes, Forms,
-  Dialogs, LCLIntf, lcltype, fgl, Math, log, sound;
+  Dialogs, LCLIntf, lcltype, fgl, Math, log, sound, constants;
 
-const
-  //READ_NOTLOADED = -1;
-  //READ_SND = 0;
 
-  //SampleRate = 44100;
-  //FramesPerBuffer = 1024;
-
-  // How long you want to play the test sine:
-  //NumSecs = 2;
-
-  // Wavetable size. Influences your pitch:
-  TableSize = 200;
-
-  MAX_VOLUME = 100;
-  MIN_VOLUME = 0;
-
-  DEFAULT_VOLUME = 90;
-  VOLUME_LOG_BASE = 10;
-
-  INVALID_SOUNDPOOL_INDEX = -1;
-
-  REFILL_BUFFER_SIZE = 4096;
-
-  {$IF defined(windows) }
-  WIN_HINT = 'Hint: Is this DLL missing?';
-  {$ELSEIF Defined(unix)}
-  LX_HINT = 'Hint: Install packages libportaudio2, libsndfile1 and libmpg123-0';
-  {$ENDIF}
 
 //SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
 

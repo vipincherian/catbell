@@ -29,73 +29,11 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, StdCtrls,
+  timerframe, fgl, sequence, editform, Math, StdCtrls, constants,
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
   {portaudio, sndfile,}{ctypes,} audio, metronome, log;
-
-const
-  FORM_MIN_WIDTH = 600;
-  FORM_MIN_HEIGHT = 300;
-  //TICON_RED_INDEX: integer = 1;
-  TICON_GREEN_INDEX: integer = 0;
-  TRAY_PROGRESS_ICON_COUNT = 24;
-
-  PROGRESS_COLOUR = $4352E2;
-  PROGRESS_GLOSS_OPACITY = 60;
-
-  PROGRESS_COMPLETED = 2.0;
-
-  TRAY_OUTLINE_INSET = 2;
-
-  OVERLAY_STROKE_WIDTH = 16;
-  OVERLAY_STROKE_COLOUR = $515151;
-  OVERLAY_BACKGROUND_COLOUR = $5CEFFF;
-
-  TRAY_CENTRE_INNER_RADIUS = 2;
-  TRAY_CENTRE_OUTER_RADIUS = 4;
-  TRAY_BASE_WIDTH = 16;
-
-  WIDGET_ICON_WIDTH = 24;
-
-  RAD_MULTIPLIER = 16;
-
-  APP_ICON_SIZE = 256;
-
-  LAST_TRAY_ICON_DEFAULT = -1;
-
-  DEF_COUNTDOWN_CAPTION: string = '00:00:00';
-  TIMER_PROGRESS_FINISHED: single = 2.0;
-  TIMER_PROGRESS_OFFTRAY: single = 3.0;
-
-  //TIMER_CONF_CLOCKS = 'clocks';
-  //TIMER_CONF_TIMERS = 'timers';
-  //TIMER_CONF_TITLE = 'timer_title';
-  //TIMER_CONF_TIME = 'time';
-  //TIMER_CONF_HOURS = 'hours';
-  //TIMER_CONF_MINUTES = 'minutes';
-  //TIMER_CONF_SECONDS = 'seconds';
-  //TIMER_CONF_DURATION = 'duration';
-  //TIMER_CONF_NOTIFIER = 'notifier';
-
-
-  //TIMER_CONF_COUNT = 'count';
-  //TIMER_CONF_ORDER = 'order';
-
-
-
-  //WM_USER = $400;
-  //UM_AFTERSHOW = LM_USER;
-
-  PANEL_TIMERCOUNT = 0;
-  PANEL_AUDIO = 1;
-  PANEL_MESSAGE = 2;
-
-  //II_MUTED = 12;
-  //II_NOTMUTED = 11;
-
-  HELP_URL = 'https://github.com/vipincherian/catbell/blob/master/doc/help.md';
 
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
@@ -805,7 +743,7 @@ begin
       CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
       CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
 
-      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
+      CanvasBGRA.Pie(Inset, Inset, LARGE_ICON_SIZE - Inset, LARGE_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
 
       { To give it a glossy feel, we try to add a translucent
@@ -814,7 +752,7 @@ begin
       CanvasBGRA.Pen.Opacity := PROGRESS_GLOSS_OPACITY;
       CanvasBGRA.Brush.Color := clWhite;
       CanvasBGRA.Pen.Color := clWhite;
-      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
+      CanvasBGRA.Pie(Inset, Inset, LARGE_ICON_SIZE - Inset, LARGE_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER,
         { We need to draw only half the circle, or the current pie,
         whichever is lesser. } -(15 * RAD_MULTIPLIER * Max(
@@ -851,7 +789,7 @@ begin
 
     {$IF defined(windows) }
     // Create overlay icons, only in the case of windows
-    HiResBmp := TBGRABitmap.Create(APP_ICON_SIZE, APP_ICON_SIZE);
+    HiResBmp := TBGRABitmap.Create(LARGE_ICON_SIZE, LARGE_ICON_SIZE);
     with HiResBmp do
     begin
       CanvasBGRA.Brush.Color := OVERLAY_BACKGROUND_COLOUR;
@@ -860,13 +798,13 @@ begin
 
       CanvasBGRA.Ellipse(OVERLAY_STROKE_WIDTH div 2,
         OVERLAY_STROKE_WIDTH div 2,
-        APP_ICON_SIZE - (OVERLAY_STROKE_WIDTH div 2),
-        APP_ICON_SIZE - (OVERLAY_STROKE_WIDTH div 2));
+        LARGE_ICON_SIZE - (OVERLAY_STROKE_WIDTH div 2),
+        LARGE_ICON_SIZE - (OVERLAY_STROKE_WIDTH div 2));
 
 
       CanvasBGRA.Brush.Color := PROGRESS_COLOUR;
       CanvasBGRA.Pen.Color := PROGRESS_COLOUR;
-      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
+      CanvasBGRA.Pie(Inset, Inset, LARGE_ICON_SIZE - Inset, LARGE_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER, -(15 * RAD_MULTIPLIER * (Count - 1)));
 
       { To give it a glossy feel, we try to add a translucent
@@ -875,7 +813,7 @@ begin
       CanvasBGRA.Pen.Opacity := PROGRESS_GLOSS_OPACITY;
       CanvasBGRA.Brush.Color := clWhite;
       CanvasBGRA.Pen.Color := clWhite;
-      CanvasBGRA.Pie(Inset, Inset, APP_ICON_SIZE - Inset, APP_ICON_SIZE - Inset,
+      CanvasBGRA.Pie(Inset, Inset, LARGE_ICON_SIZE - Inset, LARGE_ICON_SIZE - Inset,
         90 * RAD_MULTIPLIER,
         { We need to draw only half the circle, or the current pie,
         whichever is lesser. } -(15 * RAD_MULTIPLIER * Max(

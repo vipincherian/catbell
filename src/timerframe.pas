@@ -28,64 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, EditBtn, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, {EventLog,} adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LCLIntf, StrUtils, log{, sound}, metronome, fgl;
-
-const
-  TIMER_IMG_GREY_TIMER: integer = 0;
-  TIMER_IMG_COLOUR_TIMER: integer = 1;
-  TIMER_IMG_NOTIFY_YES: integer = 2;
-  TIMER_IMG_NOTIFY_NO: integer = 3;
-
-  CLOCK_HEIGHT = 38;
-  DEF_COUNTDOWN_CAPTION: string = '00:00:00';
-  TIMER_PROGRESS_FINISHED: single = 2.0;
-
-  TIMER_CONF_CLOCKS = 'clocks';
-  TIMER_CONF_TIMERS = 'timers';
-  TIMER_CONF_TITLE = 'timer_title';
-  TIMER_CONF_TIME = 'time';
-  //TIMER_CONF_HOURS = 'hours';
-  //TIMER_CONF_MINUTES = 'minutes';
-  //TIMER_CONF_SECONDS = 'seconds';
-  TIMER_CONF_DURATION = 'duration';
-  TIMER_CONF_NOTIFIER = 'notifier';
-  //TIMER_CONF_ID = 'id';
-  TIMER_CONF_COUNT = 'count';
-  //TIMER_CONF_ORDER = 'order';
-
-  TIMER_CONF_SOUND_NONE = INVALID_SOUNDPOOL_INDEX;
-  TIMER_CONF_SOUND_DEFALUT = 0;
-  TIMER_CONF_SOUND_CUSTOM = 1;
-
-  TIMER_CONF_SOUNDTYPE = 'audio_type';
-  TIMER_CONF_SOUNDFILEPATH = 'audio_file';
-  TIMER_CONF_SOUNDLENGTH = 'audio_duration';
-  TIMER_CONF_SOUNDLOOP = 'audio_loop';
-
-
-  TIMER_CONF_MODALALERT = 'modal_alert';
-  TIMER_CONF_TRAYNOTIFICATION = 'tray_notification';
-
-  TIMER_CONF_PENDINGTICKCOUNT = 'pending_tick_count';
-  TIMER_CONF_ENDTIME = 'end_time';
-  TIMER_CONF_ORIGTICKCOUNT = 'orig_tick_count';
-
-
-
-
-  TIMER_CONF_RUNNING = 'running';
-  TIMER_CONF_PAUSED = 'paused';
-
-  TIMER_CONF_METRONOME = 'metronome';
-
-  // For auto arranging
-  TIMER_PADDING = 5;
-  TIMER_REPORT_PADDING = 20;
-
-//UM_PLAY_AUDIO = LM_USER + 1;
-//UM_FINISHED_AUDIO = LM_USER + 2;
-
-//BUFFER_SIZE = 1024;
+  {ctypes,} LCLIntf, StrUtils, log{, sound}, metronome, fgl, constants;
 
 type
 

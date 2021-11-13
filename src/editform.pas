@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
   ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} {EventLog,}
-  Math, audio, log{, sound};
+  Math, audio, log{, sound}, constants;
 
 type
   {TTimerSoundInfo = record
@@ -170,18 +170,12 @@ type
 var
   frmEdit: TfrmEdit;
 
-const
-  TYPE_DURATION = 0;
-  TYPE_BY = 1;
-
-  SOUND_DEFAULT = 0;
-  SOUND_CUSTOM = 2;
-  SOUND_NONE = 1;
 
 implementation
 
 uses
-  main, timerframe;
+  //main,
+  timerframe;
 
 {$R *.lfm}
 

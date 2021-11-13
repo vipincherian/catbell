@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  DateTimePicker, dateutils, settings;
+  DateTimePicker, dateutils, settings, constants;
 
 type
 
@@ -56,11 +56,6 @@ type
 var
   frmAdjust: TfrmAdjust;
 
-const
-  ADJUST_SHORTEN = 0;
-  ADJUST_EXTEND = 1;
-  ADJUST_STOPBY = 2;
-  ADJUST_STOPBY_TEXT = 'Stop timer by';
 
 implementation
 

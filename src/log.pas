@@ -6,12 +6,7 @@ interface
 
 uses
   Classes, SysUtils, EventLog, LCLIntf, LCLType, fgl;
-//const
-  {LOG_NONE = 0;
-  LOG_ERROR = 1;
-  LOG_WARN = 2;
-  LOG_INFO = 3;
-  LOG_ALL = 4;}
+
 type
   TLogLevel = (LOG_NONE, LOG_ERROR, LOG_WARN, LOG_INFO, LOG_ALL);
   TNotifyLogEvent = procedure(Msg: string) of object;

@@ -25,12 +25,10 @@ unit settings;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, Graphics, DateTimePicker, jsonConf,
-  audio, {EventLog,} LCLIntf, LCLType;
+  Classes, SysUtils, Forms, {Dialogs, }{Graphics,} DateTimePicker, jsonConf,
+  audio, {EventLog,} LCLIntf , LCLType, constants;
 
 type
-
-  TTaskbarIconType = (TaskbarAppIcon, TaskbarOverlayIcon);
   { TUserConfig }
 
   TUserConfig = class(TObject)
@@ -112,109 +110,6 @@ var
   //GlobalDefault: TDefaultConfig;
   UserConfig: TUserFileConfig = nil;
 //Logger: TEventLog;
-
-const
-  AUDIO_ABORT_SHORT_WAIT = 2000;
-  AUDIO_ABORT_LONG_WAIT = 5000;
-
-  TIMER_INIT_MINS = 'timer_init_mins';
-  DEF_TIMER_INIT_MINS = 0;
-
-  TIMER_INIT_SECS = 'timer_init_secs';
-  DEF_TIMER_INIT_SECS = 10;
-
-  TIMER_INIT_TITLE = 'timer_init_title';
-  DEF_TIMER_INIT_TITLE = 'Countdown timer';
-
-  LAST_POS_TOP = 'x';
-  LAST_POS_LEFT = 'y';
-  LAST_POS_BOTTOM = 'bottom';
-  LAST_POS_RIGHT = 'right';
-
-  LAST_POS_NORMAL = 'last_pos/normal/';
-  LAST_POS_RESTORED = 'last_pos/restored/';
-
-
-  SHOW_MODAL_ALERT = 'show_modal_alert';
-  SHOW_TRAY_ALERT = 'show_tray_alert';
-  DEF_SHOW_MODAL_ALERT = False;
-  DEF_SHOW_TRAY_ALERT = True;
-
-  AUTO_PROGRESS = 'auto_progress';
-  DEF_AUTO_PROGRESS = True;
-
-  QUERY_EXIT = 'query_exit';
-  DEF_QUERY_EXIT = True;
-
-  ALLOW_TIMERTITLE_EDIT = 'allow_timertitle_edit';
-  DEF_ALLOW_TIMERTITLE_EDIT = False;
-
-  TIMER_TITLE = 'timer_title';
-  DEF_TIMER_TITLE = 'Countdown timer';
-
-  TIMER_HOURS = 'timer_hours';
-  DEF_TIMER_HOURS = 0;
-
-  TIMER_MINS = 'timer_mins';
-  DEF_TIMER_MINS = 10;
-
-  TIMER_SECS = 'timer_secs';
-  DEF_TIMER_SECS = 0;
-
-  TIMER_DURATION = 'timer_duration';
-  DEF_TIMER_DURATION = 3.4722222189884633E-003;
-
-  WINDOW_STATE = 'window_state';
-  DEF_WINDOW_STATE = integer(wsNormal);
-
-  TIME_FORMAT = 'time_format';
-  DEF_TIME_FORMAT = tf12;
-
-  ADJ_DIFF = 'adjust_diff';
-  DEF_ADJ_DIFF = DEF_TIMER_DURATION;
-  ADJ_COMPLETEBY = 'adust_completeby';
-  DEF_ADJ_COMPLETEBY = DEF_TIMER_DURATION;
-
-  USE_DEFAULT_AUDIO_DEVICE = 'audio_device_default';
-  DEF_USE_DEFAULT_AUDIO_DEVICE = True;
-  AUDIO_HOSTAPI_NAME = 'audio_hostapi_name';
-  DEF_AUDIO_HOSTAPI_NAME = '';
-  AUDIO_DEVICE_NAME = 'audio_device_name';
-  DEF_AUDIO_DEVICE_NAME = '';
-
-  //TASKBAR_SHOW_APPICON = 1;
-  //TASKBAR_SHOW_OVERLAY = 2;
-
-  TASKBAR_ICON_TYPE = 'taskbar_appicon';
-  {$IF defined(windows)}
-  DEF_TASKBAR_ICON_TYPE = TaskbarOverlayIcon;
-  {$ELSE}
-  DEF_TASKBAR_ICON_TYPE = TaskbarAppIcon;
-  {$ENDIF}
-
-  USE_DEFAULT_SOUND = 'use_default_sound';
-  DEF_USE_DEFAULT_SOUND = True;
-
-  LOOP_SOUND = 'loop_sound';
-  DEF_LOOP_SOUND = False;
-
-  VOLUME_LEVEL = 'volume';
-  DEF_VOLUME_LEVEL = DEFAULT_VOLUME;
-
-  //METRONOME_BPM = 'metronome_bpm';
-  //DEF_METRONOME_BPM = 100;
-
-  TRAY_ICON_SIZE = 'tray_icon_size';
-  APP_ICON_SIZE = 'app_icon_size';
-
-  OVERRIDE_TRAY_ICON_SIZE = 'override_tray_icon_size';
-  DEF_OVERRIDE_TRAY_ICON_SIZE = False;
-  OVERRIDE_APP_ICON_SIZE = 'override_app_icon_size';
-  DEF_OVERRIDE_APP_ICON_SIZE = False;
-
-  RESTART_FROM_FINISH = 'restart_from_finish';
-  DEF_RESTART_FROM_FINISH = True;
-
 
 
 //procedure InitSettings;

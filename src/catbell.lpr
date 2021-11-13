@@ -44,7 +44,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   //metronome,
   log,
   //sound,
-  UniqueInstanceRaw;
+  UniqueInstanceRaw, constants;
 
 {$R *.res}
 
