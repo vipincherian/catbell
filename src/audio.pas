@@ -210,8 +210,6 @@ type
   private
     FEntries: TSoundPoolList;
     FDefaultSoundIndex, FTickIndex: integer;
-    {%H-}constructor Create;
-    {%H-}destructor {%H-}Destroy; override;
     function GetCustomSoundRangeStart: integer;
     function GetRawDefaultSound: PRawSoundData;
     function GetRawTickSound: PRawSoundData;
@@ -221,6 +219,8 @@ type
     function LoadDefaultSound(const ResourceID: string): integer;
     procedure LoadSoundFromResource(ResourceName: string; var Sound: TSoundData);
   public
+    constructor Create;
+    destructor Destroy; override;
     procedure LoadAllDefaultSounds;
     property RawDefaultSound: PRawSoundData read GetRawDefaultSound;
     property RawTickSound: PRawSoundData read GetRawTickSound;
@@ -437,8 +437,17 @@ end;
 
 constructor TSoundPool.Create;
 begin
-  FEntries := TSoundPoolList.Create;
-  //LoadAllDefaultSounds;
+  { Constructor cannot be hidden unless it is made strict private.
+  Constructor will proceed with creation only if the single instance is not
+  created yet. Once created, the same instance is returned.}
+  if not Assigned(SoundPool) then
+  begin
+    inherited Create;
+    FEntries := TSoundPoolList.Create;
+    //LoadAllDefaultSounds;
+  end
+  else
+    Self := SoundPool;
 
 end;
 

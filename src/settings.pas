@@ -100,17 +100,17 @@ type
     FConf: TJSONConfig;
     procedure Save;
     procedure CreateAnew;
-    {%H-}constructor Create(FileName: string);
-    {%H-}destructor {%H-}Destroy; override;
-  public
 
+  public
+    constructor Create(FileName: string);
+    destructor Destroy; override;
     procedure Load;
     procedure Flush;
   end;
 
 var
   //GlobalDefault: TDefaultConfig;
-  UserConfig: TUserFileConfig;
+  UserConfig: TUserFileConfig = nil;
 //Logger: TEventLog;
 
 const
@@ -247,11 +247,19 @@ implementation
 
 constructor TUserFileConfig.Create(FileName: string);
 begin
-  inherited Create;
-  FFileName := FileName;
-  FConf := TJSONConfig.Create(nil);
-  FConf.Filename := FFileName;
-  FConf.Formatted := True;
+  { Constructor cannot be hidden unless it is made strict private.
+  Constructor will proceed with creation only if the single instance is not
+  created yet. Once created, the same instance is returned.}
+  if not Assigned(UserConfig) then
+  begin
+    inherited Create;
+    FFileName := FileName;
+    FConf := TJSONConfig.Create(nil);
+    FConf.Filename := FFileName;
+    FConf.Formatted := True;
+  end
+  else
+    Self := UserConfig;
 end;
 
 destructor TUserFileConfig.Destroy;
@@ -663,6 +671,8 @@ begin
 end;
 
 initialization;
+
+  { TODO : Fix this }
   { Combo-box indices are set blindly. An assert to check this during development. }
   Assert(integer(tf12) = 0);
   Assert(integer(tf24) = 1);

@@ -24,11 +24,9 @@ type
     //FBpmTimer: TTimer;
     //procedure SetBpm(AValue: integer);
     //procedure SetRunning(AValue: boolean);
-    {%H-}constructor Create;
-    {%H-}destructor {%H-}Destroy; override;
-
   public
-
+    constructor Create;
+    destructor Destroy; override;
     //procedure HandleTimerTrigger;
     procedure Abort;
     procedure Start;
@@ -66,25 +64,30 @@ implementation
 
 constructor TMetronome.Create;
 begin
-  //FSubscriptions := 0;
-  FAudioPlayer := TAudioPlayer.Create;
-  FAudioPlayer.Looped := True;
-  FSubscribers := 0;
-  //FTickSound := TSndSound.Create;
-  //FTickSound.LoadTick;
+  { Constructor cannot be hidden unless it is made strict private.
+  Constructor will proceed with creation only if the single instance is not
+  created yet. Once created, the same instance is returned.}
+  if not Assigned(MetronomeInstance) then
+  begin
+    inherited Create;
+    //FSubscriptions := 0;
+    FAudioPlayer := TAudioPlayer.Create;
+    FAudioPlayer.Looped := True;
+    FSubscribers := 0;
+    //FTickSound := TSndSound.Create;
+    //FTickSound.LoadTick;
+    //FLastPlayedTick := GetTickCount64;
+    //FBpmTimer := TTimer.Create(nil);
+    //FBpmTimer.Interval := 60000 div FBpm;
+    //FBpmTimer.Enabled := False;
+    //FBpmTimer.OnTimer := @OnBpmTimer;
+    //Bpm := UserConfig.Bpm;
+    //Bpm := 100;
+    FRunning := False;
+  end
+  else
+    Self := MetronomeInstance;
 
-  //FLastPlayedTick := GetTickCount64;
-
-
-  //FBpmTimer := TTimer.Create(nil);
-  //FBpmTimer.Interval := 60000 div FBpm;
-  //FBpmTimer.Enabled := False;
-  //FBpmTimer.OnTimer := @OnBpmTimer;
-
-  //Bpm := UserConfig.Bpm;
-
-  //Bpm := 100;
-  FRunning := False;
 end;
 
 destructor TMetronome.Destroy;

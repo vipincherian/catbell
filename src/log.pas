@@ -23,10 +23,11 @@ type
     FLogger: TEventLog;
     FLogLock: TCriticalSection;
     FSubscribers: TLogListenerList;
-    {%H-}constructor Create;
-    {%H-}destructor {%H-}Destroy; override;
+
   public
     Level: TLogLevel;
+    constructor Create;
+    destructor Destroy; override;
     procedure Info(const Msg: string);
     procedure Info(const Fmt: string; Args: array of const);
     procedure Debug(const Msg: string);
@@ -49,13 +50,22 @@ implementation
 
 constructor TLogger.Create;
 begin
-  InitializeCriticalSection(FLogLock);
-  FLogger := TEventLog.Create(nil);
-  //Logger := frmMain.evlMain;
-  FLogger.LogType := ltFile;
-  FLogger.FileName := GetAppConfigDir(False) + 'catbell.log';
-  Level := LOG_ALL;
-  FSubscribers := TLogListenerList.Create;
+  { Constructor cannot be hidden unless it is made strict private.
+  Constructor will proceed with creation only if the single instance is not
+  created yet. Once created, the same instance is returned.}
+  if not Assigned(Logger) then
+  begin
+    inherited Create;
+    InitializeCriticalSection(FLogLock);
+    FLogger := TEventLog.Create(nil);
+    //Logger := frmMain.evlMain;
+    FLogger.LogType := ltFile;
+    FLogger.FileName := GetAppConfigDir(False) + 'catbell.log';
+    Level := LOG_ALL;
+    FSubscribers := TLogListenerList.Create;
+  end
+  else
+    Self := Logger;
 end;
 
 destructor TLogger.Destroy;
