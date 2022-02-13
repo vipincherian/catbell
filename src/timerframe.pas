@@ -586,7 +586,7 @@ end;
 function TfraTimer.RestartFromLastFinish: boolean;
 var
   //EstimatedCompletion,
-  Diff, CurrentTime: TDateTime;
+  {Diff, }CurrentTime: TDateTime;
   //Hours, Mins, Secs: word;
   //DiffMilli: int64 = 0;
   NewEndTickCount, Adjustment: longword;
@@ -611,7 +611,7 @@ begin
   // stop
 
   //Logger.Debug('EstimatedCompletion - ' + DateTimeToStr(EstimatedCompletion) +
-    //' > ' + FloatToStr(EstimatedCompletion));
+  //' > ' + FloatToStr(EstimatedCompletion));
   Logger.Debug('FLastCompletionTime - ' + DateTimeToStr(FLastCompletionTime) +
     ' > ' + FloatToStr(FLastCompletionTime));
   Logger.Debug('FLastCompletionTime + Duration - ' +
@@ -627,7 +627,7 @@ begin
     Exit;
   end;
 
-  Diff := CurrentTime - FLastCompletionTime;
+  //Diff := CurrentTime - FLastCompletionTime;
 
   //Hours := HourOf(Diff);
   //Mins := MinuteOf(Diff);
@@ -654,13 +654,20 @@ begin
     end;
   end;
 
-  Start;
+  // Calculate the adjustment prior to starting the timer. The process of
+  // starting the timer changes FLastCompletionTime
+
+  Logger.Debug('FLastCompletionTime (after Start) - ' +
+    DateTimeToStr(FLastCompletionTime) + ' > ' + FloatToStr(FLastCompletionTime));
 
   Adjustment := MilliSecondsBetween(CurrentTime, FLastCompletionTime);
 
   //Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
   //  longword(Secs)) * 1000);
-  Logger.Debug('Adjustment (MilliSecondsBetween(CurrentTime, FLastCompletionTime)) - ' + IntToStr(Adjustment));
+  Logger.Debug('Adjustment (MilliSecondsBetween(CurrentTime, FLastCompletionTime)) - ' +
+    IntToStr(Adjustment));
+
+  Start;
 
   NewEndTickCount := FEndTickCount - Adjustment;
   Logger.Debug('FEndTickCount - ' + IntToStr(FEndTickCount));
@@ -954,6 +961,17 @@ begin
   else
     {The timer run has completed. Stop the timer and play audio if required}
   begin
+
+    // If already stopped (and if audio not playing), then the timer is
+    // already stopped completely.
+
+    // TODO: The stop method is doing too many things
+    if not FRunning then
+    begin
+      Logger.Debug('Timer is already stopped.');
+      Exit;
+    end;
+
     FLastCompletionTime := Now;
     // Stop the Metronome if it is running
     if Metronome and not Paused then
