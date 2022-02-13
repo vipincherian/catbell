@@ -585,8 +585,9 @@ end;
 
 function TfraTimer.RestartFromLastFinish: boolean;
 var
-  EstimatedCompletion, Diff, CurrentTime: TDateTime;
-  Hours, Mins, Secs: word;
+  //EstimatedCompletion,
+  Diff, CurrentTime: TDateTime;
+  //Hours, Mins, Secs: word;
   //DiffMilli: int64 = 0;
   NewEndTickCount, Adjustment: longword;
   StartTickCount: longword = 0;
@@ -595,21 +596,29 @@ begin
 
   Assert(not Running);
 
-  Hours := HourOf(Duration);
-  Mins := MinuteOf(Duration);
-  Secs := SecondOf(Duration);
+  //Hours := HourOf(Duration);
+  //Mins := MinuteOf(Duration);
+  //Secs := SecondOf(Duration);
 
-  EstimatedCompletion := FLastCompletionTime;
-  IncHour(EstimatedCompletion, Hours);
-  IncMinute(EstimatedCompletion, Mins);
-  IncSecond(EstimatedCompletion, Secs);
+  //EstimatedCompletion := FLastCompletionTime;
+  //IncHour(EstimatedCompletion, Hours);
+  //IncMinute(EstimatedCompletion, Mins);
+  //IncSecond(EstimatedCompletion, Secs);
 
   CurrentTime := Now;
 
-  Logger.Debug('EstimatedCompletion - ' + DateTimeToStr(EstimatedCompletion));
-  Logger.Debug('FLastCompletionTime - ' + DateTimeToStr(FLastCompletionTime));
-  Logger.Debug('Added - ' + DateTimeToStr(FLastCompletionTime + Duration));
-  Logger.Debug('Now - ' + DateTimeToStr(CurrentTime));
+  // Logging important variables to troubleshoot issues with restart from last
+  // stop
+
+  //Logger.Debug('EstimatedCompletion - ' + DateTimeToStr(EstimatedCompletion) +
+    //' > ' + FloatToStr(EstimatedCompletion));
+  Logger.Debug('FLastCompletionTime - ' + DateTimeToStr(FLastCompletionTime) +
+    ' > ' + FloatToStr(FLastCompletionTime));
+  Logger.Debug('FLastCompletionTime + Duration - ' +
+    DateTimeToStr(FLastCompletionTime + Duration) + ' > ' +
+    FloatToStr(FLastCompletionTime + Duration));
+  Logger.Debug('CurrentTime - ' + DateTimeToStr(CurrentTime) + ' > ' +
+    FloatToStr(CurrentTime));
 
   { Is it too late to re-start? }
   if (FLastCompletionTime + Duration) <= CurrentTime then
@@ -620,9 +629,9 @@ begin
 
   Diff := CurrentTime - FLastCompletionTime;
 
-  Hours := HourOf(Diff);
-  Mins := MinuteOf(Diff);
-  Secs := SecondOf(Diff);
+  //Hours := HourOf(Diff);
+  //Mins := MinuteOf(Diff);
+  //Secs := SecondOf(Diff);
 
   //Logger.Debug('Adjustment Secs - ' + IntToStr(Secs));
 
@@ -651,9 +660,11 @@ begin
 
   //Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
   //  longword(Secs)) * 1000);
-  Logger.Debug('Adjustment - ' + IntToStr(Adjustment));
+  Logger.Debug('Adjustment (MilliSecondsBetween(CurrentTime, FLastCompletionTime)) - ' + IntToStr(Adjustment));
 
   NewEndTickCount := FEndTickCount - Adjustment;
+  Logger.Debug('FEndTickCount - ' + IntToStr(FEndTickCount));
+  Logger.Debug('NewEndTickCount - ' + IntToStr(NewEndTickCount));
 
   FEndTickCount := NewEndTickCount;
   HandleTimerTrigger();

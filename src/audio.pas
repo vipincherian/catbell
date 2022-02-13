@@ -1091,12 +1091,12 @@ begin
     (AudioSystem.OutputDevice.DeviceName = '') then
   begin
     DeviceId := AudioSystem.DefaultDeviceIndex;
-    Logger.Info('TAudio using default device to play audio.');
+    Logger.Debug('TAudio using default device to play audio.');
   end
   else
   begin
     DeviceId := AudioSystem.GetDeviceIndex(AudioSystem.OutputDevice);
-    Logger.Info('TAudio using device - ' + AudioSystem.OutputDevice.DeviceName +
+    Logger.Debug('TAudio using device - ' + AudioSystem.OutputDevice.DeviceName +
       ' host api - ' + AudioSystem.OutputDevice.HostAPIName);
   end;
   StreamParams.device := DeviceId;
