@@ -423,7 +423,7 @@ procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   CurrPosNormal, CurrPosRestored: TRect;
   Count: integer;
-  StartTickCount: longword;
+  StartTickCount: QWord;
 begin
   { if any audio is playing, stop }
   if AudioSystem.Loaded then
@@ -1406,10 +1406,12 @@ begin
 
       State.Running := Conf.GetValue(TIMER_CONF_RUNNING, False);
       State.Paused := Conf.GetValue(TIMER_CONF_PAUSED, False);
-      State.PendingTicks := Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, 0);
+      State.PendingTicks :=
+        StrToQWord(string(Conf.GetValue(TIMER_CONF_PENDINGTICKCOUNT, '0')));
       State.EndTime := StrToFloat(
         string(Conf.GetValue(TIMER_CONF_ENDTIME, '0')), fs);
-      State.DurationTicks := Conf.GetValue(TIMER_CONF_ORIGTICKCOUNT, 0);
+      State.DurationTicks :=
+        StrToQword(string(Conf.GetValue(TIMER_CONF_ORIGTICKCOUNT, '0')));
 
       NewTimerClock.LoadState(State);
 
@@ -1540,7 +1542,8 @@ begin
 
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
-    Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) + '/'), True);
+    Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
+      '/'), True);
 
     // FOrder has the order of IDs
     Id := FOrder[Count];
@@ -1623,9 +1626,9 @@ begin
 
     // Set pending tick count and end time to zero to begin with
     // Then udpate the ones applicable afterwards.
-    Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, State.PendingTicks);
+    Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, IntToStr(State.PendingTicks));
     Conf.SetValue(TIMER_CONF_ENDTIME, FloatToStr(State.EndTime, fs));
-    Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, State.DurationTicks);
+    Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, IntToStr(State.DurationTicks));
 
 
     Conf.SetValue(TIMER_CONF_METRONOME, TimerClock.Metronome);
@@ -1644,7 +1647,7 @@ var
   TimerClock: TfraTimer;
   Count: integer;
   IdList: TIdList;
-  StartTickCount: longword;
+  StartTickCount: QWord;
 begin
   IdList := TIdList.Create;
 

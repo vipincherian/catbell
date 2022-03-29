@@ -359,7 +359,7 @@ end;
 
 procedure TfrmEdit.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
-  StartTickCount: longword;
+  StartTickCount: QWord;
 begin
   //FDescription := edtDescription.Text;
 
@@ -389,7 +389,7 @@ end;
 
 procedure TfrmEdit.bbCancelClick(Sender: TObject);
 var
-  StartTickCount: longword;
+  StartTickCount: QWord;
 begin
   FAudioPlayer.Abort;
   StartTickCount := GetTickCount64;

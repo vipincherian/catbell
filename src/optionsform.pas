@@ -410,7 +410,7 @@ end;
 
 procedure TfrmOptions.FormHide(Sender: TObject);
 var
-  StartTickCount: longword;
+  StartTickCount: QWord;
 begin
   if AudioSystem.Loaded and FAudioPlayer.Playing then
   begin
@@ -490,7 +490,7 @@ end;
 
 procedure TfrmOptions.bbStopClick(Sender: TObject);
 var
-  StartTickCount: longword;
+  StartTickCount: QWord;
 begin
   if AudioSystem.Loaded then;
   begin

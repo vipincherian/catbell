@@ -102,7 +102,7 @@ end;
 
 procedure TMetronome.Abort;
 var
-  StartTickCount: longword;
+  StartTickCount: QWord;
 begin
 
   FAudioPlayer.Abort;

@@ -35,9 +35,9 @@ type
   TTimerState = record
     Running: boolean;
     Paused: boolean;
-    PendingTicks: longword;
+    PendingTicks: QWord;
     EndTime: TDateTime;
-    DurationTicks: longword;
+    DurationTicks: QWord;
   end;
 
   { TfraTimer }
@@ -80,10 +80,10 @@ type
     FTrayNotification: boolean;
     FTitleEditable: boolean;
 
-    FOrigTickDuration: longword;
-    FStartTickCount: longword;
-    FEndTickCount: longword;
-    FPendingTickCount: longword;
+    FOrigTickDuration: QWord;
+    FStartTickCount: QWord;
+    FEndTickCount: QWord;
+    FPendingTickCount: QWord;
 
     FPaused: boolean;
     FRunning: boolean;
@@ -126,7 +126,7 @@ type
     function GetId: longword;
     procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
-    procedure UpdateProgress(const PendingMilliseconds: longword);
+    procedure UpdateProgress(const PendingMilliseconds: QWord);
     procedure ReenableEditControls;
     procedure ArrangeControls;
   public
@@ -490,14 +490,14 @@ begin
   FTrayNotification := AValue;
 end;
 
-procedure TfraTimer.UpdateProgress(const PendingMilliseconds: longword);
+procedure TfraTimer.UpdateProgress(const PendingMilliseconds: QWord);
 var
   ProgressPercentage: single;
   CounterText: string;
   Seconds: integer;
   Minutes: integer;
   Hours: integer;
-  Elapsed: longword;
+  Elapsed: QWord;
 begin
   Elapsed := Ceil(PendingMilliseconds / 1000);
   //Logger.Debug('Elapsed in ms is ' + IntToStr(PendingMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
@@ -589,8 +589,8 @@ var
   {Diff, }CurrentTime: TDateTime;
   //Hours, Mins, Secs: word;
   //DiffMilli: int64 = 0;
-  NewEndTickCount, Adjustment: longword;
-  StartTickCount: longword = 0;
+  NewEndTickCount, Adjustment: QWord;
+  StartTickCount: QWord = 0;
 begin
   Result := False;
 
@@ -812,8 +812,8 @@ end;
 
 procedure TfraTimer.HandleTimerTrigger();
 var
-  PendingMilliseconds: longword;
-  CurrTickCount: longword;
+  PendingMilliseconds: QWord;
+  CurrTickCount: QWord;
 begin
   EnterCriticalSection(AudioCriticalSection);
 
@@ -863,8 +863,8 @@ begin
     FStartTickCount := GetTickCount64;
 
     FEndTickCount :=
-      FStartTickCount + (((3600 * longword(Hours)) + (60 * longword(Minutes)) +
-      longword(Seconds)) * 1000);
+      FStartTickCount + (((3600 * QWord(Hours)) + (60 * QWord(Minutes)) +
+      QWord(Seconds)) * 1000);
 
     FOrigTickDuration := FEndTickCount - FStartTickCount;
     if UserConfig.AutoProgress = True then
@@ -1085,7 +1085,7 @@ end;
 procedure TfraTimer.AdjustTimer(Sender: TObject);
 var
   Hours, Mins, Secs: word;
-  NewEndTickCount, CurrTickCount, Adjustment: longword;
+  NewEndTickCount, CurrTickCount, Adjustment: QWord;
   Diff: int64;
   EndTime: TDateTime;
 begin
@@ -1111,8 +1111,8 @@ begin
         Exit;
       end;
 
-      Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
-        longword(Secs)) * 1000);
+      Adjustment := (((3600 * QWord(Hours)) + (60 * QWord(Mins)) +
+        QWord(Secs)) * 1000);
       if FPaused = False then
       begin
         if Adjustment > FEndTickCount then
@@ -1173,8 +1173,8 @@ begin
         Exit;
       end;
 
-      Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
-        longword(Secs)) * 1000);
+      Adjustment := (((3600 * QWord(Hours)) + (60 * QWord(Mins)) +
+        QWord(Secs)) * 1000);
       Inc(FOrigTickDuration, Adjustment);
       if FPaused = False then
       begin
@@ -1226,7 +1226,7 @@ end;
 
 procedure TfraTimer.SaveState(var SaveTo: TTimerState);
 var
-  CurrTickCount, DiffTicks: longword;
+  CurrTickCount, DiffTicks: QWord;
 begin
   with SaveTo do
   begin
@@ -1245,7 +1245,7 @@ end;
 
 procedure TfraTimer.LoadState(var LoadFrom: TTimerState);
 var
-  NewPendingTickCount: longword;
+  NewPendingTickCount: QWord;
   TimeNow: TDateTime;
 begin
   { If any of the timers saved as running/paused re-instate the same state}
