@@ -910,11 +910,20 @@ begin
 end;
 
 procedure TfraTimer.Pause;
+var
+  CurrTickCount: QWord;
 begin
+  CurrTickCount := GetTickCount64;
 
-  FPendingTickCount := FEndTickCount - GetTickCount64;
-  if FPendingTickCount <= 0 then
-    Finish;
+  {Save the pending tick counts.
+  While doing this if we see that there are no pending tick counts, finish
+  instead of stop.}
+
+  Assert(FEndTickCount > 0);
+  if FEndTickCount <= CurrTickCount then
+    Finish
+  else
+    FPendingTickCount := FEndTickCount - CurrTickCount;
 
   FPaused := True;
 
@@ -1253,7 +1262,13 @@ begin
   begin
     if LoadFrom.Paused then
     begin
-      Pause;
+      FPaused := True;
+
+      PlayButtonEnabled := True;
+      PauseButtonEnabled := False;
+      StopButtonEnabled := True;
+      DurationEnabled := False;
+
       with LoadFrom do
       begin
         FRunning := Running;
