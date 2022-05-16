@@ -3,9 +3,9 @@ unit audio;
 {$mode objfpc}{$H+}{$Q+}{$R+}
 
 {$IFDEF LIBPORTAUDIO_STALNK_STALIB}
-
+{$LINKLIB gcc}
   {$LINKLIB portaudio}
-  {$LINKLIB msvcrt}
+
   {$LINKLIB kernel32}
   {$LINKLIB libwinmm}
   {$LINKLIB user32}
@@ -13,7 +13,35 @@ unit audio;
   {$LINKLIB ucrt}
   {$LINKLIB advapi32}
   {$LINKLIB setupapi}
-  {$LINKLIB gcc}
+{$LINKLIB msvcrt}
+
+{$ENDIF}
+
+{$IFDEF LIBSNDFILE_STALNK_STALIB}
+
+
+
+
+{$LINKLIB gcc}
+{$LINKLIB msvcrt}
+{$LINKLIB sndfile}
+{$LINKLIB vorbisfile}
+
+//{$LINKLIB vorbisenc}
+{$LINKLIB vorbis}
+
+//{$LINKLIB FLAC++}
+{$LINKLIB FLAC}
+
+//{$LINKLIB libstdc++}
+{$LINKLIB opus}
+
+{$LINKLIB ssp}
+{$LINKLIB ogg}
+
+{$LINKLIB advapi32}
+
+//{$LINKLIB gmp}
   //{$LINKLIB gcc_s}
 
   //{$MODESWITCH CVAR+}

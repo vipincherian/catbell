@@ -66,7 +66,7 @@ uses
 
 const
   {$IF defined(windows) }
-  LIB_PORTAUDIO = 'libportaudio-2.dll';
+  LIB_PORTAUDIO = 'libportaudio.dll';
   //LIB_PORTAUDIO = 'xxx';
   {$ELSEIF Defined(unix)}
   LIB_PORTAUDIO = 'libportaudio.so.2';
