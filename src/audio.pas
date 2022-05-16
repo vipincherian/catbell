@@ -2,6 +2,25 @@ unit audio;
 
 {$mode objfpc}{$H+}{$Q+}{$R+}
 
+{$IFDEF LIBPORTAUDIO_STALNK_STALIB}
+
+  {$LINKLIB portaudio}
+  {$LINKLIB msvcrt}
+  {$LINKLIB kernel32}
+  {$LINKLIB libwinmm}
+  {$LINKLIB user32}
+  {$LINKLIB ole32}
+  {$LINKLIB ucrt}
+  {$LINKLIB advapi32}
+  {$LINKLIB setupapi}
+  {$LINKLIB gcc}
+  //{$LINKLIB gcc_s}
+
+  //{$MODESWITCH CVAR+}
+{$ENDIF}
+
+
+
 interface
 
 uses
@@ -807,7 +826,7 @@ begin
   //FDefaultTick.Loaded := False;
   FDevices := TAudioDeviceList.Create;
 
-  {$IFNDEF AUDIO_STATIC}
+
   FLoaded := Pa_Load(LIB_PORTAUDIO);
   if not FLoaded then
   begin
@@ -822,6 +841,7 @@ begin
     Exit;
   end;
 
+  {$IFNDEF AUDIO_STATIC}
   { Load sndfile library only if portaudio was loaded successfully }
 
   if FLoaded then
