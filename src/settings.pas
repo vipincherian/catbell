@@ -224,8 +224,8 @@ begin
     TaskbarIconType := TTaskbarIconType(FConf.GetValue(TASKBAR_ICON_TYPE,
       integer(DEF_TASKBAR_ICON_TYPE)));
 
-    UseDefaultAudioDevice := FConf.GetValue(USE_DEFAULT_SOUND,
-      DEF_USE_DEFAULT_AUDIO_DEVICE);
+    UseDefaultSound := FConf.GetValue(USE_DEFAULT_SOUND,
+      DEF_USE_DEFAULT_SOUND);
     LoopSound := FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
     Volume := FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
     //Bpm := FConf.GetValue(METRONOME_BPM, DEF_METRONOME_BPM);
