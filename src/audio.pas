@@ -42,9 +42,9 @@ unit audio;
 {$LINKLIB advapi32}
 
 //{$LINKLIB gmp}
-  //{$LINKLIB gcc_s}
+//{$LINKLIB gcc_s}
 
-  //{$MODESWITCH CVAR+}
+//{$MODESWITCH CVAR+}
 {$ENDIF}
 
 
@@ -90,6 +90,7 @@ type
   TAudioDevice = record
     HostAPIName: string;
     DeviceName: string;
+    Index: integer;
   end;
 
   { A type which holds a wavetable, two integers keeping track of
@@ -177,6 +178,7 @@ type
 
 
     function GetDevices: TAudioDeviceList;
+    procedure ReloadDevicesList;
     procedure SetOutputDevice(AValue: TAudioDevice);
     procedure CleanUp;
     procedure SetVolume(AValue: integer);
@@ -947,7 +949,9 @@ begin
 
   if FLoaded then
   begin
-    FDefaultDevice := Pa_GetDefaultOutputDevice();
+    ReloadDevicesList;
+    //FDefaultDevice := Pa_GetDefaultOutputDevice();
+    FDefaultDevice := GetDefaultDeviceIndex;
     if FDefaultDevice = paNoDevice then
     begin
       Logger.Debug('No default device');
@@ -1254,12 +1258,6 @@ end;
 
 
 function TAudioSystem.GetDevices: TAudioDeviceList;
-var
-  NumDevices, Count: integer;
-  DeviceInfo: PPaDeviceInfo;
-  HostAPIInfo: PPaHostApiInfo;
-  DeviceName: string;
-  Device: PAudioDevice;
 begin
   //EnterCriticalSection(AudioCriticalSection);
   if not AudioSystem.Loaded then
@@ -1268,6 +1266,26 @@ begin
     raise EAudioNotLoaded.Create('Audio not loaded.');
   end;
 
+  ReloadDevicesList;
+  Result := FDevices;
+
+  //LeaveCriticalSection(AudioCriticalSection);
+end;
+
+procedure TAudioSystem.ReloadDevicesList;
+var
+  Device: PAudioDevice;
+  DeviceName: string;
+  HostAPIInfo: PPaHostApiInfo;
+  DeviceInfo: PPaDeviceInfo;
+  Count: integer;
+  NumDevices: integer;
+begin
+  if not FLoaded then
+  begin
+    //LeaveCriticalSection(AudioCriticalSection);
+    raise EAudioNotLoaded.Create('Audio not loaded.');
+  end;
   for Device in FDevices do
   begin
     Dispose(Device);
@@ -1305,6 +1323,7 @@ begin
 
         Device^.DeviceName := Devicename;
         Device^.HostAPIName := HostAPIInfo^.Name;
+        Device^.Index := Count;
 
         FDevices.Add(Device);
         Logger.Debug('Devide ID - ' + IntToStr(Count));
@@ -1318,9 +1337,6 @@ begin
 
   end;
   Logger.Debug('');
-  Result := FDevices;
-
-  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 procedure TAudioSystem.GetDefaultDevice(Device: PAudioDevice);
@@ -1404,11 +1420,41 @@ end;
 
 function TAudioSystem.GetDefaultDeviceIndex: AudioDeviceIndex;
 var
-  DeviceId: AudioDeviceIndex;
+  DeviceId: AudioDeviceIndex = paNoDevice;
+  Device: PAudioDevice;
+  Count: integer;
 begin
   //EnterCriticalSection(AudioCriticalSection);
   if not FLoaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
+
+  {$IF DEFINED(WINDOWS)}
+
+  // In Windows use Microsoft Sound Mapper as default without consulting
+  // PortAudio. PortAudio - incorrectly - points us to a specific device.
+  // But Sound Mapper is the best option as it redirects audio based on
+  // output device availability.
+  for Count := 0 to FDevices.Count - 1 do
+  begin
+    Device := FDevices.Items[Count];
+    if Device^.DeviceName = 'Microsoft Sound Mapper - Output' then
+    begin
+      if Device^.HostAPIName = 'MME' then
+      begin
+        Result := Device^.Index;
+        Exit;
+      end;
+      DeviceId := Device^.Index;
+    end;
+  end;
+
+  if DeviceId <> paNoDevice then
+  begin
+    Result := DeviceId;
+    Exit;
+
+  end;
+  {$ENDIF}
 
   DeviceId := Pa_GetDefaultOutputDevice();
   if DeviceId = paNoDevice then
@@ -1417,6 +1463,7 @@ begin
     //LeaveCriticalSection(AudioCriticalSection);
     raise EInvalidDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
   end;
+
   Result := DeviceId;
   //LeaveCriticalSection(AudioCriticalSection);
 end;
