@@ -96,6 +96,9 @@ begin
   Application.CreateForm(TfrmAdjust, frmAdjust);
   Application.Run;
 
+  Logger.Info('*************************');
+  Logger.Info('Application shutting down');
+  Logger.Info('*************************');
   //CleanupSettings;
 
 end.
