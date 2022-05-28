@@ -65,12 +65,14 @@ uses
   ctypes;
 
 const
-  {$IF defined(windows) }
+  //{$DEFINE FORCE_FAIL_PORTAUDIO}
+  {$IF defined(FORCE_FAIL_PORTAUDIO)}
+  LIB_PORTAUDIO = 'xxx';
+  {$ELSEIF defined(windows) }
   LIB_PORTAUDIO = 'libportaudio.dll';
   //LIB_PORTAUDIO = 'xxx';
   {$ELSEIF Defined(unix)}
   LIB_PORTAUDIO = 'libportaudio.so.2';
-  //LIB_PORTAUDIO = 'xxx';
   {$ENDIF}
   PORTAUDIO_VERSION = '190600_20161030';
 

@@ -316,7 +316,9 @@ begin
   end
   else
   begin
-    tbVolume.Position := 0;
+    // There is no need to set the position of tbVolume to 0. If set, this will
+    // trigger the callback, which would in turn set the volume of the audio
+    // system.
     tbVolume.Enabled := False;
   end;
 
