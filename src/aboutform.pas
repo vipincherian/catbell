@@ -27,7 +27,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, Buttons, LCLIntf, LCLType;
+  StdCtrls, ComCtrls, Buttons, LCLIntf, LCLType, FileInfo;
 
 type
 
@@ -36,7 +36,7 @@ type
   TfrmAbout = class(TForm)
     bbClose: TBitBtn;
     Image1: TImage;
-    Label1: TLabel;
+    lblAppName: TLabel;
     Label2: TLabel;
     Label4: TLabel;
     lblLicense: TLabel;
@@ -79,8 +79,16 @@ var
   LicenseText: string;
   Buffer: Pointer;
   Item: TListItem;
+  Info: TFileVersionInfo;
 begin
   //memLicense.Text:='hello';
+  // Read file version information and add
+  Info := TFileVersionInfo.Create(Self);
+  Info.ReadFileInfo;
+  lblAppName.Caption := Info.VersionStrings.Values['ProductName'] +
+    ' ' + Info.VersionStrings.Values['FileVersion'];
+  Info.Free;
+
   Stream := TResourceStream.Create(hinstance, 'GPL2', RT_RCDATA);
   Buffer := AllocMem(Stream.Size + 1);
   Stream.ReadBuffer(Buffer^, Stream.Size);
@@ -126,6 +134,7 @@ begin
   pgAdditional.ActivePage := tsLicense;
 
 end;
+
 
 procedure TfrmAbout.sttUrlClick(Sender: TObject);
 begin

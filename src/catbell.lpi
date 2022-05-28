@@ -20,6 +20,13 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <AutoIncrementBuild Value="True"/>
+      <MinorVersionNr Value="8"/>
+      <BuildNr Value="3"/>
+      <StringTable ProductName="Catbell"/>
+    </VersionInfo>
     <BuildModes Count="3">
       <Item1 Name="Default" Default="True"/>
       <Item2 Name="Debug">

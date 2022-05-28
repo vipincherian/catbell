@@ -33,7 +33,7 @@ uses
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
-  {portaudio, sndfile,}{ctypes,} audio, metronome, log;
+  {portaudio, sndfile,}{ctypes,} audio, metronome, log, FileInfo;
 
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
@@ -228,6 +228,8 @@ implementation
 { TfrmMain }
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  Info: TFileVersionInfo;
 begin
   { Obtain the application handle, and the taskbar COM object.
   This has to be done at the beginning, as calls are made to progressupdate
@@ -324,6 +326,14 @@ begin
   //tbVolume.Position:=0;
 
   Logger.Subscribe(@SetStatusMessage);
+
+  // Load File version info
+
+  Info := TFileVersionInfo.Create(Self);
+  Info.ReadFileInfo;
+  Caption := Info.VersionStrings.Values['ProductName'] + ' ' +
+    Info.VersionStrings.Values['FileVersion'];
+  Info.Free;
 
 end;
 
