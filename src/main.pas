@@ -603,7 +603,17 @@ begin
     MessageDlg('Audio not loaded.' + LineEnding +
       'Alarms and other dependent functionalities will not work.' +
       LineEnding + LineEnding + AudioSystem.Error,
-      mtWarning, [mbOK], 0);
+      mtWarning, [mbOK], 0)
+  else if AudioSystem.Volume <= 0 then
+  begin
+    if QuestionDlg('Audio Muted',
+      'Audio seems to be working, but volume is set to zero.' +
+      ' Reset volume to default levels?', mtConfirmation,
+      [mrYes, 'Reset volume', mrNo, 'Keep muted'], '') = mrYes then
+      // This in turn sets the volume of the audio system
+      tbVolume.Position := DEFAULT_VOLUME;
+  end;
+
   with UserConfig do
   begin
     if LastWindowState = wsMaximized then
