@@ -688,7 +688,6 @@ begin
   //lsvSoundDetails.Clear;
   if FLoadedSoundIndex > INVALID_SOUNDPOOL_INDEX then
   begin
-    { TODO : Autosize columns }
     Details := SoundPool.RawSoundDetails[FLoadedSoundIndex]^;
 
     //lsvSoundDetails.Column[0].Width:=LVSCW_AUTOSIZE;

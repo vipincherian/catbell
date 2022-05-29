@@ -1,0 +1,3 @@
+sndfile.pas
+portaudio.pas
+mpg123.pas
