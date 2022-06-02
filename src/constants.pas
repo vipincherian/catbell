@@ -15,16 +15,6 @@ const
 
   {Audio}
 
-  //READ_NOTLOADED = -1;
-  //READ_SND = 0;
-
-  //SampleRate = 44100;
-  //FramesPerBuffer = 1024;
-
-  // How long you want to play the test sine:
-  //NumSecs = 2;
-
-  // Wavetable size. Influences your pitch:
   TableSize = 200;
 
   MAX_VOLUME = 100;
@@ -50,7 +40,7 @@ const
 
   FORM_MIN_WIDTH = 600;
   FORM_MIN_HEIGHT = 300;
-  //TICON_RED_INDEX: integer = 1;
+
   TICON_GREEN_INDEX: integer = 0;
   TRAY_PROGRESS_ICON_COUNT = 24;
 
@@ -77,35 +67,11 @@ const
 
   LAST_TRAY_ICON_DEFAULT = -1;
 
-  //DEF_COUNTDOWN_CAPTION: string = '00:00:00';
-  //TIMER_PROGRESS_FINISHED: single = 2.0;
   TIMER_PROGRESS_OFFTRAY: single = 3.0;
-
-  //TIMER_CONF_CLOCKS = 'clocks';
-  //TIMER_CONF_TIMERS = 'timers';
-  //TIMER_CONF_TITLE = 'timer_title';
-  //TIMER_CONF_TIME = 'time';
-  //TIMER_CONF_HOURS = 'hours';
-  //TIMER_CONF_MINUTES = 'minutes';
-  //TIMER_CONF_SECONDS = 'seconds';
-  //TIMER_CONF_DURATION = 'duration';
-  //TIMER_CONF_NOTIFIER = 'notifier';
-
-
-  //TIMER_CONF_COUNT = 'count';
-  //TIMER_CONF_ORDER = 'order';
-
-
-
-  //WM_USER = $400;
-  //UM_AFTERSHOW = LM_USER;
 
   PANEL_TIMERCOUNT = 0;
   PANEL_AUDIO = 1;
   PANEL_MESSAGE = 2;
-
-  //II_MUTED = 12;
-  //II_NOTMUTED = 11;
 
   HELP_URL = 'https://github.com/vipincherian/catbell/blob/master/doc/help.md';
 
@@ -124,14 +90,9 @@ const
   TIMER_CONF_TIMERS = 'timers';
   TIMER_CONF_TITLE = 'timer_title';
   TIMER_CONF_TIME = 'time';
-  //TIMER_CONF_HOURS = 'hours';
-  //TIMER_CONF_MINUTES = 'minutes';
-  //TIMER_CONF_SECONDS = 'seconds';
   TIMER_CONF_DURATION = 'duration';
   TIMER_CONF_NOTIFIER = 'notifier';
-  //TIMER_CONF_ID = 'id';
   TIMER_CONF_COUNT = 'count';
-  //TIMER_CONF_ORDER = 'order';
 
   TIMER_CONF_SOUND_NONE = INVALID_SOUNDPOOL_INDEX;
   TIMER_CONF_SOUND_DEFALUT = 0;
@@ -150,24 +111,16 @@ const
   TIMER_CONF_ENDTIME = 'end_time';
   TIMER_CONF_ORIGTICKCOUNT = 'orig_tick_count';
 
-
-
-
   TIMER_CONF_RUNNING = 'running';
   TIMER_CONF_PAUSED = 'paused';
 
   TIMER_CONF_METRONOME = 'metronome';
 
-  // For auto arranging
+  { For auto arranging }
   TIMER_PADDING = 5;
   TIMER_REPORT_PADDING = 20;
 
-//UM_PLAY_AUDIO = LM_USER + 1;
-//UM_FINISHED_AUDIO = LM_USER + 2;
-
-//BUFFER_SIZE = 1024;
-
-  {Settings}
+  { Settings }
   AUDIO_ABORT_SHORT_WAIT = 2000;
   AUDIO_ABORT_LONG_WAIT = 5000;
 
@@ -236,9 +189,6 @@ const
   AUDIO_DEVICE_NAME = 'audio_device_name';
   DEF_AUDIO_DEVICE_NAME = '';
 
-  //TASKBAR_SHOW_APPICON = 1;
-  //TASKBAR_SHOW_OVERLAY = 2;
-
   TASKBAR_ICON_TYPE = 'taskbar_appicon';
   {$IF defined(windows)}
   DEF_TASKBAR_ICON_TYPE = TaskbarOverlayIcon;
@@ -254,9 +204,6 @@ const
 
   VOLUME_LEVEL = 'volume';
   DEF_VOLUME_LEVEL = DEFAULT_VOLUME;
-
-  //METRONOME_BPM = 'metronome_bpm';
-  //DEF_METRONOME_BPM = 100;
 
   TRAY_ICON_SIZE = 'tray_icon_size';
   APP_ICON_SIZE = 'app_icon_size';

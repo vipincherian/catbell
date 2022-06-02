@@ -22,7 +22,6 @@ Boston, MA  02110-1301, USA.
 program catbell;
 
 {$mode objfpc}{$H+}{$Q+}{$R+}
-//{$INTERFACES CORBA}
 uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   cthreads, {$ENDIF} {$ENDIF}
   Interfaces, // this includes the LCL widgetset
@@ -41,16 +40,12 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   adjustform,
   audio,
   eventlog,
-  //metronome,
   log,
-  //sound,
   UniqueInstanceRaw, constants;
 
 {$R *.res}
 
 begin
-  //RequireDerivedFormResource := True;
-
   if InstanceRunning then
   begin
     MessageDlg('This program is already running.' + LineEnding +
@@ -82,7 +77,6 @@ begin
 
 
   Application.Initialize;
-  //InitSettings;
 
   Application.CreateForm(TfrmMain, frmMain);
 
@@ -99,6 +93,4 @@ begin
   Logger.Info('*************************');
   Logger.Info('Application shutting down');
   Logger.Info('*************************');
-  //CleanupSettings;
-
 end.

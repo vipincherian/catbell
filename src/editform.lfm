@@ -89,8 +89,8 @@ object frmEdit: TfrmEdit
     TabOrder = 0
     object tsTimer: TTabSheet
       Caption = 'Timer'
-      ClientHeight = 199
-      ClientWidth = 513
+      ClientHeight = 193
+      ClientWidth = 515
       ImageIndex = 0
       object GroupBox1: TGroupBox
         Left = 16
@@ -98,21 +98,21 @@ object frmEdit: TfrmEdit
         Top = 8
         Width = 489
         Caption = 'Specifications'
-        ClientHeight = 68
+        ClientHeight = 70
         ClientWidth = 485
         TabOrder = 0
         object Label1: TLabel
           Left = 22
-          Height = 15
+          Height = 14
           Top = 8
-          Width = 60
+          Width = 58
           Alignment = taRightJustify
           Caption = 'Description'
           ParentColor = False
         end
         object edtDescription: TEdit
           Left = 92
-          Height = 23
+          Height = 25
           Top = 8
           Width = 380
           Anchors = [akTop, akLeft, akRight]
@@ -121,18 +121,18 @@ object frmEdit: TfrmEdit
         end
         object Label2: TLabel
           Left = 35
-          Height = 15
+          Height = 14
           Top = 40
-          Width = 46
+          Width = 45
           Alignment = taRightJustify
           Caption = 'Duration'
           ParentColor = False
         end
         object dtpDuration: TDateTimePicker
           Left = 92
-          Height = 23
+          Height = 22
           Top = 40
-          Width = 65
+          Width = 63
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = -53780
@@ -158,22 +158,22 @@ object frmEdit: TfrmEdit
         Top = 104
         Width = 488
         Caption = 'Show on completion'
-        ClientHeight = 69
+        ClientHeight = 71
         ClientWidth = 484
         TabOrder = 1
         object ckbModalAlert: TCheckBox
           Left = 16
-          Height = 19
+          Height = 21
           Top = 8
-          Width = 112
+          Width = 111
           Caption = 'Show modal alert'
           TabOrder = 0
         end
         object ckbTrayNotification: TCheckBox
           Left = 16
-          Height = 19
+          Height = 21
           Top = 40
-          Width = 113
+          Width = 110
           Caption = 'Show notification'
           TabOrder = 1
         end
@@ -190,7 +190,7 @@ object frmEdit: TfrmEdit
         Top = 8
         Width = 208
         Caption = 'Alarm on completion'
-        ClientHeight = 85
+        ClientHeight = 87
         ClientWidth = 204
         TabOrder = 0
         object cmbSoundType: TComboBox
@@ -198,7 +198,7 @@ object frmEdit: TfrmEdit
           Height = 23
           Top = 8
           Width = 100
-          ItemHeight = 15
+          ItemHeight = 0
           ItemIndex = 0
           Items.Strings = (
             'Default'
@@ -247,7 +247,7 @@ object frmEdit: TfrmEdit
         Top = 8
         Width = 272
         Caption = 'Custom alarm'
-        ClientHeight = 156
+        ClientHeight = 158
         ClientWidth = 268
         TabOrder = 1
         object bbSelectSound: TBitBtn
@@ -282,11 +282,11 @@ object frmEdit: TfrmEdit
           Columns = <          
             item
               AutoSize = True
-              Width = 54
+              Width = 1
             end          
             item
               AutoSize = True
-              Width = 25
+              Width = 241
             end>
           Items.LazData = {
             5400000003000000FFFFFFFFFFFFFFFFFFFFFFFF000000000400000046696C65
@@ -305,7 +305,7 @@ object frmEdit: TfrmEdit
         Top = 120
         Width = 208
         Caption = 'Metronome'
-        ClientHeight = 44
+        ClientHeight = 46
         ClientWidth = 204
         TabOrder = 2
         object ckbMetronome: TCheckBox
