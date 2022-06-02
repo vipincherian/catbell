@@ -55,10 +55,6 @@ uses
   Classes, SysUtils, sndfile, mpg123, portaudio, {EventLog,} ctypes, Forms,
   Dialogs, LCLIntf, lcltype, fgl, Math, log, sound, constants;
 
-
-
-//SAudioFile = '{6decd475-7e30-461a-989c-995bb233ad7a}';
-
 type
   EAudioNotLoaded = class(Exception);
   EInvalidDevice = class(Exception);
@@ -72,16 +68,11 @@ type
     Size: integer;
     ChannelCount: integer;
     SampleFormat: PaSampleFormat;
-    //VolumePoll: TAmplitudeScalePoller;
-    //Loaded: boolean;
   end;
   PRawSoundData = ^TRawSoundData;
-  //TSeekableRawSoundData = TSeekableSoundData;
-  //PSeekableRawSoundData = PSeekableSoundData;
 
   TSeekableRawSoundData = record
     RawSound: PRawSoundData;
-    //Channels: integer;
     Position: sf_count_t;
     VolumePoll: TAmplitudeScalePoller;
   end;
@@ -92,18 +83,6 @@ type
     DeviceName: string;
     Index: integer;
   end;
-
-  { A type which holds a wavetable, two integers keeping track of
-    at which offset in the wavetable each channel is currently
-    playing (= phase), and a message: }
-  {PaTestData = record
-    Sine: array[0..TableSize] of CFloat;
-    LeftPhase: CInt32;
-    RightPhase: CInt32;
-    AMessage: PChar;
-    Player: Pointer;
-  end;
-  PPaTestData = ^PaTestData;}
 
   PAudioDevice = ^TAudioDevice;
   TAudioDeviceList = specialize TFPGList<PAudioDevice>;
@@ -123,23 +102,15 @@ type
   end;
   PRawUserInfo = ^TRawUserInfo;
 
-  //PSoundData = ^TSoundData;
-
   { TAudioPlayer }
   TAudioPlayer = class(TObject)
   private
 
-    //FUserInfo: TUserInfo;
     FRawUserInfo: TRawUserInfo;
     FStream: PPaStream;
     FSeekableSoundData: TSeekableRawSoundData;
 
     FAudioPlaying: boolean;
-
-    //Data: PaTestData;
-    //DataPointer: PPaTestData;
-
-    //procedure SetVolume(AValue: integer);
 
   public
 
@@ -149,7 +120,6 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    //procedure Play(Sound: TSound; var Volume: integer; PlayLooped: boolean = False);
     procedure Play(RawSound: PRawSoundData);
     procedure Abort;
     procedure FinishedAud({%H-}Datax: PtrInt);
@@ -164,8 +134,6 @@ type
     FLoadError: string;
     FOutputDevice: TAudioDevice;
     {Default sounds }
-    //FDefaultSound: TSoundData;
-    //FDefaultTick: TSoundData;
     FDevices: TAudioDeviceList;
     FDefaultDevice: integer;
     FVolume: integer;
@@ -173,9 +141,6 @@ type
 
     {%H-}constructor Create;
     {%H-}destructor {%H-}Destroy; override;
-
-    //function GetAmplitudeScale: double;
-
 
     function GetDevices: TAudioDeviceList;
     procedure ReloadDevicesList;
@@ -185,15 +150,12 @@ type
   public
 
     UseDefaultDevice: boolean;
-    //AudioCriticalSection: TRTLCriticalSection; static;
-    //FVolume: integer;
     function GetDefaultDeviceIndex: AudioDeviceIndex;
     procedure GetDefaultDevice(Device: PAudioDevice);
     function GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
     function GetAmplitudeScale: double;
     property DefaultDeviceIndex: AudioDeviceIndex read GetDefaultDeviceIndex;
     property Devices: TAudioDeviceList read GetDevices;
-    //property Volume: integer read FVolume write SetVolume;
 
     procedure SetDefaulDevice;
     procedure LoadDefaultSounds;
@@ -205,12 +167,9 @@ type
     property AmplitudeScale: double read GetAmplitudeScale;
     function LoadSound(Avalue: string): TSound;
     function ConvertVolumeToAmplitudeScale(Vol: integer): double;
-    //property DefaultSound: TSoundData read FDefaultSound;
-    //property DefaultTick: TSoundData read FDefaultTick;
   end;
 
   TSoundPoolEntryDetails = record
-    //Source: string;
     Duration: double;
   end;
   PSoundPoolEntryDetails = ^TSoundPoolEntryDetails;
@@ -218,7 +177,6 @@ type
   TSoundPoolEntry = record
     Original: PSoundData;
     Raw: PRawSoundData;
-    //RawVolumeAdjusted: PRawSoundData;
     Details: TSoundPoolEntryDetails;
   end;
   PSoundPoolEntry = ^TSoundPoolEntry;
@@ -257,7 +215,6 @@ type
   end;
 
 var
-  //PaErrCode: PaError;
   AudioSystem: TAudioSystem = nil;
   SoundPool: TSoundPool = nil;
 
@@ -281,17 +238,11 @@ function FeedAudioStream({%H-}input: pointer; output: pointer; frameCount: culon
 var
   AudioInfo: PRawUserInfo;
   BytesToRead: integer = 0;
-  //readSuccess: boolean;
-  //UsedSound: TSound;
   Data: pcfloat;
   Count: integer;
   AmpScale: double;
-  //AmpScale: double;
   Poller: TAmplitudeScalePoller;
 begin
-  //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
-  //Logger.Debug('Inside FeedAudioStream');
-
   { Log statements in this callback will invariably result in a crash }
 
   AudioInfo := PRawUserinfo(userData);
@@ -304,37 +255,19 @@ begin
   AmpScale := Poller();
   Assert((AmpScale >= 0) and (AmpScale <= 1));
 
-  //Assert(AudioInfo <> nil);
-  //Assert(AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size);
-  //Assert(AudioInfo^.Sound^. <> nil);
-  //AudioInfo^.Sound.;
-
   BytesToRead := Min(AudioInfo^.RawSeekable.RawSound^.Size -
     AudioInfo^.RawSeekable.Position + 1, frameCount *
     AudioInfo^.RawSeekable.RawSound^.ChannelCount * sizeof(cfloat));
 
-  //Logger.Debug('frameCount - ' + IntToStr(frameCount));
-  //Logger.Debug('BytesRead - ' + IntToStr(BytesToRead));
-  //Logger.Debug('AudioInfo^.RawSeekable.Position - ' + IntToStr(AudioInfo^.RawSeekable.Position));
-  //Logger.Debug('AudioInfo^.RawSeekable.Sound^.Size - ' + IntToStr(AudioInfo^.RawSeekable.RawSound^.Size));
-  //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
-  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
-  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
-  //    );
   Move((AudioInfo^.RawSeekable.RawSound^.Buffer +
     AudioInfo^.RawSeekable.Position)^, output^,
     BytesToRead);
-  //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
-  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
-  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
-  //    );
 
   { Apply scaling to amplitude to control AmpScale }
   Data := output;
   for Count := 0 to (AudioInfo^.RawSeekable.RawSound^.ChannelCount * frameCount) - 1 do
   begin
     Data[Count] := Data[Count] * AmpScale;
-    //AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
   end;
 
   AudioInfo^.RawSeekable.Position += BytesToRead;
@@ -358,18 +291,11 @@ var
   AudioInfo: PRawUserInfo;
   BytesToRead: integer = 0;
   FrameCountBytes: integer = 0;
-  //BytesCompleted: integer = 0;
-  //readSuccess: boolean;
-  //UsedSound: TSound;
   Data: pcfloat;
   Count: integer;
   AmpScale: double;
-  //AmpScale: double;
   Poller: TAmplitudeScalePoller;
 begin
-  //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
-  //Logger.Debug('Inside FeedAudioStream');
-
   { Log statements in this callback will invariably result in a crash }
 
   AudioInfo := PRawUserinfo(userData);
@@ -392,23 +318,9 @@ begin
   FrameCountBytes := frameCount * AudioInfo^.RawSeekable.RawSound^.ChannelCount *
     sizeof(cfloat);
 
-
-  //Assert(AudioInfo <> nil);
-  //Assert(AudioInfo^.RawSeekable.Position <= AudioInfo^.RawSeekable.RawSound^.Size);
-  //Assert(AudioInfo^.Sound^. <> nil);
-  //AudioInfo^.Sound.;
-
   BytesToRead := Min(AudioInfo^.RawSeekable.RawSound^.Size -
     AudioInfo^.RawSeekable.Position + 1, FrameCountBytes);
 
-  //Logger.Debug('frameCount - ' + IntToStr(frameCount));
-  //Logger.Debug('BytesRead - ' + IntToStr(BytesToRead));
-  //Logger.Debug('AudioInfo^.RawSeekable.Position - ' + IntToStr(AudioInfo^.RawSeekable.Position));
-  //Logger.Debug('AudioInfo^.RawSeekable.Sound^.Size - ' + IntToStr(AudioInfo^.RawSeekable.RawSound^.Size));
-  //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
-  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
-  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
-  //    );
   Move((AudioInfo^.RawSeekable.RawSound^.Buffer +
     AudioInfo^.RawSeekable.Position)^, output^,
     BytesToRead);
@@ -418,12 +330,7 @@ begin
   for Count := 0 to (AudioInfo^.RawSeekable.RawSound^.ChannelCount * frameCount) - 1 do
   begin
     Data[Count] := Data[Count] * AmpScale;
-    //AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
   end;
-  //Logger.Debug('Soundpool - AudioInfo^.RawSeekable.Sound^.Buffer - '
-  //    + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[0], 16)
-  //    + ' ' + IntToHex(PQWord(AudioInfo^.RawSeekable.RawSound^.Buffer)[1], 16)
-  //    );
 
   { When BytesToRead is less tham FrameCountBytes, we have not filled the
   entire buffer. This was attempted, but filling buffers without any gap
@@ -445,14 +352,11 @@ var
   AudioInfo: PRawUserInfo;
   {%H-}AudioTemp: TAudioPlayer; // Possibly buggy hint, omitting
 begin
-  //EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
-
   AudioInfo := PRawUserInfo(userData);
   AudioInfo^.RawSeekable.Position := 0;
   AudioTemp := TAudioPlayer(AudioInfo^.Player);
 
   Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
-  //LeaveCriticalSection(TAudioPlayer.AudioCriticalSection);
 end;
 
 { TSoundPool }
@@ -466,7 +370,6 @@ begin
   begin
     inherited Create;
     FEntries := TSoundPoolList.Create;
-    //LoadAllDefaultSounds;
   end
   else
     Self := SoundPool;
@@ -483,8 +386,6 @@ begin
     Dispose(SoundPoolEntry^.Original);
     FreeMem(SoundPoolEntry^.Raw^.Buffer);
     Dispose(SoundPoolEntry^.Raw);
-    //FreeMem(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
-    //Dispose(SoundPoolEntry^.RawVolumeAdjusted);
     Dispose(SoundPoolEntry);
   end;
   FEntries.Free;
@@ -544,19 +445,12 @@ var
   SndFile: TSound = nil;
   Size: integer;
   Read: integer;
-  //VolumeBuffer: PCFloat;
-  //RawBuffer: PCFloat;
-  //Count: integer;
-  //Volume: integer;
-  //AmpScale: double;
 begin
   Logger.Debug('Enteringe RefillRawSound');
 
   Result := False;
   SoundPoolEntry := FEntries.Items[Index];
 
-  //SndFile := TSndSound.Create;
-  //SndFile.LoadInMemorySound(SoundPoolEntry^.Original);
   SndFile := TSoundFactory.CreateSound(SoundPoolEntry^.Original);
   if SndFile = nil then
   begin
@@ -577,9 +471,6 @@ begin
 
   if SoundPoolEntry^.Raw = nil then
   begin
-    //FreeMem(SoundPoolEntry^.Raw^.Buffer);
-    //Dispose(SoundPoolEntry^.Raw);
-
     SoundPoolEntry^.Raw := New(PRawSoundData);
     SoundPoolEntry^.Raw^.Buffer :=
       AllocMem(SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
@@ -587,13 +478,6 @@ begin
       (SndFile.FrameLength * SndFile.Channels * SizeOf(cfloat));
   end;
 
-  { Create the record to hold raw volume adjusted sound }
-  //SoundPoolEntry^.RawVolumeAdjusted := New(PRawSoundData);
-  //SoundPoolEntry^.RawVolumeAdjusted^.Buffer := AllocMem(SoundPoolEntry^.Raw^.Size);
-  //SoundPoolEntry^.RawVolumeAdjusted^.Size := SoundPoolEntry^.Raw^.Size;
-  //Logger.Debug('Soundpool - SoundPoolEntry^.RawVolumeAdjusted^.Size - ' + IntTostr(SoundPoolEntry^.RawVolumeAdjusted^.Size));
-
-  //SoundPoolEntry^.Original^
   { Read raw data and keep it raedy for use }
   Logger.Debug('Starting refill loop');
   Logger.Debug('Total allocated bytes - ' + IntToStr(SndFile.FrameLength *
@@ -604,8 +488,8 @@ begin
     begin
         { SndFile.Read returns the number of floats read. This already takes the
         number of channels to account, so no need to multiply }
-      Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer +
-        (Size {* SizeOf(cfloat)}), REFILL_BUFFER_SIZE);
+      Read := SndFile.Read(SoundPoolEntry^.Raw^.Buffer + Size,
+        REFILL_BUFFER_SIZE);
 
       Size += Read;
       if Read = 0 then
@@ -622,21 +506,9 @@ begin
     IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[0], 16) + ' ' +
     IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[1], 16)
     );
-  { Fill the volume adjusted raw data too. This is used for playing }
 
-  //RawBuffer := PCFloat(SoundPoolEntry^.Raw^.Buffer);
-  //VolumeBuffer := PCFloat(SoundPoolEntry^.RawVolumeAdjusted^.Buffer);
-
-  { Apply scaling to amplitude to control volume }
-  {for Count := 0 to (SndFile.FrameLength * SndFile.Channels) - 1 do
-  begin
-    RawBuffer[Count] := RawBuffer[Count] * AudioSystem.AmplitudeScale; //AudioInfo^.Volume;
-  end;}
-
-  //FreeMem(Buffer);
   Logger.Debug('Size of default sound - ' + IntToStr(Size));
 
-  // Set
   SoundPoolEntry^.Details.Duration := SndFile.Duration;
 
   SndFile.Free;
@@ -646,14 +518,6 @@ end;
 function TSoundPool.LoadDefaultSound(const ResourceID: string): integer;
 var
   SoundPoolEntry: PSoundPoolEntry;
-  //SndFile: TSndSound;
-  //Size: integer;
-  //Read: integer;
-  //VolumeBuffer: PCFloat;
-  //RawBuffer: PCFloat;
-  //Count: integer;
-  //Volume: integer;
-  //AmpScale: double;
   Index: integer = -1;
 begin
 
@@ -683,8 +547,6 @@ begin
 end;
 
 procedure TSoundPool.LoadAllDefaultSounds;
-//var
-//ResourceID: string;
 begin
   if AudioSystem.Loaded then
   begin
@@ -722,8 +584,6 @@ begin
   if BytesRead <> Size then
     Logger.Warning('BytesRead does not match Size in TAudio.LoadDefaultSounds');
 
-  //Logger.Info('Size of the stream is ' + IntToStr(Size));
-  //Sound.Loaded := True;
   Stream.Free;
 end;
 
@@ -806,7 +666,6 @@ begin
     Exit;
   end;
 
-  //SoundPoolEntry^.Details.Source := FileName;
   Result := Index;
 end;
 
@@ -826,22 +685,6 @@ begin
   end;
 end;
 
-{ This is called when playback is finished.
-  Remember: ALWAYS USE CDECL or your pointers will be messed up!
-  Pointers to this function must be castable to PPaStreamFinishedCallback: }
-{procedure StreamFinished(UserData: pointer); cdecl;
-var
-  LocalDataPointer: PPaTestData;
-  {%H-}AudioTemp: TAudioPlayer; // buggy hint, omitting
-begin
-  EnterCriticalSection(TAudioPlayer.AudioCriticalSection);
-  LocalDataPointer := PPaTestData(UserData);
-  AudioTemp := TAudioPlayer(LocalDataPointer^.Player);
-  Application.QueueAsyncCall(@(AudioTemp.FinishedAud), 0);
-  LeaveCriticalSection(TAudioPlayer.AudioCriticalSection);
-end;}
-
-
 { TAudioSystem }
 
 constructor TAudioSystem.Create;
@@ -851,16 +694,13 @@ begin
   FLoaded := False;
   FVolume := MAX_VOLUME;
   FAmpScale := 1;
-  ;
-  //FDefaultSound.Loaded := False;
-  //FDefaultTick.Loaded := False;
+
   FDevices := TAudioDeviceList.Create;
 
 
   FLoaded := Pa_Load(LIB_PORTAUDIO);
   if not FLoaded then
   begin
-    //Logger.Debug('Could not load portaudio');
     FLoadError := 'Failed to load library: PortAudio (' + LIB_PORTAUDIO +
       ').' + LineEnding;
     {$IF defined(windows) }
@@ -879,7 +719,6 @@ begin
     FLoaded := sf_load(LIB_SNDFILE);
     if not FLoaded then
     begin
-      //Logger.Debug('Could not load sndfile');
       FLoadError := 'Failed to load library: libsndfile (' + LIB_SNDFILE +
         ').' + LineEnding;
       {$IF defined(windows) }
@@ -897,7 +736,6 @@ begin
     FLoaded := Mp_Load(LIB_MPG123);
     if not FLoaded then
     begin
-      //Logger.Debug('Could not load mpg123');
       FLoadError := 'Failed to load library: libmpg123 (' + LIB_MPG123 +
         ').' + LineEnding;
       {$IF defined(windows) }
@@ -912,15 +750,12 @@ begin
     if mpg123_init() <> MPG123_OK then
     begin
       FLoaded := False;
-      //Logger.Debug('mpg123_init() failed');
       Mp_Unload;
       sf_Unload;
       Pa_Unload;
       Exit;
     end;
   end;
-
-  //FAudioWorking:=Status;
 
   {$ENDIF}
 
@@ -950,7 +785,6 @@ begin
   if FLoaded then
   begin
     ReloadDevicesList;
-    //FDefaultDevice := Pa_GetDefaultOutputDevice();
     FDefaultDevice := GetDefaultDeviceIndex;
     if FDefaultDevice = paNoDevice then
     begin
@@ -964,7 +798,6 @@ begin
       {$ENDIF}
     end;
   end;
-  //InitCriticalSection(TAudioPlayer.AudioCriticalSection);
 end;
 
 destructor TAudioSystem.Destroy;
@@ -990,128 +823,8 @@ begin
   Result := FAmpScale;
 end;
 
-//function TAudioSystem.GetAmplitudeScale: double;
-//var
-//  AmpScale: double;
-//begin
-//  Assert((FVolume >= 0) and (FVolume <= MAX_VOLUME));
-//  AmpScale := Volume / MAX_VOLUME;
-//  AmpScale := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
-//  Assert((AmpScale >= 0) and (AmpScale <= 1));
-//  Result := AmpScale;
-//end;
-
-
 
 { TAudioPlayer }
-
-//procedure TAudioPlayer.Play(Sound: TSound; var Volume: integer; PlayLooped: boolean);
-//var
-//  PaErrCode: PaError;
-//  StreamParams: PaStreamParameters;
-//  DeviceId: integer;
-//  //AmpScale: double;
-//begin
-//  //EnterCriticalSection(AudioCriticalSection);
-
-//  try
-//    if not AudioSystem.Loaded then
-//      raise EAudioNotLoaded.Create('Audio not loaded.');
-
-//    if FAudioPlaying then
-//    begin
-//      ShowMessage('Again?');
-//      //LeaveCriticalsection(AudioCriticalSection);
-//      Exit;
-//    end;
-
-//    {if sf_seek(FSoundFile, 0, SEEK_SET) = -1 then
-//    begin
-//      Logger.Debug('Sf_seek returned error');
-//    end;}
-//    Sound.SeekToBeginning;
-
-//    if AudioSystem.UseDefaultDevice or (AudioSystem.OutputDevice.HostAPIName = '') or
-//      (AudioSystem.OutputDevice.DeviceName = '') then
-//    begin
-//      DeviceId := AudioSystem.DefaultDeviceIndex;
-//      Logger.Info('TAudio using default device to play audio.');
-//    end
-//    else
-//    begin
-//      DeviceId := AudioSystem.GetDeviceIndex(AudioSystem.OutputDevice);
-//      Logger.Info('TAudio using device - ' + AudioSystem.OutputDevice.DeviceName +
-//        ' host api - ' + AudioSystem.OutputDevice.HostAPIName);
-//    end;
-//    StreamParams.device := DeviceId;
-
-//    Logger.Debug('Audio device is ' + IntToStr(StreamParams.device));
-
-//    //StreamParams.channelCount := FInfo.channels;
-//    StreamParams.channelCount := Sound.Channels;
-//    StreamParams.sampleFormat := Sound.SampleFormat;
-
-//    Logger.Debug('Oldplay - StreamParams.channelCount ' +
-//      IntToStr(StreamParams.channelCount));
-//    Logger.Debug('Oldplay - StreamParams.sampleFormat ' +
-//      IntToStr(StreamParams.sampleFormat));
-//    //Sound.SampleRate
-//    Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate));
-
-//    Streamparams.suggestedLatency :=
-//      //0.5;
-//      Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency;
-//    StreamParams.hostApiSpecificStreamInfo := nil;
-//    //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
-
-//    //FUserInfo.SoundFile := FSoundFile;
-
-//    FUserInfo.Sound := Sound;
-//    FUserInfo.Looped := PlayLooped;
-//    FUserInfo.Player := Self;
-
-//    //Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
-//    //AmpScale := Volume / MAX_VOLUME;
-//    //FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
-//    //Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
-//    FUserInfo.Volume := @Volume;
-
-//    //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
-
-//    PaErrCode := Pa_OpenStream(@FStream, nil, @StreamParams,
-//      Sound.SampleRate, paFramesPerBufferUnspecified,
-//      //2024,
-//      paClipOff, PPaStreamCallback(@FeedAudioStream), @FUserInfo);
-//    if (paErrCode <> Int32(paNoError)) then
-//    begin
-//      Logger.Debug('Pa_OpenStream failed ' + Pa_GetErrorText(paErrCode));
-//      Logger.Debug('Error after Pa_OpenStream ' + IntToHex(PaErrCode, 8));
-//      Exit;
-//    end;
-
-//    PaErrCode := Pa_SetStreamFinishedCallback(FStream,
-//      PPaStreamFinishedCallback(@AudioStreamFinished));
-//    if (paErrCode <> Int32(paNoError)) then
-//    begin
-//      Logger.Debug('Pa_SetStreamFinishedCallback failed ' + Pa_GetErrorText(paErrCode));
-//      Logger.Debug('Error after Pa_SetStreamFinishedCallback ' + IntToHex(PaErrCode, 8));
-//      Exit;
-//    end;
-
-//    PaErrCode := Pa_StartStream(FStream);
-//    if (paErrCode <> Int32(paNoError)) then
-//    begin
-//      Logger.Debug('Pa_StartStream failed ' + Pa_GetErrorText(paErrCode));
-//      Logger.Debug('Error after Pa_StartStream ' + IntToHex(PaErrCode, 8));
-//      Exit;
-//    end;
-
-//    FAudioPlaying := True;
-
-//  finally
-//    ;//LeaveCriticalSection(AudioCriticalSection);
-//  end;
-//end;
 
 procedure TAudioPlayer.Play(RawSound: PRawSoundData);
 var
@@ -1155,17 +868,14 @@ begin
 
   Logger.Debug('Audio device is ' + IntToStr(StreamParams.device));
 
-  //StreamParams.channelCount := FInfo.channels;
   StreamParams.channelCount := RawSound^.ChannelCount;
   StreamParams.sampleFormat := RawSound^.SampleFormat;
   Logger.Debug('Newplay - StreamParams.channelCount ' +
     IntToStr(StreamParams.channelCount));
   Logger.Debug('Newplay - StreamParams.sampleFormat ' +
     IntToStr(StreamParams.sampleFormat));
-  //Sound.SampleRate
-  //Logger.Debug('Oldplay - Sound.SampleRate ' + IntToStr(Sound.SampleRate);
 
-  // If latency has to be overridden, then do that.
+  { If latency has to be overridden, then do that. }
 
   if UserConfig.OverrideLatency then
     Streamparams.suggestedLatency := UserConfig.Latency / AUDIO_LATENCY_DIVISOR
@@ -1174,21 +884,9 @@ begin
       (Pa_GetDeviceInfo(StreamParams.device)^.defaultLowOutputLatency);
 
   StreamParams.hostApiSpecificStreamInfo := nil;
-  //Logger.Debug('Default device is ' + IntToStr(StreamParams.device));
-
-  //FUserInfo.SoundFile := FSoundFile;
 
   FRawUserInfo.RawSeekable := FSeekableSoundData;
-  //FUserInfo.Looped := PlayLooped;
   FRawUserInfo.Player := Self;
-
-  //Assert((Volume >= 0) and (Volume <= MAX_VOLUME));
-  //AmpScale := Volume / MAX_VOLUME;
-  //FUserInfo.Volume := (power(VOLUME_LOG_BASE, AmpScale) - 1) / (VOLUME_LOG_BASE - 1);
-  //Assert((FUserInfo.Volume >= 0) and (FUserInfo.Volume <= 1));
-  //FUserInfo.Volume := @Volume;
-
-  //Move(FInfo, FUserInfo.Info, SizeOf(SF_INFO));
 
   Logger.Debug('');
   Logger.Debug('Before Play');
@@ -1259,17 +957,14 @@ end;
 
 function TAudioSystem.GetDevices: TAudioDeviceList;
 begin
-  //EnterCriticalSection(AudioCriticalSection);
   if not AudioSystem.Loaded then
   begin
-    //LeaveCriticalSection(AudioCriticalSection);
     raise EAudioNotLoaded.Create('Audio not loaded.');
   end;
 
   ReloadDevicesList;
   Result := FDevices;
 
-  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 procedure TAudioSystem.ReloadDevicesList;
@@ -1283,7 +978,6 @@ var
 begin
   if not FLoaded then
   begin
-    //LeaveCriticalSection(AudioCriticalSection);
     raise EAudioNotLoaded.Create('Audio not loaded.');
   end;
   for Device in FDevices do
@@ -1346,7 +1040,6 @@ var
   HostAPIInfo: PPaHostApiInfo;
   DeviceName, HostAPIName: string;
 begin
-  //EnterCriticalSection(AudioCriticalSection);
   DevideId := GetDefaultDeviceIndex;
   DeviceInfo := Pa_GetDeviceInfo(DevideId);
   if DeviceInfo = nil then
@@ -1367,7 +1060,6 @@ begin
   Device^.DeviceName := DeviceName;
   Device^.HostAPIName := HostAPIName;
 
-  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 procedure TAudioSystem.SetOutputDevice(AValue: TAudioDevice);
@@ -1380,15 +1072,7 @@ begin
   end;
 end;
 
-{procedure TAudioPlayer.SetVolume(AValue: integer);
-begin
-  if FVolume=AValue then Exit;
-  FVolume:=Min(AValue, MAX_VOLUME);
-end;}
-
 constructor TAudioPlayer.Create;
-  //var
-  //  i: integer;
 begin
 
   if not AudioSystem.Loaded then
@@ -1401,16 +1085,6 @@ begin
 
   OnPlayCompletion := nil;
 
-  { Fill a Sine wavetable (Float Data -1 .. +1) }
-  //for i := 0 to TableSize - 1 do
-  //Data.Sine[i] := CFloat((Sin((CFloat(i) / CFloat(TableSize)) * Pi * 2)));
-
-  //Data.LeftPhase := 0;
-  //Data.RightPhase := 0;
-  //Data.AMessage := 'No Message'#0;
-
-  //DataPointer := @Data;
-
 end;
 
 destructor TAudioPlayer.Destroy;
@@ -1421,19 +1095,16 @@ end;
 function TAudioSystem.GetDefaultDeviceIndex: AudioDeviceIndex;
 var
   DeviceId: AudioDeviceIndex = paNoDevice;
-  Device: PAudioDevice;
-  Count: integer;
 begin
-  //EnterCriticalSection(AudioCriticalSection);
   if not FLoaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
   {$IF DEFINED(WINDOWS)}
 
-  // In Windows use Microsoft Sound Mapper as default without consulting
-  // PortAudio. PortAudio - incorrectly - points us to a specific device.
-  // But Sound Mapper is the best option as it redirects audio based on
-  // output device availability.
+  { In Windows use Microsoft Sound Mapper as default without consulting
+  PortAudio. PortAudio - incorrectly - points us to a specific device.
+  But Sound Mapper is the best option as it redirects audio based on
+  output device availability. }
   for Count := 0 to FDevices.Count - 1 do
   begin
     Device := FDevices.Items[Count];
@@ -1460,12 +1131,10 @@ begin
   if DeviceId = paNoDevice then
   begin
     Logger.Debug('No default device');
-    //LeaveCriticalSection(AudioCriticalSection);
     raise EInvalidDevice.Create('Pa_GetDefaultOutputDevice() returned PaNoDevice');
   end;
 
   Result := DeviceId;
-  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 function TAudioSystem.GetDeviceIndex(Device: TAudioDevice): AudioDeviceIndex;
@@ -1474,7 +1143,6 @@ var
   DeviceInfo: PPaDeviceInfo;
   HostAPIInfo: PPaHostApiInfo;
 begin
-  //EnterCriticalSection(AudioCriticalSection);
   if not FLoaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
@@ -1506,12 +1174,10 @@ begin
       if HostAPIInfo^.Name = Device.HostAPIName then
       begin
         Result := CountDevice;
-        //LeaveCriticalSection(AudioCriticalSection);
         Exit;
       end;
     end;
   end;
-  //LeaveCriticalSection(AudioCriticalSection);
   raise EInvalidDevice.Create('No matching device for ' + Device.DeviceName +
     ':' + Device.HostAPIName);
 
@@ -1533,13 +1199,9 @@ begin
   end;
   FDevices.Clear;
 
-  //FreeMem(FDefaultSound.Buffer);
-  //FreeMem(FDefaultTick.Buffer);
 end;
 
 procedure TAudioSystem.SetVolume(AValue: integer);
-//var
-//  AmpScale: double;
 begin
   if FVolume = AValue then
     Exit;
@@ -1547,8 +1209,6 @@ begin
   UserConfig.Volume := FVolume;
 
   FAmpScale := ConvertVolumeToAmplitudeScale(FVolume);
-
-  //SoundPool.RefillAll;
 end;
 
 { TODO : Is this implementation ?}
@@ -1563,21 +1223,17 @@ begin
   begin
     Exit;
   end;
-  //SoundPool.LoadSoundFromResource('DEFAULT_SOUND', FDefaultSound);
-  //SoundPool.LoadSoundFromResource('TICK', FDefaultTick);
 end;
 
 procedure TAudioSystem.FreeDefaultSounds;
 begin
-  ;//FreeMem(FDefaultSound.Buffer);
-  //FreeMem(FDefaultTick.Buffer);
+  ;
 end;
 
 procedure TAudioPlayer.Abort;
 var
   PaErrCode: PaError;
 begin
-  //EnterCriticalSection(AudioCriticalSection);
   try
     if not AudioSystem.Loaded then
       raise EAudioNotLoaded.Create('Audio not loaded.');
@@ -1587,6 +1243,8 @@ begin
       Logger.Debug('Audio not playing. There is nothing to be done in abort');
       Exit;
     end;
+
+    { TODO : Try with Pa_AbortStream and see if it works }
     {Pa_AbortStream throws an exception in Linux, using  }
     PaErrCode := Pa_StopStream(FStream);
     if (paErrCode <> Int32(paNoError)) then
@@ -1600,8 +1258,7 @@ begin
     in that callback function}
 
   finally
-    ;//FAudioPlaying := False;
-    //LeaveCriticalSection(AudioCriticalSection);
+    ;
   end;
 
 end;
@@ -1613,25 +1270,8 @@ begin
   if not AudioSystem.Loaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
 
-  //EnterCriticalSection(AudioCriticalSection);
-
   {This check might be redundant. Just to be safe}
   Assert(FStream <> nil);
-  {paErrCode := Pa_IsStreamStopped(FStream);
-  if paErrCode = 0 then
-  begin
-    paErrCode := Pa_StopStream(FStream);
-    if (paErrCode <> Int32(paNoError)) then
-    begin
-      Logger.Debug('Pa_StopStream failed ' + Pa_GetErrorText(paErrCode));
-      Logger.Debug('Error after Pa_StopStream ' + IntToHex(PaErrCode, 8));
-    end;
-  end
-  else if PaErrCode <> 1 then
-  begin
-    Logger.Debug('Pa_IsStreamStopped failed ' + Pa_GetErrorText(paErrCode));
-    Logger.Debug('Error after Pa_IsStreamStopped ' + IntToHex(PaErrCode, 8));
-  end;}
 
   paErrCode := Pa_StopStream(FStream);
   if (paErrCode <> Int32(paNoError)) then
@@ -1650,7 +1290,6 @@ begin
   FAudioPlaying := False;
   if OnPlayCompletion <> nil then
     OnPlayCompletion(Self);
-  //LeaveCriticalSection(AudioCriticalSection);
 end;
 
 function TAudioSystem.LoadSound(Avalue: string): TSound;
@@ -1709,9 +1348,6 @@ initialization
 
 
 finalization
-  //DoneCriticalsection(TAudioPlayer.AudioCriticalSection);
-  //SoundPool.Free;
   FreeAndNil(SoundPool);
-  //AudioSystem.Free;
   FreeAndNil(AudioSystem);
 end.

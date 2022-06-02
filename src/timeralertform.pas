@@ -37,7 +37,6 @@ type
     bbRestart: TBitBtn;
     cbFromFinish: TCheckBox;
     Label1: TLabel;
-    //FTimer: TTimer;
     lsvMessages: TListView;
     procedure bbCloseClick(Sender: TObject);
     procedure bbRestartClick(Sender: TObject);
@@ -50,7 +49,6 @@ type
     procedure lsvMessagesItemChecked(Sender: TObject; {%H-}Item: TListItem);
   private
     { private declarations }
-    //FTimers: TTimerFrameList;
     procedure StopTimers;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
@@ -71,9 +69,7 @@ implementation
 
 procedure TfrmAlert.FormCreate(Sender: TObject);
 begin
-  //AlphaBlend:=True;
   AlphaBlendValue := 50;
-  //FTimers := TTimerFrameList.Create;
   bbRestart.Enabled := False;
   cbFromFinish.Checked := UserConfig.RestartFromFinish;
 
@@ -81,15 +77,13 @@ end;
 
 procedure TfrmAlert.FormDestroy(Sender: TObject);
 begin
-  //FTimers.Clear;
-  //FTimers.Free;
+  ;
 end;
 
 procedure TfrmAlert.FormShow(Sender: TObject);
 begin
   Left := (Screen.Width - Width) div 2;
   Top := (Screen.Height - Height) div 2;
-  //FTimer.Interval:=2000;
 end;
 
 procedure TfrmAlert.lsvMessagesItemChecked(Sender: TObject; Item: TListItem);
@@ -103,11 +97,6 @@ var
   Timer: TfraTimer = nil;
   Item: TListItem;
 begin
-  //for Timer in FTimers do
-  //begin
-  //  Timer.Stop(True);
-  //end;
-
   for Item in lsvMessages.Items do
   begin
     Timer := TfraTimer(Item.Data);
@@ -147,8 +136,6 @@ var
   Duration: TDateTime;
   DurationText: string;
 begin
-  //FTimers.Add(Timer);
-
   Duration := Timer.Duration;
 
   Hours := HourOf(Duration);
@@ -183,7 +170,6 @@ begin
 
   try
     StopTimers;
-    //for Entry in FTimers do Entry.RestartFromLastFinish;
     ErrorMessage := '';
     for Item in lsvMessages.Items do
     begin
@@ -201,7 +187,7 @@ begin
       else
         Entry.Start;
     end;
-    //ShowMessage('The following timers failed to restart:' + LineEnding + ErrorMessage);
+
     if Failures > 0 then
       MessageDlg('The following timers failed to restart: ' +
         LineEnding + '(time duration elapsed).' + LineEnding +
@@ -224,16 +210,12 @@ begin
 end;
 
 procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-//var
-//  Timer: TfraTimer = nil;
 begin
   lsvMessages.BeginUpdate;
   lsvMessages.Items.Clear;
   lsvMessages.EndUpdate;
 
   ReenableControls;
-  //FTimers.Clear;
-
 end;
 
 end.

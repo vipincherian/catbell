@@ -102,7 +102,6 @@ procedure TfrmAdjust.FormShow(Sender: TObject);
 begin
   dtpTill.TimeFormat := TTimeFormat(UserConfig.DefaultTimeFormat);
   dtpDiff.Time:=UserConfig.AdjustDiff;
-  //dtpTill.Date:=Now;
   SetTillDateTime;
 end;
 

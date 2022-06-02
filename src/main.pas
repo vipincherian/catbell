@@ -33,7 +33,7 @@ uses
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
-  {portaudio, sndfile,}{ctypes,} audio, metronome, log, FileInfo;
+  audio, metronome, log, FileInfo;
 
 type
   TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
@@ -56,7 +56,6 @@ type
     bbDelete: TBitBtn;
     bbMoveUp: TBitBtn;
     bbMoveDown: TBitBtn;
-    //evlMain: TEventLog;
     hdrTimers: THeaderControl;
     ilMain: TImageList;
     ilMainSmall: TImageList;
@@ -105,7 +104,6 @@ type
     ToolButton9: TToolButton;
     tbVolume: TTrackBar;
     procedure aiHelpExecute(Sender: TObject);
-    procedure alUnmuteExecute(Sender: TObject);
     procedure aiDeleteTimerExecute(Sender: TObject);
     procedure aiExportExecute(Sender: TObject);
     procedure aiMoveDownExecute(Sender: TObject);
@@ -162,8 +160,6 @@ type
     FOrder: TIdList;
     FCounterClockID: TSequence;
 
-    //FMetronome: TMetronome;
-
     FShortTimer: TTimer;
 
     { This is an invisible timer frame, the purpose of which
@@ -214,7 +210,6 @@ type
     procedure AfterShow({%H-}Data: PtrInt);
     procedure ShowModalAlert({%H-}Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
-    //property Metronome: TMetronome read FMetronome;
 
   end;
 
@@ -245,8 +240,6 @@ begin
   AudioSystem.LoadDefaultSounds;
   SoundPool.LoadAllDefaultSounds;
 
-  //FMetronome := TMetronome.Create;
-
   FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
   Constraints.MinHeight := FORM_MIN_HEIGHT;
@@ -262,7 +255,6 @@ begin
 
   FDbDefault := True;
 
-  //ilMainSmall.GetIcon(TICON_GREEN_INDEX, tiMain.Icon);
   tiMain.Visible := True;
 
   bbDelete.Caption := '';
@@ -298,8 +290,6 @@ begin
 
   tiMain.Icon.Assign(FTrayStoppedBitmap);
 
-  //tbUnmute.Enabled := (UserConfig.Volume = 0);
-
   stbMain.BeginUpdate;
   if AudioSystem.Loaded then
     stbMain.Panels[PANEL_AUDIO].Text := 'Audio: Ok'
@@ -316,20 +306,16 @@ begin
   end
   else
   begin
-    // There is no need to set the position of tbVolume to 0. If set, this will
-    // trigger the callback, which would in turn set the volume of the audio
-    // system.
+    { There is no need to set the position of tbVolume to 0. If set, this will
+    trigger the callback, which would in turn set the volume of the audio
+    system.}
     tbVolume.Enabled := False;
   end;
 
   imgVolumeOff.Left := imgVolumeOn.Left;
   imgVolumeOff.Top := imgVolumeOn.Top;
 
-  //tbVolume.Position:=0;
-
   Logger.Subscribe(@SetStatusMessage);
-
-  // Load File version info
 
   Info := TFileVersionInfo.Create(Self);
   Info.ReadFileInfo;
@@ -342,7 +328,6 @@ end;
 procedure TfrmMain.aiNewTimerExecute(Sender: TObject);
 var
   Added: TfraTimer;
-  //TempAudio: TAudioPlayer;
 begin
   with UserConfig do
   begin
@@ -354,22 +339,9 @@ begin
     { We are not providing an option to keep audio looped by default }
     frmEdit.ckbLoop.Checked := False;
   end;
-  //TempAudio := nil;
 
-  //frmEdit.CurrentSound := nil;
-  if AudioSystem.Loaded then
-  begin
-    //TempAudio := TAudioPlayer.Create;
-    //frmEdit.Audio := TempAudio;
-
-  end
-  else
-  begin
-    //frmEdit.Audio := nil;
-    //frmEdit.AudioFileName := '';
-    //frmEdit.SoundDuration := 0;
+  if not AudioSystem.Loaded then
     frmEdit.SoundLooped := False;
-  end;
 
   if frmEdit.ShowForAdd then
   begin
@@ -381,22 +353,12 @@ begin
 
     if AudioSystem.Loaded then
     begin
-      //Added.Audio := TempAudio;
-      //Added.CustomSound := frmEdit.NewSound;
       Added.SoundLooped := frmEdit.ckbLoop.Checked;
       Added.Metronome := frmEdit.Metronome;
-    end
-    else
-    begin
-      //Added.SoundInfo.FileName := frmEdit.edtSound.Text;
-      //Added.SoundInfo.Duration := 0;
-      //Added.SoundInfo.Looped := frmEdit.ckbLoop.Checked;
     end;
     PostTimerCreation(Added);
     SavetoFile;
   end;
-  //else
-  //  TempAudio.Free;
 end;
 
 procedure TfrmMain.aiOptionsExecute(Sender: TObject);
@@ -531,12 +493,6 @@ begin
   SavetoFile;
 end;
 
-procedure TfrmMain.alUnmuteExecute(Sender: TObject); { TODO : What is this? Unmute? }
-begin
-  UserConfig.Volume := DEF_VOLUME_LEVEL;
-  //tbUnmute.Enabled := False;
-end;
-
 procedure TfrmMain.aiHelpExecute(Sender: TObject);
 begin
   OpenUrl(HELP_URL);
@@ -579,8 +535,6 @@ begin
 
   FShortTimer.Free;
 
-  //FMetronome.Free;
-  //inherited Destroy;
 end;
 
 procedure TfrmMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
@@ -594,7 +548,7 @@ end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
-  ;//ResizeHeaderSections;
+  ;
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -610,7 +564,7 @@ begin
       'Audio seems to be working, but volume is set to zero.' +
       ' Reset volume to default levels?', mtConfirmation,
       [mrYes, 'Reset volume', mrNo, 'Keep muted'], '') = mrYes then
-      // This in turn sets the volume of the audio system
+      { This in turn sets the volume of the audio system }
       tbVolume.Position := DEFAULT_VOLUME;
   end;
 
@@ -708,15 +662,12 @@ var
   TrayIconSize, AppIconSize: integer;
   Stream: TResourceStream;
   Count: integer;
-  //ctx: TBGRACanvas2D;
 begin
-  //TrayIconSize := GetSystemMetrics(SM_CXSMICON);
-  //AppIconSize := GetSystemMetrics(SM_CXICON);
 
   TrayIconSize := UserConfig.TrayIconSize;
   AppIconSize := UserConfig.AppIconSize;
 
-  // Read the image in resources to a stream
+  { Read the image in resources to a stream }
   Stream := TResourceStream.Create(hinstance, '256_HOURGLASS_FLAT', RT_RCDATA);
 
   { Create one hi-res image and then resize it and assign}
@@ -746,7 +697,6 @@ begin
 
   FinalBmp.Free;
 
-  //ProgressUpdate(nil, PROGRESS_COMPLETED);
   HiresBmp.Free;
   Stream.Free;
 
@@ -810,7 +760,7 @@ begin
 
 
     {$IF defined(windows) }
-    // Create overlay icons, only in the case of windows
+    { Create overlay icons, only in the case of windows }
     HiResBmp := TBGRABitmap.Create(LARGE_ICON_SIZE, LARGE_ICON_SIZE);
     with HiResBmp do
     begin
@@ -912,13 +862,11 @@ begin
   Inc(Filled, Temp);
 
   Temp := Timer.lblCountdown.Left + Timer.lblCountdown.Width;
-  //Temp := Temp + ((Timer.ckbIconProgress.Left - Temp) div 2) - Filled;
   Temp := Temp - Filled + (TIMER_PADDING div 2);
   hdrTimers.Sections.Items[3].Width := Temp;
   Inc(Filled, Temp);
 
   Temp := Timer.ckbIconProgress.Left + Timer.ckbIconProgress.Width;
-  //Temp := Temp + ((Timer.bbEdit.Left - Temp) div 2) - Filled;
   Temp := Temp - Filled + TIMER_REPORT_PADDING - (TIMER_PADDING div 2);
   hdrTimers.Sections.Items[4].Width := Temp;
   Inc(Filled, Temp);
@@ -1066,7 +1014,6 @@ var
 
   Duration: TDateTime;
   DurationText: string;
-  //Item: TListItem;
 begin
 
   Duration := Sender.Duration;
@@ -1101,8 +1048,6 @@ begin
     Application.QueueAsyncCall(@ShowModalAlert, 0);
   end;
   UpdateStatusTimerCount;
-  //Logger.Debug('Exiting TimerFinished. Timer ID - ' + InttoStr(Id));
-
 end;
 
 procedure TfrmMain.TimerPaused(Sender: TfraTimer);
@@ -1131,7 +1076,6 @@ var
   Index: integer;
 begin
   try
-    //Sender := TfraTimer(Sender);
     FShortTimer.Enabled := True;
     Index := FActiveTimerFrames.IndexOf(Sender);
     if Index = -1 then
@@ -1269,7 +1213,7 @@ begin
 
 end;
 
-procedure TfrmMain.OptionsFormClosed();//Sender: TObject; var Action: TCloseAction);
+procedure TfrmMain.OptionsFormClosed();
 var
   Temp: TfraTimer;
   Count: integer;
@@ -1292,7 +1236,6 @@ begin
   end;
 
   tbVolume.Position := AudioSystem.Volume;
-  //tbUnmute.Enabled := (UserConfig.Volume = 0);
 
 end;
 
@@ -1363,7 +1306,7 @@ begin
       NewTimerClock.Caption :=
         string(Conf.GetValue(TIMER_CONF_TITLE, DEF_TIMER_TITLE));
 
-      // When float is saved, it is saved as
+      { When float is saved, it is saved as string }
       fs := FormatSettings;
       fs.DecimalSeparator := '.';
 
@@ -1371,10 +1314,6 @@ begin
         StrToFloat(string(Conf.GetValue(TIMER_CONF_DURATION, '0')), fs);
       NewTimerClock.IsProgressOnIcon :=
         Conf.GetValue(UTF8Decode(TIMER_CONF_NOTIFIER), False);
-
-      //NewTimerClock.UseDefaultSound :=
-      //  Conf.GetValue(TIMER_CONF_USEDEFSOUND, True);
-
 
       AudioFileName := string(Conf.GetValue(TIMER_CONF_SOUNDFILEPATH, ''));
 
@@ -1418,7 +1357,6 @@ begin
         NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       end;
 
-      //NewTimerClock.SoundInfo.Looped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);
       NewTimerClock.ModalAlert :=
         Conf.GetValue(TIMER_CONF_MODALALERT, False);
       NewTimerClock.TrayNotification :=
@@ -1443,8 +1381,6 @@ begin
     end;
 
     Conf.Free;
-    //OrderString.Free;
-    //Order.Free;
     Reorder;
 
     if ErrorText = '' then
@@ -1473,7 +1409,6 @@ begin
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
 
   FTimerFrames.Add(Id, NewWidget);
-  //FOrder.Insert(0, Id);
   FOrder.Add(Id);
 
   Reorder;
@@ -1514,7 +1449,7 @@ begin
        has to be published for the previous one.
   }
 
-  // For all timers other than the sender, uncheck if checked
+  { For all timers other than the sender, uncheck if checked }
   for Count := 0 to FTimerFrames.Count - 1 do
   begin
     Temp := FTimerFrames.Data[Count];
@@ -1540,17 +1475,13 @@ procedure TfrmMain.SaveClocks(Conf: TJsonConfig);
 var
   TimerClock: TfraTimer;
   Count: integer;
-  //OrderStrings: TStringList;
   Id: longword;
   fs: TFormatSettings;
-  //EndTime: TDateTime;
   State: TTimerState;
 begin
 
-  //OrderStrings := TStringList.Create;
-
-  // While saving, existing IDs of clocks are ignored.
-  // New IDs are generated in sequence.
+  { While saving, existing IDs of clocks are ignored.
+  New IDs are generated in sequence. }
 
   Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
 
@@ -1567,7 +1498,7 @@ begin
     Conf.OpenKey(UTF8Decode(TIMER_CONF_TIMERS + '/' + IntToStr(Count + 1) +
       '/'), True);
 
-    // FOrder has the order of IDs
+    { FOrder has the order of IDs }
     Id := FOrder[Count];
 
     TimerClock := FTimerFrames.KeyData[Id];
@@ -1583,37 +1514,6 @@ begin
       UTF8Decode(FloatToStr(TimerClock.Duration, fs)));
 
     Conf.SetValue(UTF8Decode(TIMER_CONF_NOTIFIER), TimerClock.IsProgressOnIcon);
-
-    {if AudioSystem.Loaded then
-    begin
-      if TimerClock.CustomSound <> nil then
-      begin
-        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH),
-          UTF8Decode(TimerClock.CustomSound.Source));
-        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
-          UTF8Decode(FloatToStr(TimerClock.CustomSound.Duration, fs)));
-        Conf.SetValue(TIMER_CONF_SOUNDLOOP,
-          TimerClock.SoundLooped);
-      end
-      else
-      begin
-        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH),
-          UTF8Decode(''));
-        Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
-          UTF8Decode(FloatToStr(0.0)));
-        Conf.SetValue(TIMER_CONF_SOUNDLOOP, False);
-      end;
-    end
-    else
-    begin
-      //Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDFILEPATH),
-      //  UTF8Decode(TimerClock.SoundInfo.FileName));
-      //Conf.SetValue(UTF8Decode(TIMER_CONF_SOUNDLENGTH),
-      //  UTF8Decode(FloatToStr(TimerClock.SoundInfo.Duration, fs)));
-      //Conf.SetValue(TIMER_CONF_SOUNDLOOP,
-      //  TimerClock.SoundInfo.Looped);
-    end;}
-
 
     Conf.SetValue(TIMER_CONF_MODALALERT,
       TimerClock.ModalAlert);
@@ -1646,21 +1546,18 @@ begin
     Conf.SetValue(TIMER_CONF_RUNNING, State.Running);
     Conf.SetValue(TIMER_CONF_PAUSED, State.Paused);
 
-    // Set pending tick count and end time to zero to begin with
-    // Then udpate the ones applicable afterwards.
+    { Set pending tick count and end time to zero to begin with
+    Then udpate the ones applicable afterwards. }
     Conf.SetValue(TIMER_CONF_PENDINGTICKCOUNT, IntToStr(State.PendingTicks));
     Conf.SetValue(TIMER_CONF_ENDTIME, FloatToStr(State.EndTime, fs));
     Conf.SetValue(TIMER_CONF_ORIGTICKCOUNT, IntToStr(State.DurationTicks));
 
 
     Conf.SetValue(TIMER_CONF_METRONOME, TimerClock.Metronome);
-    //OrderStrings.Insert(0, IntToStr(Count + 1));
 
     Conf.CloseKey;
   end;
 
-  //Conf.SetValue(TIMER_CONF_ORDER, OrderStrings);
-  //OrderStrings.Free;
 end;
 
 procedure TfrmMain.DeleteSelected;
@@ -1782,7 +1679,6 @@ end;
 procedure TfrmMain.OnShortTimer(Sender: TObject);
 var
   TimerFrame: TfraTimer;
-  //TriggerMetronome: boolean = False;
 begin
   try
     if FActiveTimerFrames.Count = 0 then
@@ -1790,7 +1686,6 @@ begin
     try
       for TimerFrame in FActiveTimerFrames do
       begin
-        //TriggerMetronome := (TriggerMetronome or TimerFrame.Metronome);
         TimerFrame.HandleTimerTrigger();
       end;
     except
@@ -1798,8 +1693,6 @@ begin
         Logger.Debug('Exception in TfrmMain.OnShortTimer: ' + E.ClassName +
           LineEnding + E.Message);
     end;
-    //if TriggerMetronome then
-    //  FMetronome.HandleTimerTrigger;
   finally
   end;
 

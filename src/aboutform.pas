@@ -53,7 +53,6 @@ type
     procedure sttUrlClick(Sender: TObject);
   private
     { private declarations }
-    //Buffer: Pointer;
   public
     { public declarations }
   end;
@@ -81,8 +80,7 @@ var
   Item: TListItem;
   Info: TFileVersionInfo;
 begin
-  //memLicense.Text:='hello';
-  // Read file version information and add
+  { Read file version information and add }
   Info := TFileVersionInfo.Create(Self);
   Info.ReadFileInfo;
   lblAppName.Caption := Info.VersionStrings.Values['ProductName'] +
@@ -95,7 +93,6 @@ begin
   LicenseText := PAnsiChar(Buffer);
   lblLicense.Caption := LicenseText;
   Freemem(Buffer);
-  //LicenseText := Stream.ReadAnsiString;
   Stream.Free;
   lsvBuild.BeginUpdate;
 

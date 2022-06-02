@@ -89,7 +89,7 @@ object frmAlert: TfrmAlert
       item
         AutoSize = True
         Caption = 'Duration'
-        Width = 273
+        Width = 274
       end>
     ReadOnly = True
     TabOrder = 1
