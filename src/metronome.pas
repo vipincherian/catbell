@@ -1,3 +1,24 @@
+{
+
+Copyright (C) 2021 Vipin Cherian
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the
+Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+Boston, MA  02110-1301, USA.
+
+}
+
 unit metronome;
 
 {$mode objfpc}{$H+}{$Q+}{$R+}
@@ -5,7 +26,7 @@ unit metronome;
 interface
 
 uses
-  Classes, SysUtils, Forms, audio, settings, {EventLog,} ExtCtrls, log{, sound}, constants;
+  Classes, SysUtils, Forms, audio, settings, ExtCtrls, log, constants;
 
 type
 
@@ -14,28 +35,15 @@ type
   TMetronome = class(TObject)
   private
     FAudioPlayer: TAudioPlayer;
-    //FTickSound: TSndSound;
     FRunning: boolean;
     FSubscribers: integer;
-    //FLastPlayedTick: longword;
-    //FBpm: integer;
-    //FInterval: integer;
-    //FSubscriptions: integer;
-    //FBpmTimer: TTimer;
-    //procedure SetBpm(AValue: integer);
-    //procedure SetRunning(AValue: boolean);
   public
     constructor Create;
     destructor Destroy; override;
-    //procedure HandleTimerTrigger;
     procedure Abort;
     procedure Start;
     procedure Stop;
-    //procedure Subscribe;
-    //procedure Unsubscribe;
-    //procedure OnBpmTimer(Sender: TObject);
     property Running: boolean read FRunning;
-    //property Bpm: integer read FBpm write SetBpm;
   end;
 
 var
@@ -45,23 +53,6 @@ implementation
 
 { TMetronome }
 
-//procedure TMetronome.SetRunning(AValue: boolean);
-//begin
-//  if FRunning = AValue then
-//    Exit;
-
-//  FRunning := AValue;
-//end;
-
-//procedure TMetronome.SetBpm(AValue: integer);
-//begin
-//  if FBpm = AValue then
-//    Exit;
-//  FBpm := AValue;
-//  //FInterval := 60000 div FBpm;
-//  FBpmTimer.Interval := 60000 div FBpm;
-//end;
-
 constructor TMetronome.Create;
 begin
   { Constructor cannot be hidden unless it is made strict private.
@@ -70,19 +61,9 @@ begin
   if not Assigned(MetronomeInstance) then
   begin
     inherited Create;
-    //FSubscriptions := 0;
     FAudioPlayer := TAudioPlayer.Create;
     FAudioPlayer.Looped := True;
     FSubscribers := 0;
-    //FTickSound := TSndSound.Create;
-    //FTickSound.LoadTick;
-    //FLastPlayedTick := GetTickCount64;
-    //FBpmTimer := TTimer.Create(nil);
-    //FBpmTimer.Interval := 60000 div FBpm;
-    //FBpmTimer.Enabled := False;
-    //FBpmTimer.OnTimer := @OnBpmTimer;
-    //Bpm := UserConfig.Bpm;
-    //Bpm := 100;
     FRunning := False;
   end
   else
@@ -92,10 +73,8 @@ end;
 
 destructor TMetronome.Destroy;
 begin
-  //FBpmTimer.Free;
   if FAudioPlayer.Playing then
     Abort;
-  //FTickSound.Free;
   FAudioPlayer.Free;
   inherited Destroy;
 end;
@@ -141,34 +120,6 @@ begin
     Dec(FSubscribers);
 end;
 
-//procedure TMetronome.Subscribe;
-//begin
-//  Inc(FSubscriptions);
-//  if not FBpmTimer.Enabled then
-//  begin
-//    FBpmTimer.Enabled := True;
-//  end;
-//end;
-
-//procedure TMetronome.Unsubscribe;
-//begin
-//  Assert(FSubscriptions > 0);
-//  //Assert(False);
-//  Dec(FSubscriptions);
-//  if FSubscriptions = 0 then
-//    FBpmTimer.Enabled := False;
-//end;
-
-//procedure TMetronome.OnBpmTimer(Sender: TObject);
-//begin
-//  //if Bpm <> UserConfig.Bpm then
-//  //  Bpm := UserConfig.Bpm;
-//  if FSubscriptions > 0 then
-//  begin
-//    if not FAudioPlayer.Playing then
-//    ;//FAudioPlayer.Play(FTickSound, UserConfig.Volume, False);
-//  end;
-//end;
 
 initialization;
   if AudioSystem.Loaded then

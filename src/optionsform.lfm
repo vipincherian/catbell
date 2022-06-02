@@ -445,7 +445,7 @@ object frmOptions: TfrmOptions
             item
               AutoSize = True
               Caption = 'Host API'
-              Width = 392
+              Width = 393
             end>
           ColumnClick = False
           ReadOnly = True

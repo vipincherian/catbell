@@ -115,28 +115,21 @@ type
     FDefaultConfig: TUserConfig;
     FTestSound: TSndSound;
     FAudioPlayer: TAudioPlayer;
-    //FVolume: integer;
     FAmpScale: double;
     function GetVolume: integer;
     function GetAmplitudeScale: double;
     procedure RefreshAudioDevices;
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
-    //procedure SetVolume(AValue: integer);
     procedure ReenableControls;
-    //property Volume: integer read GetVolume write SetVolume;
   public
     { public declarations }
-    //property Volume: integer read GetVolume write SetVolume;
   end;
 
 var
   frmOptions: TfrmOptions;
 
 implementation
-
-//uses
-//  main;
 
 {$R *.lfm}
 
@@ -150,7 +143,6 @@ end;
 procedure TfrmOptions.tbVolumeChange(Sender: TObject);
 begin
   lblVolume.Caption := IntToStr(tbVolume.Position) + '%';
-  //Volume := Min(Max(tbVolume.Position, MIN_VOLUME), MAX_VOLUME);
   FAmpScale := AudioSystem.ConvertVolumeToAmplitudeScale(
     Max(Min(tbVolume.Position, MAX_VOLUME), MIN_VOLUME));
 end;
@@ -216,7 +208,6 @@ begin
     cbUseDefaultSound.Checked := UseDefaultSound;
     cbLoopSound.Checked := LoopSound;
     tbVolume.Position := AudioSystem.Volume;
-    //speBpm.Value := Bpm;
 
     cbOverrideTrayIconSize.Checked := OverrideTrayIconSize;
     cbOverrideAppIconSize.Checked := OverrideAppIconSize;
@@ -321,9 +312,6 @@ begin
     AudioSystem.Volume := Max(Min(tbVolume.Position, MAX_VOLUME), MIN_VOLUME);
     Volume := AudioSystem.Volume;
 
-    //Bpm := speBpm.Value;
-    //frmMain.Metronome.Bpm := Bpm;
-
     OverrideTrayIconSize := cbOverrideTrayIconSize.Checked;
     OverrideAppIconSize := cbOverrideAppIconSize.Checked;
 
@@ -335,14 +323,6 @@ begin
 
   end;
 end;
-
-//procedure TfrmOptions.SetVolume(AValue: integer);
-//begin
-//  //FVolume := Max(Min(AValue, MAX_VOLUME), MIN_VOLUME);
-//  //tbVolume.Position := FVolume;
-//  FAmpScale := AudioSystem.ConvertVolumeToAmplitudeScale(
-//    Max(Min(AValue, MAX_VOLUME), MIN_VOLUME));
-//end;
 
 procedure TfrmOptions.ReenableControls;
 begin
@@ -368,7 +348,6 @@ begin
   FAudioPlayer := nil;
   bbStop.Enabled := False;
 
-  //FVolume := AudioSystem.Volume;
   FAmpScale := AudioSystem.AmplitudeScale;
 
   if AudioSystem.Loaded then
@@ -382,8 +361,6 @@ begin
     bbPlay.Enabled := True;
 
     FTestSound := TSndSound.Create;
-    //FTestSound.LoadDefaultSound;
-
   end
   else
   begin
@@ -464,7 +441,7 @@ begin
 
     if not AudioSystem.UseDefaultDevice then
     begin
-      AudioSystem.SetDefaulDevice; // In case no items are checked
+      AudioSystem.SetDefaulDevice; { In case no items are checked }
       for Item in lsvAudioDevices.Items do
       begin
         if Item.Checked then
@@ -476,9 +453,6 @@ begin
       end;
     end;
 
-    //FAudioPlayer.PlaySine;
-    //FAudioPlayer.PlayTest;
-    //FAudioPlayer.Looped:=True;
     FAudioPlayer.AmplitudeScalePoller := @GetAmplitudeScale;
     FAudioPlayer.Play(SoundPool.RawDefaultSound);
 
@@ -507,7 +481,6 @@ begin
           break;
       end;
     end;
-    //FAudioPlayer.Abort;
     pgbAudio.Style := pbstNormal;
     bbPlay.Enabled := True;
     bbStop.Enabled := False;
@@ -524,7 +497,6 @@ begin
       mtInformation, mbOKCancel, 0) = mrOk then
     begin
       SetControlsAs(FDefaultConfig);
-      //Close;
     end;
   end;
 
@@ -572,21 +544,18 @@ end;
 procedure TfrmOptions.lsvAudioDevicesDblClick(Sender: TObject);
 var
   hts: THitTests;
-  //ht : THitTest;
-  //sht : string;
   CurrPos: TPoint;
 
   Selected, AnItem: TListItem;
 begin
-  // Get the position of the mouse cursor related to ListView
+  { Get the position of the mouse cursor related to ListView }
   CurrPos := lsvAudioDevices.ScreenToClient(Mouse.CursorPos);
 
-  // Where was the double-click received?
+  { Where was the double-click received? }
   hts := lsvAudioDevices.GetHitTestInfoAt(CurrPos.X, CurrPos.Y);
   if hts <= [htOnIcon, htOnItem, htOnLabel, htOnStateIcon] then
   begin
     Selected := lsvAudioDevices.Selected;
-    //Selected.Checked:=True;
     for AnItem in lsvAudioDevices.Items do
       AnItem.Checked := (Selected = Anitem);
   end;

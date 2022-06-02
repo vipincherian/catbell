@@ -56,6 +56,10 @@ done <<< $(find ../../ -type f \( -iname \*.pas -o -iname \*.bash -o \
     -iname \*.ps1 \) -not -path "*/backup/*" | \
     grep -v -f whitelist_copyright.txt)
 
-echo "$error_count errors found."
+if [[ "$error_count" -ne 0 ]]
+then
+    echo "$error_count errors found."
+fi
+
 exit "$error_count"
 

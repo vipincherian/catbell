@@ -95,12 +95,7 @@ type
     FLoadedSoundSource: string;
 
     FLastCompletionTime: TDateTime;
-    //FDefaultSound: TSound;
-    //FCustomSound: TSound;
-
-    //procedure SetAudio(AValue: TAudioPlayer);
     function GetIsSoundPlaying: boolean;
-    //procedure SetCustomSound(AValue: TSound);
     procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
@@ -133,15 +128,12 @@ type
     { public declarations }
 
     LastProgressIconIndex: integer;
-    //UseDefaultSound: boolean;
-
-    //SoundInfo: TTimerSoundInfo;
     SoundLooped: boolean;
 
     FMetronome: boolean;
 
-    // Callback on progress-on-icon checkbox change only if
-    // this variable is true. Used to avoid unending triggering of events.
+    { Callback on progress-on-icon checkbox change only if
+    this variable is true. Used to avoid unending triggering of events. }
     CallbackOnProgressOnIconChange: boolean;
 
     procedure ClockSelected(Sender: TObject);
@@ -194,14 +186,10 @@ type
     property TrayNotification: boolean read FTrayNotification write SetTrayNotification;
     property TitleEditable: boolean read FTitleEditable write SetTitleEditable;
     property Progress: single read FProgress;
-    //property Audio: TAudioPlayer read FAudioPlayer;// write SetAudio;
-    //property CustomSound: TSound read FCustomSound write SetCustomSound;
     property Metronome: boolean read FMetronome write SetMetronome;
     property SoundIndex: integer read FSoundIndex write SetSoundIndex;
     property LoadedSoundIndex: integer read FLoadedSoundIndex write SetLoadedSoundIndex;
     property LoadedSoundSource: string read FLoadedSoundSource write FLoadedSoundSource;
-    //property PendingTickCount: longword read FPendingTickCount;
-
   end;
 
   TTimerFrameList = specialize TFPGList<TfraTimer>;
@@ -325,27 +313,6 @@ begin
   FId := AValue;
   Name := Name + IntToStr(AValue);
 end;
-
-{procedure TfraTimer.SetAudio(AValue: TAudioPlayer);
-begin
-  FAudio.Free;
-  FAudio := AValue
-end;}
-
-//procedure TfraTimer.SetCustomSound(AValue: TSound);
-//var
-//  OldCustomSound: TSound;
-//begin
-//if FCustomSound=AValue then Exit;
-
-//OldCustomSound := FCustomSound;
-//FCustomSound:=AValue;
-
-//OldCustomSound.Free;
-//FCustomSound.Free;
-//FCustomSound:= AValue;
-
-//end;
 
 function TfraTimer.GetIsSoundPlaying: boolean;
 begin
@@ -500,7 +467,6 @@ var
   Elapsed: QWord;
 begin
   Elapsed := Ceil(PendingMilliseconds / 1000);
-  //Logger.Debug('Elapsed in ms is ' + IntToStr(PendingMilliseconds) + ' of ' + IntToStr(FOrigTickDuration));
 
   Seconds := Elapsed mod 60;
   Minutes := Elapsed div 60;
@@ -512,17 +478,18 @@ begin
   if Counter <> CounterText then
     Counter := CounterText;
 
-  // Calculate percentage ProgressPercentage
+  { Calculate percentage ProgressPercentage }
 
   Assert(FOrigTickDuration > 0);
 
   ProgressPercentage := 1 - (PendingMilliseconds / FOrigTickDuration);
-  // Elapsed time can exceed total pending tick duration, in certain cases.
-  // The system could go on sleep mode while a timer is running
-  // (and while the timer event is being processed) and on
-  // waking up, the pre-caculated tick duration could have already been
-  // overshot. If that is the case, mark ProgressPercentage as zero, and the next
-  // timer event will mark it as completed.
+
+  { Elapsed time can exceed total pending tick duration, in certain cases.
+  The system could go on sleep mode while a timer is running
+  (and while the timer event is being processed) and on
+  waking up, the pre-caculated tick duration could have already been
+  overshot. If that is the case, mark ProgressPercentage as zero, and the next
+  timer event will mark it as completed. }
   if ProgressPercentage < 0 then
     ProgressPercentage := 0;
   Assert(ProgressPercentage <= 1);
@@ -536,24 +503,13 @@ begin
   If so, a few controls which were disabled can be re-enabled }
   if frmEdit.Showing and (frmEdit.Id = FId) then
   begin
-    {with frmEdit do
-    begin
-      dtpDuration.Enabled := True;
-      //frmEdit.tsAudio.Enabled:=True;
-      ckbUseDefaultSound.Enabled:=True;
-      bbSelectSound.Enabled:=True and (not ckbUseDefaultSound.Checked);
-      bbClearSound.Enabled:=True and (not ckbUseDefaultSound.Checked);
-      // Looped is enabled irrespective of whether default CurrentSound is
-      // used or not.
-      ckbLoop.Enabled:=True;
-    end;}
     frmEdit.ReenableControls;
   end;
 end;
 
 procedure TfraTimer.ArrangeControls;
 begin
-  // Horizontally arrange controls
+  { Horizontally arrange controls }
   cbSelect.Left := TIMER_PADDING;
   imgTimer.Left := cbSelect.Left + cbSelect.Width + TIMER_PADDING;
   edtTitle.Left := imgTimer.Left + imgTimer.Width + TIMER_PADDING;
@@ -568,7 +524,7 @@ begin
   dtpSet.Left := bbPlay.Left - dtpSet.Width - TIMER_PADDING;
   edtTitle.Width := dtpSet.Left - edtTitle.Left - TIMER_PADDING;
 
-  // Vertically centre controls
+  { Vertically centre controls }
   cbSelect.Top := (Height - cbSelect.Height) div 2;
   imgTimer.Top := (Height - imgTimer.Height) div 2;
   edtTitle.Top := (Height - edtTitle.Height) div 2;
@@ -585,10 +541,7 @@ end;
 
 function TfraTimer.RestartFromLastFinish: boolean;
 var
-  //EstimatedCompletion,
-  {Diff, }CurrentTime: TDateTime;
-  //Hours, Mins, Secs: word;
-  //DiffMilli: int64 = 0;
+  CurrentTime: TDateTime;
   NewEndTickCount, Adjustment: QWord;
   StartTickCount: QWord = 0;
 begin
@@ -596,22 +549,11 @@ begin
 
   Assert(not Running);
 
-  //Hours := HourOf(Duration);
-  //Mins := MinuteOf(Duration);
-  //Secs := SecondOf(Duration);
-
-  //EstimatedCompletion := FLastCompletionTime;
-  //IncHour(EstimatedCompletion, Hours);
-  //IncMinute(EstimatedCompletion, Mins);
-  //IncSecond(EstimatedCompletion, Secs);
-
   CurrentTime := Now;
 
-  // Logging important variables to troubleshoot issues with restart from last
-  // stop
+  { Logging important variables to troubleshoot issues with restart from last
+  stop. }
 
-  //Logger.Debug('EstimatedCompletion - ' + DateTimeToStr(EstimatedCompletion) +
-  //' > ' + FloatToStr(EstimatedCompletion));
   Logger.Debug('FLastCompletionTime - ' + DateTimeToStr(FLastCompletionTime) +
     ' > ' + FloatToStr(FLastCompletionTime));
   Logger.Debug('FLastCompletionTime + Duration - ' +
@@ -627,17 +569,9 @@ begin
     Exit;
   end;
 
-  //Diff := CurrentTime - FLastCompletionTime;
-
-  //Hours := HourOf(Diff);
-  //Mins := MinuteOf(Diff);
-  //Secs := SecondOf(Diff);
-
-  //Logger.Debug('Adjustment Secs - ' + IntToStr(Secs));
-
-  // Wait for audio player to finish before starting again
+  { Wait for audio player to finish before starting again. }
   StartTickCount := GetTickCount64;
-  // Wait for FAudio to complete
+  { Wait for FAudio to complete. }
   if FAudioPlayer.Playing then
   begin
     FAudioPlayer.Abort;
@@ -654,16 +588,14 @@ begin
     end;
   end;
 
-  // Calculate the adjustment prior to starting the timer. The process of
-  // starting the timer changes FLastCompletionTime
+  { Calculate the adjustment prior to starting the timer. The process of
+  starting the timer changes FLastCompletionTime }
 
   Logger.Debug('FLastCompletionTime (after Start) - ' +
     DateTimeToStr(FLastCompletionTime) + ' > ' + FloatToStr(FLastCompletionTime));
 
   Adjustment := MilliSecondsBetween(CurrentTime, FLastCompletionTime);
 
-  //Adjustment := (((3600 * longword(Hours)) + (60 * longword(Mins)) +
-  //  longword(Secs)) * 1000);
   Logger.Debug('Adjustment (MilliSecondsBetween(CurrentTime, FLastCompletionTime)) - ' +
     IntToStr(Adjustment));
 
@@ -692,25 +624,7 @@ begin
 
   bbAdjust.Enabled := False;
 
-  { When a timer stops, check if the same timer was being edited?
-  If so, a few controls which were disabled can be re-enabled }
-  {if frmEdit.Showing and (frmEdit.Id = FId) then
-  begin
-    with frmEdit do
-    begin
-      dtpDuration.Enabled := True;
-      //frmEdit.tsAudio.Enabled:=True;
-      ckbUseDefaultSound.Enabled:=True;
-      bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-      bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-      // Looped is enabled irrespective of whether default sound is
-      // used or not.
-      ckbLoop.Enabled:=True;
-    end;
-  end;}
   ReenableEditControls;
-
-  //bbEdit.Enabled := True;
 end;
 
 procedure TfraTimer.Hide;
@@ -719,8 +633,6 @@ begin
 end;
 
 constructor TfraTimer.Create(AOwner: TComponent);
-  //var
-  //  SndFile: TSndSound;
 begin
   inherited Create(AOwner);
   InitCriticalSection(AudioCriticalSection);
@@ -736,8 +648,6 @@ begin
   Parent := TWinControl(AOwner);
 
   cbSelect.OnChange := @ClockSelected;
-
-  //UseDefaultSound:=True;
 
   FLoadedSoundIndex := INVALID_SOUNDPOOL_INDEX;
   FLoadedSoundSource := '';
@@ -767,12 +677,8 @@ begin
     FSoundIndex := SoundPool.DefaultSoundIndex;
     FAudioPlayer := TAudioPlayer.Create;
     FAudioPlayer.OnPlayCompletion := @AudioPlayed;
-
-    //SndFile := TSndSound.Create;
-    //SndFile.LoadDefaultSound;
-    //FDefaultSound := SndFile;
   end;
-  //FCustomSound := nil;
+
   Metronome := False;
 
   FLastCompletionTime := 0;
@@ -782,11 +688,8 @@ end;
 destructor TfraTimer.Destroy;
 begin
   FAudioPlayer.Free;
-  //FDefaultSound.Free;
-  //FCustomSound.Free;
   Parent := nil;
 
-  //DoneCriticalsection(AudioCriticalSection);
   inherited Destroy;
 end;
 
@@ -806,7 +709,7 @@ begin
   Hours := HourOf(TempDuration);
   Minutes := MinuteOf(TempDuration);
   Seconds := SecondOf(TempDuration);
-  // If Hours, Minutes, Seconds, all are zero then disable play button
+  { If Hours, Minutes, Seconds, all are zero then disable play button. }
   bbPlay.Enabled := not ((Hours = 0) and (Minutes = 0) and (Seconds = 0));
 end;
 
@@ -887,25 +790,11 @@ begin
   DurationEnabled := False;
 
   bbAdjust.Enabled := True;
-  //bbEdit.Enabled:=False;
 
   frmMain.TimerStarted(Self);
 
   if Metronome then
     MetronomeInstance.Start;
-
-  {if frmEdit.Showing and (frmEdit.Id = FId) then
-  begin
-    with frmEdit do
-    begin
-      //dtpDuration.Enabled := False;
-      //frmEdit.tsAudio.Enabled:=True;
-      ckbUseDefaultSound.Enabled:=False;
-      bbSelectAudioFile.Enabled:=False;
-      bbClearAudioFile.Enabled:=False;
-      ckbLoop.Enabled:=False;
-    end;
-  end;}
 
 end;
 
@@ -943,11 +832,10 @@ procedure TfraTimer.Stop(UserInitiated: boolean);
 var
   Device: TAudioDevice;
 begin
-  { The audio is playing and the user request is to terminate the audio.}
+  { The audio is playing and the user request is to terminate the audio. }
   Logger.Debug('Entering Stop. UserInitiated - ' +
     IfThen(UserInitiated, 'True', 'False'));
 
-  //FLastCompletionTime := Now;
   if AudioSystem.Loaded and FAudioPlayer.Playing then
   begin
     FRunning := False;
@@ -958,7 +846,6 @@ begin
     DurationEnabled := True;
 
     bbAdjust.Enabled := False;
-    //bbEdit.Enabled:=True;
 
     {There is no need to close the stream. Stopping/aborting the stream
     will trigger the callback for stream stoppage. The stream will be closed
@@ -971,10 +858,10 @@ begin
     {The timer run has completed. Stop the timer and play audio if required}
   begin
 
-    // If already stopped (and if audio not playing), then the timer is
-    // already stopped completely.
+    { If already stopped (and if audio not playing), then the timer is
+    already stopped completely. }
 
-    // TODO: The stop method is doing too many things
+    { TODO: The stop method is doing too many things }
     if not FRunning then
     begin
       Logger.Debug('Timer is already stopped.');
@@ -982,7 +869,7 @@ begin
     end;
 
     FLastCompletionTime := Now;
-    // Stop the Metronome if it is running
+    { Stop the Metronome if it is running. }
     if Metronome and not Paused then
       MetronomeInstance.Stop;
 
@@ -1026,46 +913,19 @@ begin
 
       end;
       ReenableEditControls;
-      // Play the sound as per configuration
+      { Play the sound as per configuration. }
       if FSoundIndex >= SoundPool.DefaultSoundIndex then
       begin
-        //FAudioPlayer.Play(FDefaultSound, UserConfig.Volume, SoundLooped)
-        //Logger.Error('Raw Default Sound size' + IntToStr(SoundPool.RawDefaultSound^.Size));
-        //  FAudioPlayer.Play(SoundPool.RawDefaultSound)
-        //end
-        //else
-        //begin
-        // If UseDefaultSound is false, then audio is loaded.
-        // This is alredy checked. No need to check ...
-        //if FCustomSound <> nil then
-        //FAudioPlayer.Play(FCustomSound, UserConfig.Volume, SoundLooped);
-        FAudioPlayer.Looped := SoundLooped;
         FAudioPlayer.AmplitudeScalePoller := @AudioSystem.GetAmplitudeScale;
         FAudioPlayer.Play(SoundPool.RawSound[FSoundIndex]);
       end;
-
-      //Logger.Debug('FAudio.Play');
     end
     else
     begin
       PlayButtonEnabled := True;
       StopButtonEnabled := False;
-      { When a timer stops, check if the same timer was being edited?
-      If so, a few controls which were disabled can be re-enabled }
-      {if frmEdit.Showing and (frmEdit.Id = FId) then
-      begin
-        with frmEdit do
-        begin
-          dtpDuration.Enabled := True;
-          //frmEdit.tsAudio.Enabled:=True;
-          ckbUseDefaultSound.Enabled:=True;
-          bbSelectAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-          bbClearAudioFile.Enabled:=True and (not ckbUseDefaultSound.Checked);
-          ckbLoop.Enabled:=True;
-        end;
-      end; }
+
       ReenableEditControls;
-      //bbEdit.Enabled:=True;
     end;
   end;
   frmMain.TimerFinished(Self, UserInitiated);
@@ -1099,8 +959,8 @@ var
   EndTime: TDateTime;
 begin
 
-  // If the timer is not running, there is nothing to do
-  // We should not even be in such a situation, but that is a different
+  { If the timer is not running, there is nothing to do
+  We should not even be in such a situation, but that is a different. }
   if not FRunning then
   begin
     frmAdjust.Close;
@@ -1129,8 +989,8 @@ begin
           if MessageDlg('Confirm', 'This will stop the timer',
             mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
             Exit;
-          // Adjustment is too large and cannot be used for computations
-          // As a circumvention, set NewEndTickCount to 0;
+          { Adjustment is too large and cannot be used for computations
+          As a circumvention, set NewEndTickCount to 0. }
           NewEndTickCount := 0;
         end
         else
@@ -1147,23 +1007,19 @@ begin
         FEndTickCount := NewEndTickCount;
         HandleTimerTrigger();
       end
-      else  // If paused
+      else  { If paused }
       begin
         if Adjustment > FPendingTickCount then
         begin
           if MessageDlg('Confirm', 'This will stop the timer',
             mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
             Exit;
-          // Adjustment is too large and cannot be used for computations
-          // As a circumvention, set NewEndTickCount to 0;
-          // NewPendingTickCount := 0;
+
           Stop(True);
         end
         else
         begin
-          //FPendingTickCount := NewPendingTickCount;
           FPendingTickCount := FPendingTickCount - Adjustment;
-          //FPendingTickCount := NewPendingTickCount;
           UpdateProgress(FPendingTickCount);
         end;
 
@@ -1202,17 +1058,17 @@ begin
       CurrTickCount := GetTickCount64;
       if CurrTickCount >= FEndTickCount then
         Exit;
-      // No need for UTC, as this is base don local TZ time selected by user
+      { No need for UTC, as this is base don local TZ time selected by user }
       EndTime := IncMilliSecond(Now, (FEndTickCount - CurrTickCount));
 
-      // If extension
+      { If extension }
       if EndTime < frmAdjust.dtpTill.DateTime then
       begin
         Diff := MilliSecondsBetween(EndTime, frmAdjust.dtpTill.DateTime);
         Inc(FEndTickCount, Diff);
         Inc(FOrigTickDuration, Diff);
       end
-      else // If shortening
+      else { If shortening }
       begin
         Diff := MilliSecondsBetween(frmAdjust.dtpTill.DateTime, EndTime);
         NewEndTickCount := FEndTickCount - Diff;
@@ -1242,7 +1098,8 @@ begin
     Running := FRunning;
     Paused := FPaused;
     PendingTicks := FPendingTickCount;
-    // FPendingTickCount is reliable only if the timer is paused
+
+    { FPendingTickCount is reliable only if the timer is paused. }
     CurrTickCount := GetTickCount64;
     DiffTicks := 0;
     if FEndTickCount > CurrTickCount then
@@ -1276,11 +1133,10 @@ begin
         FPendingTickCount := PendingTicks;
         FOrigTickDuration := DurationTicks;
       end;
-      //UpdateProgress(FPendingTickCount);
     end
     else
     begin
-      // Now moves as the processer executes. Save it in a variable.
+      { Now moves as the processer executes. Save it in a variable. }
       TimeNow := LocalTimeToUniversal(Now);
       if LoadFrom.EndTime <= TimeNow then
       begin
@@ -1299,7 +1155,6 @@ begin
           FEndTickCount := GetTickCount64 + NewPendingTickCount;
           FOrigTickDuration := DurationTicks;
         end;
-        //UpdateProgress(NewPendingTickCount);
       end;
     end;
   end;

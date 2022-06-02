@@ -68,8 +68,6 @@ type
 
     Volume: integer;
 
-    //Bpm: integer;
-
     TrayIconSizeOverridden: integer;
     AppIconSizeOverridden: integer;
     DefaultTrayIconSize: integer;
@@ -112,36 +110,9 @@ type
   end;
 
 var
-  //GlobalDefault: TDefaultConfig;
   UserConfig: TUserFileConfig = nil;
-//Logger: TEventLog;
-
-
-//procedure InitSettings;
-//procedure CleanupSettings;
 
 implementation
-
-//procedure InitSettings;
-//begin
-//  { Combo-box indices are set blindly. An assert to check this during development. }
-//  Assert(integer(tf12) = 0);
-//  Assert(integer(tf24) = 1);
-
-//  if not DirectoryExists(GetAppConfigDir(False)) then
-//    CreateDir(GetAppConfigDir(False));
-
-//  UserConfig := TUserFileConfig.Create(GetAppConfigDir(False) + 'user.json');
-
-//  UserConfig.Load;
-//end;
-
-//procedure CleanupSettings;
-//begin
-//  UserConfig.Free;
-//end;
-
-
 
 { TUserFileConfig }
 
@@ -224,11 +195,10 @@ begin
     TaskbarIconType := TTaskbarIconType(FConf.GetValue(TASKBAR_ICON_TYPE,
       integer(DEF_TASKBAR_ICON_TYPE)));
 
-    UseDefaultSound := FConf.GetValue(USE_DEFAULT_SOUND,
-      DEF_USE_DEFAULT_SOUND);
+    UseDefaultSound := FConf.GetValue(USE_DEFAULT_SOUND, DEF_USE_DEFAULT_SOUND);
+
     LoopSound := FConf.GetValue(LOOP_SOUND, DEF_LOOP_SOUND);
     Volume := FConf.GetValue(VOLUME_LEVEL, DEF_VOLUME_LEVEL);
-    //Bpm := FConf.GetValue(METRONOME_BPM, DEF_METRONOME_BPM);
 
     TrayIconSizeOverridden := FConf.GetValue(TRAY_ICON_SIZE, DefaultTrayIconSize);
     AppIconSizeOverridden := FConf.GetValue(APP_ICON_SIZE, DefaultAppIconSize);
@@ -291,7 +261,6 @@ begin
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
   FConf.SetValue(VOLUME_LEVEL, Volume);
-  //Fconf.SetValue(METRONOME_BPM, Bpm);
 
   FConf.SetValue(TRAY_ICON_SIZE, TrayIconSizeOverridden);
   FConf.SetValue(APP_ICON_SIZE, AppIconSizeOverridden);
@@ -359,7 +328,6 @@ begin
   FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
   FConf.SetValue(LOOP_SOUND, LoopSound);
   FConf.SetValue(VOLUME_LEVEL, Volume);
-  //FConf.SetValue(METRONOME_BPM, Bpm);
 
   FConf.SetValue(TRAY_ICON_SIZE, TrayIconSizeOverridden);
   FConf.SetValue(APP_ICON_SIZE, AppIconSizeOverridden);
@@ -450,7 +418,6 @@ begin
   UseDefaultSound := DEF_USE_DEFAULT_SOUND;
   LoopSound := DEF_LOOP_SOUND;
   Volume := DEF_VOLUME_LEVEL;
-  //Bpm := DEF_METRONOME_BPM;
 
   AdjustCompleteby := DEF_ADJ_COMPLETEBY;
   AdjustDiff := DEF_ADJ_DIFF;
@@ -500,7 +467,6 @@ begin
   UseDefaultSound := From.UseDefaultSound;
   LoopSound := From.LoopSound;
   Volume := From.Volume;
-  //Bpm := From.Bpm;
 
   TrayIconSizeOverridden := From.TrayIconSizeOverridden;
   AppIconSizeOverridden := From.AppIconSizeOverridden;
@@ -568,12 +534,6 @@ begin
   if Volume <> From.Volume then
     Exit;
 
-  //if Bpm <> From.Bpm then
-  //begin
-  //  Result := False;
-  //  Exit;
-  //end;
-
   if TrayIconSizeOverridden <> From.TrayIconSizeOverridden then
     Exit;
 
@@ -586,7 +546,7 @@ begin
   if OverrideAppIconSize <> From.OverrideAppIconSize then
     Exit;
 
-  // RestartFromFinish is not compared as it is not set in options form
+  { RestartFromFinish is not compared as it is not set in options form }
 
   if OverrideLatency <> From.OverrideLatency then
     Exit;
@@ -600,7 +560,8 @@ end;
 initialization;
 
   { TODO : Fix this }
-  { Combo-box indices are set blindly. An assert to check this during development. }
+  { Combo-box indices are set blindly.
+  An assert to check this during development. }
   Assert(integer(tf12) = 0);
   Assert(integer(tf24) = 1);
 
