@@ -73,7 +73,7 @@ unit audio;
 interface
 
 uses
-  Classes, SysUtils, sndfile, mpg123, portaudio, {EventLog,} ctypes, Forms,
+  Classes, SysUtils, sndfile, mpg123, portaudio, ctypes, Forms,
   Dialogs, LCLIntf, lcltype, fgl, Math, log, sound, constants;
 
 type
@@ -467,20 +467,27 @@ var
   Size: integer;
   Read: integer;
 begin
-  Logger.Debug('Enteringe RefillRawSound');
+  //Logger.Debug('Entering RefillRawSound');
 
   Result := False;
+
+  Logger.Debug('Refilling raw sound #' + IntToStr(Index));
   SoundPoolEntry := FEntries.Items[Index];
 
   SndFile := TSoundFactory.CreateSound(SoundPoolEntry^.Original);
   if SndFile = nil then
   begin
     Logger.Debug('Fatal error: sound factory could not create sound. Index - ' +
-      IntToStr(Index));
+      IntToStr(Index) + ' at ' + string(
+  {$INCLUDE %FILE%}
+      ) + ':' + string(
+  {$INCLUDE %LINE%}
+      ));
     Exit;
   end;
 
-  Logger.Debug('Soundpool - loading default sound');
+  { Debug logs }
+  //Logger.Debug('Soundpool - loading default sound');
   Logger.Debug('Soundpool - SndFile.Channels - ' + IntToStr(SndFile.Channels));
   Logger.Debug('Soundpool - SndFile.FrameLength - ' + IntToStr(SndFile.FrameLength));
   Logger.Debug('Soundpool - SizeOf(cfloat) - ' + IntToStr(SizeOf(cfloat)));
@@ -500,7 +507,7 @@ begin
   end;
 
   { Read raw data and keep it raedy for use }
-  Logger.Debug('Starting refill loop');
+  //Logger.Debug('Starting refill loop');
   Logger.Debug('Total allocated bytes - ' + IntToStr(SndFile.FrameLength *
     SndFile.Channels * SizeOf(cfloat)));
   Size := 0;
@@ -528,7 +535,7 @@ begin
     IntToHex(PQWord(SoundPoolEntry^.Raw^.Buffer)[1], 16)
     );
 
-  Logger.Debug('Size of default sound - ' + IntToStr(Size));
+  //Logger.Debug('Size of default sound - ' + IntToStr(Size));
 
   SoundPoolEntry^.Details.Duration := SndFile.Duration;
 
@@ -558,7 +565,12 @@ begin
   except
     on E: Exception do
     begin
-      Logger.Error('Could not fill raw sound for resource ID - ' + ResourceID);
+      Logger.Error('Could not fill raw sound for resource ID - ' +
+        ResourceID + string(
+  {$INCLUDE %FILE%}
+        ) + ':' + string(
+  {$INCLUDE %LINE%}
+        ));
       Logger.Error(E.Message);
       Result := -1;
       Exit;
@@ -573,6 +585,7 @@ begin
   begin
     FDefaultSoundIndex := LoadDefaultSound('DEFAULT_SOUND');
     FTickIndex := LoadDefaultSound('TICK');
+
     if (FDefaultSoundIndex < 0) or (FTickIndex < 0) then
     begin
       Logger.Error('Could not load one of the default sounds');
