@@ -1129,6 +1129,10 @@ end;
 function TAudioSystem.GetDefaultDeviceIndex: AudioDeviceIndex;
 var
   DeviceId: AudioDeviceIndex = paNoDevice;
+  {$IF DEFINED(WINDOWS)}
+  Count: integer;
+  Device: PAudioDevice;
+  {$ENDIF}
 begin
   if not FLoaded then
     raise EAudioNotLoaded.Create('Audio not loaded.');
