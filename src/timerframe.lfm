@@ -10,30 +10,40 @@ object fraTimer: TfraTimer
   DesignLeft = 248
   DesignTop = 159
   object imgTimer: TImage
-    Left = 32
+    AnchorSideLeft.Control = cbSelect
+    AnchorSideLeft.Side = asrBottom
+    Left = 33
     Height = 24
-    Top = 9
+    Top = 8
     Width = 24
+    BorderSpacing.Left = 5
     OnClick = imgTimerClick
     ParentShowHint = False
   end
   object edtTitle: TEdit
-    Left = 65
-    Height = 25
+    AnchorSideLeft.Control = imgTimer
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideRight.Control = dtpSet
+    Left = 62
+    Height = 23
     Top = 9
-    Width = 247
+    Width = 255
     Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 5
+    BorderSpacing.Right = 5
     ReadOnly = True
     TabOrder = 1
     Text = 'edtTitle'
   end
   object lblCountdown: TLabel
-    Left = 560
-    Height = 14
-    Top = 14
-    Width = 42
+    AnchorSideRight.Control = ckbIconProgress
+    Left = 556
+    Height = 15
+    Top = 12
+    Width = 48
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
+    BorderSpacing.Right = 20
     Caption = '00:00:00'
     Font.Style = [fsBold]
     ParentColor = False
@@ -43,20 +53,22 @@ object fraTimer: TfraTimer
   end
   object cbSelect: TCheckBox
     Left = 8
-    Height = 21
+    Height = 19
     Top = 11
-    Width = 21
+    Width = 20
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
-    Left = 320
-    Height = 22
-    Top = 10
-    Width = 63
+    AnchorSideRight.Control = bbPlay
+    Left = 322
+    Height = 23
+    Top = 8
+    Width = 65
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
     TabOrder = 2
+    BorderSpacing.Right = 5
     TrailingSeparator = False
     TextForNullDate = 'NULL'
     LeadingZeros = True
@@ -73,14 +85,16 @@ object fraTimer: TfraTimer
     OnChange = dtpSetChange
   end
   object bbPlay: TBitBtn
+    AnchorSideRight.Control = bbPause
     Cursor = crHandPoint
     Left = 392
     Height = 36
     Hint = 'Start the timer'
-    Top = 3
+    Top = 2
     Width = 36
     Action = aiPlay
     Anchors = [akTop, akRight]
+    BorderSpacing.Right = 5
     Images = ilTimer
     ImageIndex = 2
     ImageWidth = 24
@@ -89,14 +103,16 @@ object fraTimer: TfraTimer
     TabOrder = 3
   end
   object bbPause: TBitBtn
+    AnchorSideRight.Control = bbStop
     Cursor = crHandPoint
-    Left = 432
+    Left = 433
     Height = 36
     Hint = 'Pause the timer'
-    Top = 3
+    Top = 2
     Width = 36
     Action = aiPause
     Anchors = [akTop, akRight]
+    BorderSpacing.Right = 5
     Enabled = False
     Glyph.Data = {
       36090000424D3609000000000000360000002800000018000000180000000100
@@ -181,14 +197,16 @@ object fraTimer: TfraTimer
     TabOrder = 4
   end
   object bbStop: TBitBtn
+    AnchorSideRight.Control = bbAdjust
     Cursor = crHandPoint
-    Left = 472
+    Left = 474
     Height = 36
     Hint = 'Stop the timer'
-    Top = 3
+    Top = 2
     Width = 36
     Action = aiStop
     Anchors = [akTop, akRight]
+    BorderSpacing.Right = 5
     Enabled = False
     Glyph.Data = {
       36090000424D3609000000000000360000002800000018000000180000000100
@@ -277,7 +295,7 @@ object fraTimer: TfraTimer
     Left = 664
     Height = 36
     Hint = 'Edit the timer'
-    Top = 3
+    Top = 2
     Width = 36
     Action = aiEdit
     Anchors = [akTop, akRight]
@@ -364,23 +382,27 @@ object fraTimer: TfraTimer
     TabOrder = 8
   end
   object ckbIconProgress: TCheckBox
+    AnchorSideRight.Control = bbEdit
     Left = 624
-    Height = 21
+    Height = 19
     Top = 11
-    Width = 21
+    Width = 20
     Anchors = [akTop, akRight]
+    BorderSpacing.Right = 20
     OnChange = ckbIconProgressChange
     TabOrder = 7
   end
   object bbAdjust: TBitBtn
+    AnchorSideRight.Control = lblCountdown
     Cursor = crHandPoint
-    Left = 512
+    Left = 515
     Height = 36
     Hint = 'Tweak this run of the timer'
-    Top = 3
+    Top = 2
     Width = 36
     Action = aiAdjust
     Anchors = [akTop, akRight]
+    BorderSpacing.Right = 5
     Glyph.Data = {
       36090000424D3609000000000000360000002800000018000000180000000100
       2000000000000009000064000000640000000000000000000000000000000000

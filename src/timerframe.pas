@@ -123,7 +123,7 @@ type
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: QWord);
     procedure ReenableEditControls;
-    procedure ArrangeControls;
+
   public
     { public declarations }
 
@@ -158,6 +158,8 @@ type
 
     procedure SaveState(var SaveTo: TTimerState);
     procedure LoadState(var LoadFrom: TTimerState);
+
+    //procedure ArrangeControls;
 
     procedure AbortSound;
     function RestartFromLastFinish: boolean;
@@ -507,10 +509,10 @@ begin
   end;
 end;
 
-procedure TfraTimer.ArrangeControls;
-begin
+//procedure TfraTimer.ArrangeControls;
+//begin
   { Horizontally arrange controls }
-  cbSelect.Left := TIMER_PADDING;
+  {cbSelect.Left := TIMER_PADDING;
   imgTimer.Left := cbSelect.Left + cbSelect.Width + TIMER_PADDING;
   edtTitle.Left := imgTimer.Left + imgTimer.Width + TIMER_PADDING;
 
@@ -522,22 +524,22 @@ begin
   bbPause.Left := bbStop.Left - bbPause.Width - TIMER_PADDING;
   bbPlay.Left := bbPause.Left - bbPlay.Width - TIMER_PADDING;
   dtpSet.Left := bbPlay.Left - dtpSet.Width - TIMER_PADDING;
-  edtTitle.Width := dtpSet.Left - edtTitle.Left - TIMER_PADDING;
+  edtTitle.Width := dtpSet.Left - edtTitle.Left - TIMER_PADDING;}
 
   { Vertically centre controls }
-  cbSelect.Top := (Height - cbSelect.Height) div 2;
-  imgTimer.Top := (Height - imgTimer.Height) div 2;
-  edtTitle.Top := (Height - edtTitle.Height) div 2;
-  dtpSet.Top := (Height - dtpSet.Height) div 2;
-  bbPlay.Top := (Height - bbPlay.Height) div 2;
-  bbPause.Top := (Height - bbPause.Height) div 2;
-  bbStop.Top := (Height - bbStop.Height) div 2;
-  bbAdjust.Top := (Height - bbAdjust.Height) div 2;
-  lblCountdown.Top := (Height - lblCountdown.Height) div 2;
-  ckbIconProgress.Top := (Height - ckbIconProgress.Height) div 2;
-  bbEdit.Top := (Height - bbEdit.Height) div 2;
+  //cbSelect.Top := (Height - cbSelect.Height) div 2;
+  //imgTimer.Top := (Height - imgTimer.Height) div 2;
+  //edtTitle.Top := (Height - edtTitle.Height) div 2;
+  //dtpSet.Top := (Height - dtpSet.Height) div 2;
+  //bbPlay.Top := (Height - bbPlay.Height) div 2;
+  //bbPause.Top := (Height - bbPause.Height) div 2;
+  //bbStop.Top := (Height - bbStop.Height) div 2;
+  //bbAdjust.Top := (Height - bbAdjust.Height) div 2;
+  //lblCountdown.Top := (Height - lblCountdown.Height) div 2;
+  //ckbIconProgress.Top := (Height - ckbIconProgress.Height) div 2;
+  //bbEdit.Top := (Height - bbEdit.Height) div 2;
 
-end;
+//end;
 
 function TfraTimer.RestartFromLastFinish: boolean;
 var
@@ -682,7 +684,7 @@ begin
   Metronome := False;
 
   FLastCompletionTime := 0;
-  ArrangeControls;
+  //ArrangeControls;
 end;
 
 destructor TfraTimer.Destroy;
