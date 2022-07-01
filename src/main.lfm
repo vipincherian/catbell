@@ -254,14 +254,16 @@ object frmMain: TfrmMain
     SimplePanel = False
   end
   object bbDelete: TBitBtn
+    AnchorSideBottom.Control = bbMoveUp
     Cursor = crHandPoint
     Left = 611
     Height = 36
     Hint = 'Delete the sected timer(s)'
-    Top = 178
+    Top = 170
     Width = 36
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
+    BorderSpacing.Bottom = 5
     Images = ilMain
     ImageIndex = 7
     ParentShowHint = False
@@ -269,14 +271,16 @@ object frmMain: TfrmMain
     TabOrder = 3
   end
   object bbMoveUp: TBitBtn
+    AnchorSideBottom.Control = bbMoveDown
     Cursor = crHandPoint
     Left = 611
     Height = 36
     Hint = 'Move the selected timer(s) up'
-    Top = 218
+    Top = 211
     Width = 36
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
+    BorderSpacing.Bottom = 5
     Images = ilMain
     ImageIndex = 8
     ParentShowHint = False
@@ -284,14 +288,16 @@ object frmMain: TfrmMain
     TabOrder = 4
   end
   object bbMoveDown: TBitBtn
+    AnchorSideBottom.Control = stbMain
     Cursor = crHandPoint
     Left = 611
     Height = 36
     Hint = 'Move the selected timer(s) down'
-    Top = 258
+    Top = 252
     Width = 36
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
+    BorderSpacing.Bottom = 5
     Images = ilMain
     ImageIndex = 9
     ParentShowHint = False
@@ -299,9 +305,12 @@ object frmMain: TfrmMain
     TabOrder = 5
   end
   object tbVolume: TTrackBar
+    AnchorSideTop.Control = imgVolumeOn
+    AnchorSideTop.Side = asrBottom
+    AnchorSideBottom.Control = lblVolume
     Left = 615
-    Height = 88
-    Top = 64
+    Height = 77
+    Top = 68
     Width = 25
     Max = 100
     OnChange = tbVolumeChange
@@ -310,14 +319,19 @@ object frmMain: TfrmMain
     Reversed = True
     TickStyle = tsNone
     Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Top = 5
+    BorderSpacing.Bottom = 5
     TabOrder = 6
   end
   object imgVolumeOn: TImage
+    AnchorSideTop.Control = tlbMain
+    AnchorSideTop.Side = asrBottom
     Left = 615
     Height = 24
-    Top = 40
+    Top = 39
     Width = 24
     Anchors = [akTop, akRight]
+    BorderSpacing.Top = 5
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869639104000089504E47
       0D0A1A0A0000000D4948445200000018000000180806000000E0773DF8000000
@@ -360,13 +374,15 @@ object frmMain: TfrmMain
     }
   end
   object lblVolume: TLabel
+    AnchorSideBottom.Control = bbDelete
     Left = 604
     Height = 15
-    Top = 152
+    Top = 150
     Width = 39
     Alignment = taRightJustify
     Anchors = [akRight, akBottom]
     AutoSize = False
+    BorderSpacing.Bottom = 5
     Caption = 'lblVolume'
     ParentColor = False
   end
