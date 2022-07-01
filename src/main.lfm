@@ -236,8 +236,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 23
-    Top = 293
+    Height = 19
+    Top = 297
     Width = 652
     Panels = <    
       item
@@ -257,7 +257,7 @@ object frmMain: TfrmMain
     Left = 611
     Height = 36
     Hint = 'Delete the sected timer(s)'
-    Top = 170
+    Top = 174
     Width = 36
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
@@ -274,7 +274,7 @@ object frmMain: TfrmMain
     Left = 611
     Height = 36
     Hint = 'Move the selected timer(s) up'
-    Top = 211
+    Top = 215
     Width = 36
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
@@ -291,7 +291,7 @@ object frmMain: TfrmMain
     Left = 611
     Height = 36
     Hint = 'Move the selected timer(s) down'
-    Top = 252
+    Top = 256
     Width = 36
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
@@ -307,7 +307,7 @@ object frmMain: TfrmMain
     AnchorSideTop.Side = asrBottom
     AnchorSideBottom.Control = lblVolume
     Left = 615
-    Height = 77
+    Height = 81
     Top = 68
     Width = 25
     Max = 100
@@ -375,7 +375,7 @@ object frmMain: TfrmMain
     AnchorSideBottom.Control = bbDelete
     Left = 604
     Height = 15
-    Top = 150
+    Top = 154
     Width = 39
     Alignment = taRightJustify
     Anchors = [akRight, akBottom]

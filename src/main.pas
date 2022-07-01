@@ -619,8 +619,22 @@ procedure TfrmMain.tbVolumeChange(Sender: TObject);
 begin
   lblVolume.Caption := IntToStr(tbVolume.Position) + '%';
   AudioSystem.Volume := tbVolume.Position;
-  imgVolumeOn.Visible := (tbVolume.Position > 0);
-  imgVolumeOff.Visible := (not imgVolumeOn.Visible);
+  //imgVolumeOn.Visible := (tbVolume.Position > 0);
+  //imgVolumeOff.Visible := (not imgVolumeOn.Visible);
+  { Change the anchor sibling of volume slider so that it does not grow }
+  if tbVolume.Position > 0 then
+  begin
+    tbVolume.AnchorSide[akTop].Control := imgVolumeOn;
+    imgVolumeOn.Visible := True;
+    imgVolumeOff.Visible := False;
+  end
+  else
+  begin
+    tbVolume.AnchorSide[akTop].Control := imgVolumeOff;
+    imgVolumeOn.Visible := False;
+    imgVolumeOff.Visible := True;
+  end;
+
 end;
 
 procedure TfrmMain.tiMainClick(Sender: TObject);
