@@ -174,6 +174,7 @@ type
       write SetStopButtonEnabled;
     property Counter: string read GetCounter write SetCounter;
     property Duration: TDateTime read GetDuration write SetDuration;
+    property LastCompletedAt: TDateTime read FLastCompletionTime;
     property DurationEnabled: boolean read GetDurationEnabled write SetDurationEnabled;
     property Caption: string read GetCaption write SetCaption;
 

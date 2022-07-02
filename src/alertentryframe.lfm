@@ -12,13 +12,12 @@ object fraAlertEntry: TfraAlertEntry
   DesignLeft = 454
   DesignTop = 233
   object stDescription: TStaticText
-    AnchorSideTop.Control = bbRestart
-    AnchorSideTop.Side = asrCenter
-    AnchorSideRight.Control = bbRestart
-    Left = 8
+    AnchorSideTop.Control = stDuration
+    AnchorSideRight.Control = stDuration
+    Left = 5
     Height = 20
-    Top = 8
-    Width = 518
+    Top = 10
+    Width = 366
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
     BorderSpacing.Left = 5
@@ -94,5 +93,29 @@ object fraAlertEntry: TfraAlertEntry
     ParentShowHint = False
     ShowHint = True
     TabOrder = 2
+  end
+  object stCompletedAt: TStaticText
+    AnchorSideTop.Control = bbRestart
+    AnchorSideTop.Side = asrCenter
+    Left = 456
+    Height = 17
+    Top = 10
+    Width = 65
+    Anchors = [akTop, akRight]
+    BorderSpacing.Right = 5
+    Caption = 'stCompletedAt'
+    TabOrder = 3
+  end
+  object stDuration: TStaticText
+    AnchorSideTop.Control = bbRestart
+    AnchorSideTop.Side = asrCenter
+    Left = 376
+    Height = 17
+    Top = 10
+    Width = 65
+    Anchors = [akTop, akRight]
+    BorderSpacing.Right = 5
+    Caption = 'stDuration'
+    TabOrder = 4
   end
 end

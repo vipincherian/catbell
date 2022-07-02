@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, fgl, dateutils,
-  settings, alertentryframe, sequence, log;
+  settings, alertentryframe, sequence, log, DateTimePicker;
 
 type
   TAlertEntryList = specialize TFPGList<TfraAlertEntry>;
@@ -45,11 +45,12 @@ type
     procedure bbCloseClick(Sender: TObject);
     //procedure bbRestartClick(Sender: TObject);
     //procedure cbFromFinishChange(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
+    //procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure sbxEntriesResize(Sender: TObject);
     procedure tmrAlertTimer(Sender: TObject);
     //procedure lsvMessagesItemChecked(Sender: TObject; {%H-}Item: TListItem);
   private
@@ -61,6 +62,7 @@ type
     procedure StartTimer(Sender: TObject);
     procedure RemoveAlert(Entry: TfraAlertEntry);
     procedure EmptyAlertsAndClose;
+    procedure ResizeHeaderSections;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     //procedure ReenableControls;
@@ -98,6 +100,11 @@ procedure TfrmAlert.FormShow(Sender: TObject);
 begin
   Left := (Screen.Width - Width) div 2;
   Top := (Screen.Height - Height) div 2;
+end;
+
+procedure TfrmAlert.sbxEntriesResize(Sender: TObject);
+begin
+  ResizeHeaderSections;
 end;
 
 procedure TfrmAlert.tmrAlertTimer(Sender: TObject);
@@ -207,6 +214,36 @@ begin
   Close;
 end;
 
+procedure TfrmAlert.ResizeHeaderSections;
+var
+  Entry: TfraAlertEntry;
+  TempRight: integer = 0;
+  TempLeft: integer = 0;
+begin
+  if FEntries.Count <= 0 then
+    Exit;
+
+  Entry := FEntries.First;
+
+  TempRight := Entry.stDescription.Left + Entry.stDescription.Width;
+  Inc(TempRight, (Entry.stDuration.Left - TempRight) div 2);
+  hdrEntries.Sections.Items[0].Width := TempRight;
+  TempLeft := TempRight;
+
+  TempRight := Entry.stDuration.Left + Entry.stDuration.Width;
+  Inc(TempRight, (Entry.stCompletedAt.Left - TempRight) div 2);
+  hdrEntries.Sections.Items[1].Width := TempRight - TempLeft;
+  TempLeft := TempRight;
+
+  TempRight := Entry.stCompletedAt.Left + Entry.stCompletedAt.Width;
+  Inc(TempRight, (Entry.bbRestart.Left - TempRight) div 2);
+  hdrEntries.Sections.Items[2].Width := TempRight - TempLeft;
+  TempLeft := TempRight;
+
+  hdrEntries.Sections.Items[3].Width := hdrEntries.ClientWidth - TempRight;
+
+end;
+
 procedure TfrmAlert.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
@@ -241,6 +278,8 @@ var
 
   Entry: TfraAlertEntry;
   Index: integer;
+
+  Formatter: string = '';
 begin
   Duration := Timer.Duration;
 
@@ -266,10 +305,17 @@ begin
   Entry.Left := 0;
   Entry.Anchors := [akTop, akLeft, akRight];
 
-  Entry.stDescription.Caption := Timer.Caption + ' ' + DurationText;
+  Entry.stDescription.Caption := Timer.Caption;
+  Entry.stDuration.Caption := DurationText;
 
-  {TODO: Thread safety}
-  Index := FEntries.Add(Entry);
+  if UserConfig.DefaultTimeFormat = integer(tf24) then
+    Formatter := 'hh:nn'
+  else
+    Formatter := 'hh:nn am/pm';
+
+  Entry.stCompletedAt.Caption :=
+    FormatDateTime(Formatter, Entry.Timer.LastCompletedAt);
+
 
   Entry.AnchorSide[akRight].Side := asrRight;
   Entry.AnchorSide[akRight].Control := pnlEntries;
@@ -277,14 +323,23 @@ begin
   Entry.AnchorSide[akLeft].Side := asrLeft;
   Entry.AnchorSide[akLeft].Control := pnlEntries;
 
-  if Index > 0 then
+  Entry.OnTimerRestart := @RestartTimer;
+  Entry.OnTimerStart := @StartTimer;
+
+  {TODO: Thread safety}
+  Index := FEntries.Add(Entry);
+
+  if Index = 0 then
+  begin
+    Entry.AnchorSide[akTop].Side := asrTop;
+    Entry.AnchorSide[akTop].Control := pnlEntries;
+    ResizeHeaderSections;
+  end
+  else
   begin
     Entry.AnchorSide[akTop].Side := asrBottom;
     Entry.AnchorSide[akTop].Control := FEntries.Items[Index - 1];
   end;
-
-  Entry.OnTimerRestart := @RestartTimer;
-  Entry.OnTimerStart := @StartTimer;
 
   tmrAlert.Enabled := True;
 end;
@@ -339,10 +394,10 @@ end;
 //  UserConfig.RestartFromFinish := cbFromFinish.Checked;
 //end;
 
-procedure TfrmAlert.FormActivate(Sender: TObject);
-begin
-
-end;
+//procedure TfrmAlert.FormActivate(Sender: TObject);
+//begin
+//
+//end;
 
 procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin

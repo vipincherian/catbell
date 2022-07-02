@@ -50,7 +50,6 @@ object frmAlert: TfrmAlert
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
-  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -105,8 +104,33 @@ object frmAlert: TfrmAlert
       Top = 1
       Width = 522
       DragReorder = False
-      Sections = <>
+      Sections = <      
+        item
+          Alignment = taLeftJustify
+          Text = 'Description'
+          Width = 30
+          Visible = True
+        end      
+        item
+          Alignment = taLeftJustify
+          Text = 'Duration'
+          Width = 30
+          Visible = True
+        end      
+        item
+          Alignment = taLeftJustify
+          Text = 'Completed at'
+          Width = 30
+          Visible = True
+        end      
+        item
+          Alignment = taLeftJustify
+          Text = 'Controls'
+          Width = 30
+          Visible = True
+        end>
       Align = alTop
+      Enabled = False
     end
     object sbxEntries: TScrollBox
       Left = 1
@@ -122,6 +146,7 @@ object frmAlert: TfrmAlert
       ClientHeight = 179
       ClientWidth = 522
       TabOrder = 1
+      OnResize = sbxEntriesResize
       object pnlEntries: TPanel
         Left = 0
         Height = 179
@@ -129,7 +154,6 @@ object frmAlert: TfrmAlert
         Width = 522
         Align = alClient
         BevelOuter = bvNone
-        Caption = 'pnlEntries'
         TabOrder = 0
       end
     end

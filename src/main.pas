@@ -852,6 +852,8 @@ begin
     Timer := FReference;
   end;
 
+  {TODO: TIMER_PADDING cannot be used - correct}
+
   hdrTimers.Sections.Items[0].Width :=
     Timer.cbSelect.Left + Timer.cbSelect.Width + (TIMER_PADDING div 2);
   Inc(Filled, hdrTimers.Sections.Items[0].Width);
@@ -859,10 +861,10 @@ begin
   Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
   Inc(Temp, ((Timer.bbPlay.Left - Temp) div 2));
 
-    { If there are no timers added, we are using FReference as a reference.
-    It is an invisible frame and is not under the scrollbar hence its width and
-    the scrollbar's may not be the same. This needs to be taken into account,
-    and an adjustment of (sbxClocks.Width - Timer.Width) needs to be made.}
+  { If there are no timers added, we are using FReference as a reference.
+  It is an invisible frame and is not under the scrollbar hence its width and
+  the scrollbar's may not be the same. This needs to be taken into account,
+  and an adjustment of (sbxClocks.Width - Timer.Width) needs to be made.}
 
   Inc(Temp, sbxClocks.ClientWidth - Timer.Width - Filled);
 

@@ -13,6 +13,8 @@ type
   TfraAlertEntry = class(TFrame)
     bbRestart: TBitBtn;
     bbStart: TBitBtn;
+    stCompletedAt: TStaticText;
+    stDuration: TStaticText;
     stDescription: TStaticText;
     procedure bbRestartClick(Sender: TObject);
     procedure bbStartClick(Sender: TObject);
