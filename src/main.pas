@@ -182,7 +182,7 @@ type
     function GetAnySelected: boolean;
     function QueryCanSelectedMoveDown: boolean;
     function QueryCanSelectedMoveUp: boolean;
-    procedure Reorder;
+    //procedure Reorder;
     procedure SetStatusMessage(AValue: string);
     procedure ShowInForeground;
     procedure UpdateStatusTimerCount;
@@ -990,15 +990,15 @@ begin
 end;
 
 
-procedure TfrmMain.Reorder;
-var
-  Id: longword;
-  TimerWidget, PreviousWidget: TfraTimer;
-  Filled: integer;
-  CountTabOrder: integer;
-  Count: integer;
-begin
-  Filled := hdrTimers.Height;
+//procedure TfrmMain.Reorder;
+//var
+//  Id: longword;
+//  TimerWidget, PreviousWidget: TfraTimer;
+//  Filled: integer;
+//  CountTabOrder: integer;
+//  Count: integer;
+//begin
+  {Filled := hdrTimers.Height;
   CountTabOrder := 0;
   hdrTimers.Top := 0;
   //for Id in FOrder do
@@ -1028,9 +1028,9 @@ begin
   end;
   sbxClocks.ReAlign;
   pnlClocks.ReAlign;
-  pnlClocks.Refresh;
+  pnlClocks.Refresh; }
 
-end;
+//end;
 
 procedure TfrmMain.SetStatusMessage(AValue: string);
 begin
@@ -1445,7 +1445,7 @@ begin
     end;
 
     Conf.Free;
-    Reorder;
+    //Reorder;
 
     if ErrorText = '' then
       Logger.Info('Saved timers loaded.')
@@ -1494,6 +1494,7 @@ begin
     WidgetAbove := FTimerFrames.Items[Index - 1];
     NewWidget.AnchorSide[akTop].Side := asrBottom;
     NewWidget.AnchorSide[akTop].Control := WidgetAbove;
+    NewWidget.Top := WidgetAbove.Top + WidgetAbove.Height;
   end;
 
   //FOrder.Add(Id);
