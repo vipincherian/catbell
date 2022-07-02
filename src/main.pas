@@ -122,9 +122,9 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
+    procedure pnlClocksResize(Sender: TObject);
     procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
-    procedure sbxClocksResize(Sender: TObject);
     procedure tbProgressAutoClick(Sender: TObject);
     procedure tbVolumeChange(Sender: TObject);
 
@@ -326,6 +326,8 @@ begin
   Caption := Info.VersionStrings.Values['ProductName'] + ' ' +
     Info.VersionStrings.Values['FileVersion'];
   Info.Free;
+
+  pnlClocks.Caption := '';
 
 end;
 
@@ -609,6 +611,11 @@ begin
   ShowInForeground;
 end;
 
+procedure TfrmMain.pnlClocksResize(Sender: TObject);
+begin
+  ResizeHeaderSections;
+end;
+
 procedure TfrmMain.sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 begin
@@ -618,10 +625,6 @@ begin
   end;
 end;
 
-procedure TfrmMain.sbxClocksResize(Sender: TObject);
-begin
-  ResizeHeaderSections;
-end;
 
 procedure TfrmMain.tbProgressAutoClick(Sender: TObject);
 begin
