@@ -9,8 +9,8 @@ object fraTimer: TfraTimer
   ClientHeight = 80
   ClientWidth = 707
   TabOrder = 0
-  DesignLeft = 248
-  DesignTop = 159
+  DesignLeft = 249
+  DesignTop = 187
   object imgTimer: TImage
     AnchorSideLeft.Control = cbSelect
     AnchorSideLeft.Side = asrBottom

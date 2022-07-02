@@ -1,9 +1,9 @@
 object frmAlert: TfrmAlert
   AnchorSideTop.Side = asrBottom
   AnchorSideRight.Side = asrBottom
-  Left = 431
+  Left = 432
   Height = 276
-  Top = 254
+  Top = 282
   Width = 534
   Anchors = [akTop, akLeft, akRight]
   BorderIcons = [biSystemMenu]

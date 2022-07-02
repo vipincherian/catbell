@@ -36,8 +36,9 @@ uses
   audio, metronome, log, FileInfo;
 
 type
-  TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
-  TIdList = specialize TFPGList<longword>;
+  //TTimerFrameMap = specialize TFPGMap<longword, TfraTimer>;
+  //TIdList = specialize TFPGList<longword>;
+  //TTimerFrameList = specialize TFPGList<TfraTimer>;
 
   { TfrmMain }
 
@@ -68,6 +69,7 @@ type
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     MenuItem9: TMenuItem;
+    pnlClocks: TPanel;
     pmiQuit: TMenuItem;
     pmiShowWindow: TMenuItem;
     pmiExit: TMenuItem;
@@ -81,11 +83,10 @@ type
     miAlarm: TMenuItem;
     miNewTimer: TMenuItem;
     pnlBorder: TPanel;
-    pnlClocks: TPanel;
     pmTray: TPopupMenu;
     pmMain: TPopupMenu;
-    sdgExport: TSaveDialog;
     sbxClocks: TScrollBox;
+    sdgExport: TSaveDialog;
     stbMain: TStatusBar;
     tlbMain: TToolBar;
     ToolButton1: TToolButton;
@@ -155,9 +156,10 @@ type
     FDbFileName: string;
     FDbDefault: boolean;
 
-    FTimerFrames: TTimerFrameMap;
+    //FTimerFrames: TTimerFrameMap;
+    FTimerFrames: TTimerFrameList;
     FActiveTimerFrames: TTimerFrameList;
-    FOrder: TIdList;
+    //FOrder: TIdList;
     FCounterClockID: TSequence;
 
     FShortTimer: TTimer;
@@ -203,7 +205,8 @@ type
     procedure SaveClocks(Conf: TJsonConfig);
     procedure DeleteSelected;
     property AnySelected: boolean read GetAnySelected;
-    procedure RemoveTimer(IdNew: longword);
+    //procedure RemoveTimer(IdNew: longword);
+    procedure RemoveTimer(Widget: TfraTimer);
     procedure MoveSelectedClocksUp;
     procedure MoveSelectedClocksDown;
     procedure OnShortTimer(Sender: TObject);
@@ -240,12 +243,13 @@ begin
   AudioSystem.LoadDefaultSounds;
   SoundPool.LoadAllDefaultSounds;
 
-  FOrder := TIdList.Create;
+  //FOrder := TIdList.Create;
   Constraints.MinWidth := FORM_MIN_WIDTH;
   Constraints.MinHeight := FORM_MIN_HEIGHT;
   ;
 
-  FTimerFrames := TTimerFrameMap.Create;
+  //FTimerFrames := TTimerFrameMap.Create;
+  FTimerFrames := TTimerFrameList.Create;
   FActiveTimerFrames := TTimerFrameList.Create;
 
   FCounterClockID := TSequence.Create;
@@ -398,21 +402,23 @@ var
   CurrPosNormal, CurrPosRestored: TRect;
   Count: integer;
   StartTickCount: QWord;
+  Timer: TfraTimer;
 begin
   { if any audio is playing, stop }
   if AudioSystem.Loaded then
   begin
     StatusMessage := 'Stopping sounds being played if any...';
     Cursor := crHourglass;
-    for Count := 0 to FTimerFrames.Count - 1 do
+    //for Count := 0 to FTimerFrames.Count - 1 do
+    for Timer in FTimerFrames do
     begin
-      FTimerFrames.Data[Count].AbortSound;
+      Timer.AbortSound;
 
       StartTickCount := GetTickCount64;
       { Abort is asynchronous, wait till each timer aborts.
       Also, we do not wait for more than two seconds per timer.
       After that, it is past caring. Tardiness can be tolerated only as much. }
-      while FTimerFrames.Data[Count].IsSoundPlaying do
+      while Timer.IsSoundPlaying do
       begin
         Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
         Application.ProcessMessages;
@@ -502,6 +508,7 @@ procedure TfrmMain.FormDestroy(Sender: TObject);
 var
   Count: integer;
   I: integer;
+  Timer: TfraTimer = nil;
 begin
   for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
   begin
@@ -519,11 +526,17 @@ begin
 
   SavetoFile;
 
-  for I := 0 to FTimerFrames.Count - 1 do
-  begin
-    FTimerFrames.Data[i].Free;
-  end;
+  //for I := 0 to FTimerFrames.Count - 1 do
+  //begin
+  //  FTimerFrames.Data[i].Free;
+  //end;
 
+  while FTimerFrames.Count > 0 do
+  begin
+    Timer := FTimerFrames.First;
+    FTimerFrames.Remove(Timer);
+    Timer.Free;
+  end;
   FCounterClockID.Free;
 
   FReference.Free;
@@ -531,7 +544,7 @@ begin
   FActiveTimerFrames.Free;
   FTimerFrames.Free;
 
-  FOrder.Free;
+  //FOrder.Free;
 
   FShortTimer.Free;
 
@@ -842,15 +855,20 @@ var
   Filled: integer = 0;
   Temp: integer;
 begin
-  if FOrder.Count > 0 then
-  begin
-    Id := FOrder.Items[0];
-    Timer := FTimerFrames.KeyData[Id];
-  end
+  //if FOrder.Count > 0 then
+  //begin
+  //  Id := FOrder.Items[0];
+  //  Timer := FTimerFrames.KeyData[Id];
+  //end
+  //else
+  //begin
+  //  Timer := FReference;
+  //end;
+
+  if FTimerFrames.Count > 0 then
+    Timer := FTimerFrames.First
   else
-  begin
     Timer := FReference;
-  end;
 
   {TODO: TIMER_PADDING cannot be used - correct}
 
@@ -897,11 +915,13 @@ var
   Count: integer;
   Clock: TfraTimer;
 begin
-  for Count := 0 to FTimerFrames.Count - 1 do
+  //for Count := 0 to FTimerFrames.Count - 1 do
+  Result := False;
+  for Clock in FTimerFrames do
   begin
-    Clock := FTimerFrames.Data[Count];
-    if Clock = nil then
-      ShowMessage('Clock is Nil');
+    //Clock := FTimerFrames.Data[Count];
+    //if Clock = nil then
+    //  ShowMessage('Clock is Nil');
     if Clock.Selected then
     begin
       Result := True;
@@ -911,15 +931,19 @@ begin
   Result := False;
 end;
 
-function TfrmMain.GetCanselectedMoveDown: boolean;
+function TfrmMain.GetCanselectedMoveUp: boolean;
 var
   Id: longword;
+  Clock: TfraTimer;
   EncounteredSelected: boolean;
 begin
   EncounteredSelected := False;
-  for Id in FOrder do
+  //for Id in FOrder do
+  for Clock in FTimerFrames do
   begin
-    if not FTimerFrames.KeyData[Id].Selected then
+    //if not FTimerFrames.KeyData[Id].Selected then
+    {TODO: nested f else can be taken out}
+    if not Clock.Selected then
     begin
       if EncounteredSelected then
       begin
@@ -936,15 +960,19 @@ begin
   Result := False;
 end;
 
-function TfrmMain.GetCanSelectedMoveUp: boolean;
+function TfrmMain.GetCanSelectedMoveDown: boolean;
 var
   Id: longword;
   EncounteredUnselected: boolean;
+  Clock: TfraTimer;
 begin
   EncounteredUnselected := False;
-  for Id in FOrder do
+  //for Id in FOrder do
+  for Clock in FTimerFrames do
   begin
-    if FTimerFrames.KeyData[Id].Selected then
+    //if FTimerFrames.KeyData[Id].Selected then
+    {TODO: nested f else can be taken out}
+    if Clock.Selected then
     begin
       if EncounteredUnselected then
       begin
@@ -965,23 +993,42 @@ end;
 procedure TfrmMain.Reorder;
 var
   Id: longword;
-  TimerWidget: TfraTimer;
+  TimerWidget, PreviousWidget: TfraTimer;
   Filled: integer;
   CountTabOrder: integer;
+  Count: integer;
 begin
   Filled := hdrTimers.Height;
   CountTabOrder := 0;
   hdrTimers.Top := 0;
-  for Id in FOrder do
+  //for Id in FOrder do
+
+  TimerWidget := FTimerFrames.First;
+
+  TimerWidget.AnchorSide[akTop].Side := asrTop;
+  TimerWidget.AnchorSide[akTop].Control := pnlClocks;
+
+  TimerWidget.TabOrder := 0;
+
+  for Count := 1 to FTimerFrames.Count - 1 do
   begin
-    TimerWidget := FTimerFrames.KeyData[Id];
+    //TimerWidget := FTimerFrames.KeyData[Id];
 
-    TimerWidget.Top := Filled;
-    TimerWidget.TabOrder := CountTabOrder;
+    TimerWidget := FTimerFrames.Items[Count];
+    PreviousWidget := FTimerFrames.Items[Count - 1];
 
-    Inc(Filled, TimerWidget.Height);
-    Inc(CountTabOrder);
+    TimerWidget.AnchorSide[akTop].Side := asrBottom;
+    TimerWidget.AnchorSide[akTop].Control := PreviousWidget;
+
+    //TimerWidget.Top := Filled;
+    TimerWidget.TabOrder := Count;//CountTabOrder;
+
+    //Inc(Filled, TimerWidget.Height);
+    //Inc(CountTabOrder);
   end;
+  sbxClocks.ReAlign;
+  pnlClocks.ReAlign;
+  pnlClocks.Refresh;
 
 end;
 
@@ -1244,9 +1291,10 @@ begin
       tbProgressAuto.Down := AutoProgress;
       tbProgressAutoClick(Self);
     end;
-    for Count := 0 to FTimerFrames.Count - 1 do
+    //for Count := 0 to FTimerFrames.Count - 1 do
+    for Temp in FTimerFrames do
     begin
-      Temp := FTimerFrames.Data[Count];
+      //Temp := FTimerFrames.Data[Count];
       Temp.TitleEditable := AllowTimerTitleEdit;
     end;
   end;
@@ -1413,22 +1461,46 @@ end;
 function TfrmMain.AddTimer(): TfraTimer;
 var
   Id: longword;
-  NewWidget: TfraTimer;
+  NewWidget, WidgetAbove: TfraTimer;
+  Index: integer;
 begin
   Id := FCounterClockID.NextVal;
 
-  NewWidget := TfraTimer.Create(sbxClocks);
+  NewWidget := TfraTimer.Create(pnlClocks);
   NewWidget.Id := Id;
+  NewWidget.Parent := pnlClocks;
   NewWidget.TitleEditable := UserConfig.AllowTimerTitleEdit;
 
   NewWidget.imgTimer.Picture.Assign(FWidgetStoppedBitmap);
   NewWidget.LastProgressIconIndex := LAST_TRAY_ICON_DEFAULT;
 
-  FTimerFrames.Add(Id, NewWidget);
-  FOrder.Add(Id);
+  NewWidget.AnchorSide[akRight].Side := asrRight;
+  NewWidget.AnchorSide[akRight].Control := pnlClocks;
 
-  Reorder;
+  NewWidget.AnchorSide[akLeft].Side := asrLeft;
+  NewWidget.AnchorSide[akLeft].Control := pnlClocks;
 
+  //FTimerFrames.Add(Id, NewWidget);
+  Index := FTimerFrames.Add(NewWidget);
+
+  if Index = 0 then
+  begin
+    NewWidget.AnchorSide[akTop].Side := asrTop;
+    NewWidget.AnchorSide[akTop].Control := pnlClocks;
+  end
+  else
+  begin
+    WidgetAbove := FTimerFrames.Items[Index - 1];
+    NewWidget.AnchorSide[akTop].Side := asrBottom;
+    NewWidget.AnchorSide[akTop].Control := WidgetAbove;
+  end;
+
+  //FOrder.Add(Id);
+
+
+  //Reorder;
+  //sbxClocks.Refresh;
+  pnlClocks.Refresh;
   Result := NewWidget;
 end;
 
@@ -1466,9 +1538,10 @@ begin
   }
 
   { For all timers other than the sender, uncheck if checked }
-  for Count := 0 to FTimerFrames.Count - 1 do
+  //for Count := 0 to FTimerFrames.Count - 1 do
+  for Temp in FTimerFrames do
   begin
-    Temp := FTimerFrames.Data[Count];
+    //Temp := FTimerFrames.Data[Count];
     if Temp <> Sender then
       if Temp.IsProgressOnIcon then
       begin
@@ -1491,7 +1564,7 @@ procedure TfrmMain.SaveClocks(Conf: TJsonConfig);
 var
   TimerClock: TfraTimer;
   Count: integer;
-  Id: longword;
+  //Id: longword;
   fs: TFormatSettings;
   State: TTimerState;
 begin
@@ -1501,12 +1574,12 @@ begin
 
   Conf.SetValue(TIMER_CONF_COUNT, FTimerFrames.Count);
 
-  if FOrder.Count <> FTimerFrames.Count then
-  begin
-    ShowMessage('Fatal error - FOrder.Count does not match FTimerFrames.Count' +
-      LineEnding + 'Saved timers will be lost.');
-    Exit;
-  end;
+  //if FOrder.Count <> FTimerFrames.Count then
+  //begin
+  //  ShowMessage('Fatal error - FOrder.Count does not match FTimerFrames.Count' +
+  //    LineEnding + 'Saved timers will be lost.');
+  //  Exit;
+  //end;
 
 
   for Count := 0 to FTimerFrames.Count - 1 do
@@ -1515,9 +1588,10 @@ begin
       '/'), True);
 
     { FOrder has the order of IDs }
-    Id := FOrder[Count];
+    //Id := FOrder[Count];
 
-    TimerClock := FTimerFrames.KeyData[Id];
+    //TimerClock := FTimerFrames.KeyData[Id];
+    TimerClock := FTimerFrames.Items[Count];
 
     if TimerClock = nil then
       ShowMessage('Clock is Nil');
@@ -1581,115 +1655,218 @@ var
   Id: longword;
   TimerClock: TfraTimer;
   Count: integer;
-  IdList: TIdList;
+  //IdList: TIdList;
+  TobeRemoved: TTimerFrameList;
   StartTickCount: QWord;
 begin
-  IdList := TIdList.Create;
+  //IdList := TIdList.Create;
+  TobeRemoved := TTimerFrameList.Create;
 
   { FPGMap does not have an iterator. So removal of elements have to be done
   with kid-gloves. A seperate list is created to hold IDs of elements to be
   removed from the list. After iteration, removal is done in a separte loop}
 
-  for Count := 0 to FTimerFrames.Count - 1 do
+  //for Count := 0 to FTimerFrames.Count - 1 do
+  for TimerClock in FTimerFrames do
   begin
-    TimerClock := FTimerFrames.Data[Count];
-    if TimerClock = nil then
-      ShowMessage('Clock is Nil');
+    //TimerClock := FTimerFrames.Data[Count];
+    //if TimerClock = nil then
+    //  ShowMessage('Clock is Nil');
+    Assert(Assigned(TimerClock));
 
-    if TimerClock.Running or TimerClock.IsSoundPlaying then;
-    TimerClock.Stop(True);
-
-    StartTickCount := GetTickCount64;
-    { Abort is asynchronous, wait till each timer aborts.
-    Also, we do not wait for more than two seconds per timer.
-    After that, it is past caring. Tardiness can be tolerated only as much. }
-    while TimerClock.IsSoundPlaying do
-    begin
-      Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
-      Application.ProcessMessages;
-      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_LONG_WAIT) then
-        break;
-    end;
+    //if TimerClock.Running or TimerClock.IsSoundPlaying then;
+    //TimerClock.Stop(True);
+    //
+    //StartTickCount := GetTickCount64;
+    //{ Abort is asynchronous, wait till each timer aborts.
+    //Also, we do not wait for more than two seconds per timer.
+    //After that, it is past caring. Tardiness can be tolerated only as much. }
+    //while TimerClock.IsSoundPlaying do
+    //begin
+    //  Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
+    //  Application.ProcessMessages;
+    //  if GetTickCount64 > (StartTickCount + AUDIO_ABORT_LONG_WAIT) then
+    //    break;
+    //end;
 
     if TimerClock.Selected then
     begin
-      IdList.Add(TimerClock.Id);
+
+
+      if TimerClock.Running or TimerClock.IsSoundPlaying then;
+      TimerClock.Stop(True);
+
+      StartTickCount := GetTickCount64;
+      { Abort is asynchronous, wait till each timer aborts.
+      Also, we do not wait for more than two seconds per timer.
+      After that, it is past caring. Tardiness can be tolerated only as much. }
+      while TimerClock.IsSoundPlaying do
+      begin
+        Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
+        Application.ProcessMessages;
+        if GetTickCount64 > (StartTickCount + AUDIO_ABORT_LONG_WAIT) then
+          break;
+      end;
+
+      //IdList.Add(TimerClock.Id);
+      TobeRemoved.Add(TimerClock);
     end;
 
   end;
 
-  for Id in IdList do
+  //for Id in IdList do
+  For TimerClock in TobeRemoved do
   begin
-    RemoveTimer(Id);
+    RemoveTimer(TimerClock);
   end;
-  IdList.Free;
+  //IdList.Free;
+  TobeRemoved.Free;
 
 end;
 
-procedure TfrmMain.RemoveTimer(IdNew: longword);
+procedure TfrmMain.RemoveTimer(Widget: TfraTimer);
 var
-  RemovedTimer: TfraTimer;
+  //RemovedTimer: TfraTimer;
   Index: integer;
+  NextWidget: TfraTimer;
 begin
-  Index := FTimerFrames.IndexOf(IdNew);
-  RemovedTimer := TfraTimer(FTimerFrames.Data[Index]);
-  FTimerFrames.Remove(IdNew);
-  FOrder.Remove(IdNew);
-  RemovedTimer.Free;
-  Reorder;
-end;
+  //Index := FTimerFrames.IndexOf(IdNew);
+  //RemovedTimer := TfraTimer(FTimerFrames.Data[Index]);
+  //FTimerFrames.Remove(IdNew);
+  Index := FTimerFrames.IndexOf(Widget);
 
-procedure TfrmMain.MoveSelectedClocksUp;
-var
-  Id: longword;
-  Count: integer;
-begin
-  Count := 0;
-  for Id in FOrder do
+  if Index = 0 then
   begin
-    if Count = 0 then
-    begin
-      Inc(Count);
-      Continue;
-    end;
-
-    if FTimerFrames.KeyData[Id].Selected then
-    begin
-      {If x and y are selected, do not exchange, keep the order as it is}
-      if not (FTimerFrames.KeyData[FOrder.Items[Count - 1]].Selected and
-        FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
-        FOrder.Exchange(Count - 1, Count);
-    end;
-    Inc(Count);
+    NextWidget := FTimerFrames.Items[1];
+    NextWidget.AnchorSide[akTop].Side := asrTop;
+    NextWidget.AnchorSide[akTop].Control := pnlClocks;
+  end
+  else if Index < FTimerFrames.Count - 1 then
+  begin
+    NextWidget := FTimerFrames.Items[Index + 1];
+    NextWidget.AnchorSide[akTop].Side := asrBottom;
+    NextWidget.AnchorSide[akTop].Control := Widget.AnchorSide[akTop].Control;
   end;
-  Reorder;
+
+  FTimerFrames.Remove(Widget);
+  //FOrder.Remove(IdNew);
+  Widget.Free;
+  //Reorder;
 end;
 
 procedure TfrmMain.MoveSelectedClocksDown;
 var
-  Id: longword;
+  //Id: longword;
+  Widget, WidgetAbove: TfraTimer;
   Count: integer;
-  First: boolean;
+  TempControl: TControl;
+  TempReference: TAnchorSideReference;
+  TempTop: integer;
 begin
-  First := True;
-  for Count := (FTimerFrames.Count - 1) downto 0 do
+  //Count := 0;
+  //for Id in FOrder do
+  for Count := 1 to FTimerFrames.Count - 1 do
   begin
-    if First then
-    begin
-      First := False;
-      Continue;
-    end;
-    Id := FOrder.Items[Count];
-    if FTimerFrames.KeyData[Id].Selected then
+    //if Count = 0 then
+    //begin
+    //  Inc(Count);
+    //  Continue;
+    //end;
+    Widget := FTimerFrames.Items[Count];
+    WidgetAbove := FTimerFrames.Items[Count - 1];
+    //if FTimerFrames.KeyData[Id].Selected then
+    if Widget.Selected and (not WidgetAbove.Selected) then
     begin
       {If x and y are selected, do not exchange, keep the order as it is}
-      if not (FTimerFrames.KeyData[FOrder.Items[Count + 1]].Selected and
-        FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
-        FOrder.Exchange(Count + 1, Count);
+      //if not (FTimerFrames.KeyData[FOrder.Items[Count - 1]].Selected and
+      //  FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
+      //  FOrder.Exchange(Count - 1, Count);
+      FTimerFrames.Exchange(Count - 1, Count);
+
+      TempReference := Widget.AnchorSide[akTop].Side;
+      TempControl := Widget.AnchorSide[akTop].Control;
+      TempTop := Widget.Top;
+
+      Widget.AnchorSide[akTop].Side := WidgetAbove.AnchorSide[akTop].Side;
+      Widget.AnchorSide[akTop].Control := WidgetAbove.AnchorSide[akTop].Control;
+      Widget.Top := WidgetAbove.Top;
+
+      WidgetAbove.AnchorSide[akTop].Side := TempReference;
+      WidgetAbove.AnchorSide[akTop].Control := TempControl;
+      WidgetAbove.Top := TempTop;
+
+      //WidgetAbove.ReAlign;
+      //Widget.ReAlign;
+
+    end;
+    //Inc(Count);
+  end;
+  //Reorder;
+  //pnlClocks.ReAlign;
+  //pnlClocks.Hide;
+  //pnlClocks.Show;
+  //pnlClocks.Refresh;
+  //sbxClocks.Refresh;
+end;
+
+procedure TfrmMain.MoveSelectedClocksUp;
+var
+  //Id: longword;
+  Count: integer;
+  First: boolean;
+  Widget, WidgetBelow: TfraTimer;
+  TempControl: TControl;
+  TempReference: TAnchorSideReference;
+  TempTop: integer;
+begin
+  First := True;
+  for Count := (FTimerFrames.Count - 2) downto 0 do
+  begin
+    //if First then
+    //begin
+    //  First := False;
+    //  Continue;
+    //end;
+    //Id := FOrder.Items[Count];
+
+    Widget := FTimerFrames.Items[Count];
+    WidgetBelow := FTimerFrames.Items[Count + 1];
+
+    //if FTimerFrames.KeyData[Id].Selected then
+    //begin
+    //  {If x and y are selected, do not exchange, keep the order as it is}
+    //  if not (FTimerFrames.KeyData[FOrder.Items[Count + 1]].Selected and
+    //    FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
+    //    FOrder.Exchange(Count + 1, Count);
+    //end;
+
+    if Widget.Selected and (not WidgetBelow.Selected) then
+    begin
+      {If x and y are selected, do not exchange, keep the order as it is}
+      //if not (FTimerFrames.KeyData[FOrder.Items[Count - 1]].Selected and
+      //  FTimerFrames.KeyData[FOrder.Items[Count]].Selected) then
+      //  FOrder.Exchange(Count - 1, Count);
+      FTimerFrames.Exchange(Count, Count + 1);
+
+      TempReference := Widget.AnchorSide[akTop].Side;
+      TempControl := Widget.AnchorSide[akTop].Control;
+      TempTop := Widget.Top;
+
+      Widget.AnchorSide[akTop].Side := WidgetBelow.AnchorSide[akTop].Side;
+      Widget.AnchorSide[akTop].Control := WidgetBelow.AnchorSide[akTop].Control;
+      Widget.Top := WidgetBelow.Top;
+
+      WidgetBelow.AnchorSide[akTop].Side := TempReference;
+      WidgetBelow.AnchorSide[akTop].Control := TempControl;
+      WidgetBelow.Top := TempTop;
+
+      //WidgetAbove.ReAlign;
+      //Widget.ReAlign;
+
     end;
 
   end;
-  Reorder;
+  //Reorder;
 end;
 
 procedure TfrmMain.OnShortTimer(Sender: TObject);
@@ -1727,9 +1904,10 @@ begin
   done here solely because of overlay icons, which does not seem to get
   updated before the form is shown.}
   begin
-    for Count := 0 to FTimerFrames.Count - 1 do
+    //for Count := 0 to FTimerFrames.Count - 1 do
+    for TimerFrame in FTimerFrames do
     begin
-      TimerFrame := FTimerFrames.Data[Count];
+      //TimerFrame := FTimerFrames.Data[Count];
       if TimerFrame.Running then
         TimerFrame.HandleTimerTrigger;
     end;

@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 347
+  Left = 348
   Height = 336
-  Top = 174
+  Top = 202
   Width = 652
   HorzScrollBar.Page = 152
   HorzScrollBar.Range = 152
@@ -164,32 +164,6 @@ object frmMain: TfrmMain
     ClientHeight = 248
     ClientWidth = 590
     TabOrder = 1
-    object sbxClocks: TScrollBox
-      Left = 1
-      Height = 222
-      Top = 25
-      Width = 588
-      HorzScrollBar.Page = 1
-      VertScrollBar.Page = 1
-      Align = alClient
-      BorderStyle = bsNone
-      ClientHeight = 222
-      ClientWidth = 588
-      TabOrder = 0
-      OnMouseUp = sbxClocksMouseUp
-      OnResize = sbxClocksResize
-      object pnlClocks: TPanel
-        Left = 0
-        Height = 222
-        Top = 0
-        Width = 588
-        Align = alClient
-        BevelOuter = bvNone
-        Caption = 'pnlClocks'
-        TabOrder = 0
-        Visible = False
-      end
-    end
     object hdrTimers: THeaderControl
       Left = 1
       Height = 24
@@ -234,6 +208,27 @@ object frmMain: TfrmMain
         end>
       Align = alTop
       Enabled = False
+    end
+    object sbxClocks: TScrollBox
+      Left = 1
+      Height = 222
+      Top = 25
+      Width = 588
+      HorzScrollBar.Page = 1
+      VertScrollBar.Page = 1
+      Align = alClient
+      ClientHeight = 220
+      ClientWidth = 586
+      TabOrder = 1
+      object pnlClocks: TPanel
+        Left = 0
+        Height = 220
+        Top = 0
+        Width = 586
+        Align = alClient
+        Caption = 'pnlClocks'
+        TabOrder = 0
+      end
     end
   end
   object stbMain: TStatusBar

@@ -652,7 +652,7 @@ begin
     edtTitle.Text := DefaultTimerTitle;
   end;
 
-  Parent := TWinControl(AOwner);
+  //Parent := TWinControl(AOwner);
 
   cbSelect.OnChange := @ClockSelected;
 

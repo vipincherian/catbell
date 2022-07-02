@@ -9,8 +9,8 @@ object fraAlertEntry: TfraAlertEntry
   ClientHeight = 229
   ClientWidth = 620
   TabOrder = 0
-  DesignLeft = 454
-  DesignTop = 233
+  DesignLeft = 455
+  DesignTop = 261
   object stDescription: TStaticText
     AnchorSideTop.Control = stDuration
     AnchorSideRight.Control = stDuration

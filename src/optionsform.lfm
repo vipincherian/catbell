@@ -1,7 +1,7 @@
 object frmOptions: TfrmOptions
-  Left = 311
+  Left = 312
   Height = 428
-  Top = 176
+  Top = 204
   Width = 539
   Caption = 'Options'
   ClientHeight = 428

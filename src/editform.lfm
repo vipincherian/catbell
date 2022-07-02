@@ -1,7 +1,7 @@
 object frmEdit: TfrmEdit
-  Left = 351
+  Left = 352
   Height = 283
-  Top = 238
+  Top = 266
   Width = 549
   BorderStyle = bsSingle
   Caption = 'Edit Timer'
