@@ -180,8 +180,8 @@ type
     procedure ResizeHeaderSections;
 
     function GetAnySelected: boolean;
-    function GetCanselectedMoveDown: boolean;
-    function GetCanSelectedMoveUp: boolean;
+    function QueryCanSelectedMoveDown: boolean;
+    function QueryCanSelectedMoveUp: boolean;
     procedure Reorder;
     procedure SetStatusMessage(AValue: string);
     procedure ShowInForeground;
@@ -842,10 +842,10 @@ procedure TfrmMain.SetListButtonsStatus;
 begin
   bbDelete.Enabled := AnySelected;
   tbDelete.Enabled := AnySelected;
-  bbMoveUp.Enabled := getCanSelectedMoveUp;
-  bbMoveDown.Enabled := GetCanselectedMoveDown;
-  tbMoveUp.Enabled := getCanSelectedMoveUp;
-  tbMoveDown.Enabled := GetCanselectedMoveDown;
+  bbMoveUp.Enabled := QueryCanSelectedMoveUp;
+  bbMoveDown.Enabled := QueryCanSelectedMoveDown;
+  tbMoveUp.Enabled := QueryCanSelectedMoveUp;
+  tbMoveDown.Enabled := QueryCanSelectedMoveDown;
 end;
 
 procedure TfrmMain.ResizeHeaderSections;
@@ -931,7 +931,7 @@ begin
   Result := False;
 end;
 
-function TfrmMain.GetCanselectedMoveUp: boolean;
+function TfrmMain.QueryCanSelectedMoveUp: boolean;
 var
   Id: longword;
   Clock: TfraTimer;
@@ -960,7 +960,7 @@ begin
   Result := False;
 end;
 
-function TfrmMain.GetCanSelectedMoveDown: boolean;
+function TfrmMain.QueryCanSelectedMoveDown: boolean;
 var
   Id: longword;
   EncounteredUnselected: boolean;
