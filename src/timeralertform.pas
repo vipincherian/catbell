@@ -188,7 +188,10 @@ begin
   end;
 
   FEntries.Remove(Entry);
-  Entry.Free;
+  //Entry.Free;
+  { Cannot free Entry here, as we are in Entry's button's callback.
+  Application.ReleaseComponent will do it asynchronously }
+  Application.ReleaseComponent(Entry);
   pnlEntries.Refresh;
 
   if FEntries.Count = 0 then
