@@ -139,7 +139,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="17">
+    <Units Count="18">
       <Unit0>
         <Filename Value="catbell.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -229,6 +229,13 @@
         <Filename Value="constants.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit16>
+      <Unit17>
+        <Filename Value="alertentryframe.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="fraAlertEntry"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit17>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

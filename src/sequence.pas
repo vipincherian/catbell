@@ -34,13 +34,14 @@ type
   // ToDo: Make TSequence Thread safe
   TSequence = class(TObject)
   private
-    FCounter: LongWord;
+    FCounter: longword;
     procedure Increment;
   public
     constructor Create();
-    Destructor  Destroy; override;
-    function  CurrVal(): Longword;
-    function NextVal(): Longword;
+    destructor Destroy; override;
+    function CurrVal(): longword;
+    function NextVal(): longword;
+    procedure Reset;
   end;
 
 implementation
@@ -52,9 +53,10 @@ begin
   Inc(FCounter);
 end;
 
-constructor TSequence.Create;
+constructor TSequence.Create();
 begin
-  FCounter := 0;
+  //FCounter := 0;
+  Reset;
 end;
 
 destructor TSequence.Destroy;
@@ -62,15 +64,20 @@ begin
   inherited Destroy;
 end;
 
-function TSequence.CurrVal: Longword;
+function TSequence.CurrVal(): longword;
 begin
-     Result := FCounter;
+  Result := FCounter;
 end;
 
-function TSequence.NextVal: Longword;
+function TSequence.NextVal(): longword;
 begin
-     Increment;
-     Result := FCounter;
+  Increment;
+  Result := FCounter;
+end;
+
+procedure TSequence.Reset;
+begin
+  FCounter := 0;
 end;
 
 end.

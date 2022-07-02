@@ -41,7 +41,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   audio,
   eventlog,
   log,
-  UniqueInstanceRaw, constants;
+  UniqueInstanceRaw, constants, alertentryframe;
 
 {$R *.res}
 

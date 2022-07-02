@@ -1,13 +1,16 @@
 object frmAlert: TfrmAlert
+  AnchorSideTop.Side = asrBottom
+  AnchorSideRight.Side = asrBottom
   Left = 431
-  Height = 218
+  Height = 276
   Top = 254
-  Width = 336
+  Width = 534
+  Anchors = [akTop, akLeft, akRight]
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Timer Finished'
-  ClientHeight = 218
-  ClientWidth = 336
+  ClientHeight = 276
+  ClientWidth = 534
   Icon.Data = {
     7E04000000000100010010100000010020006804000016000000280000001000
     0000200000000100200000000000000400006400000064000000000000000000
@@ -54,9 +57,9 @@ object frmAlert: TfrmAlert
   OnShow = FormShow
   LCLVersion = '2.0.12.0'
   object bbClose: TBitBtn
-    Left = 253
+    Left = 451
     Height = 30
-    Top = 182
+    Top = 240
     Width = 75
     Anchors = [akRight, akBottom]
     DefaultCaption = True
@@ -78,7 +81,7 @@ object frmAlert: TfrmAlert
     Left = 8
     Height = 112
     Top = 32
-    Width = 320
+    Width = 208
     Checkboxes = True
     Columns = <    
       item
@@ -89,7 +92,7 @@ object frmAlert: TfrmAlert
       item
         AutoSize = True
         Caption = 'Duration'
-        Width = 274
+        Width = 162
       end>
     ReadOnly = True
     TabOrder = 1
@@ -99,7 +102,7 @@ object frmAlert: TfrmAlert
   object bbRestart: TBitBtn
     Left = 8
     Height = 30
-    Top = 182
+    Top = 240
     Width = 75
     Anchors = [akLeft, akBottom]
     Caption = '&Restart'
@@ -116,5 +119,51 @@ object frmAlert: TfrmAlert
     Caption = 'Restart from last finish (wherever possible)'
     OnChange = cbFromFinishChange
     TabOrder = 3
+  end
+  object pnlMaster: TPanel
+    Left = 268
+    Height = 178
+    Top = 52
+    Width = 244
+    BevelInner = bvLowered
+    BevelOuter = bvNone
+    Caption = 'pnlMaster'
+    ClientHeight = 178
+    ClientWidth = 244
+    TabOrder = 4
+    object hdrEntries: THeaderControl
+      Left = 1
+      Height = 30
+      Top = 1
+      Width = 242
+      DragReorder = False
+      Sections = <>
+      Align = alTop
+    end
+    object sbxEntries: TScrollBox
+      Left = 1
+      Height = 146
+      Top = 31
+      Width = 242
+      HorzScrollBar.Page = 1
+      HorzScrollBar.Visible = False
+      VertScrollBar.Page = 1
+      Align = alClient
+      Anchors = []
+      BorderStyle = bsNone
+      ClientHeight = 146
+      ClientWidth = 242
+      TabOrder = 1
+      object pnlEntries: TPanel
+        Left = 0
+        Height = 146
+        Top = 0
+        Width = 242
+        Align = alClient
+        BevelOuter = bvNone
+        Caption = 'pnlEntries'
+        TabOrder = 0
+      end
+    end
   end
 end

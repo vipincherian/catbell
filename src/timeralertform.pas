@@ -26,9 +26,11 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, {fgl,} dateutils, settings;
+  LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, fgl, dateutils,
+  settings, alertentryframe, sequence, log;
 
 type
+  TAlertEntryList = specialize TFPGList<TfraAlertEntry>;
 
   { TfrmAlert }
 
@@ -36,8 +38,12 @@ type
     bbClose: TBitBtn;
     bbRestart: TBitBtn;
     cbFromFinish: TCheckBox;
+    hdrEntries: THeaderControl;
     Label1: TLabel;
     lsvMessages: TListView;
+    pnlMaster: TPanel;
+    pnlEntries: TPanel;
+    sbxEntries: TScrollBox;
     procedure bbCloseClick(Sender: TObject);
     procedure bbRestartClick(Sender: TObject);
     procedure cbFromFinishChange(Sender: TObject);
@@ -49,7 +55,13 @@ type
     procedure lsvMessagesItemChecked(Sender: TObject; {%H-}Item: TListItem);
   private
     { private declarations }
+    FEntryIDGenerator: TSequence;
+    FEntries: TAlertEntryList;
     procedure StopTimers;
+    procedure RestartTimer(Sender: TObject);
+    procedure StartTimer(Sender: TObject);
+    procedure RemoveAlert(Entry: TfraAlertEntry);
+    procedure EmptyAlertsAndClose;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure ReenableControls;
@@ -73,11 +85,14 @@ begin
   bbRestart.Enabled := False;
   cbFromFinish.Checked := UserConfig.RestartFromFinish;
 
+  FEntryIDGenerator := TSequence.Create;
+  FEntries := TAlertEntryList.Create;
 end;
 
 procedure TfrmAlert.FormDestroy(Sender: TObject);
 begin
-  ;
+  FEntries.Free;
+  FEntryIDGenerator.Free;
 end;
 
 procedure TfrmAlert.FormShow(Sender: TObject);
@@ -102,6 +117,74 @@ begin
     Timer := TfraTimer(Item.Data);
     Timer.Stop(True);
   end;
+end;
+
+procedure TfrmAlert.RestartTimer(Sender: TObject);
+var
+  Entry: TfraAlertEntry;
+begin
+  Entry := TfraAlertEntry(Sender);
+  //ShowMessage('Got message');
+  Entry.Timer.Stop(True);
+  Entry.Timer.RestartFromLastFinish;
+  RemoveAlert(Entry);
+end;
+
+procedure TfrmAlert.StartTimer(Sender: TObject);
+var
+  Entry: TfraAlertEntry;
+begin
+  Entry := TfraAlertEntry(Sender);
+  //ShowMessage('Got message');
+  Entry.Timer.Stop(True);
+  Entry.Timer.Start;
+  RemoveAlert(Entry);
+end;
+
+procedure TfrmAlert.RemoveAlert(Entry: TfraAlertEntry);
+var
+  Index: integer;
+  PrevEntry, NextEntry: TfraAlertEntry;
+begin
+  Index := FEntries.IndexOf(Entry);
+
+  Assert(Index >= 0);
+
+  if Index < (FEntries.Count - 1) then
+  begin
+    NextEntry := FEntries.Items[Index + 1];
+    if Index > 0 then
+    begin
+      PrevEntry := FEntries.Items[Index - 1];
+      NextEntry.AnchorSide[akTop].Control := PrevEntry;
+    end
+    else
+      NextEntry.AnchorSide[akTop].Control := nil;
+  end;
+
+  FEntries.Remove(Entry);
+  Entry.Free;
+  pnlEntries.Refresh;
+
+  if FEntries.Count = 0 then
+  begin
+    FEntryIDGenerator.Reset;
+    Close;
+  end;
+
+end;
+
+procedure TfrmAlert.EmptyAlertsAndClose;
+var
+  Item: TfraAlertEntry;
+begin
+  for Item in FEntries do
+  begin
+    Item.Timer.Stop(True);
+    FEntries.Remove(Item);
+    Item.Free;
+  end;
+  Close;
 end;
 
 procedure TfrmAlert.CreateParams(var Params: TCreateParams);
@@ -135,6 +218,9 @@ var
 
   Duration: TDateTime;
   DurationText: string;
+
+  Entry: TfraAlertEntry;
+  Index: integer;
 begin
   Duration := Timer.Duration;
 
@@ -151,12 +237,33 @@ begin
   Item.SubItems.Add(DurationText);
 
   lsvMessages.EndUpdate;
+
+  Entry := TfraAlertEntry.Create(sbxEntries, Timer);
+  Entry.Name := Entry.Name + IntToStr(FEntryIDGenerator.NextVal());
+  Entry.Parent := pnlEntries;
+
+  Entry.Width := pnlEntries.ClientWidth;
+  Entry.Left := 0;
+  Entry.Anchors := [akTop, akLeft, akRight];
+
+  Entry.stDescription.Caption := Timer.Caption + ' ' + DurationText;
+
+  {TODO: Thread safety}
+  Index := FEntries.Add(Entry);
+
+  if Index > 0 then
+  begin
+    Entry.AnchorSide[akTop].Side := asrBottom;
+    Entry.AnchorSide[akTop].Control := FEntries.Items[Index - 1];
+  end;
+
+  Entry.OnTimerRestart := @RestartTimer;
+  Entry.OnTimerStart := @StartTimer;
 end;
 
 procedure TfrmAlert.bbCloseClick(Sender: TObject);
 begin
-  StopTimers;
-  Close;
+  EmptyAlertsAndClose;
 end;
 
 procedure TfrmAlert.bbRestartClick(Sender: TObject);
@@ -211,10 +318,11 @@ end;
 
 procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  lsvMessages.BeginUpdate;
-  lsvMessages.Items.Clear;
-  lsvMessages.EndUpdate;
-
+  //lsvMessages.BeginUpdate;
+  //lsvMessages.Items.Clear;
+  //lsvMessages.EndUpdate;
+  //
+  EmptyAlertsAndClose;
   ReenableControls;
 end;
 
