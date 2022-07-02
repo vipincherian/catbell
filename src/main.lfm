@@ -164,17 +164,6 @@ object frmMain: TfrmMain
     ClientHeight = 248
     ClientWidth = 590
     TabOrder = 1
-    object pnlClocks: TPanel
-      Left = 1
-      Height = 222
-      Top = 25
-      Width = 588
-      Align = alClient
-      BevelOuter = bvNone
-      Caption = 'pnlClocks'
-      TabOrder = 0
-      Visible = False
-    end
     object sbxClocks: TScrollBox
       Left = 1
       Height = 222
@@ -184,9 +173,22 @@ object frmMain: TfrmMain
       VertScrollBar.Page = 1
       Align = alClient
       BorderStyle = bsNone
-      TabOrder = 1
+      ClientHeight = 222
+      ClientWidth = 588
+      TabOrder = 0
       OnMouseUp = sbxClocksMouseUp
       OnResize = sbxClocksResize
+      object pnlClocks: TPanel
+        Left = 0
+        Height = 222
+        Top = 0
+        Width = 588
+        Align = alClient
+        BevelOuter = bvNone
+        Caption = 'pnlClocks'
+        TabOrder = 0
+        Visible = False
+      end
     end
     object hdrTimers: THeaderControl
       Left = 1

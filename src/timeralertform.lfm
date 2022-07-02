@@ -72,7 +72,7 @@ object frmAlert: TfrmAlert
   end
   object Label1: TLabel
     Left = 5
-    Height = 15
+    Height = 14
     Top = 5
     Width = 529
     Align = alTop

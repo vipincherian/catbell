@@ -188,8 +188,9 @@ begin
   end;
 
   FEntries.Remove(Entry);
-  //Entry.Free;
-  { Cannot free Entry here, as we are in Entry's button's callback.
+
+  { Cannot free Entry (Entry.Free) here, as we are in Entry's button's callback.
+  Although that works fine in Linux, throws exception in Windows.
   Application.ReleaseComponent will do it asynchronously }
   Application.ReleaseComponent(Entry);
   pnlEntries.Refresh;
