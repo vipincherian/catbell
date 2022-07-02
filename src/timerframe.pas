@@ -73,7 +73,7 @@ type
 
   private
     { private declarations }
-    FId: longword;
+    //FId: longword;
     AudioCriticalSection: TRTLCriticalSection;
 
     FModalAlert: boolean;
@@ -95,8 +95,12 @@ type
     FLoadedSoundSource: string;
 
     FLastCompletionTime: TDateTime;
+
+    FBeingEdited: boolean;
+    FBeingAdjusted: boolean;
+
     function GetIsSoundPlaying: boolean;
-    procedure SetId(AValue: longword);
+    //procedure SetId(AValue: longword);
     function GetCaption: string;
     function GetCounter: string;
     function GetDuration: TDateTime;
@@ -118,7 +122,7 @@ type
     procedure SetSoundIndex(AValue: integer);
 
     procedure SetStopButtonEnabled(AValue: boolean);
-    function GetId: longword;
+    //function GetId: longword;
     procedure SetTitleEditable(AValue: boolean);
     procedure SetTrayNotification(AValue: boolean);
     procedure UpdateProgress(const PendingMilliseconds: QWord);
@@ -142,7 +146,7 @@ type
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property Id: longword read FId write SetId;
+    //property Id: longword read FId write SetId;
     procedure SetCounter(AValue: string);
     procedure CheckForZeroTime;
 
@@ -263,8 +267,11 @@ begin
   frmEdit.SoundLooped := SoundLooped;
   frmEdit.Metronome := Metronome;
 
+  FBeingEdited := True;
+
   if frmEdit.ShowForEdit(Self) then
   begin
+
     Caption := frmEdit.Description;
     dtpSet.Time := frmEdit.Duration;
     FTrayNotification := frmEdit.TrayNotification;
@@ -279,6 +286,8 @@ begin
 
     frmMain.SavetoFile;
   end;
+
+  FBeingEdited := False;
 end;
 
 procedure TfraTimer.aiAdjustExecute(Sender: TObject);
@@ -298,8 +307,10 @@ begin
   frmAdjust.bbApply.Enabled := True;
   frmAdjust.dtpDiff.Show;
   frmAdjust.dtpTill.Hide;
-  frmAdjust.Id := FId;
+  //frmAdjust.Id := FId;
+  FBeingAdjusted:=True;
   frmAdjust.ShowModal;
+  FBeingAdjusted:=False;
 end;
 
 
@@ -308,16 +319,16 @@ begin
   ;
 end;
 
-procedure TfraTimer.SetId(AValue: longword);
-begin
-  Assert(AValue > 0);
-  if FId > 0 then
-    Exit;
-  if FId = AValue then
-    Exit;
-  FId := AValue;
-  Name := Name + IntToStr(AValue);
-end;
+//procedure TfraTimer.SetId(AValue: longword);
+//begin
+//  Assert(AValue > 0);
+//  if FId > 0 then
+//    Exit;
+//  if FId = AValue then
+//    Exit;
+//  FId := AValue;
+//  Name := Name + IntToStr(AValue);
+//end;
 
 function TfraTimer.GetIsSoundPlaying: boolean;
 begin
@@ -440,10 +451,10 @@ begin
   bbStop.Enabled := AValue;
 end;
 
-function TfraTimer.GetId: longword;
-begin
-  Result := FId;
-end;
+//function TfraTimer.GetId: longword;
+//begin
+//  Result := FId;
+//end;
 
 procedure TfraTimer.SetTitleEditable(AValue: boolean);
 begin
@@ -506,7 +517,8 @@ procedure TfraTimer.ReenableEditControls;
 begin
   { When a timer stops, check if the same timer was being edited?
   If so, a few controls which were disabled can be re-enabled }
-  if frmEdit.Showing and (frmEdit.Id = FId) then
+
+  if frmEdit.Showing and FBeingEdited then
   begin
     frmEdit.ReenableControls;
   end;
@@ -643,7 +655,7 @@ constructor TfraTimer.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   InitCriticalSection(AudioCriticalSection);
-  FId := 0;
+  //FId := 0;
   FProgress := 0.0;
 
   with UserConfig do
@@ -689,6 +701,9 @@ begin
   Metronome := False;
 
   FLastCompletionTime := 0;
+
+  FBeingAdjusted := False;
+  FBeingEdited := False;
   //ArrangeControls;
 end;
 
@@ -891,7 +906,7 @@ begin
     FOrigTickDuration := 0;
     FStartTickCount := 0;
 
-    if frmAdjust.Showing and (frmAdjust.Id = Fid) then
+    if frmAdjust.Showing and FBeingAdjusted then
       frmAdjust.bbApply.Enabled := False;
 
     PauseButtonEnabled := False;

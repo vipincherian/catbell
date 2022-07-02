@@ -1467,7 +1467,8 @@ begin
   Id := FCounterClockID.NextVal;
 
   NewWidget := TfraTimer.Create(pnlClocks);
-  NewWidget.Id := Id;
+  //NewWidget.Id := Id;
+  NewWidget.Name := NewWidget.Name + IntToStr(Id);
   NewWidget.Parent := pnlClocks;
   NewWidget.TitleEditable := UserConfig.AllowTimerTitleEdit;
 
@@ -1676,7 +1677,7 @@ begin
 
     //if TimerClock.Running or TimerClock.IsSoundPlaying then;
     //TimerClock.Stop(True);
-    //
+
     //StartTickCount := GetTickCount64;
     //{ Abort is asynchronous, wait till each timer aborts.
     //Also, we do not wait for more than two seconds per timer.
@@ -1691,7 +1692,6 @@ begin
 
     if TimerClock.Selected then
     begin
-
 
       if TimerClock.Running or TimerClock.IsSoundPlaying then;
       TimerClock.Stop(True);
@@ -1715,7 +1715,8 @@ begin
   end;
 
   //for Id in IdList do
-  For TimerClock in TobeRemoved do
+  for TimerClock in TobeRemoved do
+
   begin
     RemoveTimer(TimerClock);
   end;

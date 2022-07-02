@@ -78,7 +78,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     FProceed: boolean;
-    FId: longword;
+    //FId: longword;
     FWidget: Pointer;
 
     FAudioPlayer: TAudioPlayer;
@@ -130,7 +130,7 @@ type
     property LoadedSoundSource: string read FLoadedSoundSource
       write SetLoadedSoundSource;
 
-    property Id: longword read FId;
+    //property Id: longword read FId;
 
     property SoundLooped: boolean read GetSoundLooped write SetSoundLooped;
     property Metronome: boolean read GetMetronome write SetMetronome;
@@ -599,7 +599,7 @@ function TfrmEdit.ShowForAdd: boolean;
 begin
   Caption := 'Add Timer';
   tsTimer.Show;
-  FId := longword(-1);
+  //FId := longword(-1);
   ReenableControls;
   Result := ShowAndGetSpecs;
 end;
@@ -615,14 +615,14 @@ begin
   end;
   tsTimer.Show;
   Widget := TfraTimer(Sender);
-  Fid := Widget.Id;
+  //Fid := Widget.Id;
   FWidget := Widget;
   Caption := 'Edit Timer';
 
   ReenableControls;
 
   Result := ShowAndGetSpecs;
-  FId := longword(-1);
+  //FId := longword(-1);
 end;
 
 end.
