@@ -5,7 +5,7 @@ unit alertentryframe;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, timerframe;
+  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, timerframe;
 
 type
   { TfraAlertEntry }

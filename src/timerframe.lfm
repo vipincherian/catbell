@@ -12,7 +12,7 @@ object fraTimer: TfraTimer
   object imgTimer: TImage
     AnchorSideLeft.Control = cbSelect
     AnchorSideLeft.Side = asrBottom
-    Left = 33
+    Left = 34
     Height = 24
     Top = 8
     Width = 24
@@ -24,10 +24,10 @@ object fraTimer: TfraTimer
     AnchorSideLeft.Control = imgTimer
     AnchorSideLeft.Side = asrBottom
     AnchorSideRight.Control = dtpSet
-    Left = 62
-    Height = 23
+    Left = 63
+    Height = 25
     Top = 9
-    Width = 255
+    Width = 261
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 5
     BorderSpacing.Right = 5
@@ -37,10 +37,10 @@ object fraTimer: TfraTimer
   end
   object lblCountdown: TLabel
     AnchorSideRight.Control = ckbIconProgress
-    Left = 556
-    Height = 15
+    Left = 561
+    Height = 14
     Top = 12
-    Width = 48
+    Width = 42
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 20
@@ -53,17 +53,17 @@ object fraTimer: TfraTimer
   end
   object cbSelect: TCheckBox
     Left = 8
-    Height = 19
+    Height = 21
     Top = 11
-    Width = 20
+    Width = 21
     TabOrder = 0
   end
   object dtpSet: TDateTimePicker
     AnchorSideRight.Control = bbPlay
-    Left = 322
-    Height = 23
+    Left = 329
+    Height = 22
     Top = 8
-    Width = 65
+    Width = 63
     CenturyFrom = 1941
     MaxDate = 2958465
     MinDate = -53780
@@ -87,7 +87,7 @@ object fraTimer: TfraTimer
   object bbPlay: TBitBtn
     AnchorSideRight.Control = bbPause
     Cursor = crHandPoint
-    Left = 392
+    Left = 397
     Height = 36
     Hint = 'Start the timer'
     Top = 2
@@ -105,7 +105,7 @@ object fraTimer: TfraTimer
   object bbPause: TBitBtn
     AnchorSideRight.Control = bbStop
     Cursor = crHandPoint
-    Left = 433
+    Left = 438
     Height = 36
     Hint = 'Pause the timer'
     Top = 2
@@ -199,7 +199,7 @@ object fraTimer: TfraTimer
   object bbStop: TBitBtn
     AnchorSideRight.Control = bbAdjust
     Cursor = crHandPoint
-    Left = 474
+    Left = 479
     Height = 36
     Hint = 'Stop the timer'
     Top = 2
@@ -383,10 +383,10 @@ object fraTimer: TfraTimer
   end
   object ckbIconProgress: TCheckBox
     AnchorSideRight.Control = bbEdit
-    Left = 624
-    Height = 19
+    Left = 623
+    Height = 21
     Top = 11
-    Width = 20
+    Width = 21
     Anchors = [akTop, akRight]
     BorderSpacing.Right = 20
     OnChange = ckbIconProgressChange
@@ -395,7 +395,7 @@ object fraTimer: TfraTimer
   object bbAdjust: TBitBtn
     AnchorSideRight.Control = lblCountdown
     Cursor = crHandPoint
-    Left = 515
+    Left = 520
     Height = 36
     Hint = 'Tweak this run of the timer'
     Top = 2

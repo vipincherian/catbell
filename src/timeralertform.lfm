@@ -57,11 +57,13 @@ object frmAlert: TfrmAlert
   OnShow = FormShow
   LCLVersion = '2.0.12.0'
   object bbClose: TBitBtn
-    Left = 451
+    Left = 388
     Height = 30
     Top = 240
-    Width = 75
+    Width = 141
     Anchors = [akRight, akBottom]
+    BorderSpacing.Right = 10
+    BorderSpacing.Bottom = 10
     DefaultCaption = True
     GlyphShowMode = gsmAlways
     Kind = bkClose
@@ -70,100 +72,73 @@ object frmAlert: TfrmAlert
     TabOrder = 0
   end
   object Label1: TLabel
-    Left = 8
+    Left = 5
     Height = 14
-    Top = 8
-    Width = 167
+    Top = 5
+    Width = 529
+    Align = alTop
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
     Caption = 'The following timers completed:-'
     ParentColor = False
   end
-  object lsvMessages: TListView
-    Left = 8
-    Height = 112
-    Top = 32
-    Width = 208
-    Checkboxes = True
-    Columns = <    
-      item
-        AutoSize = True
-        Caption = 'Title'
-        Width = 30
-      end    
-      item
-        AutoSize = True
-        Caption = 'Duration'
-        Width = 162
-      end>
-    ReadOnly = True
-    TabOrder = 1
-    ViewStyle = vsReport
-    OnItemChecked = lsvMessagesItemChecked
-  end
-  object bbRestart: TBitBtn
-    Left = 8
-    Height = 30
-    Top = 240
-    Width = 75
-    Anchors = [akLeft, akBottom]
-    Caption = '&Restart'
-    Kind = bkRetry
-    ModalResult = 4
-    OnClick = bbRestartClick
-    TabOrder = 2
-  end
-  object cbFromFinish: TCheckBox
-    Left = 8
-    Height = 21
-    Top = 153
-    Width = 238
-    Caption = 'Restart from last finish (wherever possible)'
-    OnChange = cbFromFinishChange
-    TabOrder = 3
-  end
   object pnlMaster: TPanel
-    Left = 268
-    Height = 178
-    Top = 52
-    Width = 244
+    AnchorSideBottom.Control = bbClose
+    Left = 5
+    Height = 211
+    Top = 24
+    Width = 524
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 10
+    BorderSpacing.Top = 5
+    BorderSpacing.Right = 10
+    BorderSpacing.Bottom = 5
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlMaster'
-    ClientHeight = 178
-    ClientWidth = 244
-    TabOrder = 4
+    ClientHeight = 211
+    ClientWidth = 524
+    TabOrder = 1
     object hdrEntries: THeaderControl
       Left = 1
       Height = 30
       Top = 1
-      Width = 242
+      Width = 522
       DragReorder = False
       Sections = <>
       Align = alTop
     end
     object sbxEntries: TScrollBox
       Left = 1
-      Height = 146
+      Height = 179
       Top = 31
-      Width = 242
+      Width = 522
       HorzScrollBar.Page = 1
       HorzScrollBar.Visible = False
       VertScrollBar.Page = 1
       Align = alClient
       Anchors = []
       BorderStyle = bsNone
-      ClientHeight = 146
-      ClientWidth = 242
+      ClientHeight = 179
+      ClientWidth = 522
       TabOrder = 1
       object pnlEntries: TPanel
         Left = 0
-        Height = 146
+        Height = 179
         Top = 0
-        Width = 242
+        Width = 522
         Align = alClient
         BevelOuter = bvNone
         Caption = 'pnlEntries'
         TabOrder = 0
       end
     end
+  end
+  object tmrAlert: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = tmrAlertTimer
+    Left = 152
+    Top = 240
   end
 end
