@@ -422,7 +422,7 @@ begin
       After that, it is past caring. Tardiness can be tolerated only as much. }
       while Timer.IsSoundPlaying do
       begin
-        Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
+        Logger.Debug('Waiting for frame to stop audio');
         Application.ProcessMessages;
         if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
           break;
@@ -1706,7 +1706,7 @@ begin
       After that, it is past caring. Tardiness can be tolerated only as much. }
       while TimerClock.IsSoundPlaying do
       begin
-        Logger.Debug('Waiting for frame ' + IntToStr(Count) + ' to stop audio');
+        Logger.Debug('Waiting for frame to stop audio');
         Application.ProcessMessages;
         if GetTickCount64 > (StartTickCount + AUDIO_ABORT_LONG_WAIT) then
           break;

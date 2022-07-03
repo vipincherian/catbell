@@ -26,7 +26,7 @@ unit log;
 interface
 
 uses
-  Classes, SysUtils, EventLog, LCLIntf, LCLType, fgl;
+  Classes, SysUtils, EventLog, LCLIntf, LCLType, fgl, constants, Dialogs;
 
 type
   TLogLevel = (LOG_NONE, LOG_ERROR, LOG_WARN, LOG_INFO, LOG_ALL);
@@ -65,6 +65,8 @@ implementation
 
 
 constructor TLogger.Create;
+var
+  AppConfigDir: string = '';
 begin
   { Constructor cannot be hidden unless it is made strict private.
   Constructor will proceed with creation only if the single instance is not
@@ -75,7 +77,17 @@ begin
     InitializeCriticalSection(FLogLock);
     FLogger := TEventLog.Create(nil);
     FLogger.LogType := ltFile;
-    FLogger.FileName := GetAppConfigDir(False) + 'catbell.log';
+
+    {If application configuration directory does not exist, create it}
+
+    AppConfigDir := GetAppConfigDir(False);
+
+    if not DirectoryExists(AppConfigDir) then
+      if not CreateDir(AppConfigDir) then
+        ShowMessage('Failed to create application configuration directory ' +
+          AppConfigDir);
+
+    FLogger.FileName := AppConfigDir + 'catbell.log';
     Level := LOG_ALL;
     FSubscribers := TLogListenerList.Create;
   end
