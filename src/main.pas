@@ -402,7 +402,7 @@ end;
 procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   CurrPosNormal, CurrPosRestored: TRect;
-  Count: integer;
+  //Count: integer;
   StartTickCount: QWord;
   Timer: TfraTimer;
 begin
@@ -509,7 +509,7 @@ end;
 procedure TfrmMain.FormDestroy(Sender: TObject);
 var
   Count: integer;
-  I: integer;
+  //I: integer;
   Timer: TfraTimer = nil;
 begin
   for Count := 1 to TRAY_PROGRESS_ICON_COUNT do
@@ -853,7 +853,7 @@ end;
 
 procedure TfrmMain.ResizeHeaderSections;
 var
-  Id: longword;
+  //Id: longword;
   Timer: TfraTimer;
   Filled: integer = 0;
   Temp: integer;
@@ -915,7 +915,7 @@ end;
 
 function TfrmMain.GetAnySelected: boolean;
 var
-  Count: integer;
+  //Count: integer;
   Clock: TfraTimer;
 begin
   //for Count := 0 to FTimerFrames.Count - 1 do
@@ -936,7 +936,7 @@ end;
 
 function TfrmMain.QueryCanSelectedMoveUp: boolean;
 var
-  Id: longword;
+  //Id: longword;
   Clock: TfraTimer;
   EncounteredSelected: boolean;
 begin
@@ -965,7 +965,7 @@ end;
 
 function TfrmMain.QueryCanSelectedMoveDown: boolean;
 var
-  Id: longword;
+  //Id: longword;
   EncounteredUnselected: boolean;
   Clock: TfraTimer;
 begin
@@ -1282,7 +1282,7 @@ end;
 procedure TfrmMain.OptionsFormClosed();
 var
   Temp: TfraTimer;
-  Count: integer;
+  //Count: integer;
 begin
 
   {Once the options form is closed, tool buttons have to be set according
@@ -1512,7 +1512,7 @@ end;
 procedure TfrmMain.HandleTimerFrameIconProgressChange(Sender: TfraTimer);
 var
   Temp: TfraTimer;
-  Count: integer;
+  //Count: integer;
 begin
   { Tray checkboxes can be checked by only one timer at time, as the status
   of only one timer can be shown in the System Tray.
@@ -1657,9 +1657,9 @@ end;
 
 procedure TfrmMain.DeleteSelected;
 var
-  Id: longword;
+  //Id: longword;
   TimerClock: TfraTimer;
-  Count: integer;
+  //Count: integer;
   //IdList: TIdList;
   TobeRemoved: TTimerFrameList;
   StartTickCount: QWord;
@@ -1818,13 +1818,13 @@ procedure TfrmMain.MoveSelectedClocksUp;
 var
   //Id: longword;
   Count: integer;
-  First: boolean;
+  //First: boolean;
   Widget, WidgetBelow: TfraTimer;
   TempControl: TControl;
   TempReference: TAnchorSideReference;
   TempTop: integer;
 begin
-  First := True;
+  //First := True;
   for Count := (FTimerFrames.Count - 2) downto 0 do
   begin
     //if First then
@@ -1899,7 +1899,7 @@ end;
 procedure TfrmMain.AfterShow(Data: PtrInt);
 var
   TimerFrame: TfraTimer;
-  Count: integer;
+  //Count: integer;
 begin
   if FTimerFrames.Count = 0 then
     aiNewTimer.Execute

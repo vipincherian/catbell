@@ -30,14 +30,11 @@ Third party libraries used
 
 # How to setup your development environment #
 
+## IDE
+
 Install Lazarus
 
-## Assertions ##
-
-Assertions are used liberally to intercept runtime anomalous behaviour. These checks run during development testing in builds with debug info, but would not be part of the release build.
-Compiler options -> Custom options -> -Sa
-
-## Install additional Lazarus packages ##
+### Install additional Lazarus packages
 
 Download the packages from the sources mentioned above, and unzip.
 Steps:-
@@ -50,6 +47,22 @@ Steps:-
   * Click on compile
   * Click on Use > Add to project 
 (It is also possible to install these packages through the Lazarus package manager. However, that would involve re-compiling the IDE).
+
+### Compiler
+
+#### Assertions
+
+Assertions are used liberally to intercept runtime anomalous behaviour. These checks run during development testing in builds with debug info, but would not be part of the release build.
+Compiler options -> Custom options -> -Sa
+
+#### Hints & Notes
+
+fgl.ppl shows a lot of hints by default.
+Project > Project Options > Compiler Options > Messages
+Uncheck 
+- *Hint: Inlining disabled*
+- *Hint: "$1" not yet supported inside inline procedure/function*
+- *Note: Call to subroutine "$1" marked as inline is not inlined*
 
 ## Install libraries ##
 

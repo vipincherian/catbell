@@ -22,9 +22,9 @@ object frmMain: TfrmMain
   LCLVersion = '2.2.2.0'
   object tlbMain: TToolBar
     Left = 0
-    Height = 34
     Top = 0
     Width = 652
+    AutoSize = True
     ButtonHeight = 30
     ButtonWidth = 31
     Caption = 'tlbMain'
@@ -254,13 +254,14 @@ object frmMain: TfrmMain
   object bbDelete: TBitBtn
     AnchorSideBottom.Control = bbMoveUp
     Cursor = crHandPoint
-    Left = 611
-    Height = 36
+    Left = 529
+    Height = 38
     Hint = 'Delete the sected timer(s)'
-    Top = 177
-    Width = 36
+    Top = 171
+    Width = 118
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
+    AutoSize = True
     BorderSpacing.Bottom = 5
     Images = ilMain
     ImageIndex = 7
@@ -271,13 +272,14 @@ object frmMain: TfrmMain
   object bbMoveUp: TBitBtn
     AnchorSideBottom.Control = bbMoveDown
     Cursor = crHandPoint
-    Left = 611
-    Height = 36
+    Left = 551
+    Height = 38
     Hint = 'Move the selected timer(s) up'
-    Top = 218
-    Width = 36
+    Top = 214
+    Width = 96
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
+    AutoSize = True
     BorderSpacing.Bottom = 5
     Images = ilMain
     ImageIndex = 8
@@ -288,13 +290,14 @@ object frmMain: TfrmMain
   object bbMoveDown: TBitBtn
     AnchorSideBottom.Control = stbMain
     Cursor = crHandPoint
-    Left = 611
-    Height = 36
+    Left = 535
+    Height = 38
     Hint = 'Move the selected timer(s) down'
-    Top = 259
-    Width = 36
+    Top = 257
+    Width = 112
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
+    AutoSize = True
     BorderSpacing.Bottom = 5
     Images = ilMain
     ImageIndex = 9
@@ -307,8 +310,8 @@ object frmMain: TfrmMain
     AnchorSideTop.Side = asrBottom
     AnchorSideBottom.Control = lblVolume
     Left = 615
-    Height = 84
-    Top = 68
+    Height = 80
+    Top = 66
     Width = 25
     Max = 100
     OnChange = tbVolumeChange
@@ -326,7 +329,7 @@ object frmMain: TfrmMain
     AnchorSideTop.Side = asrBottom
     Left = 615
     Height = 24
-    Top = 39
+    Top = 37
     Width = 24
     Anchors = [akTop, akRight]
     BorderSpacing.Top = 5
@@ -375,7 +378,7 @@ object frmMain: TfrmMain
     AnchorSideBottom.Control = bbDelete
     Left = 604
     Height = 15
-    Top = 157
+    Top = 151
     Width = 39
     Alignment = taRightJustify
     Anchors = [akRight, akBottom]

@@ -46,18 +46,21 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
 {$R *.res}
 
 begin
-  if InstanceRunning then
-  begin
-    MessageDlg('This program is already running.' + LineEnding +
-      'Cannot start another instance.', mtWarning, [mbOK], 0);
-    Exit;
-  end;
 
   {$if declared(useHeapTrace)}
   {$IFOPT D+}
   setHeapTraceOutput('catbell_trace.log');
   {$ENDIF}
   {$endIf}
+
+  Application.Initialize;
+
+  if InstanceRunning then
+  begin
+    MessageDlg('This program is already running.' + LineEnding +
+      'Only a single instance is allowed.', mtWarning, [mbOK], 0);
+    Exit;
+  end;
 
   Logger.Info('************************');
   Logger.Info('Application run starting');
@@ -75,8 +78,6 @@ begin
 {$INCLUDE %FPCVERSION%}
     ));
 
-
-  Application.Initialize;
 
   Application.CreateForm(TfrmMain, frmMain);
 

@@ -272,7 +272,7 @@ end;
 
 procedure TfrmAlert.AddTimer(Timer: TfraTimer);
 var
-  Item: TListItem;
+  //Item: TListItem;
   Hours: word;
   Minutes: word;
   Seconds: word;
