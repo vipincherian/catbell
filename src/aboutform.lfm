@@ -48,11 +48,14 @@ object frmAbout: TfrmAbout
     0000
   }
   OnCreate = FormCreate
-  LCLVersion = '2.0.12.0'
-  object Image1: TImage
-    Left = 8
+  LCLVersion = '2.2.2.0'
+  object imgApp: TImage
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = pnlApp
+    AnchorSideTop.Side = asrCenter
+    Left = 0
     Height = 48
-    Top = 36
+    Top = 4
     Width = 48
     Picture.Data = {
       1754506F727461626C654E6574776F726B47726170686963F707000089504E47
@@ -122,50 +125,68 @@ object frmAbout: TfrmAbout
       56B9752D1468DF0000000049454E44AE426082
     }
   end
-  object Panel1: TPanel
-    Left = 64
-    Height = 104
-    Top = 8
-    Width = 341
+  object pnlApp: TPanel
+    AnchorSideLeft.Control = imgApp
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = bbClose
+    Left = 48
+    Height = 56
+    Top = 0
+    Width = 372
     Anchors = [akTop, akLeft, akRight]
+    AutoSize = True
     BevelOuter = bvLowered
-    ClientHeight = 104
-    ClientWidth = 341
+    ClientHeight = 56
+    ClientWidth = 372
     TabOrder = 0
     object lblAppName: TLabel
-      Left = 16
-      Height = 14
-      Top = 8
-      Width = 61
+      AnchorSideLeft.Control = pnlApp
+      AnchorSideTop.Control = pnlApp
+      Left = 1
+      Height = 13
+      Top = 1
+      Width = 72
       Caption = 'Catbell v1.0'
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False
     end
-    object Label2: TLabel
-      Left = 16
-      Height = 14
-      Top = 56
-      Width = 276
+    object lblDescription: TLabel
+      AnchorSideLeft.Control = lblAppName
+      AnchorSideTop.Control = lblAuthor
+      AnchorSideTop.Side = asrBottom
+      Left = 1
+      Height = 13
+      Top = 27
+      Width = 291
       Caption = 'A full featured countdown timer manager application.'
       ParentColor = False
     end
-    object Label4: TLabel
-      Left = 16
-      Height = 14
-      Top = 32
-      Width = 110
+    object lblAuthor: TLabel
+      AnchorSideLeft.Control = lblAppName
+      AnchorSideTop.Control = lblAppName
+      AnchorSideTop.Side = asrBottom
+      Left = 1
+      Height = 13
+      Top = 14
+      Width = 130
       Caption = '© Vipin Cherian 2021'
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False
     end
     object sttUrl: TStaticText
+      AnchorSideLeft.Control = lblAppName
+      AnchorSideTop.Control = lblDescription
+      AnchorSideTop.Side = asrBottom
       Cursor = crHandPoint
-      Left = 16
-      Height = 20
-      Top = 80
-      Width = 208
+      Left = 1
+      Height = 15
+      Top = 40
+      Width = 222
       AutoSize = True
       Caption = 'https://sourceforge.net/projects/catbell/'
       Color = clDefault
@@ -174,14 +195,21 @@ object frmAbout: TfrmAbout
       ParentFont = False
       ParentColor = False
       TabOrder = 0
+      TabStop = True
     end
   end
   object bbClose: TBitBtn
-    Left = 328
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Cursor = crHandPoint
+    Left = 356
     Height = 30
-    Top = 288
-    Width = 75
-    Anchors = [akTop, akRight]
+    Top = 302
+    Width = 64
+    Anchors = [akRight, akBottom]
+    AutoSize = True
     DefaultCaption = True
     Kind = bkClose
     ModalResult = 11
@@ -189,43 +217,57 @@ object frmAbout: TfrmAbout
     TabOrder = 2
   end
   object pgAdditional: TPageControl
-    Left = 16
-    Height = 152
-    Top = 128
-    Width = 389
-    ActivePage = tsLicense
-    TabIndex = 0
+    AnchorSideLeft.Control = imgApp
+    AnchorSideTop.Control = pnlApp
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = bbClose
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = bbClose
+    Left = 0
+    Height = 246
+    Top = 56
+    Width = 420
+    ActivePage = tsBuild
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabIndex = 1
     TabOrder = 1
     object tsLicense: TTabSheet
       Caption = 'License'
-      ClientHeight = 118
-      ClientWidth = 383
-      object ScrollBox1: TScrollBox
-        Left = 8
-        Height = 104
-        Top = 8
-        Width = 368
-        HorzScrollBar.Page = 28
-        VertScrollBar.Page = 14
-        ClientHeight = 102
-        ClientWidth = 366
+      ClientHeight = 219
+      ClientWidth = 410
+      object sbxLicense: TScrollBox
+        AnchorSideLeft.Control = tsLicense
+        AnchorSideTop.Control = tsLicense
+        AnchorSideRight.Control = tsLicense
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = tsLicense
+        AnchorSideBottom.Side = asrBottom
+        Left = 0
+        Height = 219
+        Top = 0
+        Width = 410
+        HorzScrollBar.Page = 30
+        VertScrollBar.Page = 13
+        Align = alClient
+        ClientHeight = 217
+        ClientWidth = 408
         TabOrder = 0
         object Panel2: TPanel
           Left = 0
-          Height = 102
+          Height = 217
           Top = 0
-          Width = 366
+          Width = 408
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel2'
-          ClientHeight = 102
-          ClientWidth = 366
+          ClientHeight = 217
+          ClientWidth = 408
           TabOrder = 0
           object lblLicense: TLabel
             Left = 0
-            Height = 102
+            Height = 217
             Top = 0
-            Width = 366
+            Width = 408
             Align = alClient
             Caption = 'Label'
             ParentColor = False
@@ -236,13 +278,20 @@ object frmAbout: TfrmAbout
     end
     object tsBuild: TTabSheet
       Caption = 'Build'
-      ClientHeight = 118
-      ClientWidth = 383
+      ClientHeight = 219
+      ClientWidth = 410
       object lsvBuild: TListView
-        Left = 8
-        Height = 112
-        Top = 8
-        Width = 368
+        AnchorSideLeft.Control = tsBuild
+        AnchorSideTop.Control = tsBuild
+        AnchorSideRight.Control = tsBuild
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = tsBuild
+        AnchorSideBottom.Side = asrBottom
+        Left = 0
+        Height = 219
+        Top = 0
+        Width = 410
+        Align = alClient
         Columns = <        
           item
             AutoSize = True
@@ -252,7 +301,7 @@ object frmAbout: TfrmAbout
           item
             AutoSize = True
             Caption = 'Data'
-            Width = 352
+            Width = 395
           end>
         ReadOnly = True
         ShowColumnHeaders = False

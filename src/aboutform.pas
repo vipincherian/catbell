@@ -27,7 +27,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ComCtrls, Buttons, LCLIntf, LCLType, FileInfo;
+  StdCtrls, ComCtrls, Buttons, LCLIntf, LCLType, FileInfo, util;
 
 type
 
@@ -35,16 +35,16 @@ type
 
   TfrmAbout = class(TForm)
     bbClose: TBitBtn;
-    Image1: TImage;
+    imgApp: TImage;
     lblAppName: TLabel;
-    Label2: TLabel;
-    Label4: TLabel;
+    lblDescription: TLabel;
+    lblAuthor: TLabel;
     lblLicense: TLabel;
     lsvBuild: TListView;
     Panel2: TPanel;
-    ScrollBox1: TScrollBox;
+    sbxLicense: TScrollBox;
     pgAdditional: TPageControl;
-    Panel1: TPanel;
+    pnlApp: TPanel;
     sttUrl: TStaticText;
     tsLicense: TTabSheet;
     tsBuild: TTabSheet;
@@ -90,7 +90,7 @@ begin
   Stream := TResourceStream.Create(hinstance, 'GPL2', RT_RCDATA);
   Buffer := AllocMem(Stream.Size + 1);
   Stream.ReadBuffer(Buffer^, Stream.Size);
-  LicenseText := PAnsiChar(Buffer);
+  LicenseText := pansichar(Buffer);
   lblLicense.Caption := LicenseText;
   Freemem(Buffer);
   Stream.Free;
@@ -99,36 +99,84 @@ begin
   Item := lsvBuild.Items.Add;
   Item.Caption := 'Target OS';
   Item.SubItems.Add(
-{$include %FPCTargetOS%}
+    {$include %FPCTargetOS%}
     );
 
   Item := lsvBuild.Items.Add;
   Item.Caption := 'Target CPU';
   Item.SubItems.Add(
-{$include %FPCTargetCPU%}
+    {$include %FPCTargetCPU%}
     );
 
   Item := lsvBuild.Items.Add;
   Item.Caption := 'Compiler(FPC) Version';
   Item.SubItems.Add(
-{$include %FPCVersion%}
+    {$include %FPCVersion%}
     );
 
   Item := lsvBuild.Items.Add;
   Item.Caption := 'Build date';
   Item.SubItems.Add(
-{$include %DATE%}
+    {$include %DATE%}
     );
 
   Item := lsvBuild.Items.Add;
   Item.Caption := 'Build time';
   Item.SubItems.Add(
-{$include %TIME%}
+    {$include %TIME%}
     );
 
   lsvBuild.EndUpdate;
 
   pgAdditional.ActivePage := tsLicense;
+
+
+  { Dynamic layout of controls }
+
+  with UserInterfaceMetrics do
+  begin
+
+    { Controls on which the rest are anchored }
+    bbClose.BorderSpacing.Bottom := Margin;
+    bbClose.BorderSpacing.Right := Margin;
+
+    with pnlApp.BorderSpacing do
+    begin
+      Top := Margin;
+      Right := Margin;
+      Left := Padding;
+    end;
+
+    { Rest of the dependent controls }
+
+    imgApp.BorderSpacing.Left := Margin;
+
+    lblAppName.BorderSpacing.Left := Padding;
+    lblAppName.BorderSpacing.Top := Padding;
+    lblAuthor.BorderSpacing.Top := Padding;
+    lblDescription.BorderSpacing.Top := 2 * Margin;
+    sttUrl.BorderSpacing.Top := Padding;
+
+    pnlApp.BorderSpacing.Top := Padding;
+
+    pgAdditional.BorderSpacing.Top := Padding;
+    pgAdditional.BorderSpacing.Bottom := Padding;
+
+    with sbxLicense.BorderSpacing do begin
+      Top:=Padding;
+      Left:=Padding;
+      Right:=Padding;
+      Bottom:=Padding;
+    end;
+
+    with lsvBuild.BorderSpacing do begin
+      Top:=Padding;
+      Left:=Padding;
+      Right:=Padding;
+      Bottom:=Padding;
+    end;
+
+  end;
 
 end;
 
