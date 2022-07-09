@@ -1,41 +1,41 @@
 object fraAlertEntry: TfraAlertEntry
   Left = 0
-  Height = 229
+  Height = 152
   Top = 0
-  Width = 620
+  Width = 621
   Anchors = [akTop, akLeft, akRight]
   AutoSize = True
   BorderSpacing.InnerBorder = 5
-  ClientHeight = 229
-  ClientWidth = 620
+  ClientHeight = 152
+  ClientWidth = 621
   TabOrder = 0
   DesignLeft = 455
   DesignTop = 261
   object stDescription: TStaticText
-    AnchorSideTop.Control = stDuration
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = bbStart
+    AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = stDuration
-    Left = 5
-    Height = 20
-    Top = 10
-    Width = 366
+    Left = 0
+    Height = 15
+    Top = 11
+    Width = 411
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
-    BorderSpacing.Left = 5
-    BorderSpacing.Right = 5
     Caption = 'stDescription'
     TabOrder = 0
   end
   object bbRestart: TBitBtn
-    AnchorSideTop.Side = asrBottom
+    AnchorSideTop.Control = bbStart
+    AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbStart
     Cursor = crHandPoint
-    Left = 531
+    Left = 541
     Height = 36
     Hint = 'Restart from last finish'
     Top = 0
     Width = 40
     Anchors = [akTop, akRight]
-    BorderSpacing.Right = 5
     Kind = bkRetry
     ModalResult = 4
     OnClick = bbRestartClick
@@ -44,15 +44,17 @@ object fraAlertEntry: TfraAlertEntry
     TabOrder = 1
   end
   object bbStart: TBitBtn
-    AnchorSideTop.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
     Cursor = crHandPoint
-    Left = 576
+    Left = 581
     Height = 36
     Hint = 'Start'
     Top = 0
     Width = 40
     Anchors = [akTop, akRight]
-    BorderSpacing.Right = 5
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
       2000000000000004000064000000640000000000000000000000000000000000
@@ -95,26 +97,26 @@ object fraAlertEntry: TfraAlertEntry
     TabOrder = 2
   end
   object stCompletedAt: TStaticText
-    AnchorSideTop.Control = bbRestart
+    AnchorSideTop.Control = bbStart
     AnchorSideTop.Side = asrCenter
-    Left = 456
+    AnchorSideRight.Control = bbRestart
+    Left = 476
     Height = 17
     Top = 10
     Width = 65
     Anchors = [akTop, akRight]
-    BorderSpacing.Right = 5
     Caption = 'stCompletedAt'
     TabOrder = 3
   end
   object stDuration: TStaticText
-    AnchorSideTop.Control = bbRestart
+    AnchorSideTop.Control = bbStart
     AnchorSideTop.Side = asrCenter
-    Left = 376
+    AnchorSideRight.Control = stCompletedAt
+    Left = 411
     Height = 17
     Top = 10
     Width = 65
     Anchors = [akTop, akRight]
-    BorderSpacing.Right = 5
     Caption = 'stDuration'
     TabOrder = 4
   end

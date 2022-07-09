@@ -138,8 +138,8 @@ const
   TIMER_CONF_METRONOME = 'metronome';
 
   { For auto arranging }
-  TIMER_PADDING = 5;
-  TIMER_REPORT_PADDING = 20;
+  //TIMER_PADDING = 5;
+  //TIMER_REPORT_PADDING = 20;
 
   { Settings }
   AUDIO_ABORT_SHORT_WAIT = 2000;
@@ -263,6 +263,12 @@ const
   {Options}
 
   LSVADUIO_INDEX_HOSTAPI: integer = 0;
+
+  {User Interface}
+  PADDING_RATIO = 2;
+  MARGIN_RATIO = 1;
+  PADDING_ROUNDED_TO = 4;
+  REPORT_PADDING_MULTIPLIER = 4;
 implementation
 
 end.

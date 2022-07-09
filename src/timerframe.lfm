@@ -30,13 +30,11 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = dtpSet
-    Left = 62
+    Left = 57
     Height = 25
     Top = 7
-    Width = 65
+    Width = 82
     Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Left = 5
-    BorderSpacing.Right = 5
     ReadOnly = True
     TabOrder = 1
     Text = 'edtTitle'
@@ -45,7 +43,7 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = ckbIconProgress
-    Left = 514
+    Left = 521
     Height = 13
     Top = 13
     Width = 50
@@ -73,7 +71,7 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbPlay
-    Left = 132
+    Left = 139
     Height = 19
     Top = 10
     Width = 71
@@ -102,7 +100,7 @@ object fraTimer: TfraTimer
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbPause
     Cursor = crHandPoint
-    Left = 208
+    Left = 215
     Height = 38
     Hint = 'Start the timer'
     Top = 0
@@ -123,7 +121,7 @@ object fraTimer: TfraTimer
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbStop
     Cursor = crHandPoint
-    Left = 251
+    Left = 258
     Height = 38
     Hint = 'Pause the timer'
     Top = 0
@@ -220,7 +218,7 @@ object fraTimer: TfraTimer
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbAdjust
     Cursor = crHandPoint
-    Left = 341
+    Left = 348
     Height = 38
     Hint = 'Stop the timer'
     Top = 0
@@ -313,9 +311,11 @@ object fraTimer: TfraTimer
     TabOrder = 5
   end
   object bbEdit: TBitBtn
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Cursor = crHandPoint
-    Left = 627
+    Left = 634
     Height = 38
     Hint = 'Edit the timer'
     Top = 0
@@ -323,7 +323,6 @@ object fraTimer: TfraTimer
     Action = aiEdit
     Anchors = [akTop, akRight]
     AutoSize = True
-    BorderSpacing.Right = 5
     Glyph.Data = {
       36090000424D3609000000000000360000002800000018000000180000000100
       20000000000000090000640000006400000000000000000000004949490E3F3F
@@ -410,7 +409,7 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbEdit
-    Left = 584
+    Left = 591
     Height = 23
     Top = 8
     Width = 23
@@ -424,7 +423,7 @@ object fraTimer: TfraTimer
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = lblCountdown
     Cursor = crHandPoint
-    Left = 423
+    Left = 430
     Height = 38
     Hint = 'Tweak this run of the timer'
     Top = 0

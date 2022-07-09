@@ -5,7 +5,7 @@ unit alertentryframe;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, timerframe;
+  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, timerframe, util;
 
 type
   { TfraAlertEntry }
@@ -63,7 +63,18 @@ begin
 
   OnTimerRestart := nil;
   OnTimerStart := nil;
+
+  { Dynamically spacing controls }
+
+  with UserInterfaceMetrics do
+  begin
+    bbStart.BorderSpacing.Top := Padding;
+    bbStart.BorderSpacing.Right := Padding;
+    stCompletedAt.BorderSpacing.Right := Padding;
+    stDuration.BorderSpacing.Right := Padding;
+    stDescription.BorderSpacing.Left := Padding;
+    stDescription.BorderSpacing.Right := Padding;
+  end;
 end;
 
 end.
-

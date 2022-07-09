@@ -29,7 +29,7 @@ uses
   ComCtrls, ActnList, ExtCtrls, Buttons, LCLIntf, LCLType,
   settings, optionsform, aboutform, BGRABitmap,
   BGRABitmapTypes, FPimage, timeralertform, dateutils, jsonConf,
-  timerframe, fgl, sequence, editform, Math, StdCtrls, constants,
+  timerframe, fgl, util, editform, Math, StdCtrls, constants,
   {$IF defined(windows) }
   ShlObj, comobj, Win32Int, InterfaceBase,
   {$ENDIF}
@@ -328,6 +328,25 @@ begin
   Info.Free;
 
   pnlClocks.Caption := '';
+
+  {Dynamically fix pacing}
+  bbMoveDown.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
+  bbMoveDown.BorderSpacing.Right := UserInterfaceMetrics.Margin;
+
+  lblVolume.BorderSpacing.Bottom := UserInterfaceMetrics.Margin;
+  tbVolume.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
+
+  imgVolumeOn.BorderSpacing.Top := UserInterfaceMetrics.Margin;
+
+
+  pnlBorder.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  pnlBorder.BorderSpacing.Left := UserInterfaceMetrics.Margin;
+  pnlBorder.BorderSpacing.Top := UserInterfaceMetrics.Padding;
+  //Self.BorderSpacing.InnerBorder := 10;
+  //BorderSpacing.Around:=10;
+  //bbMoveDown.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  //bbMoveDown.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
+  //bbDelete.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
 
 end;
 
@@ -876,7 +895,7 @@ begin
   {TODO: TIMER_PADDING cannot be used - correct}
 
   hdrTimers.Sections.Items[0].Width :=
-    Timer.cbSelect.Left + Timer.cbSelect.Width + (TIMER_PADDING div 2);
+    Timer.cbSelect.Left + Timer.cbSelect.Width + (UserInterfaceMetrics.Padding div 2);
   Inc(Filled, hdrTimers.Sections.Items[0].Width);
 
   Temp := Timer.dtpSet.Left + Timer.dtpSet.Width;
@@ -899,12 +918,13 @@ begin
   Inc(Filled, Temp);
 
   Temp := Timer.lblCountdown.Left + Timer.lblCountdown.Width;
-  Temp := Temp - Filled + (TIMER_PADDING div 2);
+  Temp := Temp - Filled + (UserInterfaceMetrics.Padding div 2);
   hdrTimers.Sections.Items[3].Width := Temp;
   Inc(Filled, Temp);
 
   Temp := Timer.ckbIconProgress.Left + Timer.ckbIconProgress.Width;
-  Temp := Temp - Filled + TIMER_REPORT_PADDING - (TIMER_PADDING div 2);
+  Temp := Temp - Filled + (UserInterfaceMetrics.Padding * 4) -
+    (UserInterfaceMetrics.Padding div 2);
   hdrTimers.Sections.Items[4].Width := Temp;
   Inc(Filled, Temp);
 
@@ -1405,7 +1425,7 @@ begin
             end
             else
             begin
-              Application.MessageBox(PAnsiChar('Could not load file ' +
+              Application.MessageBox(pansichar('Could not load file ' +
                 AudioFileName + '. Restting to default sound.'), 'Alert', MB_OK);
               NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
             end;
@@ -1414,11 +1434,8 @@ begin
           begin
             NewTimerClock.SoundIndex := SoundPool.DefaultSoundIndex;
             Logger.Error('Invalid sound type loaded for clock #' +
-              IntToStr(Count) + ' - ' + IntToStr(SoundType) + ' at ' + string(
-        {$INCLUDE %FILE%}
-              ) + ':' + string(
-        {$INCLUDE %LINE%}
-              ));
+              IntToStr(Count) + ' - ' + IntToStr(SoundType) + ' at ' +
+              string({$INCLUDE %FILE%}) + ':' + string({$INCLUDE %LINE%}));
           end;
         end;
         NewTimerClock.SoundLooped := Conf.GetValue(TIMER_CONF_SOUNDLOOP, False);

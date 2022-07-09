@@ -54,15 +54,17 @@ object frmAlert: TfrmAlert
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.0.12.0'
+  LCLVersion = '2.2.2.0'
   object bbClose: TBitBtn
-    Left = 388
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 393
     Height = 30
-    Top = 240
+    Top = 246
     Width = 141
     Anchors = [akRight, akBottom]
-    BorderSpacing.Right = 10
-    BorderSpacing.Bottom = 10
     DefaultCaption = True
     GlyphShowMode = gsmAlways
     Kind = bkClose
@@ -70,61 +72,62 @@ object frmAlert: TfrmAlert
     OnClick = bbCloseClick
     TabOrder = 0
   end
-  object Label1: TLabel
-    Left = 5
-    Height = 14
-    Top = 5
-    Width = 529
+  object lblAlert: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 0
+    Height = 13
+    Top = 0
+    Width = 534
     Align = alTop
-    BorderSpacing.Left = 5
-    BorderSpacing.Top = 5
     Caption = 'The following timers completed:-'
     ParentColor = False
   end
   object pnlMaster: TPanel
+    AnchorSideLeft.Control = lblAlert
+    AnchorSideTop.Control = lblAlert
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = bbClose
+    AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbClose
-    Left = 5
-    Height = 211
-    Top = 24
-    Width = 524
+    Left = 0
+    Height = 233
+    Top = 13
+    Width = 534
     Anchors = [akTop, akLeft, akRight, akBottom]
-    BorderSpacing.Left = 10
-    BorderSpacing.Top = 5
-    BorderSpacing.Right = 10
-    BorderSpacing.Bottom = 5
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlMaster'
-    ClientHeight = 211
-    ClientWidth = 524
+    ClientHeight = 233
+    ClientWidth = 534
     TabOrder = 1
     object hdrEntries: THeaderControl
       Left = 1
       Height = 30
       Top = 1
-      Width = 522
+      Width = 532
       DragReorder = False
       Sections = <      
         item
-          Alignment = taLeftJustify
+          Alignment = taCenter
           Text = 'Description'
           Width = 30
           Visible = True
         end      
         item
-          Alignment = taLeftJustify
+          Alignment = taCenter
           Text = 'Duration'
           Width = 30
           Visible = True
         end      
         item
-          Alignment = taLeftJustify
-          Text = 'Completed at'
+          Alignment = taCenter
+          Text = 'At'
           Width = 30
           Visible = True
         end      
         item
-          Alignment = taLeftJustify
+          Alignment = taCenter
           Text = 'Controls'
           Width = 30
           Visible = True
@@ -134,24 +137,24 @@ object frmAlert: TfrmAlert
     end
     object sbxEntries: TScrollBox
       Left = 1
-      Height = 179
+      Height = 201
       Top = 31
-      Width = 522
+      Width = 532
       HorzScrollBar.Page = 1
       HorzScrollBar.Visible = False
       VertScrollBar.Page = 1
       Align = alClient
       Anchors = []
       BorderStyle = bsNone
-      ClientHeight = 179
-      ClientWidth = 522
+      ClientHeight = 201
+      ClientWidth = 532
       TabOrder = 1
       OnResize = sbxEntriesResize
       object pnlEntries: TPanel
         Left = 0
-        Height = 179
+        Height = 201
         Top = 0
-        Width = 522
+        Width = 532
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0

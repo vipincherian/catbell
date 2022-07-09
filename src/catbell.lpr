@@ -30,7 +30,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   Dialogs,
   datetimectrls,
   main,
-  sequence,
+  util,
   timerframe,
   settings,
   optionsform,

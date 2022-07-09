@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, fgl, dateutils,
-  settings, alertentryframe, sequence, log, DateTimePicker;
+  settings, alertentryframe, util, log, DateTimePicker;
 
 type
   TAlertEntryList = specialize TFPGList<TfraAlertEntry>;
@@ -37,7 +37,7 @@ type
   TfrmAlert = class(TForm)
     bbClose: TBitBtn;
     hdrEntries: THeaderControl;
-    Label1: TLabel;
+    lblAlert: TLabel;
     pnlMaster: TPanel;
     pnlEntries: TPanel;
     sbxEntries: TScrollBox;
@@ -88,6 +88,22 @@ begin
 
   FEntryIDGenerator := TSequence.Create;
   FEntries := TAlertEntryList.Create;
+
+  { Dynamically spacing controls }
+
+  with UserInterfaceMetrics do
+  begin
+    lblAlert.BorderSpacing.Top:=Margin;
+    lblAlert.BorderSpacing.Left:=Margin;
+    //pnlMaster.BorderSpacing.Left:=Margin;
+    //pnlMaster.BorderSpacing.Right:=Margin;
+    pnlMaster.BorderSpacing.Top:=Padding;
+    pnlMaster.BorderSpacing.Bottom:=Padding;
+
+    bbClose.BorderSpacing.Right:=Margin;
+    bbClose.BorderSpacing.Bottom:=Margin;
+  end;
+
 end;
 
 procedure TfrmAlert.FormDestroy(Sender: TObject);
@@ -221,30 +237,30 @@ end;
 procedure TfrmAlert.ResizeHeaderSections;
 var
   Entry: TfraAlertEntry;
-  TempRight: integer = 0;
-  TempLeft: integer = 0;
+  RightMarker: integer = 0;
+  LeftMarker: integer = 0;
 begin
   if FEntries.Count <= 0 then
     Exit;
 
   Entry := FEntries.First;
 
-  TempRight := Entry.stDescription.Left + Entry.stDescription.Width;
-  Inc(TempRight, (Entry.stDuration.Left - TempRight) div 2);
-  hdrEntries.Sections.Items[0].Width := TempRight;
-  TempLeft := TempRight;
+  RightMarker := Entry.stDescription.Left + Entry.stDescription.Width;
+  Inc(RightMarker, (Entry.stDuration.Left - RightMarker) div 2);
+  hdrEntries.Sections.Items[0].Width := RightMarker;
+  LeftMarker := RightMarker;
 
-  TempRight := Entry.stDuration.Left + Entry.stDuration.Width;
-  Inc(TempRight, (Entry.stCompletedAt.Left - TempRight) div 2);
-  hdrEntries.Sections.Items[1].Width := TempRight - TempLeft;
-  TempLeft := TempRight;
+  RightMarker := Entry.stDuration.Left + Entry.stDuration.Width;
+  Inc(RightMarker, (Entry.stCompletedAt.Left - RightMarker) div 2);
+  hdrEntries.Sections.Items[1].Width := RightMarker - LeftMarker;
+  LeftMarker := RightMarker;
 
-  TempRight := Entry.stCompletedAt.Left + Entry.stCompletedAt.Width;
-  Inc(TempRight, (Entry.bbRestart.Left - TempRight) div 2);
-  hdrEntries.Sections.Items[2].Width := TempRight - TempLeft;
-  TempLeft := TempRight;
+  RightMarker := Entry.stCompletedAt.Left + Entry.stCompletedAt.Width;
+  Inc(RightMarker, (Entry.bbRestart.Left - RightMarker) div 2);
+  hdrEntries.Sections.Items[2].Width := RightMarker - LeftMarker;
+  LeftMarker := RightMarker;
 
-  hdrEntries.Sections.Items[3].Width := hdrEntries.ClientWidth - TempRight;
+  hdrEntries.Sections.Items[3].Width := hdrEntries.ClientWidth - RightMarker;
 
 end;
 

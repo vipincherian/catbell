@@ -18,14 +18,14 @@ Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
 Boston, MA  02110-1301, USA.
 
 }
-unit sequence;
+unit util;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Forms, Graphics, constants;
 
 type
 
@@ -44,7 +44,46 @@ type
     procedure Reset;
   end;
 
+  { TUserInterfaceMetrics }
+
+  TUserInterfaceMetrics = class(TObject)
+  private
+    FPadding: integer;
+    FMargin: integer;
+  public
+    constructor Create();
+    destructor Destroy; override;
+    property Padding: integer read FPadding;
+    property Margin: integer read FMargin;
+  end;
+
+var
+  UserInterfaceMetrics: TUserInterfaceMetrics = nil;
+
 implementation
+
+{ TUserInterfaceMetrics }
+
+constructor TUserInterfaceMetrics.Create;
+var
+  SystemFont: TFont;
+  SystemFontSize: integer;
+begin
+  SystemFont := Screen.SystemFont;
+  SystemFontSize := Round((GetFontData(SystemFont.Handle).Height *
+    72 / SystemFont.PixelsPerInch));
+  {Divide the default pitch by padding ratio an then round to the uppermost 4 }
+  FPadding := ((((SystemFontSize div PADDING_RATIO) + PADDING_ROUNDED_TO - 1) shr
+    2) shl 2);
+  FMargin := ((((SystemFontSize div MARGIN_RATIO) + PADDING_ROUNDED_TO - 1) shr
+    2) shl 2);
+
+end;
+
+destructor TUserInterfaceMetrics.Destroy;
+begin
+  inherited Destroy;
+end;
 
 { TSequence }
 
@@ -80,5 +119,9 @@ begin
   FCounter := 0;
 end;
 
-end.
+initialization
+  UserInterfaceMetrics := TUserInterfaceMetrics.Create;
 
+finalization
+  FreeAndNil(UserInterfaceMetrics);
+end.

@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, Dialogs, ActnList, dateutils, settings,
   editform, Graphics, Math, {EventLog,} adjustform, {sndfile, portaudio,} audio,
-  {ctypes,} LCLIntf, StrUtils, log{, sound}, metronome, fgl, constants;
+  {ctypes,} LCLIntf, StrUtils, log{, sound}, metronome, fgl, constants, util;
 
 type
 
@@ -308,9 +308,9 @@ begin
   frmAdjust.dtpDiff.Show;
   frmAdjust.dtpTill.Hide;
   //frmAdjust.Id := FId;
-  FBeingAdjusted:=True;
+  FBeingAdjusted := True;
   frmAdjust.ShowModal;
-  FBeingAdjusted:=False;
+  FBeingAdjusted := False;
 end;
 
 
@@ -705,6 +705,34 @@ begin
   FBeingAdjusted := False;
   FBeingEdited := False;
   //ArrangeControls;
+
+  { Space controls }
+  //BorderSpacing.InnerBorder:=10;
+  bbEdit.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  bbEdit.BorderSpacing.Top := UserInterfaceMetrics.Padding;
+
+  ckbIconProgress.BorderSpacing.Right :=
+    REPORT_PADDING_MULTIPLIER * UserInterfaceMetrics.Padding;
+  lblCountdown.BorderSpacing.Right :=
+    REPORT_PADDING_MULTIPLIER * UserInterfaceMetrics.Padding;
+
+  bbAdjust.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
+  bbStop.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
+  bbPause.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
+  bbPlay.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
+
+  dtpSet.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
+
+  edtTitle.BorderSpacing.Right:= UserInterfaceMetrics.Padding;
+
+  { Additional padding to the right of the image timer as it looks huddled
+  otherwise }
+  edtTitle.BorderSpacing.Left:= UserInterfaceMetrics.Padding * 2;
+
+  imgTimer.BorderSpacing.Left:=UserInterfaceMetrics.Padding;
+  cbSelect.BorderSpacing.Left:=UserInterfaceMetrics.Padding;
+
+
 end;
 
 destructor TfraTimer.Destroy;
