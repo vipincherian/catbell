@@ -122,6 +122,8 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
+    procedure pnlClocksMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     procedure pnlClocksResize(Sender: TObject);
     procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
@@ -628,6 +630,15 @@ end;
 procedure TfrmMain.pmiShowWindowClick(Sender: TObject);
 begin
   ShowInForeground;
+end;
+
+procedure TfrmMain.pnlClocksMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+  begin
+    pmMain.PopUp;
+  end;
 end;
 
 procedure TfrmMain.pnlClocksResize(Sender: TObject);

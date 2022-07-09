@@ -75,8 +75,8 @@ begin
   {Divide the default pitch by padding ratio an then round to the uppermost 4 }
   FPadding := ((((SystemFontSize div PADDING_RATIO) + PADDING_ROUNDED_TO - 1) shr
     2) shl 2);
-  FMargin := ((((SystemFontSize div MARGIN_RATIO) + PADDING_ROUNDED_TO - 1) shr
-    2) shl 2);
+  FMargin := ((((SystemFontSize div MARGIN_RATIO) + MARGIN_ROUNDED_TO - 1) shr
+    3) shl 3);
 
 end;
 

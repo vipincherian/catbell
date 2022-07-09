@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
   ComCtrls, DateTimePicker, settings, dateutils, {sndfile, ctypes,} {EventLog,}
-  Math, audio, log{, sound}, constants;
+  Math, audio, log{, sound}, constants, util;
 
 type
 
@@ -47,14 +47,14 @@ type
     cmbSoundType: TComboBox;
     dtpDuration: TDateTimePicker;
     edtDescription: TEdit;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    GroupBox3: TGroupBox;
-    GroupBox4: TGroupBox;
-    GroupBox5: TGroupBox;
+    gbSpecs: TGroupBox;
+    gbOnCompletion: TGroupBox;
+    gbAlarm: TGroupBox;
+    gbCustom: TGroupBox;
+    gbMetronome: TGroupBox;
     imlEdit: TImageList;
-    Label1: TLabel;
-    Label2: TLabel;
+    lblDescription: TLabel;
+    lblDuration: TLabel;
     lsvSoundDetails: TListView;
     odgAudio: TOpenDialog;
     pgEditTimer: TPageControl;
@@ -97,6 +97,7 @@ type
     function GetSoundLooped: boolean;
     function GetTrayNotification: boolean;
     function GetUseDefaultSound: boolean;
+    procedure LayoutControls;
     procedure SetLoadedSoundIndex(AValue: integer);
     procedure SetLoadedSoundSource(AValue: string);
     procedure SetMetronome(AValue: boolean);
@@ -175,6 +176,8 @@ begin
     TrayNotification := ShowTrayAlert;
   end;
 
+  LayoutControls;
+
   ReenableControls;
 
 end;
@@ -234,11 +237,7 @@ begin
     SOUND_NONE: FSoundIndex := INVALID_SOUNDPOOL_INDEX;
     else
       Logger.Warning('cmbSoundType.ItemIndex - ' + IntToStr(FSoundIndex) +
-        ' at ' + string(
-    {$INCLUDE %FILE%}
-        ) + ':' + string(
-    {$INCLUDE %LINE%}
-        ));
+        ' at ' + string({$INCLUDE %FILE%}) + ':' + string({$INCLUDE %LINE%}));
   end;
   ReenableControls;
 end;
@@ -392,11 +391,7 @@ begin
       cmbSoundType.ItemIndex := SOUND_CUSTOM
     else
       Logger.Warning('Unexpected FSoundIndex - ' + IntToStr(FSoundIndex) +
-        ' at ' + string(
-  {$INCLUDE %FILE%}
-        ) + ':' + string(
-  {$INCLUDE %LINE%}
-        ));
+        ' at ' + string({$INCLUDE %FILE%}) + ':' + string({$INCLUDE %LINE%}));
 
     lsvSoundDetails.Visible := (FSoundIndex >= SoundPool.CustomSoundRangeStart);
     bbClearSound.Enabled := lsvSoundDetails.Visible;
@@ -459,7 +454,7 @@ end;
 
 function TfrmEdit.GetSoundDuration: double;
 begin
-{ TODO : What is this for? }
+  { TODO : What is this for? }
   Result := 0;
 end;
 
@@ -496,6 +491,110 @@ end;
 function TfrmEdit.GetUseDefaultSound: boolean;
 begin
   Result := (cmbSoundType.ItemIndex = SOUND_DEFAULT);
+end;
+
+procedure TfrmEdit.LayoutControls;
+begin
+  { Dymamic layout of controls }
+  with UserInterfaceMetrics do
+  begin
+
+    { Form: Controls on which others are anchored }
+    with bbSave.BorderSpacing do
+    begin
+      Right := Margin;
+      Bottom := Margin;
+    end;
+    bbCancel.BorderSpacing.Left := Margin;
+
+    { Other controls }
+    with pgEditTimer.BorderSpacing do
+    begin
+      Top := Margin;
+      Bottom := Padding;
+    end;
+
+    {Page Timer: Controls on which others are anchored }
+    gbSpecs.BorderSpacing.Around := Margin;
+    gbSpecs.BorderSpacing.InnerBorder := Margin;
+
+    with gbOnCompletion.BorderSpacing do
+    begin
+      Top := Margin;
+      Bottom := Margin;
+      InnerBorder := Margin;
+    end;
+
+    lblDescription.BorderSpacing.Left := Margin;
+
+    with edtDescription.BorderSpacing do
+    begin
+      Left := Padding;
+      Right := Margin;
+      Top := Margin;
+    end;
+
+    {Page timer: Other controls }
+
+    dtpDuration.BorderSpacing.Top := Padding;
+
+    with ckbModalAlert.BorderSpacing do
+    begin
+      Top := Margin;
+      Left := Margin;
+    end;
+    ckbTrayNotification.BorderSpacing.Top := Padding;
+
+    {Page Sound: Controls on which others are anchored }
+
+    gbMetronome.BorderSpacing.Around := Margin;
+    gbMetronome.BorderSpacing.InnerBorder := Margin;
+    with ckbMetronome.BorderSpacing do
+    begin
+      Left := Margin;
+      //Top:=Margin;
+      //Right:=Margin;
+    end;
+
+    with gbAlarm.BorderSpacing do
+    begin
+      InnerBorder := Margin;
+      Top := Margin;
+      //Left:=Margin;
+    end;
+
+    with bbTestSound.BorderSpacing do
+    begin
+      Top := Margin;
+      Right := Margin;
+    end;
+
+    bbStopSound.BorderSpacing.Top := Padding;
+    cmbSoundType.BorderSpacing.Left := Margin;
+    cmbSoundType.BorderSpacing.Right := Padding;
+
+    with gbCustom.BorderSpacing do
+    begin
+      InnerBorder := Margin;
+      Left := Margin;
+      Right := Margin;
+    end;
+
+    with bbClearSound.BorderSpacing do begin
+      Top:=Margin;
+      Right:=Margin;
+    end;
+
+    bbSelectSound.BorderSpacing.Left:=Margin;
+
+    with lsvSoundDetails.BorderSpacing do begin
+      Top:=Padding;
+      Bottom:=Margin;
+    end;
+
+
+  end;
+
 end;
 
 procedure TfrmEdit.SetLoadedSoundIndex(AValue: integer);

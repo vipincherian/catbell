@@ -237,6 +237,7 @@ object frmMain: TfrmMain
         BevelOuter = bvNone
         Caption = 'pnlClocks'
         TabOrder = 0
+        OnMouseUp = pnlClocksMouseUp
         OnResize = pnlClocksResize
       end
     end
