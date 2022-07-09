@@ -26,7 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Buttons,
-  DateTimePicker, dateutils, settings, constants;
+  DateTimePicker, dateutils, settings, constants, util;
 
 type
 
@@ -96,12 +96,30 @@ begin
   SetTillDateTime;
 
   //Id := longword(-1);
+
+  { Dynamic layout of controls }
+
+  with UserInterfaceMetrics do
+  begin
+    with cmbOptions.BorderSpacing do
+    begin
+      Left := Margin;
+      Right := Margin;
+      Top := Padding;
+    end;
+
+    dtpDiff.BorderSpacing.Top := Padding;
+    dtpTill.BorderSpacing.Top := Padding;
+
+    bbCancel.BorderSpacing.Bottom := Margin;
+    bbApply.BorderSpacing.Bottom := Margin;
+  end;
 end;
 
 procedure TfrmAdjust.FormShow(Sender: TObject);
 begin
   dtpTill.TimeFormat := TTimeFormat(UserConfig.DefaultTimeFormat);
-  dtpDiff.Time:=UserConfig.AdjustDiff;
+  dtpDiff.Time := UserConfig.AdjustDiff;
   SetTillDateTime;
 end;
 
@@ -109,7 +127,7 @@ procedure TfrmAdjust.SetTillDateTime;
 begin
   dtpTill.DateTime := IncHour(Now, HourOf(UserConfig.AdjustCompleteby));
   dtpTill.DateTime := IncMinute(Now, MinuteOf(UserConfig.AdjustCompleteby));
-  dtpTill.DateTime := IncSecond(Now, SecondOf(UserConfig.AdjustCompleteby))
+  dtpTill.DateTime := IncSecond(Now, SecondOf(UserConfig.AdjustCompleteby));
 end;
 
 procedure TfrmAdjust.bbApplyClick(Sender: TObject);
