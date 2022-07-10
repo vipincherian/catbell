@@ -99,7 +99,6 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbPause
-    Cursor = crHandPoint
     Left = 215
     Height = 38
     Hint = 'Start the timer'
@@ -120,7 +119,6 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbStop
-    Cursor = crHandPoint
     Left = 258
     Height = 38
     Hint = 'Pause the timer'
@@ -217,7 +215,6 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbAdjust
-    Cursor = crHandPoint
     Left = 348
     Height = 38
     Hint = 'Stop the timer'
@@ -314,7 +311,6 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Cursor = crHandPoint
     Left = 634
     Height = 38
     Hint = 'Edit the timer'
@@ -422,7 +418,6 @@ object fraTimer: TfraTimer
     AnchorSideTop.Control = bbEdit
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = lblCountdown
-    Cursor = crHandPoint
     Left = 430
     Height = 38
     Hint = 'Tweak this run of the timer'

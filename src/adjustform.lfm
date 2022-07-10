@@ -76,7 +76,6 @@ object frmAdjust: TfrmAdjust
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Cursor = crHandPoint
     Left = 255
     Height = 30
     Top = 82
@@ -146,7 +145,6 @@ object frmAdjust: TfrmAdjust
     AnchorSideTop.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Cursor = crHandPoint
     Left = 0
     Height = 30
     Top = 82

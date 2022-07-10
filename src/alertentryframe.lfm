@@ -29,7 +29,6 @@ object fraAlertEntry: TfraAlertEntry
     AnchorSideTop.Control = bbStart
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbStart
-    Cursor = crHandPoint
     Left = 541
     Height = 36
     Hint = 'Restart from last finish'
@@ -48,7 +47,6 @@ object fraAlertEntry: TfraAlertEntry
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
-    Cursor = crHandPoint
     Left = 581
     Height = 36
     Hint = 'Start'

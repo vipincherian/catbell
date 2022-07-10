@@ -203,7 +203,6 @@ object frmAbout: TfrmAbout
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Cursor = crHandPoint
     Left = 356
     Height = 30
     Top = 302
@@ -246,28 +245,28 @@ object frmAbout: TfrmAbout
         Height = 219
         Top = 0
         Width = 410
-        HorzScrollBar.Page = 30
-        VertScrollBar.Page = 13
+        HorzScrollBar.Page = 34
+        VertScrollBar.Page = 17
         Align = alClient
-        ClientHeight = 217
-        ClientWidth = 408
+        ClientHeight = 215
+        ClientWidth = 406
         TabOrder = 0
         object Panel2: TPanel
           Left = 0
-          Height = 217
+          Height = 215
           Top = 0
-          Width = 408
+          Width = 406
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel2'
-          ClientHeight = 217
-          ClientWidth = 408
+          ClientHeight = 211
+          ClientWidth = 402
           TabOrder = 0
           object lblLicense: TLabel
             Left = 0
-            Height = 217
+            Height = 211
             Top = 0
-            Width = 408
+            Width = 402
             Align = alClient
             Caption = 'Label'
             ParentColor = False

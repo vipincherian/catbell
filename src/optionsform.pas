@@ -332,6 +332,12 @@ begin
   tbVolume.Enabled := AudioSystem.Loaded;
   cbUseDefaultAudio.Enabled := AudioSystem.Loaded;
   seLatency.Enabled := cbOverrideLatency.Checked;
+
+  {$IF not defined(windows)}
+  rbProgressOnAppIcon.Checked := True;
+  rbProgressOnOverlayIcon.Checked := False;
+  rbProgressOnOverlayIcon.Enabled := False;
+  {$ENDIF}
 end;
 
 procedure TfrmOptions.LayoutControls;
@@ -486,7 +492,7 @@ begin
       InnerBorder := Margin;
     end;
 
-    gbAudioTest.BorderSpacing.Bottom:=Margin;
+    gbAudioTest.BorderSpacing.Bottom := Margin;
 
     with edtDefaultHostAPI.BorderSpacing do
     begin
@@ -525,12 +531,13 @@ begin
 
     bbPlay.BorderSpacing.Right := Padding;
 
-    with pgbAudio.BorderSpacing do begin
-      Left:=Margin;
-      Right:=Padding;
+    with pgbAudio.BorderSpacing do
+    begin
+      Left := Margin;
+      Right := Padding;
     end;
 
-    gbAudioTest.BorderSpacing.Bottom:=Margin;
+    gbAudioTest.BorderSpacing.Bottom := Margin;
 
   end;
 end;
