@@ -965,7 +965,7 @@ begin
   Result := False;
 end;
 
-function TfrmMain.QueryCanSelectedMoveUp: boolean;
+function TfrmMain.QueryCanSelectedMoveDown: boolean;
 var
   //Id: longword;
   Clock: TfraTimer;
@@ -994,7 +994,7 @@ begin
   Result := False;
 end;
 
-function TfrmMain.QueryCanSelectedMoveDown: boolean;
+function TfrmMain.QueryCanSelectedMoveUp: boolean;
 var
   //Id: longword;
   EncounteredUnselected: boolean;
@@ -1787,7 +1787,7 @@ begin
   //Reorder;
 end;
 
-procedure TfrmMain.MoveSelectedClocksDown;
+procedure TfrmMain.MoveSelectedClocksUp;
 var
   //Id: longword;
   Widget, WidgetAbove: TfraTimer;
@@ -1842,7 +1842,7 @@ begin
   //sbxClocks.Refresh;
 end;
 
-procedure TfrmMain.MoveSelectedClocksUp;
+procedure TfrmMain.MoveSelectedClocksDown;
 var
   //Id: longword;
   Count: integer;
