@@ -70,8 +70,8 @@ var
   SystemFontSize: integer;
 begin
   SystemFont := Screen.SystemFont;
-  SystemFontSize := Round((GetFontData(SystemFont.Handle).Height *
-    72 / SystemFont.PixelsPerInch));
+  SystemFontSize := Abs(Round((GetFontData(SystemFont.Handle).Height *
+    72 / SystemFont.PixelsPerInch)));
   {Divide the default pitch by padding ratio an then round to the uppermost 4 }
   FPadding := ((((SystemFontSize div PADDING_RATIO) + PADDING_ROUNDED_TO - 1) shr
     2) shl 2);
