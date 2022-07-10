@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, DateTimePicker, Forms, Controls, Graphics,
   Dialogs, ComCtrls, StdCtrls, Buttons, Spin, settings, DateUtils,
-  {portaudio, }{EventLog,} audio, Math, metronome, log, sound, constants;
+  {portaudio, }{EventLog,} audio, Math, metronome, log, sound, constants, util;
 
 type
 
@@ -57,24 +57,24 @@ type
     edtDefaultDeviceName: TEdit;
     edtDefaultHostAPI: TEdit;
     edtDefaultTitle: TEdit;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    Defaults: TGroupBox;
-    GroupBox3: TGroupBox;
-    GroupBox4: TGroupBox;
-    GroupBox5: TGroupBox;
-    GroupBox6: TGroupBox;
-    GroupBox7: TGroupBox;
-    GroupBox8: TGroupBox;
+    gbApplication: TGroupBox;
+    gbIconSizeOverride: TGroupBox;
+    gbDefaultsForTimers: TGroupBox;
+    gbProgress: TGroupBox;
+    gbDefaultAdjustments: TGroupBox;
+    gbDevice: TGroupBox;
+    gbAudioTest: TGroupBox;
+    gbSound: TGroupBox;
+    gbVolume: TGroupBox;
     ilOptions: TImageList;
-    Label1: TLabel;
-    Label11: TLabel;
-    Label12: TLabel;
-    Label2: TLabel;
-    Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
+    lblDefaultTitle: TLabel;
+    lblCompleteBy: TLabel;
+    lblTimeFormat: TLabel;
+    lblDefaultTime: TLabel;
+    lblCompleteBySuffix: TLabel;
+    lblManualSelect: TLabel;
+    lblInTaskbar: TLabel;
+    lblShorten: TLabel;
     lblVolume: TLabel;
     lsvAudioDevices: TListView;
     pgbAudio: TProgressBar;
@@ -84,7 +84,7 @@ type
     speTrayIconSize: TSpinEdit;
     speAppIconSize: TSpinEdit;
     seLatency: TSpinEdit;
-    TabSheet1: TTabSheet;
+    tsAlerts: TTabSheet;
     tbVolume: TTrackBar;
     tsAudio: TTabSheet;
     tsTimers: TTabSheet;
@@ -122,6 +122,7 @@ type
     procedure SetControlsAs(Config: TUserConfig);
     procedure GetConfigFromControls(Config: TUserConfig);
     procedure ReenableControls;
+    procedure LayoutControls;
   public
     { public declarations }
   end;
@@ -333,6 +334,207 @@ begin
   seLatency.Enabled := cbOverrideLatency.Checked;
 end;
 
+procedure TfrmOptions.LayoutControls;
+var
+  WidgetControls: TControlList;
+  WidgetControl: TControl;
+  MinWidth: integer = 0;
+begin
+
+  { The labels in each tabsheet needs to be right aligned. For this, the
+  text extent of each of these labels are obtained prior, a buffer is added and
+  then the minimum width for each is set to that. This ensures that there is
+  no underflow }
+  WidgetControls := TControlList.Create;
+
+  with WidgetControls do
+  begin
+    Add(lblDefaultTitle);
+    Add(lblDefaultTime);
+    Add(lblShorten);
+    Add(lblCompleteBy);
+  end;
+
+  for WidgetControl in WidgetControls do
+    MinWidth := Max(Canvas.TextWidth(WidgetControl.Caption), MinWidth);
+
+  Inc(MinWidth, 2 * UserInterfaceMetrics.Margin);
+  for WidgetControl in WidgetControls do
+    WidgetControl.Constraints.MinWidth := MinWidth;
+
+  WidgetControls.Free;
+
+
+  with UserInterfaceMetrics do
+  begin
+    with bbtnSave.BorderSpacing do
+    begin
+      Right := Margin;
+      Bottom := Margin;
+    end;
+    bbtnCancel.BorderSpacing.Right := Padding;
+    bbtnDefault.BorderSpacing.Left := Margin;
+
+    with pgcOptions.BorderSpacing do
+    begin
+      Top := Margin;
+      Bottom := Padding;
+    end;
+
+    {Tab: Timers}
+
+    gbDefaultsForTimers.BorderSpacing.Around := Margin;
+    gbDefaultsForTimers.BorderSpacing.InnerBorder := Margin;
+    gbDefaultAdjustments.BorderSpacing.Bottom := Margin;
+    gbDefaultAdjustments.BorderSpacing.InnerBorder := Margin;
+
+    with edtDefaultTitle.BorderSpacing do
+    begin
+      Top := Margin;
+      Right := Margin;
+      Left := Padding;
+    end;
+
+    lblDefaultTitle.BorderSpacing.Left := Margin;
+
+    with dtpDefaultTime.BorderSpacing do
+    begin
+      Top := Padding;
+      Left := Padding;
+    end;
+
+    with dtpShorten.BorderSpacing do
+    begin
+      Top := Margin;
+      Right := Margin;
+      Left := Padding;
+    end;
+    lblShorten.BorderSpacing.Left := Margin;
+    dtpCompleteBy.BorderSpacing.Top := Padding;
+
+    lblCompleteBySuffix.BorderSpacing.Left := Padding;
+
+    {Tab: Alerts}
+    with gbProgress.BorderSpacing do
+    begin
+      Around := Margin;
+      InnerBorder := Margin;
+    end;
+
+    with gbSound.BorderSpacing do
+    begin
+      Bottom := Margin;
+      InnerBorder := Margin;
+    end;
+
+    with cbTrayAlert.BorderSpacing do
+    begin
+      Top := Margin;
+      Left := Margin;
+    end;
+
+    cbModalAlert.BorderSpacing.Top := Padding;
+    cbAutoProgress.BorderSpacing.Top := Padding;
+    lblInTaskbar.BorderSpacing.Top := (Margin);
+
+    with rbProgressOnAppIcon.BorderSpacing do
+    begin
+      Top := Padding;
+      Left := (2 * Margin);
+    end;
+    rbProgressOnOverlayIcon.BorderSpacing.Top := Padding;
+
+    with cbUseDefaultSound.BorderSpacing do
+    begin
+      Top := Margin;
+      Left := Margin;
+    end;
+
+    cbLoopSound.BorderSpacing.Top := Padding;
+
+    { Tab: interface }
+
+    with gbApplication.BorderSpacing do
+    begin
+      Around := Margin;
+      InnerBorder := Margin;
+    end;
+
+    gbIconSizeOverride.BorderSpacing.InnerBorder := Margin;
+
+    with ckbQueryExit.BorderSpacing do
+    begin
+      Left := Margin;
+      Top := Margin;
+    end;
+
+    ckbTimerTitleEditable.BorderSpacing.Top := Padding;
+    cmbTimeFormat.BorderSpacing.Top := Padding;
+
+    cbOverrideTrayIconSize.BorderSpacing.Left := Margin;
+    speTrayIconSize.BorderSpacing.Top := Margin;
+    speAppIconSize.BorderSpacing.Top := Padding;
+    speAppIconSize.BorderSpacing.Left := Padding;
+
+    { Tab: audio }
+
+    //tsAudio.BorderSpacing.InnerBorder:=Margin;
+
+    with gbDevice.BorderSpacing do
+    begin
+      Around := Margin;
+      InnerBorder := Margin;
+    end;
+
+    gbAudioTest.BorderSpacing.Bottom:=Margin;
+
+    with edtDefaultHostAPI.BorderSpacing do
+    begin
+      Top := Margin;
+      Right := Margin;
+    end;
+
+    with edtDefaultDeviceName.BorderSpacing do
+    begin
+      Left := Padding;
+      Right := Padding;
+    end;
+    cbUseDefaultAudio.BorderSpacing.Left := Margin;
+    lblManualSelect.BorderSpacing.Top := Margin;
+    lsvAudioDevices.BorderSpacing.Top := Padding;
+    seLatency.BorderSpacing.Top := Padding;
+    seLatency.BorderSpacing.Left := Padding;
+
+    gbVolume.BorderSpacing.InnerBorder := Margin;
+    gbAudioTest.BorderSpacing.InnerBorder := Margin;
+    gbAudioTest.BorderSpacing.Left := Margin;
+
+    //lblVolume.BorderSpacing.Left:=Margin;
+    with tbVolume.BorderSpacing do
+    begin
+      Top := Margin;
+      Left := Padding;
+      Right := Padding;
+    end;
+
+    with bbStop.BorderSpacing do
+    begin
+      Top := Margin;
+      Right := Margin;
+    end;
+
+    bbPlay.BorderSpacing.Right := Padding;
+
+    with pgbAudio.BorderSpacing do begin
+      Left:=Margin;
+      Right:=Padding;
+    end;
+
+    gbAudioTest.BorderSpacing.Bottom:=Margin;
+
+  end;
+end;
+
 procedure TfrmOptions.FormCreate(Sender: TObject);
 var
   AudioDevice: TAudioDevice;
@@ -371,6 +573,8 @@ begin
 
   seLatency.MinValue := AUDIO_LATENCY_MIN;
   seLatency.MaxValue := AUDIO_LATENCY_MAX;
+
+  LayoutControls;
 
   ReenableControls;
 

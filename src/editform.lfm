@@ -55,7 +55,6 @@ object frmEdit: TfrmEdit
     AnchorSideLeft.Control = Owner
     AnchorSideBottom.Control = bbSave
     AnchorSideBottom.Side = asrBottom
-    Cursor = crHandPoint
     Left = 0
     Height = 30
     Top = 253
@@ -74,7 +73,6 @@ object frmEdit: TfrmEdit
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Cursor = crHandPoint
     Left = 500
     Height = 30
     Top = 253
@@ -98,10 +96,10 @@ object frmEdit: TfrmEdit
     Height = 253
     Top = 0
     Width = 549
-    ActivePage = tsSound
+    ActivePage = tsTimer
     Anchors = [akTop, akLeft, akRight, akBottom]
     Images = imlEdit
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 0
     object tsTimer: TTabSheet
       Caption = 'Timer'
@@ -288,7 +286,6 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = gbAlarm
           AnchorSideRight.Control = gbAlarm
           AnchorSideRight.Side = asrBottom
-          Cursor = crHandPoint
           Left = 122
           Height = 30
           Top = 0
@@ -306,7 +303,6 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = bbTestSound
           AnchorSideRight.Side = asrBottom
-          Cursor = crHandPoint
           Left = 119
           Height = 30
           Top = 30
@@ -333,6 +329,7 @@ object frmEdit: TfrmEdit
         Top = 0
         Width = 359
         Anchors = [akTop, akLeft, akRight, akBottom]
+        AutoSize = True
         Caption = 'Custom alarm'
         ClientHeight = 209
         ClientWidth = 357
@@ -340,7 +337,6 @@ object frmEdit: TfrmEdit
         object bbSelectSound: TBitBtn
           AnchorSideLeft.Control = gbCustom
           AnchorSideTop.Control = bbClearSound
-          Cursor = crHandPoint
           Left = 0
           Height = 30
           Top = 0
@@ -356,7 +352,6 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = gbCustom
           AnchorSideRight.Control = gbCustom
           AnchorSideRight.Side = asrBottom
-          Cursor = crHandPoint
           Left = 295
           Height = 30
           Top = 0

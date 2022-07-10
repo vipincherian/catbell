@@ -60,11 +60,12 @@ object frmAlert: TfrmAlert
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Left = 393
+    Left = 470
     Height = 30
     Top = 246
-    Width = 141
+    Width = 64
     Anchors = [akRight, akBottom]
+    AutoSize = True
     DefaultCaption = True
     GlyphShowMode = gsmAlways
     Kind = bkClose

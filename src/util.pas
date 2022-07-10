@@ -25,10 +25,10 @@ unit util;
 interface
 
 uses
-  Classes, SysUtils, Forms, Graphics, constants;
+  Classes, SysUtils, Forms, Graphics, constants, fgl, Controls;
 
 type
-
+  TControlList = specialize TFPGList<TControl>;
   { TSequence }
 
   // ToDo: Make TSequence Thread safe

@@ -263,7 +263,6 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveUp
-    Cursor = crHandPoint
     Left = 534
     Height = 38
     Hint = 'Delete the sected timer(s)'
@@ -283,7 +282,6 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveDown
-    Cursor = crHandPoint
     Left = 556
     Height = 38
     Hint = 'Move the selected timer(s) up'
@@ -303,7 +301,6 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = stbMain
-    Cursor = crHandPoint
     Left = 540
     Height = 38
     Hint = 'Move the selected timer(s) down'
