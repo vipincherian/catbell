@@ -389,19 +389,19 @@ begin
 
     {Tab: Timers}
 
-    gbDefaultsForTimers.BorderSpacing.Around := Margin;
-    gbDefaultsForTimers.BorderSpacing.InnerBorder := Margin;
-    gbDefaultAdjustments.BorderSpacing.Bottom := Margin;
-    gbDefaultAdjustments.BorderSpacing.InnerBorder := Margin;
+    gbDefaultsForTimers.BorderSpacing.Around := Padding;
+    gbDefaultsForTimers.BorderSpacing.InnerBorder := Padding;
+    gbDefaultAdjustments.BorderSpacing.Bottom := Padding;
+    gbDefaultAdjustments.BorderSpacing.InnerBorder := Padding;
 
     with edtDefaultTitle.BorderSpacing do
     begin
-      Top := Margin;
-      Right := Margin;
+      Top := Padding;
+      Right := Padding;
       Left := Padding;
     end;
 
-    lblDefaultTitle.BorderSpacing.Left := Margin;
+    lblDefaultTitle.BorderSpacing.Left := Padding;
 
     with dtpDefaultTime.BorderSpacing do
     begin
@@ -415,7 +415,7 @@ begin
       Right := Margin;
       Left := Padding;
     end;
-    lblShorten.BorderSpacing.Left := Margin;
+    lblShorten.BorderSpacing.Left := Padding;
     dtpCompleteBy.BorderSpacing.Top := Padding;
 
     lblCompleteBySuffix.BorderSpacing.Left := Padding;
@@ -423,37 +423,37 @@ begin
     {Tab: Alerts}
     with gbProgress.BorderSpacing do
     begin
-      Around := Margin;
-      InnerBorder := Margin;
+      Around := Padding;
+      InnerBorder := Padding;
     end;
 
     with gbSound.BorderSpacing do
     begin
-      Bottom := Margin;
-      InnerBorder := Margin;
+      Bottom := Padding;
+      InnerBorder := Padding;
     end;
 
     with cbTrayAlert.BorderSpacing do
     begin
-      Top := Margin;
-      Left := Margin;
+      Top := Padding;
+      Left := Padding;
     end;
 
     cbModalAlert.BorderSpacing.Top := Padding;
     cbAutoProgress.BorderSpacing.Top := Padding;
-    lblInTaskbar.BorderSpacing.Top := (Margin);
+    lblInTaskbar.BorderSpacing.Top := (Padding);
 
     with rbProgressOnAppIcon.BorderSpacing do
     begin
       Top := Padding;
-      Left := (2 * Margin);
+      Left := (2 * Padding);
     end;
     rbProgressOnOverlayIcon.BorderSpacing.Top := Padding;
 
     with cbUseDefaultSound.BorderSpacing do
     begin
-      Top := Margin;
-      Left := Margin;
+      Top := Padding;
+      Left := Padding;
     end;
 
     cbLoopSound.BorderSpacing.Top := Padding;
@@ -462,23 +462,23 @@ begin
 
     with gbApplication.BorderSpacing do
     begin
-      Around := Margin;
-      InnerBorder := Margin;
+      Around := Padding;
+      InnerBorder := Padding;
     end;
 
-    gbIconSizeOverride.BorderSpacing.InnerBorder := Margin;
+    gbIconSizeOverride.BorderSpacing.InnerBorder := Padding;
 
     with ckbQueryExit.BorderSpacing do
     begin
-      Left := Margin;
-      Top := Margin;
+      Left := Padding;
+      Top := Padding;
     end;
 
     ckbTimerTitleEditable.BorderSpacing.Top := Padding;
     cmbTimeFormat.BorderSpacing.Top := Padding;
 
-    cbOverrideTrayIconSize.BorderSpacing.Left := Margin;
-    speTrayIconSize.BorderSpacing.Top := Margin;
+    cbOverrideTrayIconSize.BorderSpacing.Left := Padding;
+    speTrayIconSize.BorderSpacing.Top := Padding;
     speAppIconSize.BorderSpacing.Top := Padding;
     speAppIconSize.BorderSpacing.Left := Padding;
 
@@ -486,18 +486,20 @@ begin
 
     //tsAudio.BorderSpacing.InnerBorder:=Margin;
 
-    with gbDevice.BorderSpacing do
+    with gbAudioTest.BorderSpacing do
     begin
-      Around := Margin;
-      InnerBorder := Margin;
+      Around := Padding;
+      InnerBorder := Padding;
+      //Right := Padding;
+      //Right := Padding;
     end;
 
-    gbAudioTest.BorderSpacing.Bottom := Margin;
+    gbVolume.BorderSpacing.Left := Padding;
 
     with edtDefaultHostAPI.BorderSpacing do
     begin
-      Top := Margin;
-      Right := Margin;
+      Top := Padding;
+      Right := Padding;
     end;
 
     with edtDefaultDeviceName.BorderSpacing do
@@ -505,39 +507,40 @@ begin
       Left := Padding;
       Right := Padding;
     end;
-    cbUseDefaultAudio.BorderSpacing.Left := Margin;
-    lblManualSelect.BorderSpacing.Top := Margin;
+    cbUseDefaultAudio.BorderSpacing.Left := Padding;
+    lblManualSelect.BorderSpacing.Top := Padding;
     lsvAudioDevices.BorderSpacing.Top := Padding;
     seLatency.BorderSpacing.Top := Padding;
     seLatency.BorderSpacing.Left := Padding;
+    SeLatency.BorderSpacing.Bottom:=Padding;
 
-    gbVolume.BorderSpacing.InnerBorder := Margin;
-    gbAudioTest.BorderSpacing.InnerBorder := Margin;
-    gbAudioTest.BorderSpacing.Left := Margin;
+    gbDevice.BorderSpacing.InnerBorder := Padding;
+    gbDevice.BorderSpacing.Bottom := Padding;
+
 
     //lblVolume.BorderSpacing.Left:=Margin;
     with tbVolume.BorderSpacing do
     begin
-      Top := Margin;
+      Top := Padding;
       Left := Padding;
       Right := Padding;
     end;
 
     with bbStop.BorderSpacing do
     begin
-      Top := Margin;
-      Right := Margin;
+      Top := Padding;
+      Right := Padding;
     end;
 
     bbPlay.BorderSpacing.Right := Padding;
 
     with pgbAudio.BorderSpacing do
     begin
-      Left := Margin;
+      Left := Padding;
       Right := Padding;
     end;
 
-    gbAudioTest.BorderSpacing.Bottom := Margin;
+    //gbAudioTest.BorderSpacing.Bottom := Padding;
 
   end;
 end;

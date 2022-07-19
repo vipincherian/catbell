@@ -70,8 +70,8 @@ object frmOptions: TfrmOptions
     OnChange = pgcOptionsChange
     object tsTimers: TTabSheet
       Caption = 'Timers'
-      ClientHeight = 356
-      ClientWidth = 529
+      ClientHeight = 358
+      ClientWidth = 531
       ImageIndex = 0
       object gbDefaultsForTimers: TGroupBox
         AnchorSideLeft.Control = tsTimers
@@ -79,13 +79,13 @@ object frmOptions: TfrmOptions
         AnchorSideRight.Control = tsTimers
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 58
+        Height = 66
         Top = 0
-        Width = 529
+        Width = 531
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'For new timers'
-        ClientHeight = 44
+        ClientHeight = 46
         ClientWidth = 527
         TabOrder = 0
         object lblDefaultTitle: TLabel
@@ -93,8 +93,8 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = edtDefaultTitle
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 13
-          Top = 6
+          Height = 15
+          Top = 4
           Width = 120
           Alignment = taRightJustify
           Caption = 'Default title'
@@ -107,9 +107,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = edtDefaultTitle
           AnchorSideTop.Side = asrBottom
           Left = 120
-          Height = 19
-          Top = 25
-          Width = 71
+          Height = 23
+          Top = 23
+          Width = 65
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = -53780
@@ -132,8 +132,8 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = dtpDefaultTime
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 13
-          Top = 28
+          Height = 15
+          Top = 27
           Width = 120
           Alignment = taRightJustify
           Caption = 'Default time'
@@ -147,7 +147,7 @@ object frmOptions: TfrmOptions
           AnchorSideRight.Control = gbDefaultsForTimers
           AnchorSideRight.Side = asrBottom
           Left = 120
-          Height = 25
+          Height = 23
           Top = 0
           Width = 407
           Anchors = [akTop, akLeft, akRight]
@@ -163,13 +163,13 @@ object frmOptions: TfrmOptions
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 52
-        Top = 58
-        Width = 529
+        Height = 66
+        Top = 66
+        Width = 531
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'Adjustments'
-        ClientHeight = 38
+        ClientHeight = 46
         ClientWidth = 527
         TabOrder = 1
         object lblShorten: TLabel
@@ -177,8 +177,8 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = dtpShorten
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 13
-          Top = 3
+          Height = 15
+          Top = 4
           Width = 120
           Alignment = taRightJustify
           Caption = 'Shorten/Extend'
@@ -190,8 +190,8 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = dtpCompleteBy
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 13
-          Top = 22
+          Height = 15
+          Top = 27
           Width = 120
           Alignment = taRightJustify
           Caption = 'Complete by'
@@ -203,9 +203,9 @@ object frmOptions: TfrmOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = gbDefaultAdjustments
           Left = 120
-          Height = 19
+          Height = 23
           Top = 0
-          Width = 71
+          Width = 65
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = -53780
@@ -228,9 +228,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = dtpShorten
           AnchorSideTop.Side = asrBottom
           Left = 120
-          Height = 19
-          Top = 19
-          Width = 71
+          Height = 23
+          Top = 23
+          Width = 65
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = -53780
@@ -253,10 +253,10 @@ object frmOptions: TfrmOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = dtpCompleteBy
           AnchorSideTop.Side = asrCenter
-          Left = 191
-          Height = 13
-          Top = 22
-          Width = 147
+          Left = 185
+          Height = 15
+          Top = 27
+          Width = 143
           Caption = '(added to the current time)'
           ParentColor = False
         end
@@ -264,8 +264,8 @@ object frmOptions: TfrmOptions
     end
     object tsAlerts: TTabSheet
       Caption = 'Alerts'
-      ClientHeight = 356
-      ClientWidth = 529
+      ClientHeight = 358
+      ClientWidth = 531
       ImageIndex = 4
       object gbProgress: TGroupBox
         AnchorSideLeft.Control = tsAlerts
@@ -273,22 +273,22 @@ object frmOptions: TfrmOptions
         AnchorSideRight.Control = tsAlerts
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 142
+        Height = 130
         Top = 0
-        Width = 529
+        Width = 531
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'Progress and completion'
-        ClientHeight = 128
+        ClientHeight = 110
         ClientWidth = 527
         TabOrder = 0
         object cbTrayAlert: TCheckBox
           AnchorSideLeft.Control = gbProgress
           AnchorSideTop.Control = gbProgress
           Left = 0
-          Height = 23
+          Height = 19
           Top = 0
-          Width = 279
+          Width = 264
           Caption = 'Enable system tray notification for new timers.'
           TabOrder = 0
         end
@@ -297,9 +297,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = cbTrayAlert
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 23
-          Top = 23
-          Width = 251
+          Height = 19
+          Top = 19
+          Width = 238
           Caption = 'Enable modal popup alert for new timers.'
           TabOrder = 1
         end
@@ -308,9 +308,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = cbModalAlert
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 23
-          Top = 46
-          Width = 335
+          Height = 19
+          Top = 38
+          Width = 318
           Caption = 'Automatically show the progress of the last timer started'
           TabOrder = 2
         end
@@ -319,9 +319,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = cbAutoProgress
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 13
-          Top = 69
-          Width = 54
+          Height = 15
+          Top = 57
+          Width = 51
           Caption = 'In taskbar'
           ParentColor = False
         end
@@ -330,9 +330,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = lblInTaskbar
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 23
-          Top = 82
-          Width = 168
+          Height = 19
+          Top = 72
+          Width = 160
           Caption = 'Changing application icon'
           Checked = True
           TabOrder = 3
@@ -343,9 +343,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = rbProgressOnAppIcon
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 23
-          Top = 105
-          Width = 185
+          Height = 19
+          Top = 91
+          Width = 177
           Caption = 'Overlay icons (Windows only)'
           TabOrder = 4
         end
@@ -358,22 +358,22 @@ object frmOptions: TfrmOptions
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 60
-        Top = 142
-        Width = 529
+        Height = 58
+        Top = 130
+        Width = 531
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'Sound'
-        ClientHeight = 46
+        ClientHeight = 38
         ClientWidth = 527
         TabOrder = 1
         object cbUseDefaultSound: TCheckBox
           AnchorSideLeft.Control = gbSound
           AnchorSideTop.Control = gbSound
           Left = 0
-          Height = 23
+          Height = 19
           Top = 0
-          Width = 126
+          Width = 115
           Caption = 'Use default sound'
           TabOrder = 0
         end
@@ -382,9 +382,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = cbUseDefaultSound
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 23
-          Top = 23
-          Width = 89
+          Height = 19
+          Top = 19
+          Width = 82
           Caption = 'Play looped'
           TabOrder = 1
         end
@@ -393,8 +393,8 @@ object frmOptions: TfrmOptions
     object tsInterface: TTabSheet
       AutoSize = True
       Caption = 'Interface'
-      ClientHeight = 356
-      ClientWidth = 529
+      ClientHeight = 358
+      ClientWidth = 531
       ImageIndex = 1
       object gbApplication: TGroupBox
         AnchorSideLeft.Control = tsInterface
@@ -402,22 +402,22 @@ object frmOptions: TfrmOptions
         AnchorSideRight.Control = tsInterface
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 85
+        Height = 81
         Top = 0
-        Width = 529
+        Width = 531
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'Application'
-        ClientHeight = 71
+        ClientHeight = 61
         ClientWidth = 527
         TabOrder = 0
         object ckbQueryExit: TCheckBox
           AnchorSideLeft.Control = gbApplication
           AnchorSideTop.Control = gbApplication
           Left = 0
-          Height = 23
+          Height = 19
           Top = 0
-          Width = 200
+          Width = 192
           Caption = 'Prompt before exiting appliation'
           TabOrder = 0
         end
@@ -426,9 +426,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = ckbQueryExit
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 23
-          Top = 23
-          Width = 215
+          Height = 19
+          Top = 19
+          Width = 207
           Caption = 'Allow in-place editing of timer title.'
           TabOrder = 1
         end
@@ -437,9 +437,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = cmbTimeFormat
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 13
-          Top = 52
-          Width = 72
+          Height = 15
+          Top = 42
+          Width = 71
           Caption = 'Time format: '
           ParentColor = False
         end
@@ -448,11 +448,11 @@ object frmOptions: TfrmOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = ckbTimerTitleEditable
           AnchorSideTop.Side = asrBottom
-          Left = 72
-          Height = 25
-          Top = 46
+          Left = 71
+          Height = 23
+          Top = 38
           Width = 120
-          ItemHeight = 0
+          ItemHeight = 15
           ItemIndex = 0
           Items.Strings = (
             '12-hour clock'
@@ -470,13 +470,13 @@ object frmOptions: TfrmOptions
         AnchorSideRight.Control = gbApplication
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 64
-        Top = 85
-        Width = 529
+        Height = 66
+        Top = 81
+        Width = 531
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'Override icon sizes'
-        ClientHeight = 50
+        ClientHeight = 46
         ClientWidth = 527
         TabOrder = 1
         object cbOverrideTrayIconSize: TCheckBox
@@ -484,9 +484,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = speTrayIconSize
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 23
-          Top = 1
-          Width = 48
+          Height = 19
+          Top = 2
+          Width = 42
           Caption = 'Tray'
           OnChange = cbOverrideTrayIconSizeChange
           TabOrder = 0
@@ -496,9 +496,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = speAppIconSize
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 23
-          Top = 26
-          Width = 87
+          Height = 19
+          Top = 25
+          Width = 81
           Caption = 'Application'
           OnChange = cbOverrideAppIconSizeChange
           TabOrder = 2
@@ -506,8 +506,8 @@ object frmOptions: TfrmOptions
         object speTrayIconSize: TSpinEdit
           AnchorSideLeft.Control = speAppIconSize
           AnchorSideTop.Control = gbIconSizeOverride
-          Left = 87
-          Height = 25
+          Left = 81
+          Height = 23
           Top = 0
           Width = 74
           Increment = 2
@@ -521,9 +521,9 @@ object frmOptions: TfrmOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = speTrayIconSize
           AnchorSideTop.Side = asrBottom
-          Left = 87
-          Height = 25
-          Top = 25
+          Left = 81
+          Height = 23
+          Top = 23
           Width = 74
           Increment = 2
           MaxValue = 256
@@ -536,23 +536,26 @@ object frmOptions: TfrmOptions
     object tsAudio: TTabSheet
       AutoSize = True
       Caption = 'Audio'
-      ClientHeight = 356
-      ClientWidth = 529
+      ClientHeight = 358
+      ClientWidth = 531
       ImageIndex = 3
       OnShow = tsAudioShow
       object gbDevice: TGroupBox
-        AnchorSideLeft.Control = tsAudio
-        AnchorSideTop.Control = tsAudio
-        AnchorSideRight.Control = tsAudio
+        AnchorSideLeft.Control = gbVolume
+        AnchorSideTop.Control = gbAudioTest
+        AnchorSideTop.Side = asrBottom
+        AnchorSideRight.Control = gbAudioTest
         AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = tsAudio
+        AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 280
-        Top = 0
-        Width = 529
+        Height = 312
+        Top = 46
+        Width = 531
         Anchors = [akTop, akLeft, akRight, akBottom]
         AutoSize = True
         Caption = 'Output device'
-        ClientHeight = 266
+        ClientHeight = 292
         ClientWidth = 527
         TabOrder = 0
         object lblManualSelect: TLabel
@@ -560,9 +563,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = edtDefaultDeviceName
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 13
-          Top = 25
-          Width = 114
+          Height = 15
+          Top = 23
+          Width = 110
           Caption = 'Or, select manually : '
           ParentColor = False
         end
@@ -572,8 +575,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = edtDefaultHostAPI
           AnchorSideRight.Side = asrBottom
+          AnchorSideBottom.Control = seLatency
           Left = 0
-          Height = 182
+          Height = 231
           Top = 38
           Width = 527
           Anchors = [akTop, akLeft, akRight, akBottom]
@@ -582,12 +586,11 @@ object frmOptions: TfrmOptions
             item
               AutoSize = True
               Caption = 'Device'
-              Width = 54
             end          
             item
               AutoSize = True
               Caption = 'Host API'
-              Width = 458
+              Width = 61
             end>
           ColumnClick = False
           Constraints.MinHeight = 100
@@ -602,9 +605,9 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = edtDefaultDeviceName
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 23
-          Top = 1
-          Width = 89
+          Height = 19
+          Top = 2
+          Width = 79
           Caption = 'Use default'
           OnChange = cbUseDefaultAudioChange
           TabOrder = 0
@@ -614,10 +617,10 @@ object frmOptions: TfrmOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = edtDefaultHostAPI
           AnchorSideRight.Control = edtDefaultHostAPI
-          Left = 89
-          Height = 25
+          Left = 79
+          Height = 23
           Top = 0
-          Width = 270
+          Width = 280
           Anchors = [akTop, akLeft, akRight]
           ReadOnly = True
           TabOrder = 1
@@ -628,7 +631,7 @@ object frmOptions: TfrmOptions
           AnchorSideRight.Control = gbDevice
           AnchorSideRight.Side = asrBottom
           Left = 359
-          Height = 25
+          Height = 23
           Top = 0
           Width = 168
           Anchors = [akTop, akRight]
@@ -641,11 +644,13 @@ object frmOptions: TfrmOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = lsvAudioDevices
           AnchorSideTop.Side = asrBottom
-          Left = 115
-          Height = 35
-          Top = 220
+          AnchorSideBottom.Control = gbDevice
+          AnchorSideBottom.Side = asrBottom
+          Left = 106
+          Height = 23
+          Top = 269
           Width = 77
-          Anchors = [akTop, akLeft, akBottom]
+          Anchors = [akLeft, akBottom]
           MaxValue = 50
           TabOrder = 4
         end
@@ -654,38 +659,37 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = seLatency
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 23
-          Top = 226
-          Width = 115
+          Height = 19
+          Top = 271
+          Width = 106
           Caption = 'Override latency'
           OnChange = cbOverrideLatencyChange
           TabOrder = 5
         end
       end
       object gbAudioTest: TGroupBox
-        AnchorSideTop.Control = gbDevice
-        AnchorSideTop.Side = asrBottom
-        AnchorSideRight.Control = gbDevice
+        AnchorSideTop.Control = tsAudio
+        AnchorSideRight.Control = tsAudio
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = tsAudio
         AnchorSideBottom.Side = asrBottom
-        Left = 312
-        Height = 76
-        Top = 280
-        Width = 217
-        Anchors = [akTop, akRight, akBottom]
+        Left = 290
+        Height = 46
+        Top = 0
+        Width = 241
+        Anchors = [akTop, akRight]
         AutoSize = True
         Caption = 'Test'
-        ClientHeight = 62
-        ClientWidth = 215
+        ClientHeight = 26
+        ClientWidth = 237
         TabOrder = 1
         object bbPlay: TBitBtn
           AnchorSideTop.Control = bbStop
           AnchorSideRight.Control = bbStop
           Left = 100
-          Height = 30
+          Height = 26
           Top = 0
-          Width = 56
+          Width = 67
           Anchors = [akTop, akRight]
           AutoSize = True
           Caption = 'Test'
@@ -698,10 +702,10 @@ object frmOptions: TfrmOptions
           AnchorSideTop.Control = gbAudioTest
           AnchorSideRight.Control = gbAudioTest
           AnchorSideRight.Side = asrBottom
-          Left = 156
-          Height = 30
+          Left = 167
+          Height = 26
           Top = 0
-          Width = 59
+          Width = 70
           Anchors = [akTop, akRight]
           AutoSize = True
           Caption = 'Stop'
@@ -717,7 +721,7 @@ object frmOptions: TfrmOptions
           AnchorSideRight.Control = bbPlay
           Left = 0
           Height = 20
-          Top = 5
+          Top = 3
           Width = 100
           Anchors = [akTop, akLeft, akRight]
           Enabled = False
@@ -725,21 +729,20 @@ object frmOptions: TfrmOptions
         end
       end
       object gbVolume: TGroupBox
-        AnchorSideLeft.Control = gbDevice
-        AnchorSideTop.Control = gbDevice
-        AnchorSideTop.Side = asrBottom
+        AnchorSideLeft.Control = tsAudio
+        AnchorSideTop.Control = gbAudioTest
         AnchorSideRight.Control = gbAudioTest
         AnchorSideBottom.Control = gbAudioTest
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 76
-        Top = 280
-        Width = 312
+        Height = 46
+        Top = 0
+        Width = 290
         Anchors = [akTop, akLeft, akRight, akBottom]
         AutoSize = True
         Caption = 'Volume'
-        ClientHeight = 62
-        ClientWidth = 310
+        ClientHeight = 26
+        ClientWidth = 286
         TabOrder = 2
         object tbVolume: TTrackBar
           AnchorSideLeft.Control = lblVolume
@@ -750,7 +753,7 @@ object frmOptions: TfrmOptions
           Left = 37
           Height = 19
           Top = 0
-          Width = 273
+          Width = 249
           Max = 100
           OnChange = tbVolumeChange
           Position = 0
