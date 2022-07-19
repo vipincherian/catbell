@@ -1149,7 +1149,8 @@ begin
   if Sender.ModalAlert and (not UserInitiated) then
   begin
     frmAlert.AddTimer(Sender);
-    Application.QueueAsyncCall(@ShowModalAlert, 0);
+    //Application.QueueAsyncCall(@ShowModalAlert, 0);
+    //ShowModalAlert(0);
   end;
   UpdateStatusTimerCount;
 end;

@@ -58,8 +58,10 @@ type
     FEntryIDGenerator: TSequence;
     FEntries: TAlertEntryList;
     //procedure StopTimers;
+    MyCS: TRTLCriticalSection;
     procedure LayoutControls;
     procedure RestartTimer(Sender: TObject);
+    procedure ShowAlerts;
     procedure StartTimer(Sender: TObject);
     procedure RemoveAlert(Entry: TfraAlertEntry);
     procedure EmptyAlertsAndClose;
@@ -92,10 +94,13 @@ begin
 
   LayoutControls;
 
+  InitCriticalSection(MyCS);
+
 end;
 
 procedure TfrmAlert.FormDestroy(Sender: TObject);
 begin
+  DoneCriticalSection(MyCS);
   FEntries.Free;
   FEntryIDGenerator.Free;
 end;
@@ -154,9 +159,24 @@ var
 begin
   Entry := TfraAlertEntry(Sender);
   //ShowMessage('Got message');
+
+  { Remove first }
+  RemoveAlert(Entry);
+
   Entry.Timer.Stop(True);
   Entry.Timer.RestartFromLastFinish;
-  RemoveAlert(Entry);
+end;
+
+procedure TfrmAlert.ShowAlerts;
+begin
+  if WindowState = wsMinimized then
+    WindowState := wsNormal;
+  { If the modal window is already showing, an exception is thrown when you
+  attempt to ShowModal. So in that case, ShowOnTop }
+  if not frmAlert.Showing then
+    ShowModal
+  else
+    ShowOnTop;
 end;
 
 procedure TfrmAlert.LayoutControls;
@@ -183,9 +203,12 @@ var
 begin
   Entry := TfraAlertEntry(Sender);
   //ShowMessage('Got message');
+
+  { As the first thing, remove the alert }
+  RemoveAlert(Entry);
+
   Entry.Timer.Stop(True);
   Entry.Timer.Start;
-  RemoveAlert(Entry);
 end;
 
 procedure TfrmAlert.RemoveAlert(Entry: TfraAlertEntry);
@@ -193,34 +216,41 @@ var
   Index: integer;
   PrevEntry, NextEntry: TfraAlertEntry;
 begin
-  Index := FEntries.IndexOf(Entry);
 
-  Assert(Index >= 0);
+  EnterCriticalSection(MyCS);
+  try
+    Index := FEntries.IndexOf(Entry);
 
-  if Index < (FEntries.Count - 1) then
-  begin
-    NextEntry := FEntries.Items[Index + 1];
-    if Index > 0 then
+    Assert(Index >= 0);
+
+    if Index < (FEntries.Count - 1) then
     begin
-      PrevEntry := FEntries.Items[Index - 1];
-      NextEntry.AnchorSide[akTop].Control := PrevEntry;
-    end
-    else
-      NextEntry.AnchorSide[akTop].Control := nil;
-  end;
+      NextEntry := FEntries.Items[Index + 1];
+      if Index > 0 then
+      begin
+        PrevEntry := FEntries.Items[Index - 1];
+        NextEntry.AnchorSide[akTop].Control := PrevEntry;
+      end
+      else
+        NextEntry.AnchorSide[akTop].Control := nil;
+    end;
 
-  FEntries.Remove(Entry);
+    FEntries.Remove(Entry);
 
   { Cannot free Entry (Entry.Free) here, as we are in Entry's button's callback.
   Although that works fine in Linux, throws exception in Windows.
   Application.ReleaseComponent will do it asynchronously }
-  Application.ReleaseComponent(Entry);
-  pnlEntries.Refresh;
+    Application.ReleaseComponent(Entry);
+    pnlEntries.Refresh;
 
-  if FEntries.Count = 0 then
-  begin
-    FEntryIDGenerator.Reset;
-    Close;
+    if FEntries.Count = 0 then
+    begin
+      FEntryIDGenerator.Reset;
+      Close;
+    end;
+
+  finally
+    LeaveCriticalSection(MyCS);
   end;
 
 end;
@@ -229,15 +259,20 @@ procedure TfrmAlert.EmptyAlertsAndClose;
 var
   Item: TfraAlertEntry;
 begin
-  while FEntries.Count > 0 do
-  begin
-    Item := FEntries.First;
-    Item.Timer.Stop(True);
-    FEntries.Remove(Item);
-    Item.Free;
+  EnterCriticalSection(MyCS);
+  try
+    while FEntries.Count > 0 do
+    begin
+      Item := FEntries.First;
+      Item.Timer.Stop(True);
+      FEntries.Remove(Item);
+      Item.Free;
+    end;
+    tmrAlert.Enabled := False;
+    Close;
+  finally
+    LeaveCriticalSection(MyCS);
   end;
-  tmrAlert.Enabled := False;
-  Close;
 end;
 
 procedure TfrmAlert.ResizeHeaderSections;
@@ -323,51 +358,60 @@ begin
 
   //lsvMessages.EndUpdate;
 
-  Entry := TfraAlertEntry.Create(sbxEntries, Timer);
-  Entry.Name := Entry.Name + IntToStr(FEntryIDGenerator.NextVal());
-  Entry.Parent := pnlEntries;
+  EnterCriticalSection(MyCS);
 
-  Entry.Width := pnlEntries.ClientWidth;
-  Entry.Left := 0;
-  Entry.Anchors := [akTop, akLeft, akRight];
+  try
 
-  Entry.stDescription.Caption := Timer.Caption;
-  Entry.stDuration.Caption := DurationText;
+    Entry := TfraAlertEntry.Create(sbxEntries, Timer);
+    Entry.Name := Entry.Name + IntToStr(FEntryIDGenerator.NextVal());
+    Entry.Parent := pnlEntries;
 
-  if UserConfig.DefaultTimeFormat = integer(tf24) then
-    Formatter := 'hh:nn'
-  else
-    Formatter := 'hh:nn am/pm';
+    Entry.Width := pnlEntries.ClientWidth;
+    Entry.Left := 0;
+    Entry.Anchors := [akTop, akLeft, akRight];
 
-  Entry.stCompletedAt.Caption :=
-    FormatDateTime(Formatter, Entry.Timer.LastCompletedAt);
+    Entry.stDescription.Caption := Timer.Caption;
+    Entry.stDuration.Caption := DurationText;
+
+    if UserConfig.DefaultTimeFormat = integer(tf24) then
+      Formatter := 'hh:nn'
+    else
+      Formatter := 'hh:nn am/pm';
+
+    Entry.stCompletedAt.Caption :=
+      FormatDateTime(Formatter, Entry.Timer.LastCompletedAt);
 
 
-  Entry.AnchorSide[akRight].Side := asrRight;
-  Entry.AnchorSide[akRight].Control := pnlEntries;
+    Entry.AnchorSide[akRight].Side := asrRight;
+    Entry.AnchorSide[akRight].Control := pnlEntries;
 
-  Entry.AnchorSide[akLeft].Side := asrLeft;
-  Entry.AnchorSide[akLeft].Control := pnlEntries;
+    Entry.AnchorSide[akLeft].Side := asrLeft;
+    Entry.AnchorSide[akLeft].Control := pnlEntries;
 
-  Entry.OnTimerRestart := @RestartTimer;
-  Entry.OnTimerStart := @StartTimer;
+    Entry.OnTimerRestart := @RestartTimer;
+    Entry.OnTimerStart := @StartTimer;
 
-  {TODO: Thread safety}
-  Index := FEntries.Add(Entry);
+    {TODO: Thread safety}
+    Index := FEntries.Add(Entry);
 
-  if Index = 0 then
-  begin
-    Entry.AnchorSide[akTop].Side := asrTop;
-    Entry.AnchorSide[akTop].Control := pnlEntries;
-    ResizeHeaderSections;
-  end
-  else
-  begin
-    Entry.AnchorSide[akTop].Side := asrBottom;
-    Entry.AnchorSide[akTop].Control := FEntries.Items[Index - 1];
+    if Index = 0 then
+    begin
+      Entry.AnchorSide[akTop].Side := asrTop;
+      Entry.AnchorSide[akTop].Control := pnlEntries;
+      ResizeHeaderSections;
+    end
+    else
+    begin
+      Entry.AnchorSide[akTop].Side := asrBottom;
+      Entry.AnchorSide[akTop].Control := FEntries.Items[Index - 1];
+    end;
+
+    tmrAlert.Enabled := True;
+
+    ShowAlerts;
+  finally
+    EnterCriticalSection(MyCS);
   end;
-
-  tmrAlert.Enabled := True;
 end;
 
 procedure TfrmAlert.bbCloseClick(Sender: TObject);
