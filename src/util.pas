@@ -50,11 +50,15 @@ type
   private
     FPadding: integer;
     FMargin: integer;
+    FReferenceForm: TForm;
+    procedure SetReferenceForm(AValue: TForm);
+    procedure Recalculate;
   public
     constructor Create();
     destructor Destroy; override;
     property Padding: integer read FPadding;
     property Margin: integer read FMargin;
+    property ReferenceForm: TForm read FReferenceForm write SetReferenceForm;
   end;
 
 var
@@ -64,20 +68,43 @@ implementation
 
 { TUserInterfaceMetrics }
 
-constructor TUserInterfaceMetrics.Create;
+procedure TUserInterfaceMetrics.SetReferenceForm(AValue: TForm);
+begin
+  if FReferenceForm = AValue then Exit;
+  FReferenceForm := AValue;
+  Recalculate;
+end;
+
+procedure TUserInterfaceMetrics.Recalculate;
 var
   SystemFont: TFont;
   SystemFontSize: integer;
 begin
-  SystemFont := Screen.SystemFont;
-  SystemFontSize := Abs(Round((GetFontData(SystemFont.Handle).Height *
-    72 / SystemFont.PixelsPerInch)));
-  SystemFontSize:=8;
+  if Assigned(FReferenceForm) then
+    SystemFont := FReferenceForm.Font
+  else
+    SystemFont := Screen.SystemFont;
+
+  SystemFontSize := Abs(Round(
+    (GetFontData(SystemFont.Handle).Height * 72 / SystemFont.PixelsPerInch)));
+
+  //TempCanvas := TCanvas.Create;
+
+  //SystemFontSize := TempCanvas.Font.Size;
+  //TempCanvas.Free;
+  //SystemFontSize:=8;
+
   {Divide the default pitch by padding ratio an then round to the uppermost 4 }
   FPadding := ((((SystemFontSize div PADDING_RATIO) + PADDING_ROUNDED_TO - 1) shr
     1) shl 1);
   FMargin := ((((SystemFontSize div MARGIN_RATIO) + MARGIN_ROUNDED_TO - 1) shr
     2) shl 2);
+end;
+
+constructor TUserInterfaceMetrics.Create;
+begin
+  FReferenceForm := nil;
+  Recalculate;
 
 end;
 

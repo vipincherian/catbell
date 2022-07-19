@@ -9,7 +9,7 @@ object frmMain: TfrmMain
   VertScrollBar.Range = 152
   ActiveControl = pnlBorder
   Caption = 'Catbell'
-  ClientHeight = 315
+  ClientHeight = 316
   ClientWidth = 652
   Menu = mmMain
   OnClose = FormClose
@@ -160,21 +160,21 @@ object frmMain: TfrmMain
     AnchorSideBottom.Control = bbMoveDown
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 263
+    Height = 256
     Top = 32
-    Width = 540
+    Width = 528
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlBorder'
-    ClientHeight = 263
-    ClientWidth = 540
+    ClientHeight = 256
+    ClientWidth = 528
     TabOrder = 1
     object hdrTimers: THeaderControl
       Left = 1
       Height = 24
       Top = 1
-      Width = 538
+      Width = 526
       DragReorder = False
       Sections = <      
         item
@@ -217,22 +217,22 @@ object frmMain: TfrmMain
     end
     object sbxClocks: TScrollBox
       Left = 1
-      Height = 237
+      Height = 230
       Top = 25
-      Width = 538
+      Width = 526
       HorzScrollBar.Page = 1
       VertScrollBar.Page = 1
       Align = alClient
       BorderStyle = bsNone
-      ClientHeight = 237
-      ClientWidth = 538
+      ClientHeight = 230
+      ClientWidth = 526
       TabOrder = 1
       object pnlClocks: TPanel
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 237
+        Height = 230
         Top = 0
-        Width = 538
+        Width = 526
         Align = alClient
         BevelOuter = bvNone
         Caption = 'pnlClocks'
@@ -244,8 +244,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 15
-    Top = 300
+    Height = 23
+    Top = 293
     Width = 652
     Panels = <    
       item
@@ -263,11 +263,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveUp
-    Left = 534
-    Height = 38
+    Left = 526
+    Height = 34
     Hint = 'Delete the sected timer(s)'
-    Top = 171
-    Width = 118
+    Top = 176
+    Width = 126
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -282,11 +282,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveDown
-    Left = 556
-    Height = 38
+    Left = 544
+    Height = 34
     Hint = 'Move the selected timer(s) up'
-    Top = 214
-    Width = 96
+    Top = 215
+    Width = 108
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -301,11 +301,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = stbMain
-    Left = 540
-    Height = 38
+    Left = 528
+    Height = 34
     Hint = 'Move the selected timer(s) down'
-    Top = 257
-    Width = 112
+    Top = 254
+    Width = 124
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -324,8 +324,8 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = lblVolume
-    Left = 583
-    Height = 82
+    Left = 577
+    Height = 85
     Top = 66
     Width = 25
     Max = 100
@@ -346,7 +346,7 @@ object frmMain: TfrmMain
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
-    Left = 584
+    Left = 578
     Height = 24
     Top = 37
     Width = 24
@@ -397,9 +397,9 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = bbDelete
-    Left = 569
-    Height = 13
-    Top = 153
+    Left = 563
+    Height = 15
+    Top = 156
     Width = 53
     Alignment = taCenter
     Anchors = [akRight, akBottom]
@@ -410,7 +410,7 @@ object frmMain: TfrmMain
   object imgVolumeOff: TImage
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
-    Left = 584
+    Left = 578
     Height = 24
     Top = 144
     Width = 24

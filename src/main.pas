@@ -123,7 +123,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
     procedure pnlClocksMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      Shift: TShiftState; X, Y: integer);
     procedure pnlClocksResize(Sender: TObject);
     procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
@@ -177,6 +177,7 @@ type
 
     procedure CreateBitmaps;
     function GetStatusMessage: string;
+    procedure LayoutControls;
     procedure PostTimerCreation({%H-}AValue: TfraTimer);
     procedure SetListButtonsStatus;
     procedure ResizeHeaderSections;
@@ -331,24 +332,8 @@ begin
 
   pnlClocks.Caption := '';
 
-  {Dynamically fix pacing}
-  bbMoveDown.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
-  bbMoveDown.BorderSpacing.Right := UserInterfaceMetrics.Margin;
-
-  lblVolume.BorderSpacing.Bottom := UserInterfaceMetrics.Margin;
-  tbVolume.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
-
-  imgVolumeOn.BorderSpacing.Top := UserInterfaceMetrics.Margin;
-
-
-  pnlBorder.BorderSpacing.Right := UserInterfaceMetrics.Padding;
-  pnlBorder.BorderSpacing.Left := UserInterfaceMetrics.Margin;
-  pnlBorder.BorderSpacing.Top := UserInterfaceMetrics.Padding;
-  //Self.BorderSpacing.InnerBorder := 10;
-  //BorderSpacing.Around:=10;
-  //bbMoveDown.BorderSpacing.Right := UserInterfaceMetrics.Padding;
-  //bbMoveDown.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
-  //bbDelete.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
+  UserInterfaceMetrics.ReferenceForm := Self;
+  LayoutControls;
 
 end;
 
@@ -407,7 +392,7 @@ begin
   if OldTaskbarIconType <> UserConfig.TaskbarIconType then
   begin
     if UserConfig.TaskbarIconType = TaskbarAppIcon then
-      FTaskBarList.SetOverlayIcon(AppHandle, 0, PWideChar(''));
+      FTaskBarList.SetOverlayIcon(AppHandle, 0, pwidechar(''));
     FReportStale := True;
     if FShortTimer.Enabled then
       OnShortTimer(Self);
@@ -633,7 +618,7 @@ begin
 end;
 
 procedure TfrmMain.pnlClocksMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 begin
   if Button = mbRight then
   begin
@@ -869,6 +854,28 @@ end;
 function TfrmMain.GetStatusMessage: string;
 begin
   Result := stbMain.Panels[PANEL_MESSAGE].Text;
+end;
+
+procedure TfrmMain.LayoutControls;
+begin
+  {Dynamically fix pacing}
+  bbMoveDown.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
+  bbMoveDown.BorderSpacing.Right := UserInterfaceMetrics.Margin;
+
+  lblVolume.BorderSpacing.Bottom := UserInterfaceMetrics.Margin;
+  tbVolume.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
+
+  imgVolumeOn.BorderSpacing.Top := UserInterfaceMetrics.Margin;
+
+
+  pnlBorder.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  pnlBorder.BorderSpacing.Left := UserInterfaceMetrics.Margin;
+  pnlBorder.BorderSpacing.Top := UserInterfaceMetrics.Padding;
+  //Self.BorderSpacing.InnerBorder := 10;
+  //BorderSpacing.Around:=10;
+  //bbMoveDown.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  //bbMoveDown.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
+  //bbDelete.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
 end;
 
 procedure TfrmMain.SetListButtonsStatus;
@@ -1224,7 +1231,7 @@ begin
 
     {$IF defined(windows) }
     if UserConfig.TaskbarIconType = TaskbarOverlayIcon then
-      FTaskbarList.SetOverlayIcon(AppHandle, 0, PWideChar(''));
+      FTaskbarList.SetOverlayIcon(AppHandle, 0, pwidechar(''));
     FTaskBarList.SetProgressState(AppHandle, TBPF_NOPROGRESS);
     {$ENDIF}
 
@@ -1268,7 +1275,7 @@ begin
         begin
 
           Result := FTaskBarList.SetOverlayIcon(AppHandle,
-            FOverlayProgressIcons[Index + 1].Handle, PWideChar(''));
+            FOverlayProgressIcons[Index + 1].Handle, pwidechar(''));
           if Result <> S_OK then
             Logger.Debug('SetOverlayIcon failed ' + IntToStr(Result));
 
