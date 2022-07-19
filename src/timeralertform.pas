@@ -58,6 +58,7 @@ type
     FEntryIDGenerator: TSequence;
     FEntries: TAlertEntryList;
     //procedure StopTimers;
+    procedure LayoutControls;
     procedure RestartTimer(Sender: TObject);
     procedure StartTimer(Sender: TObject);
     procedure RemoveAlert(Entry: TfraAlertEntry);
@@ -89,20 +90,7 @@ begin
   FEntryIDGenerator := TSequence.Create;
   FEntries := TAlertEntryList.Create;
 
-  { Dynamically spacing controls }
-
-  with UserInterfaceMetrics do
-  begin
-    lblAlert.BorderSpacing.Top:=Margin;
-    lblAlert.BorderSpacing.Left:=Margin;
-    //pnlMaster.BorderSpacing.Left:=Margin;
-    //pnlMaster.BorderSpacing.Right:=Margin;
-    pnlMaster.BorderSpacing.Top:=Padding;
-    pnlMaster.BorderSpacing.Bottom:=Padding;
-
-    bbClose.BorderSpacing.Right:=Margin;
-    bbClose.BorderSpacing.Bottom:=Margin;
-  end;
+  LayoutControls;
 
 end;
 
@@ -169,6 +157,24 @@ begin
   Entry.Timer.Stop(True);
   Entry.Timer.RestartFromLastFinish;
   RemoveAlert(Entry);
+end;
+
+procedure TfrmAlert.LayoutControls;
+begin
+  { Dynamically spacing controls }
+
+  with UserInterfaceMetrics do
+  begin
+    lblAlert.BorderSpacing.Top := Padding;
+    lblAlert.BorderSpacing.Left := Padding;
+    //pnlMaster.BorderSpacing.Left:=Margin;
+    //pnlMaster.BorderSpacing.Right:=Margin;
+    pnlMaster.BorderSpacing.Top := Padding;
+    pnlMaster.BorderSpacing.Bottom := Padding;
+
+    bbClose.BorderSpacing.Right := Padding;
+    bbClose.BorderSpacing.Bottom := Padding;
+  end;
 end;
 
 procedure TfrmAlert.StartTimer(Sender: TObject);
@@ -416,7 +422,7 @@ end;
 
 //procedure TfrmAlert.FormActivate(Sender: TObject);
 //begin
-//
+
 //end;
 
 procedure TfrmAlert.FormClose(Sender: TObject; var CloseAction: TCloseAction);

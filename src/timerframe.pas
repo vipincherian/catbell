@@ -110,6 +110,7 @@ type
     function GetPlayButtonEnabled: boolean;
     function GetSelected: boolean;
     function GetStopButtonEnabled: boolean;
+    procedure LayoutControls;
     procedure SetCaption(AValue: string);
     procedure SetDuration(AValue: TDateTime);
     procedure SetDurationEnabled(AValue: boolean);
@@ -382,6 +383,35 @@ end;
 function TfraTimer.GetStopButtonEnabled: boolean;
 begin
   Result := bbStop.Enabled;
+end;
+
+procedure TfraTimer.LayoutControls;
+begin
+  { Space controls }
+  //BorderSpacing.InnerBorder:= UserInterfaceMetrics.Padding;
+  bbEdit.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  bbEdit.BorderSpacing.Top := (UserInterfaceMetrics.Padding div 2);
+
+  ckbIconProgress.BorderSpacing.Right :=
+    REPORT_PADDING_MULTIPLIER * UserInterfaceMetrics.Padding;
+  lblCountdown.BorderSpacing.Right :=
+    REPORT_PADDING_MULTIPLIER * UserInterfaceMetrics.Padding;
+
+  bbAdjust.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  bbStop.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  bbPause.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+  bbPlay.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+
+  dtpSet.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+
+  edtTitle.BorderSpacing.Right := UserInterfaceMetrics.Padding;
+
+  { Additional padding to the right of the image timer as it looks huddled
+  otherwise }
+  edtTitle.BorderSpacing.Left := UserInterfaceMetrics.Padding * 2;
+
+  imgTimer.BorderSpacing.Left := UserInterfaceMetrics.Padding;
+  cbSelect.BorderSpacing.Left := UserInterfaceMetrics.Padding;
 end;
 
 procedure TfraTimer.SetCaption(AValue: string);
@@ -706,32 +736,7 @@ begin
   FBeingEdited := False;
   //ArrangeControls;
 
-  { Space controls }
-  //BorderSpacing.InnerBorder:=10;
-  bbEdit.BorderSpacing.Right := UserInterfaceMetrics.Padding;
-  bbEdit.BorderSpacing.Top := UserInterfaceMetrics.Padding;
-
-  ckbIconProgress.BorderSpacing.Right :=
-    REPORT_PADDING_MULTIPLIER * UserInterfaceMetrics.Padding;
-  lblCountdown.BorderSpacing.Right :=
-    REPORT_PADDING_MULTIPLIER * UserInterfaceMetrics.Padding;
-
-  bbAdjust.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
-  bbStop.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
-  bbPause.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
-  bbPlay.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
-
-  dtpSet.BorderSpacing.Right:=UserInterfaceMetrics.Padding;
-
-  edtTitle.BorderSpacing.Right:= UserInterfaceMetrics.Padding;
-
-  { Additional padding to the right of the image timer as it looks huddled
-  otherwise }
-  edtTitle.BorderSpacing.Left:= UserInterfaceMetrics.Padding * 2;
-
-  imgTimer.BorderSpacing.Left:=UserInterfaceMetrics.Padding;
-  cbSelect.BorderSpacing.Left:=UserInterfaceMetrics.Padding;
-
+  LayoutControls;
 
 end;
 

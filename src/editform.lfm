@@ -3,7 +3,8 @@ object frmEdit: TfrmEdit
   Height = 283
   Top = 266
   Width = 549
-  BorderStyle = bsSingle
+  Align = alClient
+  AutoSize = True
   Caption = 'Edit Timer'
   ClientHeight = 283
   ClientWidth = 549
@@ -56,9 +57,9 @@ object frmEdit: TfrmEdit
     AnchorSideBottom.Control = bbSave
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 30
-    Top = 253
-    Width = 71
+    Height = 26
+    Top = 257
+    Width = 82
     Anchors = [akLeft, akBottom]
     AutoSize = True
     Cancel = True
@@ -73,10 +74,10 @@ object frmEdit: TfrmEdit
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Left = 500
-    Height = 30
-    Top = 253
-    Width = 49
+    Left = 487
+    Height = 26
+    Top = 257
+    Width = 62
     Anchors = [akRight, akBottom]
     AutoSize = True
     Default = True
@@ -93,7 +94,7 @@ object frmEdit: TfrmEdit
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbSave
     Left = 0
-    Height = 253
+    Height = 257
     Top = 0
     Width = 549
     ActivePage = tsSound
@@ -103,8 +104,8 @@ object frmEdit: TfrmEdit
     TabOrder = 0
     object tsTimer: TTabSheet
       Caption = 'Timer'
-      ClientHeight = 223
-      ClientWidth = 539
+      ClientHeight = 229
+      ClientWidth = 541
       ImageIndex = 0
       object gbSpecs: TGroupBox
         AnchorSideLeft.Control = tsTimer
@@ -112,13 +113,13 @@ object frmEdit: TfrmEdit
         AnchorSideRight.Control = tsTimer
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 58
+        Height = 66
         Top = 0
-        Width = 539
+        Width = 541
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'Default specifications'
-        ClientHeight = 44
+        ClientHeight = 46
         ClientWidth = 537
         TabOrder = 0
         object lblDescription: TLabel
@@ -126,9 +127,9 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = edtDescription
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 13
-          Top = 6
-          Width = 62
+          Height = 15
+          Top = 4
+          Width = 60
           Alignment = taRightJustify
           Caption = 'Description'
           ParentColor = False
@@ -139,10 +140,10 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = gbSpecs
           AnchorSideRight.Control = gbSpecs
           AnchorSideRight.Side = asrBottom
-          Left = 62
-          Height = 25
+          Left = 60
+          Height = 23
           Top = 0
-          Width = 475
+          Width = 477
           Anchors = [akTop, akLeft, akRight]
           OnChange = edtDescriptionChange
           TabOrder = 0
@@ -152,10 +153,10 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Side = asrCenter
           AnchorSideRight.Control = lblDescription
           AnchorSideRight.Side = asrBottom
-          Left = 15
-          Height = 13
-          Top = 28
-          Width = 47
+          Left = 14
+          Height = 15
+          Top = 27
+          Width = 46
           Alignment = taRightJustify
           Anchors = [akTop, akRight]
           Caption = 'Duration'
@@ -166,10 +167,10 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = edtDescription
           AnchorSideTop.Side = asrBottom
           AnchorSideBottom.Side = asrBottom
-          Left = 62
-          Height = 19
-          Top = 25
-          Width = 71
+          Left = 60
+          Height = 23
+          Top = 23
+          Width = 65
           CenturyFrom = 1941
           MaxDate = 2958465
           MinDate = -53780
@@ -198,22 +199,22 @@ object frmEdit: TfrmEdit
         AnchorSideBottom.Control = tsTimer
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 165
-        Top = 58
-        Width = 539
+        Height = 163
+        Top = 66
+        Width = 541
         Anchors = [akTop, akLeft, akRight, akBottom]
         AutoSize = True
         Caption = 'Show on completion'
-        ClientHeight = 151
+        ClientHeight = 143
         ClientWidth = 537
         TabOrder = 1
         object ckbModalAlert: TCheckBox
           AnchorSideLeft.Control = gbOnCompletion
           AnchorSideTop.Control = gbOnCompletion
           Left = 0
-          Height = 23
+          Height = 19
           Top = 0
-          Width = 121
+          Width = 112
           Caption = 'Show modal alert'
           TabOrder = 0
         end
@@ -222,9 +223,9 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = ckbModalAlert
           AnchorSideTop.Side = asrBottom
           Left = 0
-          Height = 23
-          Top = 23
-          Width = 121
+          Height = 19
+          Top = 19
+          Width = 113
           Caption = 'Show notification'
           TabOrder = 1
         end
@@ -232,8 +233,8 @@ object frmEdit: TfrmEdit
     end
     object tsSound: TTabSheet
       Caption = 'Sound'
-      ClientHeight = 223
-      ClientWidth = 539
+      ClientHeight = 229
+      ClientWidth = 541
       ImageIndex = 1
       object gbAlarm: TGroupBox
         AnchorSideLeft.Control = gbMetronome
@@ -241,25 +242,25 @@ object frmEdit: TfrmEdit
         AnchorSideRight.Control = gbMetronome
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 74
+        Height = 72
         Top = 0
-        Width = 180
+        Width = 174
         Anchors = [akTop, akLeft, akRight]
         AutoSize = True
         Caption = 'Alarm on completion'
-        ClientHeight = 60
-        ClientWidth = 178
+        ClientHeight = 52
+        ClientWidth = 170
         TabOrder = 0
         object cmbSoundType: TComboBox
           AnchorSideLeft.Control = gbAlarm
           AnchorSideTop.Control = bbTestSound
           AnchorSideRight.Control = bbTestSound
           Left = 0
-          Height = 27
+          Height = 23
           Top = 0
-          Width = 122
+          Width = 103
           Anchors = [akTop, akLeft, akRight]
-          ItemHeight = 0
+          ItemHeight = 15
           ItemIndex = 0
           Items.Strings = (
             'Default'
@@ -276,9 +277,9 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = bbStopSound
           AnchorSideTop.Side = asrCenter
           Left = 0
-          Height = 23
-          Top = 34
-          Width = 88
+          Height = 19
+          Top = 30
+          Width = 82
           Caption = 'Play in loop'
           TabOrder = 1
         end
@@ -286,10 +287,10 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = gbAlarm
           AnchorSideRight.Control = gbAlarm
           AnchorSideRight.Side = asrBottom
-          Left = 122
-          Height = 30
+          Left = 103
+          Height = 26
           Top = 0
-          Width = 56
+          Width = 67
           Anchors = [akTop, akRight]
           AutoSize = True
           Caption = 'Test'
@@ -303,10 +304,10 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = bbTestSound
           AnchorSideRight.Side = asrBottom
-          Left = 119
-          Height = 30
-          Top = 30
-          Width = 59
+          Left = 100
+          Height = 26
+          Top = 26
+          Width = 70
           Anchors = [akTop, akRight]
           AutoSize = True
           Caption = 'Stop'
@@ -324,23 +325,23 @@ object frmEdit: TfrmEdit
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = gbMetronome
         AnchorSideBottom.Side = asrBottom
-        Left = 180
-        Height = 223
+        Left = 174
+        Height = 229
         Top = 0
-        Width = 359
+        Width = 367
         Anchors = [akTop, akLeft, akRight, akBottom]
         AutoSize = True
         Caption = 'Custom alarm'
         ClientHeight = 209
-        ClientWidth = 357
+        ClientWidth = 363
         TabOrder = 1
         object bbSelectSound: TBitBtn
           AnchorSideLeft.Control = gbCustom
           AnchorSideTop.Control = bbClearSound
           Left = 0
-          Height = 30
+          Height = 26
           Top = 0
-          Width = 61
+          Width = 72
           AutoSize = True
           Caption = 'Load'
           Images = imlEdit
@@ -352,10 +353,10 @@ object frmEdit: TfrmEdit
           AnchorSideTop.Control = gbCustom
           AnchorSideRight.Control = gbCustom
           AnchorSideRight.Side = asrBottom
-          Left = 295
-          Height = 30
+          Left = 290
+          Height = 26
           Top = 0
-          Width = 62
+          Width = 73
           Anchors = [akTop, akRight]
           AutoSize = True
           Caption = 'Clear'
@@ -365,27 +366,20 @@ object frmEdit: TfrmEdit
           TabOrder = 1
         end
         object lsvSoundDetails: TListView
-          AnchorSideLeft.Control = bbSelectSound
-          AnchorSideTop.Control = bbClearSound
-          AnchorSideTop.Side = asrBottom
-          AnchorSideRight.Control = bbClearSound
-          AnchorSideRight.Side = asrBottom
-          AnchorSideBottom.Control = gbCustom
-          AnchorSideBottom.Side = asrBottom
           Left = 0
-          Height = 179
-          Top = 30
-          Width = 357
-          Anchors = [akTop, akLeft, akRight, akBottom]
+          Height = 183
+          Top = 26
+          Width = 363
           Columns = <          
             item
               AutoSize = True
-              Width = 59
+              Width = 54
             end          
             item
               AutoSize = True
-              Width = 283
+              Width = 25
             end>
+          Constraints.MinWidth = 200
           Items.LazData = {
             5400000003000000FFFFFFFFFFFFFFFFFFFFFFFF000000000400000046696C65
             FFFFFFFFFFFFFFFFFFFFFFFF000000000400000050617468FFFFFFFFFFFFFFFF
@@ -404,14 +398,14 @@ object frmEdit: TfrmEdit
         AnchorSideBottom.Control = tsSound
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 149
-        Top = 74
-        Width = 180
+        Height = 157
+        Top = 72
+        Width = 174
         Anchors = [akTop, akLeft, akBottom]
         AutoSize = True
         Caption = 'Metronome'
-        ClientHeight = 135
-        ClientWidth = 178
+        ClientHeight = 137
+        ClientWidth = 170
         TabOrder = 2
         object ckbMetronome: TCheckBox
           AnchorSideLeft.Control = gbMetronome
@@ -419,9 +413,9 @@ object frmEdit: TfrmEdit
           AnchorSideRight.Control = gbMetronome
           AnchorSideRight.Side = asrBottom
           Left = 0
-          Height = 23
+          Height = 19
           Top = 0
-          Width = 178
+          Width = 170
           Anchors = [akTop, akLeft, akRight]
           Caption = 'Ticking sound while running'
           TabOrder = 0

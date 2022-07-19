@@ -85,20 +85,19 @@ begin
   else
     SystemFont := Screen.SystemFont;
 
+  { Font's size, height etc are all coming as zero. Hence the below
+  method is the only reliable one. }
+
   SystemFontSize := Abs(Round(
     (GetFontData(SystemFont.Handle).Height * 72 / SystemFont.PixelsPerInch)));
 
-  //TempCanvas := TCanvas.Create;
 
-  //SystemFontSize := TempCanvas.Font.Size;
-  //TempCanvas.Free;
-  //SystemFontSize:=8;
+  { Divide the default pitch by padding ratio an then round to a chosen
+  power of 2 }
 
-  {Divide the default pitch by padding ratio an then round to the uppermost 4 }
   FPadding := ((((SystemFontSize div PADDING_RATIO) + PADDING_ROUNDED_TO - 1) shr
-    1) shl 1);
-  FMargin := ((((SystemFontSize div MARGIN_RATIO) + MARGIN_ROUNDED_TO - 1) shr
     2) shl 2);
+  FMargin := 2 * FPadding;
 end;
 
 constructor TUserInterfaceMetrics.Create;

@@ -510,28 +510,28 @@ begin
     { Other controls }
     with pgEditTimer.BorderSpacing do
     begin
-      Top := Margin;
+      Top := Padding;
       Bottom := Padding;
     end;
 
     {Page Timer: Controls on which others are anchored }
-    gbSpecs.BorderSpacing.Around := Margin;
-    gbSpecs.BorderSpacing.InnerBorder := Margin;
+    gbSpecs.BorderSpacing.Around := Padding;
+    gbSpecs.BorderSpacing.InnerBorder := Padding;
 
     with gbOnCompletion.BorderSpacing do
     begin
-      Top := Margin;
-      Bottom := Margin;
-      InnerBorder := Margin;
+      Top := Padding;
+      Bottom := Padding;
+      InnerBorder := Padding;
     end;
 
-    lblDescription.BorderSpacing.Left := Margin;
+    lblDescription.BorderSpacing.Left := Padding;
 
     with edtDescription.BorderSpacing do
     begin
       Left := Padding;
-      Right := Margin;
-      Top := Margin;
+      Right := Padding;
+      Top := Padding;
     end;
 
     {Page timer: Other controls }
@@ -540,56 +540,56 @@ begin
 
     with ckbModalAlert.BorderSpacing do
     begin
-      Top := Margin;
-      Left := Margin;
+      Top := Padding;
+      Left := Padding;
     end;
     ckbTrayNotification.BorderSpacing.Top := Padding;
 
     {Page Sound: Controls on which others are anchored }
 
-    gbMetronome.BorderSpacing.Around := Margin;
-    gbMetronome.BorderSpacing.InnerBorder := Margin;
+    gbMetronome.BorderSpacing.Around := Padding;
+    gbMetronome.BorderSpacing.InnerBorder := Padding;
     with ckbMetronome.BorderSpacing do
     begin
-      Left := Margin;
+      Left := Padding;
       //Top:=Margin;
       //Right:=Margin;
     end;
 
     with gbAlarm.BorderSpacing do
     begin
-      InnerBorder := Margin;
-      Top := Margin;
+      InnerBorder := Padding;
+      Top := Padding;
       //Left:=Margin;
     end;
 
     with bbTestSound.BorderSpacing do
     begin
-      Top := Margin;
-      Right := Margin;
+      Top := Padding;
+      Right := Padding;
     end;
 
     bbStopSound.BorderSpacing.Top := Padding;
-    cmbSoundType.BorderSpacing.Left := Margin;
+    cmbSoundType.BorderSpacing.Left := Padding;
     cmbSoundType.BorderSpacing.Right := Padding;
 
     with gbCustom.BorderSpacing do
     begin
-      InnerBorder := Margin;
-      Left := Margin;
-      Right := Margin;
+      InnerBorder := Padding;
+      Left := Padding;
+      Right := Padding;
     end;
 
     with bbClearSound.BorderSpacing do begin
-      Top:=Margin;
-      Right:=Margin;
+      Top:=Padding;
+      Right:=Padding;
     end;
 
-    bbSelectSound.BorderSpacing.Left:=Margin;
+    bbSelectSound.BorderSpacing.Left:=Padding;
 
     with lsvSoundDetails.BorderSpacing do begin
       Top:=Padding;
-      Bottom:=Margin;
+      Bottom:=Padding;
     end;
 
 
