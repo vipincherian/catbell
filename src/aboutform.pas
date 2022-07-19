@@ -52,6 +52,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure sttUrlClick(Sender: TObject);
   private
+    procedure LayoutControls;
     { private declarations }
   public
     { public declarations }
@@ -130,7 +131,18 @@ begin
 
   pgAdditional.ActivePage := tsLicense;
 
+  LayoutControls;
 
+end;
+
+
+procedure TfrmAbout.sttUrlClick(Sender: TObject);
+begin
+  OpenUrl(sttUrl.Caption);
+end;
+
+procedure TfrmAbout.LayoutControls;
+begin
   { Dynamic layout of controls }
 
   with UserInterfaceMetrics do
@@ -162,28 +174,23 @@ begin
     pgAdditional.BorderSpacing.Top := Padding;
     pgAdditional.BorderSpacing.Bottom := Padding;
 
-    with sbxLicense.BorderSpacing do begin
-      Top:=Padding;
-      Left:=Padding;
-      Right:=Padding;
-      Bottom:=Padding;
+    with sbxLicense.BorderSpacing do
+    begin
+      Top := Padding;
+      Left := Padding;
+      Right := Padding;
+      Bottom := Padding;
     end;
 
-    with lsvBuild.BorderSpacing do begin
-      Top:=Padding;
-      Left:=Padding;
-      Right:=Padding;
-      Bottom:=Padding;
+    with lsvBuild.BorderSpacing do
+    begin
+      Top := Padding;
+      Left := Padding;
+      Right := Padding;
+      Bottom := Padding;
     end;
 
   end;
-
-end;
-
-
-procedure TfrmAbout.sttUrlClick(Sender: TObject);
-begin
-  OpenUrl(sttUrl.Caption);
 end;
 
 end.

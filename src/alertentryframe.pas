@@ -20,6 +20,7 @@ type
     procedure bbStartClick(Sender: TObject);
   private
     FTimer: TfraTimer;
+    procedure LayoutControls;
   public
     OnTimerRestart: TNotifyEvent;
     OnTimerStart: TNotifyEvent;
@@ -53,6 +54,19 @@ begin
   end;
 end;
 
+procedure TfraAlertEntry.LayoutControls;
+begin
+  with UserInterfaceMetrics do
+  begin
+    bbStart.BorderSpacing.Top := Padding;
+    bbStart.BorderSpacing.Right := Padding;
+    stCompletedAt.BorderSpacing.Right := Padding;
+    stDuration.BorderSpacing.Right := Padding;
+    stDescription.BorderSpacing.Left := Padding;
+    stDescription.BorderSpacing.Right := Padding;
+  end;
+end;
+
 constructor TfraAlertEntry.Create(AOwner: TComponent; AssocTimer: TFraTimer);
 begin
   inherited Create(AOwner);
@@ -66,15 +80,7 @@ begin
 
   { Dynamically spacing controls }
 
-  with UserInterfaceMetrics do
-  begin
-    bbStart.BorderSpacing.Top := Padding;
-    bbStart.BorderSpacing.Right := Padding;
-    stCompletedAt.BorderSpacing.Right := Padding;
-    stDuration.BorderSpacing.Right := Padding;
-    stDescription.BorderSpacing.Left := Padding;
-    stDescription.BorderSpacing.Right := Padding;
-  end;
+  LayoutControls;
 end;
 
 end.

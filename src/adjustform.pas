@@ -44,6 +44,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
+    procedure LayoutControls;
     procedure SetTillDateTime;
   public
     //Id: longword;
@@ -97,6 +98,18 @@ begin
 
   //Id := longword(-1);
 
+  LayoutControls;
+end;
+
+procedure TfrmAdjust.FormShow(Sender: TObject);
+begin
+  dtpTill.TimeFormat := TTimeFormat(UserConfig.DefaultTimeFormat);
+  dtpDiff.Time := UserConfig.AdjustDiff;
+  SetTillDateTime;
+end;
+
+procedure TfrmAdjust.LayoutControls;
+begin
   { Dynamic layout of controls }
 
   with UserInterfaceMetrics do
@@ -114,13 +127,6 @@ begin
     bbCancel.BorderSpacing.Bottom := Margin;
     bbApply.BorderSpacing.Bottom := Margin;
   end;
-end;
-
-procedure TfrmAdjust.FormShow(Sender: TObject);
-begin
-  dtpTill.TimeFormat := TTimeFormat(UserConfig.DefaultTimeFormat);
-  dtpDiff.Time := UserConfig.AdjustDiff;
-  SetTillDateTime;
 end;
 
 procedure TfrmAdjust.SetTillDateTime;
