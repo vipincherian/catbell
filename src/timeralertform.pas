@@ -58,7 +58,7 @@ type
     FEntryIDGenerator: TSequence;
     FEntries: TAlertEntryList;
     //procedure StopTimers;
-    MyCS: TRTLCriticalSection;
+    FAlertListCriticalSection: TRTLCriticalSection;
     procedure LayoutControls;
     procedure RestartTimer(Sender: TObject);
     procedure ShowAlerts;
@@ -94,13 +94,13 @@ begin
 
   LayoutControls;
 
-  InitCriticalSection(MyCS);
+  InitCriticalSection(FAlertListCriticalSection);
 
 end;
 
 procedure TfrmAlert.FormDestroy(Sender: TObject);
 begin
-  DoneCriticalSection(MyCS);
+  DoneCriticalSection(FAlertListCriticalSection);
   FEntries.Free;
   FEntryIDGenerator.Free;
 end;
@@ -217,7 +217,7 @@ var
   PrevEntry, NextEntry: TfraAlertEntry;
 begin
 
-  EnterCriticalSection(MyCS);
+  EnterCriticalSection(FAlertListCriticalSection);
   try
     Index := FEntries.IndexOf(Entry);
 
@@ -250,7 +250,7 @@ begin
     end;
 
   finally
-    LeaveCriticalSection(MyCS);
+    LeaveCriticalSection(FAlertListCriticalSection);
   end;
 
 end;
@@ -259,7 +259,7 @@ procedure TfrmAlert.EmptyAlertsAndClose;
 var
   Item: TfraAlertEntry;
 begin
-  EnterCriticalSection(MyCS);
+  EnterCriticalSection(FAlertListCriticalSection);
   try
     while FEntries.Count > 0 do
     begin
@@ -271,7 +271,7 @@ begin
     tmrAlert.Enabled := False;
     Close;
   finally
-    LeaveCriticalSection(MyCS);
+    LeaveCriticalSection(FAlertListCriticalSection);
   end;
 end;
 
@@ -358,7 +358,7 @@ begin
 
   //lsvMessages.EndUpdate;
 
-  EnterCriticalSection(MyCS);
+  EnterCriticalSection(FAlertListCriticalSection);
 
   try
 
@@ -410,7 +410,7 @@ begin
 
     ShowAlerts;
   finally
-    EnterCriticalSection(MyCS);
+    EnterCriticalSection(FAlertListCriticalSection);
   end;
 end;
 
