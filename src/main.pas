@@ -215,6 +215,7 @@ type
     procedure OnShortTimer(Sender: TObject);
     procedure AfterShow({%H-}Data: PtrInt);
     procedure ShowModalAlert({%H-}Data: PtrInt);
+    procedure AddAlert({%H-}Data: PtrInt);
     property StatusMessage: string read GetStatusMessage write SetStatusMessage;
 
   end;
@@ -1148,7 +1149,8 @@ begin
 
   if Sender.ModalAlert and (not UserInitiated) then
   begin
-    frmAlert.AddTimer(Sender);
+    //frmAlert.AddTimer(Sender);
+    Application.QueueAsyncCall(@AddAlert, PtrInt(Sender));
     //Application.QueueAsyncCall(@ShowModalAlert, 0);
     //ShowModalAlert(0);
   end;
@@ -1965,6 +1967,15 @@ begin
     frmAlert.ShowModal
   else
     frmAlert.ShowOnTop;
+end;
+
+procedure TfrmMain.AddAlert(Data: PtrInt);
+var
+  Widget: TfraTimer;
+begin
+  Widget := TfraTimer(Data);
+  frmAlert.AddTimer(Widget);
+
 end;
 
 
