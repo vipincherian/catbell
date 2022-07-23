@@ -208,6 +208,10 @@ begin
   RemoveAlert(Entry);
 
   Entry.Timer.Stop(True);
+
+  { Start does not bother whether audio is playing }
+  //Entry.Timer.AbortSound(True);
+
   Entry.Timer.Start;
 end;
 

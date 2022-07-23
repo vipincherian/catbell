@@ -410,7 +410,7 @@ procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   CurrPosNormal, CurrPosRestored: TRect;
   //Count: integer;
-  StartTickCount: QWord;
+  //StartTickCount: QWord;
   Timer: TfraTimer;
 begin
   { if any audio is playing, stop }
@@ -421,19 +421,21 @@ begin
     //for Count := 0 to FTimerFrames.Count - 1 do
     for Timer in FTimerFrames do
     begin
-      Timer.AbortSound;
 
-      StartTickCount := GetTickCount64;
-      { Abort is asynchronous, wait till each timer aborts.
-      Also, we do not wait for more than two seconds per timer.
-      After that, it is past caring. Tardiness can be tolerated only as much. }
-      while Timer.IsSoundPlaying do
-      begin
-        Logger.Debug('Waiting for frame to stop audio');
-        Application.ProcessMessages;
-        if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
-          break;
-      end;
+      { TODO: Check it is playing first }
+      Timer.AbortSound(True);
+
+      //StartTickCount := GetTickCount64;
+      //{ Abort is asynchronous, wait till each timer aborts.
+      //Also, we do not wait for more than two seconds per timer.
+      //After that, it is past caring. Tardiness can be tolerated only as much. }
+      //while Timer.IsSoundPlaying do
+      //begin
+      //  Logger.Debug('Waiting for frame to stop audio');
+      //  Application.ProcessMessages;
+      //  if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+      //    break;
+      //end;
     end;
   end;
 

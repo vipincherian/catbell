@@ -166,7 +166,7 @@ type
 
     //procedure ArrangeControls;
 
-    procedure AbortSound;
+    procedure AbortSound(Wait: boolean = False);
 
     function QueryRestartFromLastFinish: boolean;
     function RestartFromLastFinish: boolean;
@@ -590,7 +590,7 @@ function TfraTimer.RestartFromLastFinish: boolean;
 var
   CurrentTime: TDateTime;
   NewEndTickCount, Adjustment: QWord;
-  StartTickCount: QWord = 0;
+  //StartTickCount: QWord = 0;
 begin
   Result := False;
 
@@ -617,23 +617,7 @@ begin
   //end;
 
   { Wait for audio player to finish before starting again. }
-  StartTickCount := GetTickCount64;
-  { Wait for FAudio to complete. }
-  if FAudioPlayer.Playing then
-  begin
-    FAudioPlayer.Abort;
-    while FAudioPlayer.Playing do
-    begin
-      Logger.Debug('Waiting for');
-      Application.ProcessMessages;
-      if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
-      begin
-        Logger.Warning('FAudioPlayer Abort did not complete. ' +
-          'Cannot restart timer');
-        Exit;
-      end;
-    end;
-  end;
+  AbortSound(True);
 
   { Calculate the adjustment prior to starting the timer. The process of
   starting the timer changes FLastCompletionTime }
@@ -815,6 +799,8 @@ begin
 
   if (Hours = 0) and (Minutes = 0) and (Seconds = 0) then
     Exit;
+
+  AbortSound(True);
 
   if FPaused = False then
   begin
@@ -1215,9 +1201,33 @@ begin
   end;
 end;
 
-procedure TfraTimer.AbortSound;
+procedure TfraTimer.AbortSound(Wait: boolean);
+var
+  StartTickCount: QWord;
 begin
+  if not FAudioPlayer.Playing then Exit;
+
   FAudioPlayer.Abort;
+  if Wait then
+  begin
+    StartTickCount := GetTickCount64;
+    { Wait for FAudio to complete. }
+    if FAudioPlayer.Playing then
+    begin
+      FAudioPlayer.Abort;
+      while FAudioPlayer.Playing do
+      begin
+        Logger.Debug('Waiting for');
+        Application.ProcessMessages;
+        if GetTickCount64 > (StartTickCount + AUDIO_ABORT_SHORT_WAIT) then
+        begin
+          Logger.Warning('FAudioPlayer Abort did not complete. ' +
+            'Cannot restart timer');
+          Exit;
+        end;
+      end;
+    end;
+  end;
 end;
 
 function TfraTimer.QueryRestartFromLastFinish: boolean;

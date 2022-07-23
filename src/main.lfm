@@ -9,7 +9,7 @@ object frmMain: TfrmMain
   VertScrollBar.Range = 152
   ActiveControl = pnlBorder
   Caption = 'Catbell'
-  ClientHeight = 316
+  ClientHeight = 315
   ClientWidth = 652
   Menu = mmMain
   OnClose = FormClose
@@ -160,21 +160,21 @@ object frmMain: TfrmMain
     AnchorSideBottom.Control = bbMoveDown
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 260
+    Height = 263
     Top = 32
-    Width = 549
+    Width = 540
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
     Caption = 'pnlBorder'
-    ClientHeight = 260
-    ClientWidth = 549
+    ClientHeight = 263
+    ClientWidth = 540
     TabOrder = 1
     object hdrTimers: THeaderControl
       Left = 1
       Height = 24
       Top = 1
-      Width = 547
+      Width = 538
       DragReorder = False
       Sections = <      
         item
@@ -217,22 +217,22 @@ object frmMain: TfrmMain
     end
     object sbxClocks: TScrollBox
       Left = 1
-      Height = 234
+      Height = 237
       Top = 25
-      Width = 547
+      Width = 538
       HorzScrollBar.Page = 1
       VertScrollBar.Page = 1
       Align = alClient
       BorderStyle = bsNone
-      ClientHeight = 234
-      ClientWidth = 547
+      ClientHeight = 237
+      ClientWidth = 538
       TabOrder = 1
       object pnlClocks: TPanel
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 234
+        Height = 237
         Top = 0
-        Width = 547
+        Width = 538
         Align = alClient
         BevelOuter = bvNone
         Caption = 'pnlClocks'
@@ -244,8 +244,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 19
-    Top = 297
+    Height = 15
+    Top = 300
     Width = 652
     Panels = <    
       item
@@ -263,11 +263,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveUp
-    Left = 543
-    Height = 34
+    Left = 534
+    Height = 38
     Hint = 'Delete the sected timer(s)'
-    Top = 180
-    Width = 109
+    Top = 171
+    Width = 118
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -282,11 +282,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveDown
-    Left = 563
-    Height = 34
+    Left = 556
+    Height = 38
     Hint = 'Move the selected timer(s) up'
-    Top = 219
-    Width = 89
+    Top = 214
+    Width = 96
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -301,11 +301,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = stbMain
-    Left = 549
-    Height = 34
+    Left = 540
+    Height = 38
     Hint = 'Move the selected timer(s) down'
-    Top = 258
-    Width = 103
+    Top = 257
+    Width = 112
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -324,8 +324,8 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = lblVolume
-    Left = 587
-    Height = 88
+    Left = 583
+    Height = 82
     Top = 66
     Width = 25
     Max = 100
@@ -346,7 +346,7 @@ object frmMain: TfrmMain
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
-    Left = 588
+    Left = 584
     Height = 24
     Top = 37
     Width = 24
@@ -397,10 +397,10 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = bbDelete
-    Left = 574
-    Height = 16
-    Top = 159
-    Width = 51
+    Left = 569
+    Height = 13
+    Top = 153
+    Width = 53
     Alignment = taCenter
     Anchors = [akRight, akBottom]
     BorderSpacing.Bottom = 5
@@ -410,7 +410,7 @@ object frmMain: TfrmMain
   object imgVolumeOff: TImage
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
-    Left = 588
+    Left = 584
     Height = 24
     Top = 144
     Width = 24
