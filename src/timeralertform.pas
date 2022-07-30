@@ -156,15 +156,17 @@ end;
 procedure TfrmAlert.RestartTimer(Data: PtrInt);
 var
   Entry: TfraAlertEntry;
+  TimerWidget: TfraTimer;
 begin
   Entry := TfraAlertEntry(Data);
   //ShowMessage('Got message');
 
+  TimerWidget := Entry.Timer;
   { Remove first }
   RemoveAlert(Entry);
 
-  Entry.Timer.Stop(True);
-  Entry.Timer.RestartFromLastFinish;
+  TimerWidget.Stop(True);
+  TimerWidget.RestartFromLastFinish;
 end;
 
 procedure TfrmAlert.ShowAlerts;
@@ -200,19 +202,18 @@ end;
 procedure TfrmAlert.StartTimer(Data: PtrInt);
 var
   Entry: TfraAlertEntry;
+  TimerWidget: TfraTimer;
 begin
   Entry := TfraAlertEntry(Data);
   //ShowMessage('Got message');
 
+  TimerWidget := Entry.Timer;
+
   { As the first thing, remove the alert }
   RemoveAlert(Entry);
 
-  Entry.Timer.Stop(True);
-
-  { Start does not bother whether audio is playing }
-  //Entry.Timer.AbortSound(True);
-
-  Entry.Timer.Start;
+  TimerWidget.Stop(True);
+  TimerWidget.Start;
 end;
 
 procedure TfrmAlert.RemoveAlert(Entry: TfraAlertEntry);
@@ -244,7 +245,9 @@ begin
   { Cannot free Entry (Entry.Free) here, as we are in Entry's button's callback.
   Although that works fine in Linux, throws exception in Windows.
   Application.ReleaseComponent will do it asynchronously }
-    Application.ReleaseComponent(Entry);
+    //Application.ReleaseComponent(Entry);
+
+    Entry.Free;
     pnlEntries.Refresh;
 
     if FEntries.Count = 0 then
