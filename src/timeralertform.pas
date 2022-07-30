@@ -60,9 +60,9 @@ type
     //procedure StopTimers;
     FAlertListCriticalSection: TRTLCriticalSection;
     procedure LayoutControls;
-    procedure RestartTimer(Sender: TObject);
+    procedure RestartTimer(Data: PtrInt);
     procedure ShowAlerts;
-    procedure StartTimer(Sender: TObject);
+    procedure StartTimer(Data: PtrInt);
     procedure RemoveAlert(Entry: TfraAlertEntry);
     procedure EmptyAlertsAndClose;
     procedure ResizeHeaderSections;
@@ -153,11 +153,11 @@ end;
 //  end;
 //end;
 
-procedure TfrmAlert.RestartTimer(Sender: TObject);
+procedure TfrmAlert.RestartTimer(Data: PtrInt);
 var
   Entry: TfraAlertEntry;
 begin
-  Entry := TfraAlertEntry(Sender);
+  Entry := TfraAlertEntry(Data);
   //ShowMessage('Got message');
 
   { Remove first }
@@ -197,11 +197,11 @@ begin
   end;
 end;
 
-procedure TfrmAlert.StartTimer(Sender: TObject);
+procedure TfrmAlert.StartTimer(Data: PtrInt);
 var
   Entry: TfraAlertEntry;
 begin
-  Entry := TfraAlertEntry(Sender);
+  Entry := TfraAlertEntry(Data);
   //ShowMessage('Got message');
 
   { As the first thing, remove the alert }

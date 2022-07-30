@@ -17,8 +17,8 @@ object fraAlertEntry: TfraAlertEntry
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = stDuration
     Left = 0
-    Height = 20
-    Top = 8
+    Height = 15
+    Top = 11
     Width = 411
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True

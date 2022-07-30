@@ -22,8 +22,8 @@ type
     FTimer: TfraTimer;
     procedure LayoutControls;
   public
-    OnTimerRestart: TNotifyEvent;
-    OnTimerStart: TNotifyEvent;
+    OnTimerRestart: TDataEvent;
+    OnTimerStart: TDataEvent;
     constructor Create(AOwner: TComponent; AssocTimer: TFraTimer); overload;
     property Timer: TfraTimer read Ftimer;
   end;
@@ -40,7 +40,8 @@ begin
   begin
     bbRestart.Enabled := False;
     bbStart.Enabled := False;
-    OnTimerRestart(Self);
+    //OnTimerRestart(Self);
+    Application.QueueAsyncCall(OnTimerRestart, PtrInt(Self));
   end;
 end;
 
@@ -50,7 +51,8 @@ begin
   begin
     bbRestart.Enabled := False;
     bbStart.Enabled := False;
-    OnTimerStart(Self);
+    //OnTimerStart(Self);
+    Application.QueueAsyncCall(OnTimerStart, PtrInt(Self));
   end;
 end;
 
