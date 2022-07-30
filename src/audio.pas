@@ -179,8 +179,8 @@ type
     property Devices: TAudioDeviceList read GetDevices;
 
     procedure SetDefaulDevice;
-    procedure LoadDefaultSounds;
-    procedure FreeDefaultSounds;
+    //procedure LoadDefaultSounds;
+    //procedure FreeDefaultSounds;
     property OutputDevice: TAudioDevice read FOutputDevice write SetOutputDevice;
     property Loaded: boolean read FLoaded;
     property Error: string read FLoadError;
@@ -1255,18 +1255,18 @@ begin
   GetDefaultDevice(@FOutputDevice);
 end;
 
-procedure TAudioSystem.LoadDefaultSounds;
-begin
-  if not FLoaded then
-  begin
-    Exit;
-  end;
-end;
-
-procedure TAudioSystem.FreeDefaultSounds;
-begin
-  ;
-end;
+//procedure TAudioSystem.LoadDefaultSounds;
+//begin
+//  if not FLoaded then
+//  begin
+//    Exit;
+//  end;
+//end;
+//
+//procedure TAudioSystem.FreeDefaultSounds;
+//begin
+//  ;
+//end;
 
 procedure TAudioPlayer.Abort;
 var
@@ -1282,7 +1282,10 @@ begin
       Exit;
     end;
 
-    { TODO : Try with Pa_AbortStream and see if it works }
+    { TODO : Try with Pa_AbortStream and see if it works
+      - [x] Seems to work fine in Ubuntu
+      - [ ] XUbuntu
+    }
     {Pa_AbortStream throws an exception in Linux, using  }
     PaErrCode := Pa_StopStream(FStream);
     if (paErrCode <> Int32(paNoError)) then

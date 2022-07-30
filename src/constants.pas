@@ -165,7 +165,7 @@ const
 
   SHOW_MODAL_ALERT = 'show_modal_alert';
   SHOW_TRAY_ALERT = 'show_tray_alert';
-  DEF_SHOW_MODAL_ALERT = False;
+  DEF_SHOW_MODAL_ALERT = True;
   DEF_SHOW_TRAY_ALERT = True;
 
   AUTO_PROGRESS = 'auto_progress';

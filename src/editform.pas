@@ -93,7 +93,7 @@ type
     function GetDuration: TTime;
     function GetMetronome: boolean;
     function GetModalAlert: boolean;
-    function GetSoundDuration: double;
+    //function GetSoundDuration: double;
     function GetSoundLooped: boolean;
     function GetTrayNotification: boolean;
     function GetUseDefaultSound: boolean;
@@ -452,11 +452,11 @@ begin
   ckbLoop.Checked := AValue;
 end;
 
-function TfrmEdit.GetSoundDuration: double;
-begin
-  { TODO : What is this for? }
-  Result := 0;
-end;
+//function TfrmEdit.GetSoundDuration: double;
+//begin
+//  { TODO : What is this for? }
+//  Result := 0;
+//end;
 
 function TfrmEdit.GetDescription: string;
 begin

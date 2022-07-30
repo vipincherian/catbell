@@ -398,7 +398,6 @@ begin
     Entry.OnTimerRestart := @RestartTimer;
     Entry.OnTimerStart := @StartTimer;
 
-    {TODO: Thread safety}
     Index := FEntries.Add(Entry);
 
     if Index = 0 then

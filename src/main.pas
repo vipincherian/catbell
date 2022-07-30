@@ -243,8 +243,8 @@ begin
   FTaskBarList := CreateComObject(CLSID_TaskbarList) as ITaskbarList3;
   {$ENDIF}
 
-  { TODO : Merge these calls - SoundPool should load default audio too. }
-  AudioSystem.LoadDefaultSounds;
+  //{ TODO : Merge these calls - SoundPool should load default audio too. }
+  //AudioSystem.LoadDefaultSounds;
   SoundPool.LoadAllDefaultSounds;
 
   //FOrder := TIdList.Create;
@@ -422,7 +422,6 @@ begin
     for Timer in FTimerFrames do
     begin
 
-      { TODO: Check it is playing first }
       Timer.AbortSound(True);
 
       //StartTickCount := GetTickCount64;
@@ -913,8 +912,6 @@ begin
   else
     Timer := FReference;
 
-  {TODO: TIMER_PADDING cannot be used - correct}
-
   hdrTimers.Sections.Items[0].Width :=
     Timer.cbSelect.Left + Timer.cbSelect.Width + (UserInterfaceMetrics.Padding div 2);
   Inc(Filled, hdrTimers.Sections.Items[0].Width);
@@ -981,12 +978,12 @@ var
   Clock: TfraTimer;
   EncounteredSelected: boolean;
 begin
+
   EncounteredSelected := False;
-  //for Id in FOrder do
+
+  { Code is more complicated than it seems. BEGIN END blocks are necessary }
   for Clock in FTimerFrames do
   begin
-    //if not FTimerFrames.KeyData[Id].Selected then
-    {TODO: nested f else can be taken out}
     if not Clock.Selected then
     begin
       if EncounteredSelected then
@@ -1011,11 +1008,10 @@ var
   Clock: TfraTimer;
 begin
   EncounteredUnselected := False;
-  //for Id in FOrder do
+
+  { Code is more complicated than it seems. BEGIN END blocks are necessary }
   for Clock in FTimerFrames do
   begin
-    //if FTimerFrames.KeyData[Id].Selected then
-    {TODO: nested f else can be taken out}
     if Clock.Selected then
     begin
       if EncounteredUnselected then

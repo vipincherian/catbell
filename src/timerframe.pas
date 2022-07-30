@@ -902,7 +902,6 @@ begin
     { If already stopped (and if audio not playing), then the timer is
     already stopped completely. }
 
-    { TODO: The stop method is doing too many things }
     if not FRunning then
     begin
       Logger.Debug('Timer is already stopped.');
