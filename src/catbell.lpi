@@ -35,7 +35,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="catbell"/>
+            <Filename Value="debug/catbell"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -79,7 +79,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="catbell"/>
+            <Filename Value="release/catbell"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -94,6 +94,7 @@
           <Linking>
             <Debugging>
               <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf3"/>
             </Debugging>
             <LinkSmart Value="True"/>
             <Options>

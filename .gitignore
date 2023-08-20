@@ -1,5 +1,7 @@
 /src/lib
 /src/backup
+/src/release
+/src/debug
 /src/catbell
 **/*.exe
 **/*.dbg
