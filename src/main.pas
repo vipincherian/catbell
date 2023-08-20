@@ -868,6 +868,7 @@ begin
   tbVolume.BorderSpacing.Bottom := UserInterfaceMetrics.Padding;
 
   imgVolumeOn.BorderSpacing.Top := UserInterfaceMetrics.Margin;
+  imgVolumeOff.BorderSpacing.Top := UserInterfaceMetrics.Margin;
 
 
   pnlBorder.BorderSpacing.Right := UserInterfaceMetrics.Padding;

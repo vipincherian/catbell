@@ -397,22 +397,24 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = bbDelete
-    Left = 571
+    Left = 589
     Height = 13
     Top = 167
-    Width = 53
+    Width = 17
     Alignment = taCenter
     Anchors = [akRight, akBottom]
     BorderSpacing.Bottom = 5
-    Caption = 'lblVolume'
+    Caption = '0%'
     ParentColor = False
   end
   object imgVolumeOff: TImage
+    AnchorSideTop.Control = tlbMain
+    AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     Left = 586
     Height = 24
-    Top = 144
+    Top = 32
     Width = 24
     Anchors = [akTop, akRight]
     Picture.Data = {
