@@ -67,7 +67,7 @@ uses
 const
   //{$DEFINE FORCE_FAIL_PORTAUDIO}
   {$IF defined(FORCE_FAIL_PORTAUDIO)}
-  LIB_PORTAUDIO = 'xxx';
+  LIB_PORTAUDIO = 'force_fail';
   {$ELSEIF defined(windows) }
   LIB_PORTAUDIO = 'libportaudio.dll';
   //LIB_PORTAUDIO = 'xxx';

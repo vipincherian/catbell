@@ -252,15 +252,20 @@ begin
   FConf.SetValue(ADJ_DIFF, AdjustDiff);
   FConf.SetValue(ADJ_COMPLETEBY, AdjustCompleteby);
 
-  FConf.SetValue(AUDIO_DEVICE_NAME, AudioDeviceName);
-  FConf.SetValue(AUDIO_HOSTAPI_NAME, AudioHostAPIName);
-  FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
+  if AudioSystem.Loaded then
+  begin
 
-  FConf.SetValue(TASKBAR_ICON_TYPE, integer(TaskbarIconType));
+    FConf.SetValue(AUDIO_DEVICE_NAME, AudioDeviceName);
+    FConf.SetValue(AUDIO_HOSTAPI_NAME, AudioHostAPIName);
+    FConf.SetValue(USE_DEFAULT_AUDIO_DEVICE, UseDefaultAudioDevice);
 
-  FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
-  FConf.SetValue(LOOP_SOUND, LoopSound);
-  FConf.SetValue(VOLUME_LEVEL, Volume);
+    FConf.SetValue(TASKBAR_ICON_TYPE, integer(TaskbarIconType));
+
+    FConf.SetValue(USE_DEFAULT_SOUND, UseDefaultSound);
+    FConf.SetValue(LOOP_SOUND, LoopSound);
+    FConf.SetValue(VOLUME_LEVEL, Volume);
+
+  end;
 
   FConf.SetValue(TRAY_ICON_SIZE, TrayIconSizeOverridden);
   FConf.SetValue(APP_ICON_SIZE, AppIconSizeOverridden);

@@ -577,10 +577,13 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   if not AudioSystem.Loaded then
+  begin
     MessageDlg('Audio not loaded.' + LineEnding +
       'Alarms and other dependent functionalities will not work.' +
       LineEnding + LineEnding + AudioSystem.Error,
-      mtWarning, [mbOK], 0)
+      mtWarning, [mbOK], 0);
+    tbVolume.Position := 0;
+  end
   else if AudioSystem.Volume <= 0 then
   begin
     if QuestionDlg('Audio Muted',
