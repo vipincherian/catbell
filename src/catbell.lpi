@@ -26,7 +26,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="9"/>
-      <BuildNr Value="23"/>
+      <BuildNr Value="24"/>
       <StringTable ProductName="Catbell"/>
     </VersionInfo>
     <BuildModes Count="3">

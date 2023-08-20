@@ -123,7 +123,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
     procedure pnlClocksMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: integer);
+      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
     procedure pnlClocksResize(Sender: TObject);
     procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
