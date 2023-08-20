@@ -36,10 +36,12 @@ Install Lazarus
 
 ### Install additional Lazarus packages
 
+Install bgrabitmappack4nogui.lpk and uniqueinstance_package.lpk following the steps below.
+
 Download the packages from the sources mentioned above, and unzip.
 Steps:-
 * Package > Open Package File (.lpk)
-* Select bgrabitmappack.lpk or uniqueinstance_package.lpk
+* Select bgrabitmappack4nogui.lpk or uniqueinstance_package.lpk
 * A dialog box opens, 
   * Browse to the location
     1. bgrabitmappack.lpk under the directory bgrabitmap
