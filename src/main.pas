@@ -123,7 +123,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure pmiShowWindowClick(Sender: TObject);
     procedure pnlClocksMouseUp(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
+    {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
     procedure pnlClocksResize(Sender: TObject);
     procedure sbxClocksMouseUp(Sender: TObject; Button: TMouseButton;
     {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: integer);
@@ -1937,8 +1937,29 @@ var
   TimerFrame: TfraTimer;
   //Count: integer;
 begin
+
+  { If there are no timers, prompt user to add one }
+
   if FTimerFrames.Count = 0 then
-    aiNewTimer.Execute
+  begin
+    aiNewTimer.Execute;
+
+    Assert(FTimerFrames.Count <= 1);
+
+    { If a timer was added, turning reporting on by default.
+    When the application is run for the first time, the user has to be made
+    aware of this functionality, lest he/she remians unaware forever }
+
+    if FTimerFrames.Count > 0 then
+    begin
+      with FTimerFrames.Items[0] do
+      begin
+        TrayNotification := True;
+        ckbIconProgress.Checked := True;
+      end;
+    end;
+
+  end
   else
   { If there are loaded timers which are running/paused, ask them
   to handle a timer trigger so that bitmaps are set properly. This is
