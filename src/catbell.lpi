@@ -26,7 +26,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="9"/>
-      <BuildNr Value="24"/>
+      <BuildNr Value="26"/>
       <StringTable ProductName="Catbell"/>
     </VersionInfo>
     <BuildModes Count="3">
@@ -127,7 +127,7 @@
     </RunParams>
     <RequiredPackages Count="5">
       <Item1>
-        <PackageName Value="BGRABitmapPack4NoGUI"/>
+        <PackageName Value="BGRABitmapPack"/>
       </Item1>
       <Item2>
         <PackageName Value="uniqueinstance_package"/>

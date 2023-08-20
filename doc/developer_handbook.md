@@ -18,7 +18,7 @@ Third party libraries used
   
   | Library        | Version | Source                                                              |
   |----------------|---------|---------------------------------------------------------------------|
-  | BGraBitmap     | 11.3.1  | https://github.com/bgrabitmap/bgrabitmap                            |
+  | BGraBitmap     | 11.5.5  | https://github.com/bgrabitmap/bgrabitmap                            |
   | UniqueInstance | 1.1     | https://github.com/blikblum/luipack/releases/tag/uniqueinstance-1.1 |
   * External (non-FPC)
   
@@ -36,12 +36,12 @@ Install Lazarus
 
 ### Install additional Lazarus packages
 
-Install bgrabitmappack4nogui.lpk and uniqueinstance_package.lpk following the steps below.
+Install bgrabitmappack.lpk and uniqueinstance_package.lpk following the steps below.
 
 Download the packages from the sources mentioned above, and unzip.
 Steps:-
 * Package > Open Package File (.lpk)
-* Select bgrabitmappack4nogui.lpk or uniqueinstance_package.lpk
+* Select bgrabitmappack.lpk or uniqueinstance_package.lpk
 * A dialog box opens, 
   * Browse to the location
     1. bgrabitmappack.lpk under the directory bgrabitmap
