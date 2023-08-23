@@ -1204,6 +1204,8 @@ procedure TfraTimer.AbortSound(Wait: boolean);
 var
   StartTickCount: QWord;
 begin
+  if not AudioSystem.Loaded then Exit;
+
   if not FAudioPlayer.Playing then Exit;
 
   FAudioPlayer.Abort;
