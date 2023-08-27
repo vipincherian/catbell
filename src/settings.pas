@@ -170,7 +170,7 @@ begin
 
     AutoProgress := FConf.GetValue(AUTO_PROGRESS, AutoProgress);
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
-    AllowTimerTitleEdit := FConf.GetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
+    AllowTimerTitleEdit := FConf.GetValue(ALLOW_TIMERTITLE_EDIT, DEF_ALLOW_TIMERTITLE_EDIT);
     DefaultTimerTitle := string(FConf.GetValue(UTF8Decode(TIMER_TITLE),
       UTF8Decode(DefaultTimerTitle)));
 

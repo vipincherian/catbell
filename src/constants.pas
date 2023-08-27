@@ -175,7 +175,7 @@ const
   DEF_QUERY_EXIT = True;
 
   ALLOW_TIMERTITLE_EDIT = 'allow_timertitle_edit';
-  DEF_ALLOW_TIMERTITLE_EDIT = False;
+  DEF_ALLOW_TIMERTITLE_EDIT = True;
 
   TIMER_TITLE = 'timer_title';
   DEF_TIMER_TITLE = 'Countdown timer';
