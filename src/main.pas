@@ -1261,12 +1261,14 @@ begin
     Assert((Index >= 0) and (Index < TRAY_PROGRESS_ICON_COUNT));
     if Widget = nil then
       Exit;
-    if Widget.IsProgressOnIcon and tiMain.Visible then
+    if Widget.IsProgressOnIcon then
     begin
       {Redraw icons only if there is a change}
       if (FLastTrayIconIndex <> Index) or FReportStale then
       begin
-        tiMain.Icon.Assign(FTrayProgressIcons[Index + 1]);
+
+        if tiMain.Visible then
+          tiMain.Icon.Assign(FTrayProgressIcons[Index + 1]);
 
         Icon.Assign(FTrayProgressIcons[Index + 1]);
 
