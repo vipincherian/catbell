@@ -46,6 +46,7 @@ type
     LastPosNormal: TRect;
     LastPosRestored: TRect;
     QueryExit: boolean;
+    ShowTrayIcon: boolean;
     AllowTimerTitleEdit: boolean;
     DefaultTimerTitle: string;
 
@@ -170,7 +171,9 @@ begin
 
     AutoProgress := FConf.GetValue(AUTO_PROGRESS, AutoProgress);
     QueryExit := FConf.GetValue(QUERY_EXIT, QueryExit);
-    AllowTimerTitleEdit := FConf.GetValue(ALLOW_TIMERTITLE_EDIT, DEF_ALLOW_TIMERTITLE_EDIT);
+    ShowTrayIcon := FConf.GetValue(SHOW_TRAY_ICON, DEF_SHOW_TRAY_ICON);
+    AllowTimerTitleEdit := FConf.GetValue(ALLOW_TIMERTITLE_EDIT,
+      DEF_ALLOW_TIMERTITLE_EDIT);
     DefaultTimerTitle := string(FConf.GetValue(UTF8Decode(TIMER_TITLE),
       UTF8Decode(DefaultTimerTitle)));
 
@@ -242,6 +245,7 @@ begin
   FConf.SetValue(SHOW_TRAY_ALERT, ShowTrayAlert);
   FConf.SetValue(AUTO_PROGRESS, AutoProgress);
   FConf.SetValue(QUERY_EXIT, QueryExit);
+  FConf.SetValue(SHOW_TRAY_ICON, ShowTrayIcon);
   FConf.SetValue(ALLOW_TIMERTITLE_EDIT, AllowTimerTitleEdit);
   Fconf.SetValue(TIMER_TITLE, DefaultTimerTitle);
 
@@ -304,6 +308,7 @@ begin
   FConf.SetValue(SHOW_TRAY_ALERT, DEF_SHOW_TRAY_ALERT);
   FConf.SetValue(AUTO_PROGRESS, DEF_AUTO_PROGRESS);
   FConf.SetValue(QUERY_EXIT, DEF_QUERY_EXIT);
+  FConf.SetValue(SHOW_TRAY_ICON, DEF_SHOW_TRAY_ICON);
   Fconf.SetValue(TIMER_TITLE, DEF_TIMER_TITLE);
   FConf.SetValue(TIMER_HOURS, DEF_TIMER_HOURS);
   FConf.SetValue(TIMER_MINS, DEF_TIMER_MINS);
@@ -406,6 +411,7 @@ begin
   ShowTrayAlert := DEF_SHOW_TRAY_ALERT;
   AutoProgress := DEF_AUTO_PROGRESS;
   QueryExit := DEF_QUERY_EXIT;
+  ShowTrayIcon := DEF_SHOW_TRAY_ICON;
 
   LastWindowState := wsNormal;
   DefaultTimerTitle := DEF_TIMER_TITLE;
@@ -453,6 +459,7 @@ begin
   ShowTrayAlert := From.ShowTrayAlert;
   AutoProgress := From.AutoProgress;
   QueryExit := From.QueryExit;
+  ShowTrayIcon := From.ShowTrayIcon;
 
   DefaultTimerTitle := From.DefaultTimerTitle;
 
@@ -501,6 +508,9 @@ begin
     Exit;
 
   if QueryExit <> From.QueryExit then
+    Exit;
+
+  if ShowTrayIcon <> From.ShowTrayIcon then
     Exit;
 
   if DefaultTimerTitle <> From.DefaultTimerTitle then

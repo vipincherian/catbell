@@ -174,6 +174,9 @@ const
   QUERY_EXIT = 'query_exit';
   DEF_QUERY_EXIT = True;
 
+  SHOW_TRAY_ICON = 'show_tray_icon';
+  DEF_SHOW_TRAY_ICON = True;
+
   ALLOW_TIMERTITLE_EDIT = 'allow_timertitle_edit';
   DEF_ALLOW_TIMERTITLE_EDIT = True;
 
@@ -270,7 +273,7 @@ const
   PADDING_ROUNDED_TO = 4;
   MARGIN_ROUNDED_TO = 8;
   REPORT_PADDING_MULTIPLIER = 4;
+
 implementation
 
 end.
-

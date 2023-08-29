@@ -263,8 +263,6 @@ begin
 
   FDbDefault := True;
 
-  tiMain.Visible := True;
-
   bbDelete.Caption := '';
   bbMoveUp.Caption := '';
   bbMoveDown.Caption := '';
@@ -297,6 +295,7 @@ begin
   CreateBitmaps;
 
   tiMain.Icon.Assign(FTrayStoppedBitmap);
+  tiMain.Visible := UserConfig.ShowTrayIcon;
 
   stbMain.BeginUpdate;
   if AudioSystem.Loaded then
@@ -1142,7 +1141,7 @@ begin
   DurationText := Format('%.2d', [Hours]) + ':' + Format('%.2d', [Minutes]) +
     ':' + Format('%.2d', [Seconds]);
 
-  if Sender.TrayNotification and (not UserInitiated) then
+  if Sender.TrayNotification and (not UserInitiated) and tiMain.Visible then
   begin
     tiMain.BalloonHint :=
       Sender.Caption + ' completed. (' + DurationText + ')';
@@ -1262,7 +1261,7 @@ begin
     Assert((Index >= 0) and (Index < TRAY_PROGRESS_ICON_COUNT));
     if Widget = nil then
       Exit;
-    if Widget.IsProgressOnIcon then
+    if Widget.IsProgressOnIcon and tiMain.Visible then
     begin
       {Redraw icons only if there is a change}
       if (FLastTrayIconIndex <> Index) or FReportStale then
@@ -1343,6 +1342,8 @@ begin
       //Temp := FTimerFrames.Data[Count];
       Temp.TitleEditable := AllowTimerTitleEdit;
     end;
+
+    tiMain.Visible := ShowTrayIcon;
   end;
 
   tbVolume.Position := AudioSystem.Volume;

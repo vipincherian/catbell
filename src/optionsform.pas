@@ -48,6 +48,7 @@ type
     cbUseDefaultSound: TCheckBox;
     cbLoopSound: TCheckBox;
     cbOverrideLatency: TCheckBox;
+    ckbShowTrayIcon: TCheckBox;
     ckbQueryExit: TCheckBox;
     ckbTimerTitleEditable: TCheckBox;
     cmbTimeFormat: TComboBox;
@@ -168,6 +169,7 @@ begin
   with Config do
   begin
     ckbQueryExit.Checked := QueryExit;
+    ckbShowTrayIcon.Checked := ShowTrayIcon;
     ckbTimerTitleEditable.Checked := AllowTimerTitleEdit;
 
     edtDefaultTitle.Text := DefaultTimerTitle;
@@ -267,6 +269,7 @@ begin
   with Config do
   begin
     QueryExit := ckbQueryExit.Checked;
+    ShowTrayIcon := ckbShowTrayIcon.Checked;
     AllowTimerTitleEdit := ckbTimerTitleEditable.Checked;
     DefaultTimerTitle := edtDefaultTitle.Text;
 
@@ -474,6 +477,7 @@ begin
       Top := Padding;
     end;
 
+    ckbShowTrayIcon.BorderSpacing.Top := Padding;
     ckbTimerTitleEditable.BorderSpacing.Top := Padding;
     cmbTimeFormat.BorderSpacing.Top := Padding;
 
@@ -512,7 +516,7 @@ begin
     lsvAudioDevices.BorderSpacing.Top := Padding;
     seLatency.BorderSpacing.Top := Padding;
     seLatency.BorderSpacing.Left := Padding;
-    SeLatency.BorderSpacing.Bottom:=Padding;
+    SeLatency.BorderSpacing.Bottom := Padding;
 
     gbDevice.BorderSpacing.InnerBorder := Padding;
     gbDevice.BorderSpacing.Bottom := Padding;
