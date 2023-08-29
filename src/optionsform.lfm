@@ -428,7 +428,7 @@ object frmOptions: TfrmOptions
           Top = 42
           Width = 212
           Caption = 'Allow in-place editing of timer title.'
-          TabOrder = 1
+          TabOrder = 2
         end
         object lblTimeFormat: TLabel
           AnchorSideLeft.Control = ckbQueryExit
@@ -457,7 +457,7 @@ object frmOptions: TfrmOptions
             '24-hour clock'
           )
           Style = csDropDownList
-          TabOrder = 2
+          TabOrder = 3
           Text = '12-hour clock'
         end
         object ckbShowTrayIcon: TCheckBox
@@ -469,7 +469,7 @@ object frmOptions: TfrmOptions
           Top = 21
           Width = 145
           Caption = 'Show system tray icon'
-          TabOrder = 3
+          TabOrder = 1
         end
       end
       object gbIconSizeOverride: TGroupBox
