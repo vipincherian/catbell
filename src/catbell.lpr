@@ -53,6 +53,7 @@ begin
   {$ENDIF}
   {$endIf}
 
+  Application.Scaled:=True;
   Application.Initialize;
 
   if InstanceRunning then

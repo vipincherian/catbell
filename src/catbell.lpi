@@ -8,8 +8,12 @@
       </Flags>
       <SessionStorage Value="InProjectDir"/>
       <Title Value="catbell"/>
+      <Scaled Value="True"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
+      <XPManifest>
+        <DpiAware Value="True"/>
+      </XPManifest>
       <Icon Value="0"/>
       <Resources Count="5">
         <Resource_0 FileName="../res/controls/256_progress_base.png" Type="RCDATA" ResourceName="256_PROGRESS_BASE"/>
@@ -26,7 +30,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="9"/>
-      <BuildNr Value="27"/>
+      <BuildNr Value="28"/>
       <StringTable ProductName="Catbell"/>
     </VersionInfo>
     <BuildModes Count="3">
