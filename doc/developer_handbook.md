@@ -66,6 +66,12 @@ Uncheck
 - *Hint: "$1" not yet supported inside inline procedure/function*
 - *Note: Call to subroutine "$1" marked as inline is not inlined*
 
+### Debugger
+
+PortAudio initialisation emits `External: Unknown exception code 32`. To circumvent this, use gdb instead of FpDebug. 
+
+Project options > Debugger > Debugger Backend - change to Gdb
+
 ## Install libraries ##
 
 ### Windows ###
