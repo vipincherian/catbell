@@ -883,6 +883,8 @@ begin
   pnlBorder.BorderSpacing.Right := UserInterfaceMetrics.Padding;
   pnlBorder.BorderSpacing.Left := UserInterfaceMetrics.Margin;
   pnlBorder.BorderSpacing.Top := UserInterfaceMetrics.Padding;
+
+  pnlClocks.BorderSpacing.Top := UserInterfaceMetrics.Padding;
   //Self.BorderSpacing.InnerBorder := 10;
   //BorderSpacing.Around:=10;
   //bbMoveDown.BorderSpacing.Right := UserInterfaceMetrics.Padding;
