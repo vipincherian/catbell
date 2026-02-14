@@ -50,34 +50,34 @@ object frmAlert: TfrmAlert
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
+  LCLVersion = '4.4.0.0'
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.0.12.0'
   object bbClose: TBitBtn
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Left = 470
-    Height = 30
-    Top = 246
-    Width = 64
+    Left = 457
+    Height = 37
+    Top = 239
+    Width = 77
     Anchors = [akRight, akBottom]
     AutoSize = True
     DefaultCaption = True
     GlyphShowMode = gsmAlways
     Kind = bkClose
     ModalResult = 11
-    OnClick = bbCloseClick
     TabOrder = 0
+    OnClick = bbCloseClick
   end
   object lblAlert: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
     Left = 0
-    Height = 13
+    Height = 23
     Top = 0
     Width = 534
     Align = alTop
@@ -92,14 +92,13 @@ object frmAlert: TfrmAlert
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbClose
     Left = 0
-    Height = 233
-    Top = 13
+    Height = 216
+    Top = 23
     Width = 534
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
-    Caption = 'pnlMaster'
-    ClientHeight = 233
+    ClientHeight = 216
     ClientWidth = 534
     TabOrder = 1
     object hdrEntries: THeaderControl
@@ -113,32 +112,28 @@ object frmAlert: TfrmAlert
           Alignment = taCenter
           Text = 'Description'
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'Duration'
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'At'
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'Controls'
           Width = 30
-          Visible = True
         end>
       Align = alTop
       Enabled = False
     end
     object sbxEntries: TScrollBox
       Left = 1
-      Height = 201
+      Height = 184
       Top = 31
       Width = 532
       HorzScrollBar.Page = 1
@@ -147,13 +142,13 @@ object frmAlert: TfrmAlert
       Align = alClient
       Anchors = []
       BorderStyle = bsNone
-      ClientHeight = 201
+      ClientHeight = 184
       ClientWidth = 532
       TabOrder = 1
       OnResize = sbxEntriesResize
       object pnlEntries: TPanel
         Left = 0
-        Height = 201
+        Height = 184
         Top = 0
         Width = 532
         Align = alClient

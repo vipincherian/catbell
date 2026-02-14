@@ -233,6 +233,13 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 var
   Info: TFileVersionInfo;
 begin
+  { TODO: Rather than harcoding 'Sans', get this from a system property}
+  { TODO: Debug at assembly level and see what is happening }
+
+  {$IF Defined(LINUX)}
+    // Linux using Qt LCL
+    Font.Name := Screen.SystemFont.Name;
+  {$ENDIF}
   { Obtain the application handle, and the taskbar COM object.
   This has to be done at the beginning, as calls are made to progressupdate
   from within FormCreate. This cannot be pushed down }

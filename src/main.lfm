@@ -9,9 +9,10 @@ object frmMain: TfrmMain
   VertScrollBar.Range = 152
   ActiveControl = pnlBorder
   Caption = 'Catbell'
-  ClientHeight = 319
+  ClientHeight = 336
   ClientWidth = 652
   Menu = mmMain
+  LCLVersion = '4.4.0.0'
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -19,7 +20,6 @@ object frmMain: TfrmMain
   OnMouseUp = FormMouseUp
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '2.2.6.0'
   object tlbMain: TToolBar
     Left = 0
     Top = 0
@@ -64,10 +64,10 @@ object frmMain: TfrmMain
       Top = 2
       Caption = 'tbProgressAuto'
       ImageIndex = 2
-      OnClick = tbProgressAutoClick
       ParentShowHint = False
       ShowHint = True
       Style = tbsCheck
+      OnClick = tbProgressAutoClick
     end
     object ToolButton2: TToolButton
       Cursor = crHandPoint
@@ -160,82 +160,74 @@ object frmMain: TfrmMain
     AnchorSideBottom.Control = bbMoveDown
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 265
+    Height = 274
     Top = 32
-    Width = 544
+    Width = 514
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
     BevelOuter = bvNone
-    Caption = 'pnlBorder'
-    ClientHeight = 265
-    ClientWidth = 544
+    ClientHeight = 274
+    ClientWidth = 514
     TabOrder = 1
     object hdrTimers: THeaderControl
       Left = 1
       Height = 24
       Top = 1
-      Width = 542
+      Width = 512
       DragReorder = False
       Sections = <      
         item
           Alignment = taCenter
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'Title'
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'Controls'
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'Status'
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'Report'
           Width = 30
-          Visible = True
         end      
         item
           Alignment = taCenter
           Text = 'Edit'
           Width = 30
-          Visible = True
         end>
       Align = alTop
       Enabled = False
     end
     object sbxClocks: TScrollBox
       Left = 1
-      Height = 239
+      Height = 248
       Top = 25
-      Width = 542
+      Width = 512
       HorzScrollBar.Page = 1
       VertScrollBar.Page = 1
       Align = alClient
       BorderStyle = bsNone
-      ClientHeight = 239
-      ClientWidth = 542
+      ClientHeight = 248
+      ClientWidth = 512
       TabOrder = 1
       object pnlClocks: TPanel
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 239
+        Height = 248
         Top = 0
-        Width = 542
+        Width = 512
         Align = alClient
         BevelOuter = bvNone
-        Caption = 'pnlClocks'
         TabOrder = 0
         OnMouseUp = pnlClocksMouseUp
         OnResize = pnlClocksResize
@@ -244,8 +236,8 @@ object frmMain: TfrmMain
   end
   object stbMain: TStatusBar
     Left = 0
-    Height = 17
-    Top = 302
+    Height = 25
+    Top = 311
     Width = 652
     Panels = <    
       item
@@ -263,11 +255,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveUp
-    Left = 538
-    Height = 34
+    Left = 506
+    Height = 38
     Hint = 'Delete the sected timer(s)'
-    Top = 185
-    Width = 114
+    Top = 182
+    Width = 146
     Action = aiDeleteTimer
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -282,11 +274,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = bbMoveDown
-    Left = 560
-    Height = 34
+    Left = 536
+    Height = 38
     Hint = 'Move the selected timer(s) up'
-    Top = 224
-    Width = 92
+    Top = 225
+    Width = 116
     Action = aiMoveUp
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -301,11 +293,11 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = stbMain
-    Left = 544
-    Height = 34
+    Left = 514
+    Height = 38
     Hint = 'Move the selected timer(s) down'
-    Top = 263
-    Width = 108
+    Top = 268
+    Width = 138
     Action = aiMoveDown
     Anchors = [akRight, akBottom]
     AutoSize = True
@@ -324,16 +316,16 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = lblVolume
-    Left = 585
-    Height = 96
+    Left = 570
+    Height = 83
     Top = 66
     Width = 25
     Max = 100
-    OnChange = tbVolumeChange
     Orientation = trVertical
     Position = 10
     Reversed = True
     TickStyle = tsNone
+    OnChange = tbVolumeChange
     Anchors = [akTop, akRight, akBottom]
     BorderSpacing.Top = 5
     BorderSpacing.Bottom = 5
@@ -346,7 +338,7 @@ object frmMain: TfrmMain
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
-    Left = 586
+    Left = 571
     Height = 24
     Top = 37
     Width = 24
@@ -397,10 +389,10 @@ object frmMain: TfrmMain
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = bbDelete
-    Left = 589
-    Height = 13
-    Top = 167
-    Width = 17
+    Left = 572
+    Height = 23
+    Top = 154
+    Width = 22
     Alignment = taCenter
     Anchors = [akRight, akBottom]
     BorderSpacing.Bottom = 5
@@ -412,7 +404,7 @@ object frmMain: TfrmMain
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = bbMoveDown
     AnchorSideRight.Side = asrCenter
-    Left = 586
+    Left = 571
     Height = 24
     Top = 32
     Width = 24
