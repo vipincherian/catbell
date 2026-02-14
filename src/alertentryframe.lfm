@@ -8,6 +8,7 @@ object fraAlertEntry: TfraAlertEntry
   BorderSpacing.InnerBorder = 5
   ClientHeight = 152
   ClientWidth = 621
+  LCLVersion = '4.4.0.0'
   TabOrder = 0
   DesignLeft = 455
   DesignTop = 261
@@ -17,9 +18,9 @@ object fraAlertEntry: TfraAlertEntry
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = stDuration
     Left = 0
-    Height = 15
-    Top = 11
-    Width = 411
+    Height = 25
+    Top = 6
+    Width = 343
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
     Caption = 'stDescription'
@@ -36,10 +37,10 @@ object fraAlertEntry: TfraAlertEntry
     Width = 40
     Anchors = [akTop, akRight]
     Kind = bkRetry
-    OnClick = bbRestartClick
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
+    OnClick = bbRestartClick
   end
   object bbStart: TBitBtn
     AnchorSideTop.Control = Owner
@@ -88,20 +89,21 @@ object fraAlertEntry: TfraAlertEntry
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000
     }
-    OnClick = bbStartClick
     ParentShowHint = False
     ShowHint = True
     TabOrder = 2
+    OnClick = bbStartClick
   end
   object stCompletedAt: TStaticText
     AnchorSideTop.Control = bbStart
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = bbRestart
-    Left = 476
-    Height = 17
-    Top = 10
-    Width = 65
+    Left = 426
+    Height = 25
+    Top = 6
+    Width = 115
     Anchors = [akTop, akRight]
+    AutoSize = True
     Caption = 'stCompletedAt'
     TabOrder = 3
   end
@@ -109,11 +111,12 @@ object fraAlertEntry: TfraAlertEntry
     AnchorSideTop.Control = bbStart
     AnchorSideTop.Side = asrCenter
     AnchorSideRight.Control = stCompletedAt
-    Left = 411
-    Height = 17
-    Top = 10
-    Width = 65
+    Left = 343
+    Height = 25
+    Top = 6
+    Width = 83
     Anchors = [akTop, akRight]
+    AutoSize = True
     Caption = 'stDuration'
     TabOrder = 4
   end
