@@ -718,6 +718,7 @@ begin
 
   FBeingAdjusted := False;
   FBeingEdited := False;
+  Name := Constants.TIMER_FRAME_DEF_NAME;
   //ArrangeControls;
 
   LayoutControls;

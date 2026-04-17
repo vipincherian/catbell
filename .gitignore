@@ -3,6 +3,7 @@
 /src/release
 /src/debug
 /src/catbell
+/src/catbell.lpi
 **/*.exe
 **/*.dbg
 /src/*.res
@@ -17,3 +18,4 @@
 **/.~*
 pp*.bat
 **.swp
+**/*.a

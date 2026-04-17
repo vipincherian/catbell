@@ -98,6 +98,8 @@ const
 
   {Timer frame }
 
+  TIMER_FRAME_DEF_NAME = 'fraTimer';
+
   TIMER_IMG_GREY_TIMER: integer = 0;
   TIMER_IMG_COLOUR_TIMER: integer = 1;
   TIMER_IMG_NOTIFY_YES: integer = 2;
