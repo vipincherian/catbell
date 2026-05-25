@@ -276,6 +276,10 @@ const
   MARGIN_ROUNDED_TO = 8;
   REPORT_PADDING_MULTIPLIER = 4;
 
+  {Alert}
+  TIMERALERT_FRAME_DEF_NAME = 'fraTimerFrame';
+
 implementation
+
 
 end.

@@ -2,15 +2,16 @@ object frmAlert: TfrmAlert
   AnchorSideTop.Side = asrBottom
   AnchorSideRight.Side = asrBottom
   Left = 432
-  Height = 276
+  Height = 414
   Top = 282
-  Width = 534
+  Width = 801
   Anchors = [akTop, akLeft, akRight]
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Timer Finished'
-  ClientHeight = 276
-  ClientWidth = 534
+  ClientHeight = 414
+  ClientWidth = 801
+  DesignTimePPI = 144
   Icon.Data = {
     7E04000000000100010010100000010020006804000016000000280000001000
     0000200000000100200000000000000400006400000064000000000000000000
@@ -50,7 +51,7 @@ object frmAlert: TfrmAlert
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
-  LCLVersion = '4.4.0.0'
+  LCLVersion = '4.6.0.0'
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -93,7 +94,7 @@ object frmAlert: TfrmAlert
     AnchorSideBottom.Control = bbClose
     Left = 0
     Height = 216
-    Top = 23
+    Top = 34
     Width = 534
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelInner = bvLowered
@@ -103,7 +104,7 @@ object frmAlert: TfrmAlert
     TabOrder = 1
     object hdrEntries: THeaderControl
       Left = 1
-      Height = 30
+      Height = 45
       Top = 1
       Width = 532
       DragReorder = False
@@ -111,22 +112,22 @@ object frmAlert: TfrmAlert
         item
           Alignment = taCenter
           Text = 'Description'
-          Width = 30
+          Width = 45
         end      
         item
           Alignment = taCenter
           Text = 'Duration'
-          Width = 30
+          Width = 45
         end      
         item
           Alignment = taCenter
           Text = 'At'
-          Width = 30
+          Width = 45
         end      
         item
           Alignment = taCenter
           Text = 'Controls'
-          Width = 30
+          Width = 45
         end>
       Align = alTop
       Enabled = False
@@ -161,7 +162,7 @@ object frmAlert: TfrmAlert
     Enabled = False
     Interval = 500
     OnTimer = tmrAlertTimer
-    Left = 152
-    Top = 240
+    Left = 228
+    Top = 360
   end
 end

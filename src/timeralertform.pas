@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   LCLType, ExtCtrls, Buttons, ComCtrls, timerframe, fgl, dateutils,
-  settings, alertentryframe, util, log, DateTimePicker;
+  settings, alertentryframe, util, log, DateTimePicker, constants;
 
 type
   TAlertEntryList = specialize TFPGList<TfraAlertEntry>;
@@ -370,7 +370,8 @@ begin
   try
 
     Entry := TfraAlertEntry.Create(sbxEntries, Timer);
-    Entry.Name := Entry.Name + IntToStr(FEntryIDGenerator.NextVal());
+    Entry.Name := Constants.TIMERALERT_FRAME_DEF_NAME +
+      IntToStr(FEntryIDGenerator.NextVal());
     Entry.Parent := pnlEntries;
 
     Entry.Width := pnlEntries.ClientWidth;
