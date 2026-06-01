@@ -3,11 +3,12 @@
 /src/release
 /src/debug
 /src/catbell
-/src/catbell.lpi
 **/*.exe
 **/*.dbg
 /src/*.res
 /src/catbell.lps
+/src/catbell_additional*.lpi
+/src/catbell_additional*.lps
 **/*.dll
 */*.wav
 */*.ogg
